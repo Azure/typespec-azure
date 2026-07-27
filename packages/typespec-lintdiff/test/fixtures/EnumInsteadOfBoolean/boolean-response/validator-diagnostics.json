@@ -1,0 +1,15 @@
+[
+  {
+    "code": "EnumInsteadOfBoolean",
+    "message": "Booleans properties are not descriptive in all cases and can make them to use, evaluate whether is makes sense to keep the property as boolean or turn it into an enum.",
+    "path": [
+      "paths",
+      "/widgets/{name}:isEnabled",
+      "get",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/version-policy",
+    "severity": "warning",
+    "message": "\"api-version\" should be a required parameter"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

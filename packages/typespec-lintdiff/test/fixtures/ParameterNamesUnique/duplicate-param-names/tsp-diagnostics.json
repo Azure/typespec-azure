@@ -1,0 +1,17 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/auth-required",
+    "severity": "warning",
+    "message": "Provide an authentication scheme using the `@useAuth` decorator. See: https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/use-standard-operations",
+    "severity": "warning",
+    "message": "Operation 'getWidget' should be defined using a signature from the Azure.Core namespace."
+  }
+]

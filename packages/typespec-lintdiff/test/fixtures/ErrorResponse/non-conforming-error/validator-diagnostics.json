@@ -1,0 +1,28 @@
+[
+  {
+    "code": "ErrorResponse",
+    "message": "Error response schema should contain an object property named `error`.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "responses",
+      "500",
+      "schema",
+      "properties"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ErrorResponse",
+    "message": "Error response should contain a x-ms-error-code header.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "responses",
+      "500"
+    ],
+    "severity": 0
+  }
+]

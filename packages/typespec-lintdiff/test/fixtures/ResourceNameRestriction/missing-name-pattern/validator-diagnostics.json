@@ -1,0 +1,11 @@
+[
+  {
+    "code": "ResourceNameRestriction",
+    "message": "The resource name parameter 'widgetName' should be defined with a 'pattern' restriction.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

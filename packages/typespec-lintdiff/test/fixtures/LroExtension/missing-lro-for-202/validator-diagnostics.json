@@ -1,0 +1,12 @@
+[
+  {
+    "code": "LroExtension",
+    "message": "Operations with a 202 response must specify `x-ms-long-running-operation: true`.  GET operation is excluded from the validation as GET will have 202 only if it is a polling action & hence x-ms-long-running-operation wouldn't be defined",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/start",
+      "post"
+    ],
+    "severity": 0
+  }
+]

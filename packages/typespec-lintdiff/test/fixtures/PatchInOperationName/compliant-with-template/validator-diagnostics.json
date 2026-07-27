@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PatchInOperationName",
+    "message": "'PATCH' operation 'Widgets_Modify' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config",
+      "patch",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

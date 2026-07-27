@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'Widget' should have a documentation or description, use doc comment /** */ to provide it."
+  }
+]

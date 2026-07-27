@@ -1,0 +1,24 @@
+[
+  {
+    "code": "PropertyDescription",
+    "message": "Property should have a description.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "name"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PropertyDescription",
+    "message": "Property should have a description.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "category"
+    ],
+    "severity": 0
+  }
+]

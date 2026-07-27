@@ -1,0 +1,124 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "Widgets_Read",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The widget name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget resource",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The widget name"
+        },
+        "color": {
+          "type": "string",
+          "description": "The color",
+          "default": "Red",
+          "enum": [
+            "Red",
+            "Blue",
+            "Green"
+          ],
+          "x-ms-enum": {
+            "name": "WidgetColor",
+            "modelAsString": false,
+            "values": [
+              {
+                "name": "Red",
+                "value": "Red",
+                "description": "Red"
+              },
+              {
+                "name": "Blue",
+                "value": "Blue",
+                "description": "Blue"
+              },
+              {
+                "name": "Green",
+                "value": "Green",
+                "description": "Green"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "WidgetColor": {
+      "type": "string",
+      "description": "Widget color options",
+      "enum": [
+        "Red",
+        "Blue",
+        "Green"
+      ],
+      "x-ms-enum": {
+        "name": "WidgetColor",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "Red",
+            "value": "Red",
+            "description": "Red"
+          },
+          {
+            "name": "Blue",
+            "value": "Blue",
+            "description": "Blue"
+          },
+          {
+            "name": "Green",
+            "value": "Green",
+            "description": "Green"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {}
+}

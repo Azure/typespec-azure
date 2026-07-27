@@ -1,0 +1,16 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "`nextLink` property in pageable response should be optional.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "required"
+    ],
+    "severity": 0
+  }
+]

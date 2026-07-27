@@ -1,0 +1,14 @@
+[
+  {
+    "code": "RepeatedPathInfo",
+    "message": "The 'mode' already appears in the path, please don't repeat it in the request body.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters",
+      "4"
+    ],
+    "severity": 0
+  }
+]

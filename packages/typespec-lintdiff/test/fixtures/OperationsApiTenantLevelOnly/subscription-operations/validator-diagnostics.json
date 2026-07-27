@@ -1,0 +1,11 @@
+[
+  {
+    "code": "OperationsApiTenantLevelOnly",
+    "message": "The get operations endpoint for the operations API must only be at the tenant level.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/operations"
+    ],
+    "severity": 0
+  }
+]

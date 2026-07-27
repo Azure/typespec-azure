@@ -1,0 +1,128 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/authors/{authorId}/books/{bookId}": {
+      "get": {
+        "operationId": "Books_GetAuthorBook",
+        "description": "Get an author's book.",
+        "parameters": [
+          {
+            "name": "authorId",
+            "in": "path",
+            "description": "The author identifier.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bookId",
+            "in": "path",
+            "description": "The book identifier.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          }
+        }
+      }
+    },
+    "/libraries/{libraryId}/books/{bookName}": {
+      "get": {
+        "operationId": "Books_GetLibraryBook",
+        "description": "Get a library book.",
+        "parameters": [
+          {
+            "name": "libraryId",
+            "in": "path",
+            "description": "The library identifier.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bookName",
+            "in": "path",
+            "description": "The book name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Book": {
+      "type": "object",
+      "description": "A book resource.",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The displayed title."
+        }
+      },
+      "required": [
+        "title"
+      ]
+    }
+  },
+  "parameters": {}
+}

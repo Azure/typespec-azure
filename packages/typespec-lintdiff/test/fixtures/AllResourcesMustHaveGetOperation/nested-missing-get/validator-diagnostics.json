@@ -1,0 +1,11 @@
+[
+  {
+    "code": "AllResourcesMustHaveGetOperation",
+    "message": "The resource \"WidgetPart\" does not have get operation, please add it.",
+    "path": [
+      "definitions",
+      "WidgetPart"
+    ],
+    "severity": 1
+  }
+]

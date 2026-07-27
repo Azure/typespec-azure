@@ -1,0 +1,67 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/api/paths": {
+      "get": {
+        "operationId": "Paths_ListPaths",
+        "description": "List paths",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PathItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "PathItem": {
+      "type": "object",
+      "description": "A path resource",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The path name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

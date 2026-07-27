@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ParameterNamesConvention",
+    "message": "Parameter name \"FilterExpression\" should be camel case.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "parameters",
+      "0",
+      "name"
+    ],
+    "severity": 0
+  }
+]

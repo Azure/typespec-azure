@@ -1,0 +1,14 @@
+[
+  {
+    "code": "RepeatedPathInfo",
+    "message": "The 'configName' already appears in the path, please don't repeat it in the request body.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/configurations/{configName}",
+      "put",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property",
+    "severity": "warning",
+    "message": "Property \"location\" is not valid in the resource envelope.  Please remove this property, or add it to the resource-specific property bag."
+  }
+]

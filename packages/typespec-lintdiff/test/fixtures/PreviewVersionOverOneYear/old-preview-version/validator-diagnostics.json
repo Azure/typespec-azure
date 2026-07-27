@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PreviewVersionOverOneYear",
+    "message": "The API version:2022-01-01-preview having been in a preview state over one year , please move it to GA or retire.",
+    "path": [
+      "info",
+      "version"
+    ],
+    "severity": 1
+  }
+]

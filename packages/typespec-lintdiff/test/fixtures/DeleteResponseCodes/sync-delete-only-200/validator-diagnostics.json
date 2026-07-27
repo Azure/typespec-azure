@@ -1,0 +1,12 @@
+[
+  {
+    "code": "DeleteResponseCodes",
+    "message": "Synchronous delete operations must have responses with 200, 204 and default return codes. They also must have no other response codes.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete"
+    ],
+    "severity": 0
+  }
+]

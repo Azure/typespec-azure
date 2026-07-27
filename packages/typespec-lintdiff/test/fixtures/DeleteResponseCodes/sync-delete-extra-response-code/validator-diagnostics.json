@@ -1,0 +1,12 @@
+[
+  {
+    "code": "DeleteResponseCodes",
+    "message": "An async DELETE operation must set '\"x-ms-long-running-operation\" : true'.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete"
+    ],
+    "severity": 0
+  }
+]

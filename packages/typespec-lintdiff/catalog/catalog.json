@@ -1,0 +1,3555 @@
+[
+  {
+    "id": "AllProxyResourcesShouldHaveDelete",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "RPC-Delete-V1-05",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/all-proxy-resources-should-have-delete.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls whether to add delete operations to proxy resources."
+  },
+  {
+    "id": "AllResourcesMustHaveGetOperation",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "RPC-Get-V1-04",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/all-resources-must-have-get-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls whether to add get operations."
+  },
+  {
+    "id": "AllTrackedResourcesMustHaveDelete",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Delete-V1-03",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/all-tracked-resources-must-have-delete.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls whether to add delete operations to tracked resources."
+  },
+  {
+    "id": "ApiHost",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The host is required for management plane specs.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/api-host.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter always generates valid host configuration."
+  },
+  {
+    "id": "ApiVersionParameterRequired",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-08",
+    "description": "All operations should have api-version query parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/api-version-parameter-required.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Custom ARM operations can omit ...ApiVersionParameter, and TypeSpec already surfaces direct api-version diagnostics for that authoring path."
+  },
+  {
+    "id": "APIVersionPattern",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The API Version parameter MUST be in the Year-Month-Date format (i.e. 2016-07-04.)  NOTE that this is the en-US ordering of month and date.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Version string format is user-controlled; TypeSpec doesn't enforce YYYY-MM-DD pattern."
+  },
+  {
+    "id": "ArmResourcePropertiesBag",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-07",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), top level properties should not be repeated inside the properties bag for ARM resources.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/arm-resource-properties-bag.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users control what properties they add; templates don't prevent duplicating ARM top-level properties."
+  },
+  {
+    "id": "ArrayMustHaveType",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Array type must have a type except for any type.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/array-must-have-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates type for array schemas."
+  },
+  {
+    "id": "AvoidAdditionalProperties",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Policy-V1-05, RPC-Put-V1-23",
+    "description": "Definitions must not have properties named additionalProperties except for user defined tags or predefined references.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/avoid-additional-properties.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/no-record",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/no-record' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can use Record<T> which generates additionalProperties; templates don't prevent it."
+  },
+  {
+    "id": "AvoidEmptyResponseSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/avoid-empty-response-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates non-empty response schemas."
+  },
+  {
+    "id": "AzureResourceTagsSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/azure-resource-tags-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates provide tags with correct schema; violation requires overriding base model."
+  },
+  {
+    "id": "BodyTopLevelProperties",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-06",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), top level properties of a resource should be only ones from the allowed set.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/body-top-level-properties.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add arbitrary top-level properties to resource models."
+  },
+  {
+    "id": "CollectionObjectPropertiesNaming",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Per ARM guidelines, a model returned by an `x-ms-pageable` operation must have a property named `value`. This property indicates what type of array the object is.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/collection-object-properties-naming.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User-defined models can have any property names; TypeSpec doesn't enforce 'value' property."
+  },
+  {
+    "id": "ConsistentPatchProperties",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-01",
+    "description": "The properties in the patch body must be present in the resource model and follow json merge patch.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/consistent-patch-properties.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define patch body properties independently; no enforcement of PUT schema consistency."
+  },
+  {
+    "id": "ConsistentResponseSchemaForPut",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-29",
+    "description": "A Put operation must return the same schema for 200 and 201 response codes",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/consistent-response-schema-for-put.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define different schemas for PUT 200 vs 201 responses."
+  },
+  {
+    "id": "ControlCharactersAreNotAllowed",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec source code can't contain control characters; emitter never produces them."
+  },
+  {
+    "id": "DefaultErrorResponseSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/default-error-response-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter generates proper error response schemas."
+  },
+  {
+    "id": "DefinitionsPropertiesNamesCamelCase",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Property names should be camel case.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/definitions-properties-names-camel-case.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Property names come from TypeSpec model fields; users can define any naming convention."
+  },
+  {
+    "id": "DeleteMustNotHaveRequestBody",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Delete-V1-02",
+    "description": "The delete operation must not have a request body.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete-must-not-have-request-body.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates don't add body to DELETE; custom operations could."
+  },
+  {
+    "id": "DeleteOperationResponses",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Delete-V1-01",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete-operation-responses.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce delete responses; custom operations can violate."
+  },
+  {
+    "id": "DeleteResponseBodyEmpty",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Delete-V1-04",
+    "description": "The delete response body must be empty.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete-response-body-empty.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates don't add body to DELETE 200/204 responses; custom operations could."
+  },
+  {
+    "id": "DeleteResponseCodes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Delete-V1-01, RPC-Async-V1-09",
+    "description": "Synchronous DELETE must have 200 & 204 return codes and LRO DELETE must have 202 & 204 return codes.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete-response-codes.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce correct DELETE response codes; custom operations can override."
+  },
+  {
+    "id": "DeprecatedXmsCodeGenerationSetting",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/deprecated-xms-code-generation-setting.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-code-generation-settings can be added via @extension."
+  },
+  {
+    "id": "DescriptionMustNotBeNodeName",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/description-must-not-be-node-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users write descriptions; TypeSpec doesn't enforce they differ from node names."
+  },
+  {
+    "id": "EnumMustHaveType",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/enum-must-have-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec enums always have explicit type."
+  },
+  {
+    "id": "EnumMustNotHaveEmptyValue",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/enum-must-not-have-empty-value.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec enum members can't have empty values."
+  },
+  {
+    "id": "EnumMustRespectType",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/enum-must-respect-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec enforces enum values match declared type at compile time."
+  },
+  {
+    "id": "EnumUniqueValue",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/enum-unique-value.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec enforces unique enum values at compile time."
+  },
+  {
+    "id": "EvenSegmentedPathForPutOperation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-02",
+    "description": "API path with PUT operation defined MUST have even number of segments (i.e. end in {resourceType}/{resourceName} segments).",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/even-segmented-path-for-put-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path segment count depends on @segment/@key decorators; templates don't enforce even segments."
+  },
+  {
+    "id": "GetCollectionOnlyHasValueAndNextLink",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-09, RPC-Arg-V1-01, RPC-Get-V1-06",
+    "description": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-collection-only-has-value-and-next-link.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Collection GET response properties depend on user model definitions."
+  },
+  {
+    "id": "GetCollectionResponseSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-10",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-collection-response-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls collection response structure."
+  },
+  {
+    "id": "GetMustNotHaveRequestBody",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-02",
+    "description": "The Get operation must not have a request body.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-must-not-have-request-body.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates don't add body to GET; custom operations could."
+  },
+  {
+    "id": "GetOperationMustNotBeLongRunning",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-14",
+    "description": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-operation-must-not-be-long-running.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates don't add LRO to GET; custom operations could add x-ms-long-running-operation."
+  },
+  {
+    "id": "GetResponseCodes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-01",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-response-codes.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce 200 response for GET; custom operations could add other codes."
+  },
+  {
+    "id": "GuidUsage",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/guid-usage.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can use format:'uuid' freely; TypeSpec doesn't restrict GUID usage."
+  },
+  {
+    "id": "HttpsSupportedScheme",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether specification supports HTTPS scheme or not.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/https-supported-scheme.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter always generates https scheme for Azure specs."
+  },
+  {
+    "id": "ImplementPrivateEndpointAPIs",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "This rule is to check if all the APIs for private endpoint are implemented.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Private endpoint paths are user-controlled custom operations."
+  },
+  {
+    "id": "IntegerTypeMustHaveFormat",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/integer-type-must-have-format.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates format for integer types."
+  },
+  {
+    "id": "InvalidSkuModel",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/invalid-sku-model.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Sku model properties depend on user model definition; TypeSpec doesn't enforce structure."
+  },
+  {
+    "id": "LatestVersionOfCommonTypesMustBeUsed",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "This rule checks for references that aren't using latest version of common-types.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/latest-version-of-common-types-must-be-used.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can reference any version of common-types."
+  },
+  {
+    "id": "LicenseHeaderMustNotBeSpecified",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/license-header-must-not-be-specified.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-code-generation-settings.header can be added via @extension."
+  },
+  {
+    "id": "LocationMustHaveXmsMutability",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "RPC-Put-V1-14",
+    "description": "A tracked resource's location property must have the x-ms-mutability properties set as read, create.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/location-must-have-xms-mutability.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM TrackedResource templates emit location with x-ms-mutability ['read', 'create']; the previous raw repro was non-ARM and suppression-dependent."
+  },
+  {
+    "id": "LroErrorContent",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Common-V1-05",
+    "description": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-error-content.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "LRO error response content structure depends on user model definitions."
+  },
+  {
+    "id": "LroLocationHeader",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-07",
+    "description": "Location header must be supported for all async operations that return 202.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-location-header.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-location-header",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-location-header' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM LRO templates include Location header; custom LROs can omit it."
+  },
+  {
+    "id": "LroPatch202",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+    "description": "Async PATCH should return 202.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-patch202.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM PATCH LRO template enforces 202 response; custom PATCH operations could use other codes."
+  },
+  {
+    "id": "LroPostMustNotUseOriginalUriAsFinalState",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The long running post operation must not use final-stat-via:original-uri.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM POST LRO templates set correct final-state-via; custom operations can override."
+  },
+  {
+    "id": "LroWithOriginalUriAsFinalState",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The long running operation with final-state-via:original-uri should have a sibling 'get' operation.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM LRO templates set correct final-state-via; custom operations can override."
+  },
+  {
+    "id": "MissingDefaultResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "All operations should have a default (error) response.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/missing-default-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates include default error response; custom operations can omit it."
+  },
+  {
+    "id": "MissingSegmentsInNestedResourceListOperation",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "RPC-Get-V1-11",
+    "description": "A nested resource type's List operation must include all the parent segments in its api path.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/missing-segments-in-nested-resource-list-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce resource hierarchy in paths; custom operations can violate."
+  },
+  {
+    "id": "MissingTypeObject",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/missing-type-object.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates type:object for models with properties."
+  },
+  {
+    "id": "MissingXmsErrorResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/missing-xms-error-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-error-response is user-controlled via @extension."
+  },
+  {
+    "id": "NestedResourcesMustHaveListOperation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/nested-resources-must-have-list-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls which operations exist on nested resources."
+  },
+  {
+    "id": "NoDuplicatePathsForScopeParameter",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-10",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/no-duplicate-paths-for-scope-parameter.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define duplicate paths with scope parameters."
+  },
+  {
+    "id": "NoErrorCodeResponses",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Invalid status code specified. Please refer to the documentation for the allowed set.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/no-error-code-responses.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define custom error response codes."
+  },
+  {
+    "id": "NonApplicationJsonType",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/non-application-json-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can specify non-JSON content types."
+  },
+  {
+    "id": "OperationIdRequired",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operation-id-required.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter always generates operationId."
+  },
+  {
+    "id": "OperationsAPIImplementation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), each RP must expose an operations API that returns information about all the operations available with the service.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Operations endpoint requires explicit user definition."
+  },
+  {
+    "id": "OperationsApiResponseSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operations-api-response-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Operations API response schema structure depends on user model definitions."
+  },
+  {
+    "id": "OperationsApiSchemaUsesCommonTypes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Operations-V1-01",
+    "description": "Operations API path must follow the schema provided in the common types.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operations-api-schema-uses-common-types.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Operations API schema source depends on user imports and definitions."
+  },
+  {
+    "id": "OperationsApiTenantLevelOnly",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Operations-V1-02",
+    "description": "The get operations endpoint must only be at the tenant level.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operations-api-tenant-level-only.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define /operations paths at subscription scope."
+  },
+  {
+    "id": "PageableOperation",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/pageable-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-pageable is user-controlled; templates don't enforce it for array responses."
+  },
+  {
+    "id": "ParameterNotDefinedInGlobalParameters",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Per ARM guidelines, if `subscriptionId` is used anywhere as a path parameter, it must always be defined as global parameter. `api-version` is almost always an input parameter in any ARM spec and must also be defined as a global parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-not-defined-in-global-parameters.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec emitter handles parameter placement correctly by design."
+  },
+  {
+    "id": "ParameterNotUsingCommonTypes",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "This rule checks for parameters defined in common-types that are not using the common-types definition.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-not-using-common-types.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can redefine common-types parameters instead of using $ref."
+  },
+  {
+    "id": "ParametersInPointGet",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-08",
+    "description": "Point Get's MUST not have query parameters other than api version.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameters-in-point-get.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add query parameters to point GET operations."
+  },
+  {
+    "id": "ParametersInPost",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-POST-V1-05",
+    "description": "For a POST action parameters MUST be in the payload and not in the URI.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameters-in-post.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add query parameters to POST operations."
+  },
+  {
+    "id": "ParametersOrder",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameters-order.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec generates parameters in order matching path segments."
+  },
+  {
+    "id": "ParametersSchemaAsTypeObject",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-POST-V1-05",
+    "description": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameters-schema-as-type-object.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "POST body parameter schema type depends on user model definitions."
+  },
+  {
+    "id": "PatchBodyParametersSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-10",
+    "description": "A request parameter of the Patch Operation must not have a required/default/'x-ms-mutability: [\\",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-body-parameters-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PATCH body properties can have defaults, be required, or have x-ms-mutability:create."
+  },
+  {
+    "id": "PatchIdentityProperty",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-11",
+    "description": "RP must implement PATCH for the 'identity' envelope property If it's defined in the resource model.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-identity-property.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PATCH identity property handling depends on user model definitions."
+  },
+  {
+    "id": "PatchPropertiesCorrespondToPutProperties",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-01",
+    "description": "PATCH request body must only contain properties present in the corresponding PUT request body, and must contain at least one property.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-properties-correspond-to-put-properties.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PATCH body properties can differ from PUT; users can define non-overlapping sets."
+  },
+  {
+    "id": "PatchResponseCodes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-06",
+    "description": "Synchronous PATCH must have 200 return code and LRO PATCH must have 200 and 202 return codes.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-response-codes.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce specific PATCH response codes; custom operations can override."
+  },
+  {
+    "id": "PatchSkuProperty",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "RPC-Patch-V1-09",
+    "description": "RP should consider implementing Patch for the 'SKU' envelope property if it's defined in the resource model and the service supports its updation.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-sku-property.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PATCH SKU property handling depends on user model definitions."
+  },
+  {
+    "id": "PathContainsResourceGroup",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-02",
+    "description": "Path for resource group scoped CRUD methods MUST contain a resourceGroupName parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-contains-resource-group.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce subscription/RG in paths; custom operations can use any path."
+  },
+  {
+    "id": "PathContainsResourceType",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-04",
+    "description": "Path for resource CRUD methods MUST contain a resource type.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-contains-resource-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce provider/resource-type in paths; custom operations can use any path."
+  },
+  {
+    "id": "PathContainsSubscriptionId",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-01",
+    "description": "Path for resource group scoped CRUD methods MUST contain a subscriptionId parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-contains-subscription-id.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce subscription in paths; custom operations can use any path."
+  },
+  {
+    "id": "PathForNestedResource",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-06",
+    "description": "Path for CRUD methods on a nested resource type MUST follow valid resource naming.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-for-nested-resource.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Nested resource path structure depends on @segment/@key decorators."
+  },
+  {
+    "id": "PathForResourceAction",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-07, RPC-POST-V1-01, RPC-POST-V1-07",
+    "description": "Path for 'post' method on a resource type MUST follow valid resource naming.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-for-resource-action.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Resource action path structure depends on user operation definitions."
+  },
+  {
+    "id": "PathForTrackedResourceTypes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+    "description": "The path must be under a subscription and resource group for tracked resource types.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-for-tracked-resource-types.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path structure for tracked resources depends on user path definitions."
+  },
+  {
+    "id": "PathResourceProviderMatchNamespace",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-03",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-resource-provider-match-namespace.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "@armProviderNamespace and @segment enforce path structure matching namespace."
+  },
+  {
+    "id": "PathResourceProviderNamePascalCase",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-resource-provider-name-pascal-case.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "@armProviderNamespace enforces PascalCase provider names."
+  },
+  {
+    "id": "PathResourceTypeNameCamelCase",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-resource-type-name-camel-case.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "@segment values are user-defined; casing not enforced."
+  },
+  {
+    "id": "PostOperationIdContainsUrlVerb",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/post-operation-id-contains-url-verb.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls operationId naming."
+  },
+  {
+    "id": "PostResponseCodes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03",
+    "description": "Synchronous POST must return 200 when a response body is required or 204 when no body is needed; LRO POST must initially return 202, with the final response returning 200 if a body is expected or 204 if not.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/post-response-codes.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce specific POST response codes; custom operations can override."
+  },
+  {
+    "id": "PreviewVersionOverOneYear",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/preview-version-over-one-year.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Version string is user-controlled; TypeSpec doesn't enforce timing."
+  },
+  {
+    "id": "PrivateEndpointResourceSchemaValidation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/private-endpoint-resource-schema-validation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Private endpoint resource schemas are user-defined."
+  },
+  {
+    "id": "PropertiesTypeObjectNoDefinition",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Policy-V1-03",
+    "description": "Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/properties-type-object-no-definition.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Properties with type:object can be inline schemas."
+  },
+  {
+    "id": "ProvisioningStateMustBeReadOnly",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-16",
+    "description": "This is a rule introduced to validate if provisioningState property is set to readOnly or not.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/provisioning-state-must-be-read-only.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates set provisioningState as readOnly; custom models can allow mutation."
+  },
+  {
+    "id": "ProvisioningStateSpecifiedForLROPatch",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-02",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM PATCH template enforces provisioningState in response; custom operations can omit."
+  },
+  {
+    "id": "ProvisioningStateSpecifiedForLROPut",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-02",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM PUT template enforces provisioningState in 200/201 responses; custom operations can omit."
+  },
+  {
+    "id": "ProvisioningStateValidation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-03",
+    "description": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/provisioning-state-validation.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce provisioning state enum values; custom enums can differ."
+  },
+  {
+    "id": "PutGetPatchResponseSchema",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-12",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-get-patch-response-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PUT/GET/PATCH can return different schemas."
+  },
+  {
+    "id": "PutRequestResponseSchemeArm",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-25",
+    "description": "The request & response('200') schema of the PUT operation must be same.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-request-response-scheme-arm.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PUT request and response schemas can differ."
+  },
+  {
+    "id": "PutResponseCodes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-01, RPC-Put-V1-11",
+    "description": "LRO and Synchronous PUT must have 200 & 201 return codes.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-response-codes.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce 200/201 for PUT; custom operations can use other codes."
+  },
+  {
+    "id": "QueryParametersInCollectionGet",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-15",
+    "description": "Collection Get's/List operations MUST not have query parameters other than api-version & OData filter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/query-parameters-in-collection-get.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add query parameters to collection GET operations."
+  },
+  {
+    "id": "RepeatedPathInfo",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-05",
+    "description": "Information in the Path should not be repeated in the request body (i.e. subscription ID, resource group name, resource name).",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/repeated-path-info.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Body parameters can repeat path/query info."
+  },
+  {
+    "id": "RequestBodyMustExistForPutPatch",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-28, RPC-Patch-V1-12",
+    "description": "Every Put and Patch operation must have a request body",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/request-body-must-exist-for-put-patch.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates require PUT/PATCH body; custom operations can omit body."
+  },
+  {
+    "id": "RequestSchemaForTrackedResourcesMustHaveTags",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-07",
+    "description": "A tracked resource MUST always have tags as a top level optional property",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM TrackedResource base model includes tags; custom models could omit."
+  },
+  {
+    "id": "RequiredDefaultResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/required-default-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates include default error response; custom operations can omit."
+  },
+  {
+    "id": "RequiredPropertiesMissingInResourceModel",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-03, RPC-Put-V1-08",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/required-properties-missing-in-resource-model.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM library base models (TrackedResource/ProxyResource) provide name, id, type as readonly."
+  },
+  {
+    "id": "RequiredReadOnlySystemData",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/required-read-only-system-data.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates provide readonly systemData; violation requires overriding."
+  },
+  {
+    "id": "ReservedResourceNamesModelAsEnum",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "RPC-ConstrainedCollections-V1-04",
+    "description": "Service-defined (reserved) resource names should be represented as an enum type with modelAsString set to true, not as a static string in the path.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/reserved-resource-names-model-as-enum.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Reserved resource names can be static path strings."
+  },
+  {
+    "id": "ResourceNameRestriction",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-05",
+    "description": "This rule ensures that the authors explicitly define these restrictions as a regex on the resource name.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/resource-name-restriction.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern' rule.",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Resource name parameters can lack pattern restrictions."
+  },
+  {
+    "id": "ResponseSchemaSpecifiedForSuccessStatusCode",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-24",
+    "description": "The 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/response-schema-specified-for-success-status-code.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PUT 200/201 responses can lack schemas."
+  },
+  {
+    "id": "SecurityDefinitionsStructure",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/security-definitions-structure.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM resource-manager templates emit the canonical azure_auth OAuth2 security definition shape automatically."
+  },
+  {
+    "id": "SubscriptionIdParameterInOperations",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/subscription-id-parameter-in-operations.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "ARM library always generates subscriptionId parameter for subscription-scoped operations."
+  },
+  {
+    "id": "SubscriptionsAndResourceGroupCasing",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The subscriptions and resourceGroup in resource uri should follow lower camel case.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/subscriptions-and-resource-group-casing.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "Standard ARM templates emit canonical casing, but custom Operations-interface routes can still misspell subscriptions/resourceGroups."
+  },
+  {
+    "id": "SystemDataDefinitionsCommonTypes",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+    "description": "System data references must utilize common types.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/system-data-definitions-common-types.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Prerequisite-blocked",
+    "tierRationale": "TrackedResource already emits common-types systemData; custom top-level replacements are rejected by arm-resource-invalid-envelope-property."
+  },
+  {
+    "id": "SystemDataInPropertiesBag",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+    "description": "System data must be defined as a top-level property, not in the properties bag.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/system-data-in-properties-bag.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can nest systemData in properties bag."
+  },
+  {
+    "id": "TagsAreNotAllowedForProxyResources",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-31",
+    "description": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/tags-are-not-allowed-for-proxy-resources.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Tags can be in proxy resource properties; not enforced."
+  },
+  {
+    "id": "TenantLevelAPIsNotAllowed",
+    "applicability": "ARM",
+    "severity": "warn",
+    "rpcCode": "RPC-Uri-V1-11",
+    "description": "Tenant level APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define tenant-level PUT operations."
+  },
+  {
+    "id": "TopLevelResourcesListByResourceGroup",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-05",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/top-level-resources-list-by-resource-group.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls which list operations exist."
+  },
+  {
+    "id": "TopLevelResourcesListBySubscription",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-05",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/top-level-resources-list-by-subscription.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls which list operations exist."
+  },
+  {
+    "id": "TrackedExtensionResourcesAreNotAllowed",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-12",
+    "description": "Extension resources are always considered to be proxy and must not be of the type tracked.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/tracked-extension-resources-are-not-allowed.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Extension resources can include location property."
+  },
+  {
+    "id": "TrackedResourceBeyondsThirdLevel",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-19",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path depth is determined by @segment/@key decorators; templates don't limit nesting."
+  },
+  {
+    "id": "TrackedResourcePatchOperation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/tracked-resource-patch-operation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls which operations exist on resources; templates don't enforce patch."
+  },
+  {
+    "id": "TrackedResourcesMustHavePut",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-22",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/tracked-resources-must-have-put.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "User controls which operations exist; not all resources have put in their interface."
+  },
+  {
+    "id": "UniqueClientParameterName",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/unique-client-parameter-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec generates unique parameter names."
+  },
+  {
+    "id": "UniqueModelName",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/unique-model-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec model names are unique by design."
+  },
+  {
+    "id": "UniqueXmsEnumName",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/unique-xms-enum-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-enum names are user-controlled."
+  },
+  {
+    "id": "UniqueXmsExample",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/unique-xms-example.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-examples are user-defined."
+  },
+  {
+    "id": "UnSupportedPatchProperties",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Patch-V1-02",
+    "description": "Patch may not change the name, location, or type of the resource.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/un-supported-patch-properties.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PATCH body can include unsupported properties like id, name, type."
+  },
+  {
+    "id": "ValidQueryParametersForPointOperations",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Uri-V1-13",
+    "description": "Point operations (GET, PUT, PATCH, DELETE) must not include any query parameters other than api-version.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/valid-query-parameters-for-point-operations.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Point operations can have query parameters beyond api-version."
+  },
+  {
+    "id": "ValidResponseCodeRequired",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/valid-response-code-required.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates valid response codes."
+  },
+  {
+    "id": "XmsEnumValidation",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-enum-validation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-enum is user-controlled via @extension."
+  },
+  {
+    "id": "XmsIdentifierValidation",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-identifier-validation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-identifiers is user-controlled."
+  },
+  {
+    "id": "XMSLongRunningOperationProperty",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Async-V1-15",
+    "description": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Custom ARM POST actions can emit Location or Azure-AsyncOperation headers without long-running metadata; the local native lint now covers those authorable gaps."
+  },
+  {
+    "id": "XmsPageableForListCalls",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Get-V1-11",
+    "description": "`x-ms-pageable` extension must be specified for LIST APIs.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-pageable-for-list-calls.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "Standard ARM list templates emit x-ms-pageable; only raw custom GETs can omit it, and those already warn via arm-resource-operation."
+  },
+  {
+    "id": "XmsPageableListByRGAndSubscriptions",
+    "applicability": "ARM",
+    "severity": "warning",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-pageable consistency between list operations is user-controlled."
+  },
+  {
+    "id": "XmsPageableMustHaveCorrespondingResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-pageable-must-have-corresponding-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-pageable properties are user-controlled."
+  },
+  {
+    "id": "XmsResourceInPutResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-12",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-resource-in-put-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Prerequisite-blocked",
+    "tierRationale": "The raw violating PUT needs arm-resource-operation suppression, compliant authoring needs no-openapi suppression for x-ms-azure-resource, and current template PUT hits are emitter-structure dependent rather than a clean native-lint target."
+  },
+  {
+    "id": "XMSSecretInResponse",
+    "applicability": "ARM",
+    "severity": "error",
+    "rpcCode": "RPC-Put-V1-13",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "arm"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Secret properties can lack x-ms-secret annotation."
+  },
+  {
+    "id": "ArraySchemaMustHaveItems",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/array-schema-must-have-items.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec array models always generate items schema automatically."
+  },
+  {
+    "id": "AvoidAnonymousParameter",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates named models in definitions; inline anonymous schemas are never produced."
+  },
+  {
+    "id": "AvoidAnonymousTypes",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "This rule appears when you define a model type inline, rather than in the definitions section. If the model represents the same type as another parameter in a different operation, then it becomes impossible to reuse that same class for both operations.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/avoid-anonymous-types.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec always generates named definitions; anonymous inline types not produced."
+  },
+  {
+    "id": "AvoidMsdnReferences",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/avoid-msdn-references.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can reference MSDN URLs in descriptions."
+  },
+  {
+    "id": "AvoidNestedProperties",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Nested properties can result into bad user experience especially when creating request objects. `x-ms-client-flatten` flattens the model properties so that the users can analyze and set the properties much more easily.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/avoid-nested-properties.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can nest properties deeply; TypeSpec doesn't restrict depth."
+  },
+  {
+    "id": "DefaultInEnum",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "This rule applies when the value specified by the default property does not appear in the enum constraint for a schema.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/default-in-enum.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can set enum defaults outside the enum list."
+  },
+  {
+    "id": "DeleteInOperationName",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete-in-operation-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate 'Delete' verbs automatically; custom operations can use any operationId."
+  },
+  {
+    "id": "DescriptiveDescriptionRequired",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The value of the 'description' property must be descriptive. It cannot be spaces or empty description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/descriptive-description-required.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add empty @doc strings without TypeSpec validation."
+  },
+  {
+    "id": "docLinkLocale",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "This rule is to ensure the documentation link in the description does not contains any locale.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/doc-link-locale.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Documentation links can contain locale segments like /en-us/."
+  },
+  {
+    "id": "EnumInsteadOfBoolean",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Booleans properties are not descriptive in all cases and can make them to use, evaluate whether is makes sense to keep the property as boolean or turn it into an enum.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/enum-instead-of-boolean.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define boolean properties freely; TypeSpec doesn't enforce enum usage."
+  },
+  {
+    "id": "ExtensionResourcePathPattern",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/extension-resource-path-pattern.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path structure for extension resources is user-controlled."
+  },
+  {
+    "id": "GetInOperationName",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/get-in-operation-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate 'Get'/'List' verbs automatically; custom operations can override."
+  },
+  {
+    "id": "InvalidVerbUsed",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/invalid-verb-used.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec HTTP decorators only generate valid HTTP methods."
+  },
+  {
+    "id": "ListInOperationName",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines when response contains array of items.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/list-in-operation-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates enforce 'List' in operationId for pageable operations; custom ops can override."
+  },
+  {
+    "id": "LongRunningOperationsOptionsValidator",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/long-running-operations-options-validator.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM LRO templates set valid x-ms-long-running-operation-options; custom ops can set invalid values."
+  },
+  {
+    "id": "LroExtension",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Operations with a 202 response must specify `x-ms-long-running-operation: true`. GET operation is excluded from the validation as GET will have 202 only if it is a polling action & hence x-ms-long-running-operation wouldn't be defined",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-extension.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Prerequisite-blocked",
+    "tierRationale": "The ARM violating repro needs arm-post-operation-response-codes suppression, and explicit x-ms-long-running-operation authoring is blocked by no-openapi unless suppressed."
+  },
+  {
+    "id": "LroStatusCodesReturnTypeSchema",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The '200'/'201' responses of the long running operation must have a schema definition.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-status-codes-return-type-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM LRO templates enforce schema on 200/201 responses; custom operations could use empty schemas."
+  },
+  {
+    "id": "MutabilityWithReadOnly",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/mutability-with-read-only.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Prerequisite-blocked",
+    "tierRationale": "The violating shape depends on @OpenAPI.extension(\"x-ms-mutability\", ...), which is already blocked by @azure-tools/typespec-azure-core/no-openapi unless suppressed."
+  },
+  {
+    "id": "NamePropertyDefinitionInParameter",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "A parameter must have a `name` property for the SDK to be properly generated.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/name-property-definition-in-parameter.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter always generates parameter 'name' property."
+  },
+  {
+    "id": "NextLinkPropertyMustExist",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Per definition of AutoRest x-ms-pageable extension, the property specified by nextLinkName must exist in the 200 response schema.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/next-link-property-must-exist.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can reference nonexistent nextLink properties in x-ms-pageable."
+  },
+  {
+    "id": "NonEmptyClientName",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The 'x-ms-client-name' extension is used to change the name of a parameter or property in the generated code.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/non-empty-client-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec generates non-empty x-ms-client-name values."
+  },
+  {
+    "id": "OperationIdNounConflictingModelNames",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The first part of an operation Id separated by an underscore i.e., `Noun` in a `Noun_Verb` should not conflict with names of the models defined in the definitions section. If this happens, AutoRest appends `Model` to the name of the model to resolve the conflict (`NounModel` in given example) with the name of the client itself (which will be named as `Noun` in given example). This can result in an inconsistent user experience.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operation-id-noun-conflicting-model-names.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "operationId noun part can conflict with model names; TypeSpec doesn't validate."
+  },
+  {
+    "id": "OperationIdNounVerb",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "OperationId should be of the form `Noun_Verb`.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operation-id-noun-verb.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "operationId can repeat noun in verb; TypeSpec doesn't enforce Noun_Verb pattern."
+  },
+  {
+    "id": "OperationIdSingleUnderscore",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "An operationId can have exactly one underscore, not adhering to it can cause errors in code generation.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec generates operationId as Interface_Method with single underscore."
+  },
+  {
+    "id": "OperationSummaryOrDescription",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Operation should have a summary or description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operation-summary-or-description.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/documentation-required",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule.",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Operations can lack summary or description."
+  },
+  {
+    "id": "PageableRequires200Response",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Per definition of AutoRest x-ms-pageable extension, the response schema must contain a 200 response schema.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/pageable-requires200-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Pageable operations can lack 200 response."
+  },
+  {
+    "id": "ParameterDescription",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All parameters should have a description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-description.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/documentation-required",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule.",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Parameters can lack descriptions."
+  },
+  {
+    "id": "ParameterDescriptionRequired",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The value of the 'description' property must be descriptive. It cannot be spaces or empty description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-description-required.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/documentation-required",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule.",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Parameters can lack descriptions."
+  },
+  {
+    "id": "PatchInOperationName",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-in-operation-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate 'Update' verb for PATCH; custom operations can override."
+  },
+  {
+    "id": "PutInOperationName",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-in-operation-name.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate 'Create' verb for PUT; custom operations can override."
+  },
+  {
+    "id": "ResourceHasXMsResourceEnabled",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "A 'Resource' definition must have x-ms-azure-resource extension enabled and set to true. This will indicate that the model is an Azure resource.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/resource-has-x-ms-resource-enabled.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM base models set x-ms-azure-resource; custom resource definitions could omit."
+  },
+  {
+    "id": "Rpaas_ResourceProvisioningState",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "provisioningState is user-controlled."
+  },
+  {
+    "id": "SchemaDescriptionOrTitle",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All schemas should have a description or title.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/schema-description-or-title.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/documentation-required",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule.",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Schemas can lack description or title."
+  },
+  {
+    "id": "SummaryAndDescriptionMustNotBeSame",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/summary-and-description-must-not-be-same.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Summary and description can be identical."
+  },
+  {
+    "id": "ValidFormats",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/valid-formats.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Schema format values are user-controlled."
+  },
+  {
+    "id": "XmsClientName",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The 'x-ms-client-name' extension is used to change the name of a parameter or property in the generated code. By using the 'x-ms-client-name' extension, a name can be defined for use specifically in code generation, separately from the name on the wire. It can be used for query parameters and header parameters, as well as properties of schemas. This name is case sensitive.",
+    "hasDoc": false,
+    "docPath": null,
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-client-name usage is user-controlled."
+  },
+  {
+    "id": "XmsClientNameParameter",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The `x-ms-client-name` extension is used to change the name of a parameter or property in the generated code. ",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-client-name-parameter.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-client-name can equal the original parameter name."
+  },
+  {
+    "id": "XmsClientNameProperty",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The `x-ms-client-name` extension is used to change the name of a parameter or property in the generated code.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-client-name-property.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-client-name can equal the property name."
+  },
+  {
+    "id": "XmsExamplesRequired",
+    "applicability": "Both",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Verifies whether `x-ms-examples` are provided for each operation or not.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-examples-required.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Operations can lack x-ms-examples."
+  },
+  {
+    "id": "XmsParameterLocation",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-parameter-location.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-parameter-location depends on user @extension."
+  },
+  {
+    "id": "XmsPathsMustOverloadPaths",
+    "applicability": "Both",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "The `x-ms-paths` extension allows us to overload an existing path based on path parameters. We cannot specify an `x-ms-paths` without a path that already exists in the `paths` section.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/xms-paths-must-overload-paths.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "common"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "x-ms-paths can contain paths not overloading existing paths."
+  },
+  {
+    "id": "AdditionalPropertiesAndProperties",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Don't specify additionalProperties as a sibling of properties.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/additional-properties-and-properties.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/bad-record-type",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/bad-record-type' rule.",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can specify additionalProperties alongside properties."
+  },
+  {
+    "id": "AdditionalPropertiesObject",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "additionalProperties with type object is a common error.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/additional-properties-object.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define additionalProperties with type:object."
+  },
+  {
+    "id": "ApiVersionEnum",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The api-version parameter should not be an enum.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/api-version-enum.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define api-version as an enum."
+  },
+  {
+    "id": "ConsistentResponseBody",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Ensure the get, put, and patch response body schemas are consistent.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/consistent-response-body.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define different response schemas for PUT/GET/PATCH operations."
+  },
+  {
+    "id": "DefaultResponse",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All operations should have a default (error) response.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/default-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates include default error response; custom operations can omit."
+  },
+  {
+    "id": "Delete204Response",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "A delete operation should have a 204 response.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/delete204-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate 204 for DELETE automatically; custom operations can override."
+  },
+  {
+    "id": "ErrorResponse",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Error response body should conform to Microsoft Azure API Guidelines.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/error-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Error response schemas come from user-defined models; structure not enforced."
+  },
+  {
+    "id": "Formdata",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Check for appropriate use of formData parameters.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/Formdata.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add formData parameters."
+  },
+  {
+    "id": "HeaderDisallowed",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Authorization, Content-type, and Accept headers should not be defined explicitly.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/header-disallowed.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define Authorization/Content-type/Accept header parameters."
+  },
+  {
+    "id": "HostParametersValidation",
+    "applicability": "DataPlane",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "Validate the parameters in x-ms-parameterized-host.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/host-parameters-validation.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "x-ms-parameterized-host structure is handled correctly by the emitter."
+  },
+  {
+    "id": "LongRunningResponseStatusCodeDataPlane",
+    "applicability": "DataPlane",
+    "severity": "error",
+    "rpcCode": "",
+    "description": "",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/long-running-response-status-code-data-plane.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "LRO options extension depends on user configuration."
+  },
+  {
+    "id": "LroHeaders",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "A 202 response should include an Operation-Location response header.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/lro-headers.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "202 responses can lack Operation-Location header."
+  },
+  {
+    "id": "MsPaths",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Don't use x-ms-paths except where necessary to support legacy APIs.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/ms-paths.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can use x-ms-paths."
+  },
+  {
+    "id": "Nullable",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Avoid the use of x-nullable.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/Nullable.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/no-nullable",
+    "disableForTsp": true,
+    "disableReason": "Covered by Azure Core '@azure-tools/typespec-azure-core/no-nullable' rule",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can add x-nullable."
+  },
+  {
+    "id": "OperationId",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "OperationId should conform to Azure API Guidelines",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/operation-id.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Template-enforced",
+    "tierRationale": "ARM templates generate operationIds with required verb patterns; custom operations can use any format."
+  },
+  {
+    "id": "PaginationResponse",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "An operation that returns a list that is potentially large should support pagination.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/pagination-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Pageable response schema structure depends on user model definitions."
+  },
+  {
+    "id": "ParameterDefaultNotAllowed",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "A required parameter should not specify a default value.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-default-not-allowed.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Required parameters can have defaults."
+  },
+  {
+    "id": "ParameterNamesConvention",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Parameter names should conform to Azure naming conventions.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-names-convention.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Parameter naming depends on user definitions."
+  },
+  {
+    "id": "ParameterNamesUnique",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All parameter names for an operation should be case-insensitive unique.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-names-unique.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Users can define duplicate parameter names."
+  },
+  {
+    "id": "ParameterOrder",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Path parameters must be in the same order as in the path.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/parameter-order.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec generates parameters in order matching path segments."
+  },
+  {
+    "id": "PatchContentType",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The request body content type for patch operations should be JSON merge patch.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/patch-content-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Infallible",
+    "tierRationale": "TypeSpec autorest emitter generates correct content type for PATCH operations."
+  },
+  {
+    "id": "PathCharacters",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Path should contain only recommended characters.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-characters.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path can contain non-recommended characters."
+  },
+  {
+    "id": "PathParameterNames",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Path parameter names should be consistent across all paths.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-parameter-names.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path parameter names can be inconsistent."
+  },
+  {
+    "id": "PathParameterSchema",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Path parameter should be type: string and specify maxLength and pattern.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/path-parameter-schema.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Path parameters can lack maxLength/pattern."
+  },
+  {
+    "id": "Post201Response",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Using post for a create operation is discouraged.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/post201-response.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "POST operations can return 201."
+  },
+  {
+    "id": "PropertyDescription",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All schema properties should have a description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/property-description.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/documentation-required",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule.",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Properties can lack descriptions."
+  },
+  {
+    "id": "PropertyType",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All schema properties should have a defined type.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/property-type.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Properties can lack type."
+  },
+  {
+    "id": "PutPath",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The path for a put should have a final path parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-path.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PUT paths can lack final path parameter."
+  },
+  {
+    "id": "PutRequestResponseScheme",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "The request & response('200') schema of the PUT operation must be same.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/put-request-response-scheme.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "PUT request and response schemas can differ."
+  },
+  {
+    "id": "RequestBodyNotAllowed",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "A get or delete operation must not accept a body parameter.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/request-body-not-allowed.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Data-plane GET and DELETE operations can explicitly declare body parameters."
+  },
+  {
+    "id": "RequestBodyOptional",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Flag optional request body -- common oversight.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/request-body-optional.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Request body can be optional."
+  },
+  {
+    "id": "SchemaNamesConvention",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Schema names should be Pascal case.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/schema-names-convention.md",
+    "tspEquivalent": "@azure-tools/typespec-azure-core/casing-style",
+    "disableForTsp": true,
+    "disableReason": "Covered by TSP's '@azure-tools/typespec-azure-core/casing-style' rule.",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Schema names depend on TypeSpec model names; PascalCase not enforced."
+  },
+  {
+    "id": "SchemaTypeAndFormat",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Schema should use well-defined type and format.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/schema-type-and-format.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Schema type/format combinations can be invalid."
+  },
+  {
+    "id": "SecurityDefinitionDescription",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "A security definition should have a description.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/security-definition-description.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Security definitions can lack descriptions."
+  },
+  {
+    "id": "SuccessResponseBody",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "All success responses except 202 & 204 should define a response body.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/success-response-body.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Success responses can lack body schemas."
+  },
+  {
+    "id": "VersionConvention",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "API version should be a date in YYYY-MM-DD format, optionally suffixed with '-preview'.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/version-convention.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Version format is user-controlled."
+  },
+  {
+    "id": "VersionPolicy",
+    "applicability": "DataPlane",
+    "severity": "warn",
+    "rpcCode": "",
+    "description": "Specify API version using `api-version` query parameter, not in path.",
+    "hasDoc": true,
+    "docPath": "/Users/wtemple/Development/tsp-lintdiff-migration/azure-openapi-validator/docs/version-policy.md",
+    "tspEquivalent": "",
+    "disableForTsp": false,
+    "disableReason": "",
+    "sources": [
+      "dataplane"
+    ],
+    "tier": "Unconstrained",
+    "tierRationale": "Version segments can appear in basePath/paths."
+  }
+]

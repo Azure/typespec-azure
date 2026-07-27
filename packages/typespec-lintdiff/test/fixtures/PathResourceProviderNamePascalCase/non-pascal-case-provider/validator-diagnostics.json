@@ -1,0 +1,29 @@
+[
+  {
+    "code": "PathResourceProviderNamePascalCase",
+    "message": "Resource provider naming must follow the pascal case. Path: '/providers/microsoft.testservice/operations'",
+    "path": [
+      "paths",
+      "/providers/microsoft.testservice/operations"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PathResourceProviderNamePascalCase",
+    "message": "Resource provider naming must follow the pascal case. Path: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.testservice/widgets'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.testservice/widgets"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PathResourceProviderNamePascalCase",
+    "message": "Resource provider naming must follow the pascal case. Path: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.testservice/widgets/{widgetName}'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.testservice/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

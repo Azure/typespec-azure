@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathForResourceAction",
+    "message": "Path for 'post' method on a resource type MUST follow valid resource naming.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService"
+    ],
+    "severity": 0
+  }
+]

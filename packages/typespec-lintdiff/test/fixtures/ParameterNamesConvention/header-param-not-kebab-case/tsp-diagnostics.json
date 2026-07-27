@@ -1,0 +1,12 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/parameter-names-convention",
+    "severity": "warning",
+    "message": "header parameter name 'traceId' should be kebab case."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

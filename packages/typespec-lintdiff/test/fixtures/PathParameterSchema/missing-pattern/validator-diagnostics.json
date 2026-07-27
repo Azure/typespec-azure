@@ -1,0 +1,14 @@
+[
+  {
+    "code": "PathParameterSchema",
+    "message": "Path parameter should specify characters allowed (pattern).",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "parameters",
+      "0"
+    ],
+    "severity": 0
+  }
+]

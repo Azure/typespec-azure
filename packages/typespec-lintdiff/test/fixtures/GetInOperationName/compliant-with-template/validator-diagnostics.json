@@ -1,0 +1,13 @@
+[
+  {
+    "code": "GetInOperationName",
+    "message": "'GET' operation 'Widgets_FetchDetails' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+    "path": [
+      "paths",
+      "/details/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

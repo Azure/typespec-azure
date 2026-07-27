@@ -1,0 +1,11 @@
+[
+  {
+    "code": "ExtensionResourcePathPattern",
+    "message": "The path which is for extension routing resource type, shouldn't include the parent scope.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.TestService/extensions/{extensionName}"
+    ],
+    "severity": 0
+  }
+]

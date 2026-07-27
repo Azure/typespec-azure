@@ -1,0 +1,92 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+    "severity": "warning",
+    "message": "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "severity": "warning",
+    "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+    "severity": "warning",
+    "message": "Top-level resource 'Widget' should define a list by resource group operation."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+    "severity": "warning",
+    "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+    "severity": "warning",
+    "message": "Tracked resource 'Widget' must have patch operation that at least supports the update of tags."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
+    "severity": "warning",
+    "message": "ARM POST response 404 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'check' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

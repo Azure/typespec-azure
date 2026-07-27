@@ -1,0 +1,12 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property",
+    "severity": "warning",
+    "message": "Duplicate property \"name\" found in the resource envelope and resource properties.  Please do not duplicate envelope properties in resource properties."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property",
+    "severity": "warning",
+    "message": "Duplicate property \"type\" found in the resource envelope and resource properties.  Please do not duplicate envelope properties in resource properties."
+  }
+]

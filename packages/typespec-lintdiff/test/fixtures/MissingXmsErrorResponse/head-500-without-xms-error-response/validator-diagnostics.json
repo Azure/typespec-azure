@@ -1,0 +1,14 @@
+[
+  {
+    "code": "MissingXmsErrorResponse",
+    "message": "Response code 500 is defined without a x-ms-error-response.",
+    "path": [
+      "paths",
+      "/probe-head/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/probeHead",
+      "head",
+      "responses",
+      "500"
+    ],
+    "severity": 0
+  }
+]

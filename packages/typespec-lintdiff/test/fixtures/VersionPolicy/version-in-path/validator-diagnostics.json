@@ -1,0 +1,11 @@
+[
+  {
+    "code": "VersionPolicy",
+    "message": "Version segment \"v1\" in path violates Azure versioning policy.",
+    "path": [
+      "paths",
+      "/v1/widgets/{name}"
+    ],
+    "severity": 0
+  }
+]

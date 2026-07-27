@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/casing-style",
+    "severity": "warning",
+    "message": "The names of Property types must use camelCase"
+  }
+]

@@ -1,0 +1,39 @@
+[
+  {
+    "code": "XMSSecretInResponse",
+    "message": "Property 'adminPassword' contains secret keyword and does not have 'x-ms-secret' annotation. To ensure security, must add the 'x-ms-secret' annotation to this property.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "properties",
+      "properties",
+      "adminPassword"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "XMSSecretInResponse",
+    "message": "Property 'adminPassword' contains secret keyword and does not have 'x-ms-secret' annotation. To ensure security, must add the 'x-ms-secret' annotation to this property.",
+    "path": [
+      "definitions",
+      "WidgetUpdate",
+      "properties",
+      "properties",
+      "properties",
+      "adminPassword"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "XMSSecretInResponse",
+    "message": "Property 'adminPassword' contains secret keyword and does not have 'x-ms-secret' annotation. To ensure security, must add the 'x-ms-secret' annotation to this property.",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "adminPassword"
+    ],
+    "severity": 0
+  }
+]

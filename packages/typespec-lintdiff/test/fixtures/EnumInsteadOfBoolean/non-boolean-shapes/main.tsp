@@ -1,0 +1,32 @@
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/openapi";
+import "@typespec/versioning";
+import "@azure-tools/typespec-autorest";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
+@service(#{ title: "Test Service" })
+@versioned(Versions)
+namespace TestService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+}
+
+model Widget {
+  @doc("The widget status")
+  status: string;
+}
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+@route("/widgets/{status}:check")
+@doc("Check a widget")
+@post
+op checkWidget(
+  @path @doc("The widget status") status: string,
+  @query("api-version") @doc("API version") apiVersion: string,
+  @doc("The request body") @body body: string,
+): string;

@@ -1,0 +1,32 @@
+[
+  {
+    "code": "TrackedExtensionResourcesAreNotAllowed",
+    "message": "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+    "path": [
+      "paths",
+      "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName}",
+      "get"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "TrackedExtensionResourcesAreNotAllowed",
+    "message": "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+    "path": [
+      "paths",
+      "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName}",
+      "put"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "TrackedExtensionResourcesAreNotAllowed",
+    "message": "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+    "path": [
+      "paths",
+      "/{resourceUri}/providers/Microsoft.TestService/locks/{lockName}",
+      "put"
+    ],
+    "severity": 0
+  }
+]

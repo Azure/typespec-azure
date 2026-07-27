@@ -41,6 +41,23 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - A new clone or worktree also needs `mise trust` (and `mise install` if tools are missing) before `pnpm` and other tools will work — see [Development Environment (mise)](#development-environment-mise).
 - When pushing changes and creating pull requests, push to your personal fork and open PRs against the main Azure fork's `main` branch.
 
+## LintDiff → TypeSpec migration skills
+
+The `packages/typespec-lintdiff` package hosts native TypeSpec lint rules migrated from Swagger
+LintDiff / `azure-openapi-validator`, together with an equivalence-validation harness
+(`test/harness`), fixtures (`test/fixtures`), and a coverage catalog (`catalog/`). Supporting
+analysis lives in `packages/typespec-lintdiff/docs/`.
+
+Prefer these `.github/skills/` skills when the task matches:
+
+- `/typespec-lint-discovery`, `/typespec-lint-implement`, `/typespec-lint-validate` — portable-first
+  lint discovery, implementation, and validation.
+- `/lintdiff-rule-intake`, `/lintdiff-rule-migration-overseer`, `/lintdiff-rule-reimport-repair` —
+  LintDiff / `azure-openapi-validator` rule intake and migration orchestration.
+
+Keep the generic `typespec-lint-*` skills portable-first; use the `lintdiff-*` skills when actively
+comparing validator rules to native TypeSpec outcomes.
+
 ## Available Task Instructions
 
 - [Testserver Generation](./prompts/testserver-generation.md): Instructions for generating TypeSpec HTTP spec test servers

@@ -1,0 +1,14 @@
+[
+  {
+    "code": "PatchIdentityProperty",
+    "message": "The patch operation body parameter schema should contain property 'identity'.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4"
+    ],
+    "severity": 0
+  }
+]

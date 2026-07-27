@@ -1,0 +1,17 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/no-closed-literal-union",
+    "severity": "warning",
+    "message": "Union of literals should include the base scalar as a variant to make it an open enum. (ex: `union Choice { Yes: \"yes\", No: \"no\", string };`)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "severity": "warning",
+    "message": "provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [Succeeded, Canceled, Failed]."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-unnamed-union",
+    "severity": "warning",
+    "message": "Union expression should be defined as a named union declaration."
+  }
+]

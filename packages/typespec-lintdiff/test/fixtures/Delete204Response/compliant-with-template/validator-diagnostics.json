@@ -1,0 +1,13 @@
+[
+  {
+    "code": "Delete204Response",
+    "message": "A delete operation should have a `204` response.",
+    "path": [
+      "paths",
+      "/widgets/{name}/config",
+      "delete",
+      "responses"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathContainsSubscriptionId",
+    "message": "The path for the subscriptions scoped CRUD methods do not contain the subscriptionId parameter.",
+    "path": [
+      "paths",
+      "/subscriptions/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

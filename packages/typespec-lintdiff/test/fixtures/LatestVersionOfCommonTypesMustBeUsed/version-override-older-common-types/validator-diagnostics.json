@@ -1,0 +1,332 @@
+[
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "parameters",
+      "2",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters",
+      "2",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters",
+      "2",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "2",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters",
+      "2",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "definitions",
+      "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate",
+      "allOf",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "definitions",
+      "Widget",
+      "allOf",
+      "0",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

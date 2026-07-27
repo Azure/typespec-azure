@@ -1,0 +1,37 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/no-openapi",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 10
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 5
+    }
+  ]
+}

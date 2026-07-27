@@ -1,0 +1,41 @@
+[
+  {
+    "code": "RequestBodyOptional",
+    "message": "The body parameter is not marked as required.",
+    "path": [
+      "paths",
+      "/widgets",
+      "post",
+      "parameters",
+      "1",
+      "required"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "RequestBodyOptional",
+    "message": "The body parameter is not marked as required.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "put",
+      "parameters",
+      "2",
+      "required"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "RequestBodyOptional",
+    "message": "The body parameter is not marked as required.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "patch",
+      "parameters",
+      "2",
+      "required"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "code": "HeaderDisallowed",
+    "message": "Header parameter \"authorization\" should not be defined explicitly.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "parameters",
+      "1",
+      "name"
+    ],
+    "severity": 0
+  }
+]

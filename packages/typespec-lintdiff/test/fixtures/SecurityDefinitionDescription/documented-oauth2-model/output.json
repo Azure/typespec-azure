@@ -1,0 +1,104 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "DocumentedOAuth2": {
+      "type": "oauth2",
+      "description": "OAuth2 authentication for this test service",
+      "flow": "accessCode",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "https://example.com/.default": ""
+      },
+      "tokenUrl": "https://login.microsoftonline.com/common/oauth2/token"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets": {
+      "get": {
+        "operationId": "Widgets_GetWidget",
+        "description": "Gets a widget",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DocumentedOAuth2": {
+      "type": "object",
+      "description": "OAuth2 authentication for this test service",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "OAuth2 authentication",
+          "enum": [
+            "oauth2"
+          ]
+        },
+        "flows": {
+          "type": "array",
+          "description": "Supported OAuth2 flows",
+          "items": {}
+        },
+        "defaultScopes": {
+          "type": "array",
+          "description": "Oauth2 scopes of every flow. Overridden by scope definitions in specific flows",
+          "items": {}
+        }
+      },
+      "required": [
+        "type",
+        "flows",
+        "defaultScopes"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

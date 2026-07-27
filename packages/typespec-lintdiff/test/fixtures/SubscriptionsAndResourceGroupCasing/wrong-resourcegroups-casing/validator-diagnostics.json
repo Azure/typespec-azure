@@ -1,0 +1,11 @@
+[
+  {
+    "code": "SubscriptionsAndResourceGroupCasing",
+    "message": "The path segment resourcegroups should be resourceGroups.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

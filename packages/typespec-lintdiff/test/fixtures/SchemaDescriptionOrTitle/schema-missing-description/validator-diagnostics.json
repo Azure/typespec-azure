@@ -1,0 +1,11 @@
+[
+  {
+    "code": "SchemaDescriptionOrTitle",
+    "message": "Schema should have a description or title.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

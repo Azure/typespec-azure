@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ConsistentResponseSchemaForPut",
+    "message": "200 response schema does not match 201 response schema. A PUT API must always return the same response schema for both the 200 and 201 status codes.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "code": "PathParameterSchema",
+    "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).",
+    "path": [
+      "paths",
+      "/widgets/{widgetId}",
+      "get",
+      "parameters",
+      "0"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PathParameterSchema",
+    "message": "Path parameter should be defined as type: string.",
+    "path": [
+      "paths",
+      "/widgets/{widgetId}",
+      "get",
+      "parameters",
+      "0",
+      "type"
+    ],
+    "severity": 0
+  }
+]

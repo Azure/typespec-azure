@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
+    "severity": "warning",
+    "message": "Missing identifying properties of objects in the array item, please add @identifiers(#[\"<prop>\"]) to specify it. If there are no appropriate identifying properties, please add @identifiers(#[])."
+  }
+]

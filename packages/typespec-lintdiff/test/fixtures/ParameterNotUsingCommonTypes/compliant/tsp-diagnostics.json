@@ -1,0 +1,22 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/auth-required",
+    "severity": "warning",
+    "message": "Provide an authentication scheme using the `@useAuth` decorator. See: https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  }
+]

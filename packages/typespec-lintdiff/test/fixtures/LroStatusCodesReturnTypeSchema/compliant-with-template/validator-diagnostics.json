@@ -1,0 +1,26 @@
+[
+  {
+    "code": "LroStatusCodesReturnTypeSchema",
+    "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Widgets_CreateConfig', Response code: '200'",
+    "path": [
+      "paths",
+      "/config/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "200"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroStatusCodesReturnTypeSchema",
+    "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Widgets_CreateConfig', Response code: '201'",
+    "path": [
+      "paths",
+      "/config/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "201"
+    ],
+    "severity": 0
+  }
+]

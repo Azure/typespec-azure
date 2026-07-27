@@ -1,0 +1,10 @@
+[
+  {
+    "code": "ImplementPrivateEndpointAPIs",
+    "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/privateLinkResources is missing.",
+    "path": [
+      "paths"
+    ],
+    "severity": 1
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "code": "NonEmptyClientName",
+    "message": "Empty x-ms-client-name property.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties",
+      "name",
+      "x-ms-client-name"
+    ],
+    "severity": 0
+  }
+]

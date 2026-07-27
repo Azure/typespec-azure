@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PutResponseCodes",
+    "message": "Synchronous and long-running PUT operations must have responses with 200, 201 and default return codes. They also must not have other response codes.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put"
+    ],
+    "severity": 0
+  }
+]

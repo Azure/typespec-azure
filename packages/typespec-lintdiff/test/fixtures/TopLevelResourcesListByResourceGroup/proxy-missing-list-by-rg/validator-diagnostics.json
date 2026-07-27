@@ -1,0 +1,11 @@
+[
+  {
+    "code": "TopLevelResourcesListByResourceGroup",
+    "message": "The top-level resource \"Widget\" does not have list by resource group operation, please add it.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

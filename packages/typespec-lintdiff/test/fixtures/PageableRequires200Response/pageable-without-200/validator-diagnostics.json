@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PageableRequires200Response",
+    "message": "A response for the 200 HTTP status code must be defined to use x-ms-pageable.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "responses"
+    ],
+    "severity": 0
+  }
+]

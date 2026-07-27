@@ -1,0 +1,15 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "`value` property in pageable response should be required",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

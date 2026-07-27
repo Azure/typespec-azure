@@ -1,0 +1,11 @@
+[
+  {
+    "code": "AvoidMsdnReferences",
+    "message": "For better generated code quality, remove all references to \"msdn.microsoft.com\" and \"docs.microsoft.com\".",
+    "path": [
+      "info",
+      "description"
+    ],
+    "severity": 0
+  }
+]

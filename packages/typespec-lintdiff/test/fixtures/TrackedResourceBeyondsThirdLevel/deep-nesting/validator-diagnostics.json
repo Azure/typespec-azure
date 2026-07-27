@@ -1,0 +1,11 @@
+[
+  {
+    "code": "TrackedResourceBeyondsThirdLevel",
+    "message": "The tracked resource Level4 is beyond third level of nesting.",
+    "path": [
+      "definitions",
+      "Level4"
+    ],
+    "severity": 0
+  }
+]

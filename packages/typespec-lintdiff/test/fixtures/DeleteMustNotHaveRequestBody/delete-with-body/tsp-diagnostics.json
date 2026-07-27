@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "Resource DELETE operation must be decorated with @armResourceDelete."
+  }
+]

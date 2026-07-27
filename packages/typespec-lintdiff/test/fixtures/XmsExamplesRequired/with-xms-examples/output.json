@@ -1,0 +1,70 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "GetWidget",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Widget name",
+            "required": true,
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9-]+$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "getWidget": {
+            "description": "Example payload"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Widget name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

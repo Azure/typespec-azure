@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ParameterNamesConvention",
+    "message": "header parameter name \"traceId\" should be kebab case.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "parameters",
+      "0",
+      "name"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "code": "MissingXmsErrorResponse",
+    "message": "Response code 404 is defined without a x-ms-error-response.",
+    "path": [
+      "paths",
+      "/verify/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/verify",
+      "post",
+      "responses",
+      "404"
+    ],
+    "severity": 0
+  }
+]

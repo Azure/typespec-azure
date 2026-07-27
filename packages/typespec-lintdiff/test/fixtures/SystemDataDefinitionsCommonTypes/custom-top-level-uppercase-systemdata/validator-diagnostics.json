@@ -1,0 +1,14 @@
+[
+  {
+    "code": "SystemDataDefinitionsCommonTypes",
+    "message": "System data references must utilize common types.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "SystemData",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

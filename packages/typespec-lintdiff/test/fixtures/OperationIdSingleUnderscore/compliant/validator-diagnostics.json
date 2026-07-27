@@ -1,0 +1,13 @@
+[
+  {
+    "code": "OperationIdSingleUnderscore",
+    "message": "Only 1 underscore is permitted in the operation id, following Noun_Verb conventions",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "code": "ProvisioningStateMustBeReadOnly",
+    "message": "provisioningState property must be set to readOnly.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ProvisioningStateMustBeReadOnly",
+    "message": "provisioningState property must be set to readOnly.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ProvisioningStateMustBeReadOnly",
+    "message": "provisioningState property must be set to readOnly.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "responses",
+      "201",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathForNestedResource",
+    "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/gadgets/badStaticName"
+    ],
+    "severity": 0
+  }
+]

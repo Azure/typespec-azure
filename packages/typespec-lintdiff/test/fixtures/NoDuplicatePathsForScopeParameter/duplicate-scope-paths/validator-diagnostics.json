@@ -1,0 +1,11 @@
+[
+  {
+    "code": "NoDuplicatePathsForScopeParameter",
+    "message": "Path \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.TestService/widgets/{widgetName}\" that has the scope parameter.\".",
+    "path": [
+      "paths",
+      "/{scope}/providers/Microsoft.TestService/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

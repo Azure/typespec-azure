@@ -1,0 +1,83 @@
+{
+  "name": "tsp-lintdiff-local-linter",
+  "version": "0.1.0",
+  "author": "Microsoft Corporation",
+  "description": "Native TypeSpec lint rules migrated from Swagger LintDiff / azure-openapi-validator, plus the equivalence-validation harness and coverage catalog.",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "linter",
+    "lintdiff"
+  ],
+  "type": "module",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "tspMain": "dist/src/index.js",
+  "exports": {
+    ".": {
+      "typespec": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./temp",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
+    "validate": "node --import tsx/esm test/harness/validate.ts",
+    "compare": "node --import tsx/esm test/harness/cross-repo-compare.ts",
+    "compare:setup": "node --import tsx/esm test/harness/cross-repo-setup.ts",
+    "audit:coverage": "node --import tsx/esm test/harness/audit-coverage.ts",
+    "audit:metadata": "node --import tsx/esm test/harness/audit-metadata.ts",
+    "audit:noise": "node --import tsx/esm test/harness/analyze-noise.ts",
+    "catalog": "node --import tsx/esm test/harness/catalog.ts",
+    "metadata:source": "node --import tsx/esm test/harness/generate-rule-metadata.ts",
+    "metadata:sync": "node --import tsx/esm test/harness/sync-rule-metadata.ts --write"
+  },
+  "files": [
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/versioning": "workspace:^"
+  },
+  "devDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@microsoft.azure/openapi-validator": "^2.2.4",
+    "@microsoft.azure/openapi-validator-rulesets": "^2.2.5",
+    "@stoplight/spectral-core": "^1.21.0",
+    "@types/node": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "rimraf": "catalog:",
+    "tsx": "^4.21.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

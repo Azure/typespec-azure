@@ -1,0 +1,11 @@
+[
+  {
+    "code": "EvenSegmentedPathForPutOperation",
+    "message": "API path with PUT operation defined MUST have even number of segments (i.e. end in {resourceType}/{resourceName} segments).",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "OperationIdNounVerb",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Paths' should not appear after the underscore. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+    "path": [
+      "paths",
+      "/api/paths",
+      "get",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

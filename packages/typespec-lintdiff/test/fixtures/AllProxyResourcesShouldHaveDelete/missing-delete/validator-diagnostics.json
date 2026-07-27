@@ -1,0 +1,11 @@
+[
+  {
+    "code": "AllProxyResourcesShouldHaveDelete",
+    "message": "The resource Gadget does not have a corresponding delete operation.",
+    "path": [
+      "definitions",
+      "Gadget"
+    ],
+    "severity": 1
+  }
+]

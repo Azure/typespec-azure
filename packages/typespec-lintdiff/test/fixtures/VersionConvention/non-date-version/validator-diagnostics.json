@@ -1,0 +1,11 @@
+[
+  {
+    "code": "VersionConvention",
+    "message": "API version should be a date in YYYY-MM-DD format, optionally suffixed with '-preview'.",
+    "path": [
+      "info",
+      "version"
+    ],
+    "severity": 0
+  }
+]

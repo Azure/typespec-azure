@@ -1,0 +1,108 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "GetWidget",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Widget name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "500": {
+            "description": "Custom non-conforming error",
+            "schema": {
+              "$ref": "#/definitions/MyError"
+            },
+            "x-ms-error-response": true
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "MyError": {
+      "type": "object",
+      "description": "Custom non-conforming error",
+      "properties": {
+        "errorCode": {
+          "type": "string",
+          "description": "Error code"
+        },
+        "errorMessage": {
+          "type": "string",
+          "description": "Error detail"
+        }
+      },
+      "required": [
+        "errorCode",
+        "errorMessage"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "description": "A widget resource",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The widget name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

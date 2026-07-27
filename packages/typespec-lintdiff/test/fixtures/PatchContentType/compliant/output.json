@@ -1,0 +1,77 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets/{id}": {
+      "patch": {
+        "operationId": "UpdateWidget",
+        "description": "Update a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Widget ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "widget",
+            "in": "body",
+            "description": "Widget body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

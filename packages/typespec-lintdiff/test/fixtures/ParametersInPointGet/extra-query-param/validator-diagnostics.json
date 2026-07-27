@@ -1,0 +1,13 @@
+[
+  {
+    "code": "ParametersInPointGet",
+    "message": "Query parameter filter should be removed. Point Get's MUST not have query parameters other than api version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

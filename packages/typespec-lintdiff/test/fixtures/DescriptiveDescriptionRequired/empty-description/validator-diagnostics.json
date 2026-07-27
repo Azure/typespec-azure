@@ -1,0 +1,14 @@
+[
+  {
+    "code": "DescriptiveDescriptionRequired",
+    "message": "The value provided for description is not descriptive enough. Accurate and descriptive description is essential for maintaining reference documentation.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "name",
+      "description"
+    ],
+    "severity": 0
+  }
+]

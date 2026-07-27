@@ -1,0 +1,14 @@
+[
+  {
+    "code": "Formdata",
+    "message": "Check for appropriate use of formData parameters.",
+    "path": [
+      "paths",
+      "/upload",
+      "post",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

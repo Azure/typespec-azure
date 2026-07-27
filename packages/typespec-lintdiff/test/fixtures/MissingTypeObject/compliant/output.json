@@ -1,0 +1,127 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets": {
+      "get": {
+        "operationId": "Widgets_List",
+        "description": "List widgets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Widget"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "Widgets_Create",
+        "description": "Create a widget",
+        "parameters": [
+          {
+            "name": "widget",
+            "in": "body",
+            "description": "Widget body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{id}": {
+      "get": {
+        "operationId": "Widgets_Read",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Widget ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Widgets_Remove",
+        "description": "Delete a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Widget ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

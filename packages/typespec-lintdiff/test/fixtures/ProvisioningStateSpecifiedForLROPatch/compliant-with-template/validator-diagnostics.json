@@ -1,0 +1,14 @@
+[
+  {
+    "code": "ProvisioningStateSpecifiedForLROPatch",
+    "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config",
+      "patch",
+      "responses",
+      "200"
+    ],
+    "severity": 0
+  }
+]

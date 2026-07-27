@@ -1,0 +1,112 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "GetWidget",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Status": {
+      "type": "string",
+      "description": "Status",
+      "enum": [
+        "",
+        "Active"
+      ],
+      "x-ms-enum": {
+        "name": "Status",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "Unknown",
+            "value": "",
+            "description": "Unknown"
+          },
+          {
+            "name": "Active",
+            "value": "Active",
+            "description": "Active"
+          }
+        ]
+      }
+    },
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name"
+        },
+        "status": {
+          "$ref": "#/definitions/Status",
+          "description": "Status"
+        }
+      },
+      "required": [
+        "name",
+        "status"
+      ]
+    }
+  },
+  "parameters": {}
+}

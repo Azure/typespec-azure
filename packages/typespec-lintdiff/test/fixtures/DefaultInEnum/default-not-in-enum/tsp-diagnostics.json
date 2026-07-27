@@ -1,0 +1,27 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/auth-required",
+    "severity": "warning",
+    "message": "Provide an authentication scheme using the `@useAuth` decorator. See: https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-enum",
+    "severity": "warning",
+    "message": "Azure services should not use the enum keyword. Extensible enums should be defined as unions with \"string\" as an accepted variant (ex: `union Choice { Yes: \"yes\", No: \"no\", string };`)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/use-standard-names",
+    "severity": "warning",
+    "message": "GET operations that return single objects should start with 'get'"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/use-standard-operations",
+    "severity": "warning",
+    "message": "Operation 'read' should be defined using a signature from the Azure.Core namespace."
+  }
+]

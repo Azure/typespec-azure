@@ -1,0 +1,50 @@
+{
+  "issues": [
+    {
+      "kind": "orphan-test-dir",
+      "ruleId": "AvoidAnonymousSchema"
+    },
+    {
+      "kind": "orphan-test-dir",
+      "ruleId": "BodyParamRepeatedInfo"
+    },
+    {
+      "kind": "orphan-test-dir",
+      "ruleId": "HasApiVersionParameter"
+    },
+    {
+      "kind": "orphan-test-dir",
+      "ruleId": "LroOriginalUri"
+    },
+    {
+      "kind": "orphan-test-dir",
+      "ruleId": "TrackedResourceTagsPropertyInRequest"
+    },
+    {
+      "kind": "missing-test-dir",
+      "ruleId": "LroPatch202"
+    },
+    {
+      "kind": "missing-test-dir",
+      "ruleId": "LroWithOriginalUriAsFinalState"
+    },
+    {
+      "kind": "missing-test-dir",
+      "ruleId": "ParametersOrder"
+    },
+    {
+      "kind": "missing-test-dir",
+      "ruleId": "PathResourceProviderNamePascalCase"
+    }
+  ],
+  "issueCounts": {
+    "missing-test-dir": 4,
+    "orphan-test-dir": 5,
+    "missing-rule-md": 0,
+    "no-case-dirs": 0,
+    "missing-explicit-severity": 0,
+    "missing-explicit-applicability": 0,
+    "mismatched-severity": 0,
+    "mismatched-applicability": 0
+  }
+}

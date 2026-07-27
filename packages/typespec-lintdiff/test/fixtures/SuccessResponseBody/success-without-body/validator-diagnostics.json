@@ -1,0 +1,14 @@
+[
+  {
+    "code": "SuccessResponseBody",
+    "message": "All success responses except 202 & 204 should define a response body.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "responses",
+      "200"
+    ],
+    "severity": 0
+  }
+]

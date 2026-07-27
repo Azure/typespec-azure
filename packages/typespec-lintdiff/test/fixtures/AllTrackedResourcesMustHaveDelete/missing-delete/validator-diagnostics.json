@@ -1,0 +1,11 @@
+[
+  {
+    "code": "AllTrackedResourcesMustHaveDelete",
+    "message": "The resource Widget does not have a corresponding delete operation.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

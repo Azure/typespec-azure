@@ -1,0 +1,11 @@
+[
+  {
+    "code": "EnumMustNotHaveEmptyValue",
+    "message": "Enum value must not contain empty value.",
+    "path": [
+      "definitions",
+      "Status"
+    ],
+    "severity": 0
+  }
+]

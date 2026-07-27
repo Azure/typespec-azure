@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PutRequestResponseSchemeArm",
+    "message": "A PUT operation request body schema should be the same as its 200 response schema, to allow reusing the same entity between GET and PUT. If the schema of the PUT request body is a superset of the GET response body, make sure you have a PATCH operation to make the resource updatable. Operation: 'Widgets_CreateOrUpdate' Request Model: 'parameters[4].schema' Response Model: 'responses[201].schema'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put"
+    ],
+    "severity": 0
+  }
+]

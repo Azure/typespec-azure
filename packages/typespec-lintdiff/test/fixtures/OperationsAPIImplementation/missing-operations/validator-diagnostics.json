@@ -1,0 +1,8 @@
+[
+  {
+    "code": "OperationsAPIImplementation",
+    "message": "Operations API must be implemented for 'Microsoft.TestService'.",
+    "path": [],
+    "severity": 0
+  }
+]

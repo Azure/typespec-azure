@@ -1,0 +1,16 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "Response body schema of pageable response should contain top-level property `nextLink`",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties"
+    ],
+    "severity": 0
+  }
+]

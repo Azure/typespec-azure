@@ -1,0 +1,33 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/documentation-required",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",
+      "count": 1
+    }
+  ]
+}

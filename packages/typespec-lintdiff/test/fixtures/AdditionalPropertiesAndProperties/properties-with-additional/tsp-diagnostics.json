@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/bad-record-type",
+    "severity": "warning",
+    "message": "Widget that uses 'is Record<string>' should not have properties."
+  }
+]

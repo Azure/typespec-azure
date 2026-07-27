@@ -1,0 +1,46 @@
+[
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter expand should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter modeHint should be removed. Point operation 'put' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter patchMode should be removed. Point operation 'patch' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter deleteMode should be removed. Point operation 'delete' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

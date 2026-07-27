@@ -1,0 +1,82 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/settings/{settingName}": {
+      "put": {
+        "operationId": "SettingsOperations_ReplaceSettings",
+        "description": "Update settings",
+        "parameters": [
+          {
+            "name": "settingName",
+            "in": "path",
+            "description": "The setting name",
+            "required": true,
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "settings",
+            "in": "body",
+            "description": "Replacement settings payload",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Settings"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Settings"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Settings": {
+      "type": "object",
+      "description": "Configuration settings",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Selected theme"
+        }
+      },
+      "required": [
+        "theme"
+      ]
+    }
+  },
+  "parameters": {}
+}

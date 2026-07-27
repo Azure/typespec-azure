@@ -1,0 +1,35 @@
+[
+  {
+    "code": "NamePropertyDefinitionInParameter",
+    "message": "Parameter Must have the \"name\" property defined with non-empty string as its value",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "NamePropertyDefinitionInParameter",
+    "message": "Parameter Must have the \"name\" property defined with non-empty string as its value",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "NamePropertyDefinitionInParameter",
+    "message": "Parameter Must have the \"name\" property defined with non-empty string as its value",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

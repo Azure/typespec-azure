@@ -1,0 +1,17 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/security-definition-description",
+    "severity": "warning",
+    "message": "Security definition should have a description."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/use-standard-operations",
+    "severity": "warning",
+    "message": "Operation 'createJob' should be defined using a signature from the Azure.Core namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

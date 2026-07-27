@@ -1,0 +1,22 @@
+[
+  {
+    "code": "OperationSummaryOrDescription",
+    "message": "Operation should have a summary or description.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "OperationSummaryOrDescription",
+    "message": "Operation should have a summary or description.",
+    "path": [
+      "paths",
+      "/widgets/{id}",
+      "get"
+    ],
+    "severity": 0
+  }
+]

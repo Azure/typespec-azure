@@ -1,0 +1,22 @@
+[
+  {
+    "code": "ApiVersionParameterRequired",
+    "message": "Operation should include an 'api-version' parameter.",
+    "path": [
+      "paths",
+      "/customOperation",
+      "post"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ApiVersionParameterRequired",
+    "message": "Operation should include an 'api-version' parameter.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [
+    {
+      "code": "NamePropertyDefinitionInParameter",
+      "count": 3
+    }
+  ]
+}

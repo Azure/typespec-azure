@@ -1,0 +1,22 @@
+[
+  {
+    "code": "ResponseSchemaSpecifiedForSuccessStatusCode",
+    "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ResponseSchemaSpecifiedForSuccessStatusCode",
+    "message": "The 201 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put"
+    ],
+    "severity": 0
+  }
+]

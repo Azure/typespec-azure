@@ -1,0 +1,14 @@
+[
+  {
+    "code": "AdditionalPropertiesObject",
+    "message": "additionalProperties with type object is a common error.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "metadata",
+      "additionalProperties"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "code": "InvalidSkuModel",
+    "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+    "path": [
+      "definitions",
+      "Sku"
+    ],
+    "severity": 0
+  }
+]

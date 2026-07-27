@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+    "severity": "warning",
+    "message": "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses."
+  }
+]

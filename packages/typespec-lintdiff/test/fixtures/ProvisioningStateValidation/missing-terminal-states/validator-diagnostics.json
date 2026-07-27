@@ -1,0 +1,13 @@
+[
+  {
+    "code": "ProvisioningStateValidation",
+    "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "provisioningState"
+    ],
+    "severity": 0
+  }
+]

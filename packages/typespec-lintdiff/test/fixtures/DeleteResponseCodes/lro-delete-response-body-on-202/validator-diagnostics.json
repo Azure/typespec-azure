@@ -1,0 +1,12 @@
+[
+  {
+    "code": "DeleteResponseCodes",
+    "message": "202 response for a LRO DELETE operation must not have a response schema specified.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete"
+    ],
+    "severity": 0
+  }
+]

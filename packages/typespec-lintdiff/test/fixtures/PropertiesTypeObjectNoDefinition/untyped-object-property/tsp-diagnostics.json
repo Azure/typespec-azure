@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+    "severity": "warning",
+    "message": "Properties with type:object must have definition of a reference model."
+  }
+]

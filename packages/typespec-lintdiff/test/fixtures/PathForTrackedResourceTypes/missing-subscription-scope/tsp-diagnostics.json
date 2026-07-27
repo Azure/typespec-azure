@@ -1,0 +1,12 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/list-in-operation-name",
+    "severity": "warning",
+    "message": "Operation 'patchWidgets' returns a list/pageable response and should use method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/patch-in-operation-name",
+    "severity": "warning",
+    "message": "'PATCH' operation 'patchWidgets' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

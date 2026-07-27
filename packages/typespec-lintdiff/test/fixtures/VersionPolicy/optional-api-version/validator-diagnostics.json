@@ -1,0 +1,14 @@
+[
+  {
+    "code": "VersionPolicy",
+    "message": "\"api-version\" should be a required parameter",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

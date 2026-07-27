@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    "severity": "warning",
+    "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
+  }
+]

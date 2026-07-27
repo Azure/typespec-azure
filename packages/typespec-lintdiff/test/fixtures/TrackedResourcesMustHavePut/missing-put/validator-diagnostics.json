@@ -1,0 +1,11 @@
+[
+  {
+    "code": "TrackedResourcesMustHavePut",
+    "message": "The tracked resource Widget does not have a corresponding put operation.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

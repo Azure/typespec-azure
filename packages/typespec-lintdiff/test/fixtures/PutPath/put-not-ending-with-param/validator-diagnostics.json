@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PutPath",
+    "message": "The path for a put should have a final path parameter.",
+    "path": [
+      "paths",
+      "/settings"
+    ],
+    "severity": 0
+  }
+]

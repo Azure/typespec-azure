@@ -1,0 +1,14 @@
+[
+  {
+    "code": "Post201Response",
+    "message": "Using post for a create operation is discouraged.",
+    "path": [
+      "paths",
+      "/jobs",
+      "post",
+      "responses",
+      "201"
+    ],
+    "severity": 0
+  }
+]

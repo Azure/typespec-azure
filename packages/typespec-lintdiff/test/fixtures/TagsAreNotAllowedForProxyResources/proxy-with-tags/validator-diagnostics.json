@@ -1,0 +1,34 @@
+[
+  {
+    "code": "TagsAreNotAllowedForProxyResources",
+    "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "path": [
+      "definitions",
+      "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate",
+      "properties",
+      "tags"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "TagsAreNotAllowedForProxyResources",
+    "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "path": [
+      "definitions",
+      "GadgetProperties",
+      "properties",
+      "tags"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "TagsAreNotAllowedForProxyResources",
+    "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "path": [
+      "definitions",
+      "WidgetUpdate",
+      "properties"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "code": "GetCollectionOnlyHasValueAndNextLink",
+    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.",
+    "path": [
+      "paths",
+      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.TestService/widgets/exampleWidget/parts",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties"
+    ],
+    "severity": 0
+  }
+]

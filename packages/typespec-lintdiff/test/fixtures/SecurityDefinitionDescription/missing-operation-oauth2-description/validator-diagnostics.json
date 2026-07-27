@@ -1,0 +1,11 @@
+[
+  {
+    "code": "SecurityDefinitionDescription",
+    "message": "Security definition should have a description.",
+    "path": [
+      "securityDefinitions",
+      "OAuth2Auth"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/auth-required",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-enum",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/use-standard-names",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/use-standard-operations",
+      "count": 1
+    }
+  ]
+}

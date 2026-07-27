@@ -1,0 +1,24 @@
+[
+  {
+    "code": "QueryParametersInCollectionGet",
+    "message": "Query parameter nameFilter should be removed. Collection Get's/List operation MUST not have query parameters other than api version & OData filter.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "QueryParametersInCollectionGet",
+    "message": "Query parameter tag should be removed. Collection Get's/List operation MUST not have query parameters other than api version & OData filter.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

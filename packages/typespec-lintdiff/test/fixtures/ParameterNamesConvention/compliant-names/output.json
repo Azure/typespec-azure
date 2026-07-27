@@ -1,0 +1,81 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets/{widgetName}": {
+      "get": {
+        "operationId": "GetWidget",
+        "parameters": [
+          {
+            "name": "widgetName",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "widget"
+          },
+          {
+            "name": "filterExpression",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-ms-client-name": "filter"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "trace-id",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "x-ms-client-name": "traceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

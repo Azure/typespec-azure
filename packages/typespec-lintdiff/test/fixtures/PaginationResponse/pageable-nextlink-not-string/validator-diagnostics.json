@@ -1,0 +1,18 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "`nextLink` property in pageable response should be type: string",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties",
+      "nextLink",
+      "type"
+    ],
+    "severity": 0
+  }
+]

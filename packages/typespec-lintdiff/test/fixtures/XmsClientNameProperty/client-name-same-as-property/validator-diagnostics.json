@@ -1,0 +1,14 @@
+[
+  {
+    "code": "XmsClientNameProperty",
+    "message": "Value of `x-ms-client-name` cannot be the same as Property/Model.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "name",
+      "x-ms-client-name"
+    ],
+    "severity": 0
+  }
+]

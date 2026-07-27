@@ -1,0 +1,15 @@
+[
+  {
+    "code": "OperationsApiResponseSchema",
+    "message": "The response schema of operations API '/providers/Microsoft.TestService/operations' does not match the ARM specification. Please standardize the schema.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get",
+      "responses",
+      "200",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

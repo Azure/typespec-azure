@@ -1,0 +1,14 @@
+[
+  {
+    "code": "Nullable",
+    "message": "Avoid the use of x-nullable.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "deletedAt",
+      "x-nullable"
+    ],
+    "severity": 0
+  }
+]

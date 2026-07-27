@@ -1,0 +1,106 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "GetWidget",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Widget name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget resource",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The widget name"
+        },
+        "config": {
+          "type": "object",
+          "description": "Nested config",
+          "properties": {
+            "settings": {
+              "type": "object",
+              "description": "Setting group",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "description": "Value"
+                }
+              },
+              "required": [
+                "value"
+              ]
+            }
+          },
+          "required": [
+            "settings"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "config"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern",
+    "severity": "warning",
+    "message": "The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParameter' to specify the name parameter with options to override default pattern RegEx expression."
+  }
+]

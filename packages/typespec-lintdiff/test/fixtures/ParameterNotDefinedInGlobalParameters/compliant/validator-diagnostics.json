@@ -1,0 +1,24 @@
+[
+  {
+    "code": "ParameterNotDefinedInGlobalParameters",
+    "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/details",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParameterNotDefinedInGlobalParameters",
+    "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/details",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

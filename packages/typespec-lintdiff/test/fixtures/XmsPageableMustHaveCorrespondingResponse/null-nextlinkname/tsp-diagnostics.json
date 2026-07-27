@@ -1,0 +1,57 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    "severity": "warning",
+    "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'Widget' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+    "severity": "warning",
+    "message": "Description must not match the name of the node it describes. Node name:'name' Description:'Name'"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'WidgetList' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "Resource GET operation must be decorated with @armResourceRead or @armResourceList."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+    "severity": "warning",
+    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "code": "PathResourceTypeNameCamelCase",
+    "message": "Resource type naming must follow camel case. Path: '/subscriptions/{subscriptionId}/providers/Microsoft.TestService/Widgets'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/Widgets"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PathResourceTypeNameCamelCase",
+    "message": "Resource type naming must follow camel case. Path: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/Widgets'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/Widgets"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PathResourceTypeNameCamelCase",
+    "message": "Resource type naming must follow camel case. Path: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/Widgets/{widgetName}'",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/Widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "XmsIdentifierValidation",
+    "message": "Missing identifier id in array item property",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "customTags"
+    ],
+    "severity": 1
+  }
+]

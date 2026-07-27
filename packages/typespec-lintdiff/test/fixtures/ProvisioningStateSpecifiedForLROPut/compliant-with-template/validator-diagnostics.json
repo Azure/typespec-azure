@@ -1,0 +1,22 @@
+[
+  {
+    "code": "ProvisioningStateSpecifiedForLROPut",
+    "message": "200 response schema in long running PUT operation is missing ProvisioningState property. A LRO PUT operations response schema must have ProvisioningState specified for the 200 and 201 status codes.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config",
+      "put"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ProvisioningStateSpecifiedForLROPut",
+    "message": "201 response schema in long running PUT operation is missing ProvisioningState property. A LRO PUT operations response schema must have ProvisioningState specified for the 200 and 201 status codes.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config",
+      "put"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathContainsResourceType",
+    "message": "The path for the CURD methods do not contain a resource type.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/{widgetName}/widgets"
+    ],
+    "severity": 0
+  }
+]

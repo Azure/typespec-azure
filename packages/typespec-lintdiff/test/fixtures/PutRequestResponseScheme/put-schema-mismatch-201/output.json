@@ -1,0 +1,123 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "put": {
+        "operationId": "Widgets_CreateOrUpdate",
+        "description": "Create or update a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Widget name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Widget body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WidgetRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created response",
+            "schema": {
+              "$ref": "#/definitions/WidgetCreated"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "WidgetCreated": {
+      "type": "object",
+      "description": "Widget created response body",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Widget identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Widget name"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "WidgetCreatedResponse": {
+      "type": "object",
+      "description": "Created response",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WidgetCreated",
+          "description": "Created widget"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "WidgetRequest": {
+      "type": "object",
+      "description": "Widget create request",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Widget name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

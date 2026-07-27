@@ -1,0 +1,13 @@
+[
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter $expand should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/sprockets/{sprocketName}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

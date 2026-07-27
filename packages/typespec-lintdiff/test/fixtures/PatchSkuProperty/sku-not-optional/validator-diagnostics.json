@@ -1,0 +1,14 @@
+[
+  {
+    "code": "PatchSkuProperty",
+    "message": "The patch operation body parameter schema should contain property 'sku'.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "patch",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

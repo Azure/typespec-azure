@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ApiVersionEnum",
+    "message": "The api-version parameter should not be an enum.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "parameters",
+      "1",
+      "enum"
+    ],
+    "severity": 0
+  }
+]

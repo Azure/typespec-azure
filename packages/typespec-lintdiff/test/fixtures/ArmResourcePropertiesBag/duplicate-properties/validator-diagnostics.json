@@ -1,0 +1,20 @@
+[
+  {
+    "code": "ArmResourcePropertiesBag",
+    "message": "Top level property names should not be repeated inside the properties bag for ARM resource 'Widget'. Properties [properties.name] conflict with ARM top level properties. Please rename these.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ArmResourcePropertiesBag",
+    "message": "Top level property names should not be repeated inside the properties bag for ARM resource 'Widget'. Properties [properties.type] conflict with ARM top level properties. Please rename these.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

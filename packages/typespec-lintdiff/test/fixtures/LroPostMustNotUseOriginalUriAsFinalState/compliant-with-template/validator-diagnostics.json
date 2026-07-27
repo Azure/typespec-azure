@@ -1,0 +1,13 @@
+[
+  {
+    "code": "LroPostMustNotUseOriginalUriAsFinalState",
+    "message": "The long running post operation must not use final-stat-via:original-uri.",
+    "path": [
+      "paths",
+      "/restart/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/restart",
+      "post",
+      "x-ms-long-running-operation-options"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "OperationId",
+    "message": "OperationId for get method should contain \"Get\" or \"list\"",
+    "path": [
+      "paths",
+      "/details/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

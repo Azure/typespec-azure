@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathCharacters",
+    "message": "Path contains non-recommended characters.",
+    "path": [
+      "paths",
+      "/foo/{bar}:baz/qux"
+    ],
+    "severity": 0
+  }
+]

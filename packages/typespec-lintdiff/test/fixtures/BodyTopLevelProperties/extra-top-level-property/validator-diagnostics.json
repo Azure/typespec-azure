@@ -1,0 +1,11 @@
+[
+  {
+    "code": "BodyTopLevelProperties",
+    "message": "Top level properties should be one of name, type, id, location, properties, tags, plan, sku, etag, managedBy, identity, zones. Model definition 'Widget' has extra properties ['extraProperty'].",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

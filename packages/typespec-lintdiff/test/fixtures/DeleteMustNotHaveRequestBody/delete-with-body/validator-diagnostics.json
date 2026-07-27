@@ -1,0 +1,14 @@
+[
+  {
+    "code": "DeleteMustNotHaveRequestBody",
+    "message": "The delete operation must not have a request body.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/forceDelete",
+      "delete",
+      "parameters",
+      "4"
+    ],
+    "severity": 0
+  }
+]

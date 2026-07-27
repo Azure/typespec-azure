@@ -1,0 +1,12 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "severity": "warning",
+    "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

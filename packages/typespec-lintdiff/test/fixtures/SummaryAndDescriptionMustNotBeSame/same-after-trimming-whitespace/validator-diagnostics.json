@@ -1,0 +1,12 @@
+[
+  {
+    "code": "SummaryAndDescriptionMustNotBeSame",
+    "message": "The summary and description values should not be same.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get"
+    ],
+    "severity": 0
+  }
+]

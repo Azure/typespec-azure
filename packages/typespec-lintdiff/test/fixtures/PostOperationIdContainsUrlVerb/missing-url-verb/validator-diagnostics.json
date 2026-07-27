@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PostOperationIdContainsUrlVerb",
+    "message": "OperationId should contain the verb: 'restart' in:'Widgets_DoSomething'. Consider updating the operationId",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/restart",
+      "post",
+      "operationId"
+    ],
+    "severity": 1
+  }
+]

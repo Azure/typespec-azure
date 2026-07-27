@@ -1,0 +1,7 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-response-body",
+    "severity": "warning",
+    "message": "The body of responses with success (2xx) status codes other than 202 and 204 should not be empty."
+  }
+]

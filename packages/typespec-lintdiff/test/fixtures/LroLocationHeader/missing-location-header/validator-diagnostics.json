@@ -1,0 +1,15 @@
+[
+  {
+    "code": "LroLocationHeader",
+    "message": "A 202 response should include an Location response header.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "responses",
+      "202",
+      "headers"
+    ],
+    "severity": 0
+  }
+]

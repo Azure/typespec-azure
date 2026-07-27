@@ -1,0 +1,13 @@
+[
+  {
+    "code": "DefinitionsPropertiesNamesCamelCase",
+    "message": "Property name should be camel case.",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "MyProperty"
+    ],
+    "severity": 0
+  }
+]

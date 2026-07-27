@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PatchContentType",
+    "message": "A patch operation should consume 'application/merge-patch+json' content type.",
+    "path": [
+      "paths",
+      "/widgets/{id}",
+      "patch"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ParameterNamesConvention",
+    "message": "Parameter name \"@request-id\" should not begin with '$' or '@'.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "parameters",
+      "0",
+      "name"
+    ],
+    "severity": 0
+  }
+]

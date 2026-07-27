@@ -1,0 +1,11 @@
+[
+  {
+    "code": "NestedResourcesMustHaveListOperation",
+    "message": "The nested resource \"WidgetSubPart\" does not have list operation, please add it.",
+    "path": [
+      "definitions",
+      "WidgetSubPart"
+    ],
+    "severity": 0
+  }
+]

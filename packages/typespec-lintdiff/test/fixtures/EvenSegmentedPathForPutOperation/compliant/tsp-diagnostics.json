@@ -1,0 +1,92 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "severity": "warning",
+    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "severity": "warning",
+    "message": "Properties of a PATCH request body must not be required, property:name."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  }
+]

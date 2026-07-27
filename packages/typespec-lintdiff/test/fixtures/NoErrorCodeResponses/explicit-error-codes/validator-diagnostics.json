@@ -1,0 +1,14 @@
+[
+  {
+    "code": "NoErrorCodeResponses",
+    "message": "Invalid status code specified. Please refer to the documentation for the allowed set.",
+    "path": [
+      "paths",
+      "/check/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/check",
+      "post",
+      "responses",
+      "404"
+    ],
+    "severity": 0
+  }
+]

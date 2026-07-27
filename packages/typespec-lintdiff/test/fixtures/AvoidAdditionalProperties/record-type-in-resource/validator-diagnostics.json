@@ -1,0 +1,13 @@
+[
+  {
+    "code": "AvoidAdditionalProperties",
+    "message": "Definitions must not have properties named additionalProperties except for user defined tags or predefined references.",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "metadata"
+    ],
+    "severity": 0
+  }
+]

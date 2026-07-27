@@ -1,0 +1,103 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/jobs": {
+      "post": {
+        "operationId": "Jobs_CreateJob",
+        "description": "Create a job",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Job body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Job created response",
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Job": {
+      "type": "object",
+      "description": "A job resource",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Job ID"
+        },
+        "status": {
+          "type": "string",
+          "description": "Job status"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "JobCreatedResponse": {
+      "type": "object",
+      "description": "Job created response",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Job",
+          "description": "The created job"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  "parameters": {}
+}

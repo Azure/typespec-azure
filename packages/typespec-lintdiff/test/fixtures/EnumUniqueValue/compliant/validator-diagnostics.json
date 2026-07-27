@@ -1,0 +1,11 @@
+[
+  {
+    "code": "EnumUniqueValue",
+    "message": "Enum must not contain duplicated value (case insentive).",
+    "path": [
+      "definitions",
+      "Status"
+    ],
+    "severity": 0
+  }
+]

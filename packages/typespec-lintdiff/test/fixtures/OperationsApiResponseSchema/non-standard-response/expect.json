@@ -1,0 +1,9 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [
+    {
+      "code": "OperationsApiResponseSchema",
+      "count": 1
+    }
+  ]
+}

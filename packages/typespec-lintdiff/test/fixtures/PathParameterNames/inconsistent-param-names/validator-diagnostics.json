@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathParameterNames",
+    "message": "Inconsistent path parameter names \"widgetId\" and \"name\".",
+    "path": [
+      "paths",
+      "/widgets/{widgetId}/details"
+    ],
+    "severity": 0
+  }
+]

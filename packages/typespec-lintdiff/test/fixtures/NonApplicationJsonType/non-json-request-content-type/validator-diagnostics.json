@@ -1,0 +1,14 @@
+[
+  {
+    "code": "NonApplicationJsonType",
+    "message": "Only content-type 'application/json' is supported by ARM",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/export",
+      "post",
+      "consumes",
+      "0"
+    ],
+    "severity": 0
+  }
+]

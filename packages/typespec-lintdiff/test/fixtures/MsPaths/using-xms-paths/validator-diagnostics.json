@@ -1,0 +1,10 @@
+[
+  {
+    "code": "MsPaths",
+    "message": "Don't use x-ms-paths except where necessary to support legacy APIs.",
+    "path": [
+      "x-ms-paths"
+    ],
+    "severity": 0
+  }
+]

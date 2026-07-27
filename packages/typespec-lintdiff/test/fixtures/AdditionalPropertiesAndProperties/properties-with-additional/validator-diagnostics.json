@@ -1,0 +1,26 @@
+[
+  {
+    "code": "AdditionalPropertiesAndProperties",
+    "message": "Don't specify additionalProperties as a sibling of properties.",
+    "path": [
+      "paths",
+      "/widgets/{id}",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "additionalProperties"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "AdditionalPropertiesAndProperties",
+    "message": "Don't specify additionalProperties as a sibling of properties.",
+    "path": [
+      "definitions",
+      "Widget",
+      "additionalProperties"
+    ],
+    "severity": 0
+  }
+]

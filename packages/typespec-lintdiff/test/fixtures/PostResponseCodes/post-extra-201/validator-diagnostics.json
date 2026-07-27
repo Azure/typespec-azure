@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PostResponseCodes",
+    "message": "Synchronous POST operations must have one of the following combinations of responses - 200 and default ; 204 and default. No other response codes are permitted.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/reset",
+      "post"
+    ],
+    "severity": 0
+  }
+]

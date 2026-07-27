@@ -1,0 +1,3137 @@
+[
+  {
+    "id": "AdditionalPropertiesAndProperties",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Don't specify additionalProperties as a sibling of properties.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/bad-record-type' rule."
+  },
+  {
+    "id": "AdditionalPropertiesObject",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "additionalProperties with type object is a common error.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AllProxyResourcesShouldHaveDelete",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "RPC-Delete-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AllResourcesMustHaveGetOperation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-04",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AllTrackedResourcesMustHaveDelete",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Delete-V1-03",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ApiHost",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The host is required for management plane specs.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ApiVersionEnum",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "The api-version parameter should not be an enum.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ApiVersionParameterRequired",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "All operations should have api-version query parameter.",
+    "rpcCode": "RPC-Uri-V1-08",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "APIVersionPattern",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The API Version parameter MUST be in the Year-Month-Date format (i.e. 2016-07-04.)  NOTE that this is the en-US ordering of month and date.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ArmResourcePropertiesBag",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), top level properties should not be repeated inside the properties bag for ARM resources.",
+    "rpcCode": "RPC-Get-V1-07",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ArrayMustHaveType",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Array type must have a type except for any type.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ArraySchemaMustHaveItems",
+    "engine": "native",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AvoidAdditionalProperties",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Definitions must not have properties named additionalProperties except for user defined tags or predefined references.",
+    "rpcCode": "RPC-Policy-V1-05, RPC-Put-V1-23",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/no-record' rule."
+  },
+  {
+    "id": "AvoidAnonymousParameter",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AvoidAnonymousTypes",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "This rule appears when you define a model type inline, rather than in the definitions section. If the model represents the same type as another parameter in a different operation, then it becomes impossible to reuse that same class for both operations.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AvoidEmptyResponseSchema",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AvoidMsdnReferences",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AvoidNestedProperties",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Nested properties can result into bad user experience especially when creating request objects. `x-ms-client-flatten` flattens the model properties so that the users can analyze and set the properties much more easily.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "AzureResourceTagsSchema",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "BodyTopLevelProperties",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), top level properties of a resource should be only ones from the allowed set.",
+    "rpcCode": "RPC-Put-V1-06",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "CollectionObjectPropertiesNaming",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Per ARM guidelines, a model returned by an `x-ms-pageable` operation must have a property named `value`. This property indicates what type of array the object is.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ConsistentPatchProperties",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The properties in the patch body must be present in the resource model and follow json merge patch.",
+    "rpcCode": "RPC-Patch-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ConsistentResponseBody",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Ensure the get, put, and patch response body schemas are consistent.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ConsistentResponseSchemaForPut",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "A Put operation must return the same schema for 200 and 201 response codes",
+    "rpcCode": "RPC-Put-V1-29",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ControlCharactersAreNotAllowed",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DefaultErrorResponseSchema",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DefaultInEnum",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "This rule applies when the value specified by the default property does not appear in the enum constraint for a schema.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DefaultResponse",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "All operations should have a default (error) response.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DefinitionsPropertiesNamesCamelCase",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Property names should be camel case.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "Delete204Response",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "A delete operation should have a 204 response.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DeleteInOperationName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DeleteMustNotHaveRequestBody",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The delete operation must not have a request body.",
+    "rpcCode": "RPC-Delete-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DeleteOperationResponses",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Delete-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DeleteResponseBodyEmpty",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The delete response body must be empty.",
+    "rpcCode": "RPC-Delete-V1-04",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DeleteResponseCodes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Synchronous DELETE must have 200 & 204 return codes and LRO DELETE must have 202 & 204 return codes.",
+    "rpcCode": "RPC-Delete-V1-01, RPC-Async-V1-09",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes' rule."
+  },
+  {
+    "id": "DeprecatedXmsCodeGenerationSetting",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DescriptionMustNotBeNodeName",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "DescriptiveDescriptionRequired",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The value of the 'description' property must be descriptive. It cannot be spaces or empty description.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "docLinkLocale",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "This rule is to ensure the documentation link in the description does not contains any locale.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EnumInsteadOfBoolean",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Booleans properties are not descriptive in all cases and can make them to use, evaluate whether is makes sense to keep the property as boolean or turn it into an enum.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EnumMustHaveType",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EnumMustNotHaveEmptyValue",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EnumMustRespectType",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EnumUniqueValue",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ErrorResponse",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Error response body should conform to Microsoft Azure API Guidelines.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "EvenSegmentedPathForPutOperation",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "API path with PUT operation defined MUST have even number of segments (i.e. end in {resourceType}/{resourceName} segments).",
+    "rpcCode": "RPC-Put-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ExtensionResourcePathPattern",
+    "engine": "native",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "Formdata",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Check for appropriate use of formData parameters.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetCollectionOnlyHasValueAndNextLink",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.",
+    "rpcCode": "RPC-Get-V1-09, RPC-Arg-V1-01, RPC-Get-V1-06",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetCollectionResponseSchema",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-10",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetInOperationName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetMustNotHaveRequestBody",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The Get operation must not have a request body.",
+    "rpcCode": "RPC-Get-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetOperationMustNotBeLongRunning",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+    "rpcCode": "RPC-Get-V1-14",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GetResponseCodes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "GuidUsage",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "HeaderDisallowed",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Authorization, Content-type, and Accept headers should not be defined explicitly.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "HostParametersValidation",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "error",
+    "description": "Validate the parameters in x-ms-parameterized-host.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "HttpsSupportedScheme",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "Verifies whether specification supports HTTPS scheme or not.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ImplementPrivateEndpointAPIs",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "This rule is to check if all the APIs for private endpoint are implemented.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "IntegerTypeMustHaveFormat",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "InvalidSkuModel",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "InvalidVerbUsed",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LatestVersionOfCommonTypesMustBeUsed",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "This rule checks for references that aren't using latest version of common-types.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LicenseHeaderMustNotBeSpecified",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ListInOperationName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines when response contains array of items.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LocationMustHaveXmsMutability",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "A tracked resource's location property must have the x-ms-mutability properties set as read, create.",
+    "rpcCode": "RPC-Put-V1-14",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LongRunningOperationsOptionsValidator",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LongRunningResponseStatusCodeDataPlane",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroErrorContent",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "rpcCode": "RPC-Common-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroExtension",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "Operations with a 202 response must specify `x-ms-long-running-operation: true`. GET operation is excluded from the validation as GET will have 202 only if it is a polling action & hence x-ms-long-running-operation wouldn't be defined",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroHeaders",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "A 202 response should include an Operation-Location response header.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroLocationHeader",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Location header must be supported for all async operations that return 202.",
+    "rpcCode": "RPC-Async-V1-07",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-location-header' rule."
+  },
+  {
+    "id": "LroPatch202",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Async PATCH should return 202.",
+    "rpcCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroPostMustNotUseOriginalUriAsFinalState",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The long running post operation must not use final-stat-via:original-uri.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroStatusCodesReturnTypeSchema",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The '200'/'201' responses of the long running operation must have a schema definition.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "LroWithOriginalUriAsFinalState",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The long running operation with final-state-via:original-uri should have a sibling 'get' operation.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MissingDefaultResponse",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "All operations should have a default (error) response.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MissingSegmentsInNestedResourceListOperation",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "A nested resource type's List operation must include all the parent segments in its api path.",
+    "rpcCode": "RPC-Get-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MissingTypeObject",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MissingXmsErrorResponse",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MsPaths",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Don't use x-ms-paths except where necessary to support legacy APIs.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "MutabilityWithReadOnly",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NamePropertyDefinitionInParameter",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "A parameter must have a `name` property for the SDK to be properly generated.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NestedResourcesMustHaveListOperation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NextLinkPropertyMustExist",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "Per definition of AutoRest x-ms-pageable extension, the property specified by nextLinkName must exist in the 200 response schema.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NoDuplicatePathsForScopeParameter",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Uri-V1-10",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NoErrorCodeResponses",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Invalid status code specified. Please refer to the documentation for the allowed set.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NonApplicationJsonType",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "NonEmptyClientName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The 'x-ms-client-name' extension is used to change the name of a parameter or property in the generated code.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "Nullable",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Avoid the use of x-nullable.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by Azure Core '@azure-tools/typespec-azure-core/no-nullable' rule"
+  },
+  {
+    "id": "OperationId",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "OperationId should conform to Azure API Guidelines",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationIdNounConflictingModelNames",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "The first part of an operation Id separated by an underscore i.e., `Noun` in a `Noun_Verb` should not conflict with names of the models defined in the definitions section. If this happens, AutoRest appends `Model` to the name of the model to resolve the conflict (`NounModel` in given example) with the name of the client itself (which will be named as `Noun` in given example). This can result in an inconsistent user experience.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationIdNounVerb",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "OperationId should be of the form `Noun_Verb`.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationIdRequired",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationIdSingleUnderscore",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "An operationId can have exactly one underscore, not adhering to it can cause errors in code generation.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationsAPIImplementation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), each RP must expose an operations API that returns information about all the operations available with the service.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationsApiResponseSchema",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationsApiSchemaUsesCommonTypes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Operations API path must follow the schema provided in the common types.",
+    "rpcCode": "RPC-Operations-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationsApiTenantLevelOnly",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The get operations endpoint must only be at the tenant level.",
+    "rpcCode": "RPC-Operations-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "OperationSummaryOrDescription",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Operation should have a summary or description.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule."
+  },
+  {
+    "id": "PageableOperation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PageableRequires200Response",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "Per definition of AutoRest x-ms-pageable extension, the response schema must contain a 200 response schema.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PaginationResponse",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "An operation that returns a list that is potentially large should support pagination.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterDefaultNotAllowed",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "A required parameter should not specify a default value.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterDescription",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "All parameters should have a description.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule."
+  },
+  {
+    "id": "ParameterDescriptionRequired",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The value of the 'description' property must be descriptive. It cannot be spaces or empty description.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule."
+  },
+  {
+    "id": "ParameterNamesConvention",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Parameter names should conform to Azure naming conventions.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterNamesUnique",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "All parameter names for an operation should be case-insensitive unique.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterNotDefinedInGlobalParameters",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "Per ARM guidelines, if `subscriptionId` is used anywhere as a path parameter, it must always be defined as global parameter. `api-version` is almost always an input parameter in any ARM spec and must also be defined as a global parameter.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterNotUsingCommonTypes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "This rule checks for parameters defined in common-types that are not using the common-types definition.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParameterOrder",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Path parameters must be in the same order as in the path.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParametersInPointGet",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Point Get's MUST not have query parameters other than api version.",
+    "rpcCode": "RPC-Get-V1-08",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParametersInPost",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "For a POST action parameters MUST be in the payload and not in the URI.",
+    "rpcCode": "RPC-POST-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParametersOrder",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ParametersSchemaAsTypeObject",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "rpcCode": "RPC-POST-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchBodyParametersSchema",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "A request parameter of the Patch Operation must not have a required/default/'x-ms-mutability: [\\",
+    "rpcCode": "RPC-Patch-V1-10",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchContentType",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "The request body content type for patch operations should be JSON merge patch.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchIdentityProperty",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "RP must implement PATCH for the 'identity' envelope property If it's defined in the resource model.",
+    "rpcCode": "RPC-Patch-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchInOperationName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchPropertiesCorrespondToPutProperties",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "PATCH request body must only contain properties present in the corresponding PUT request body, and must contain at least one property.",
+    "rpcCode": "RPC-Patch-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchResponseCodes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Synchronous PATCH must have 200 return code and LRO PATCH must have 200 and 202 return codes.",
+    "rpcCode": "RPC-Patch-V1-06",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PatchSkuProperty",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "RP should consider implementing Patch for the 'SKU' envelope property if it's defined in the resource model and the service supports its updation.",
+    "rpcCode": "RPC-Patch-V1-09",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathCharacters",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Path should contain only recommended characters.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathContainsResourceGroup",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Path for resource group scoped CRUD methods MUST contain a resourceGroupName parameter.",
+    "rpcCode": "RPC-Uri-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathContainsResourceType",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Path for resource CRUD methods MUST contain a resource type.",
+    "rpcCode": "RPC-Uri-V1-04",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathContainsSubscriptionId",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Path for resource group scoped CRUD methods MUST contain a subscriptionId parameter.",
+    "rpcCode": "RPC-Uri-V1-01",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathForNestedResource",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Path for CRUD methods on a nested resource type MUST follow valid resource naming.",
+    "rpcCode": "RPC-Uri-V1-06",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathForResourceAction",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Path for 'post' method on a resource type MUST follow valid resource naming.",
+    "rpcCode": "RPC-Uri-V1-07, RPC-POST-V1-01, RPC-POST-V1-07",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathForTrackedResourceTypes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The path must be under a subscription and resource group for tracked resource types.",
+    "rpcCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathParameterNames",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Path parameter names should be consistent across all paths.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathParameterSchema",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Path parameter should be type: string and specify maxLength and pattern.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathResourceProviderMatchNamespace",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Uri-V1-03",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathResourceProviderNamePascalCase",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PathResourceTypeNameCamelCase",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "Post201Response",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Using post for a create operation is discouraged.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PostOperationIdContainsUrlVerb",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PostResponseCodes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Synchronous POST must return 200 when a response body is required or 204 when no body is needed; LRO POST must initially return 202, with the final response returning 200 if a body is expected or 204 if not.",
+    "rpcCode": "RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes' rule."
+  },
+  {
+    "id": "PreviewVersionOverOneYear",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PrivateEndpointResourceSchemaValidation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PropertiesTypeObjectNoDefinition",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.",
+    "rpcCode": "RPC-Policy-V1-03",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PropertyDescription",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "All schema properties should have a description.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule."
+  },
+  {
+    "id": "PropertyType",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "All schema properties should have a defined type.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ProvisioningStateMustBeReadOnly",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "This is a rule introduced to validate if provisioningState property is set to readOnly or not.",
+    "rpcCode": "RPC-Async-V1-16",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state' rule."
+  },
+  {
+    "id": "ProvisioningStateSpecifiedForLROPatch",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Async-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ProvisioningStateSpecifiedForLROPut",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Async-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ProvisioningStateValidation",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+    "rpcCode": "RPC-Async-V1-03",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state' rule."
+  },
+  {
+    "id": "PutGetPatchResponseSchema",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Put-V1-12",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PutInOperationName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether value for `operationId` is named as per ARM guidelines.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PutPath",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "The path for a put should have a final path parameter.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PutRequestResponseScheme",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "The request & response('200') schema of the PUT operation must be same.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PutRequestResponseSchemeArm",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The request & response('200') schema of the PUT operation must be same.",
+    "rpcCode": "RPC-Put-V1-25",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "PutResponseCodes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "LRO and Synchronous PUT must have 200 & 201 return codes.",
+    "rpcCode": "RPC-Async-V1-01, RPC-Put-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes' rule."
+  },
+  {
+    "id": "QueryParametersInCollectionGet",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Collection Get's/List operations MUST not have query parameters other than api-version & OData filter.",
+    "rpcCode": "RPC-Get-V1-15",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RepeatedPathInfo",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Information in the Path should not be repeated in the request body (i.e. subscription ID, resource group name, resource name).",
+    "rpcCode": "RPC-Put-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequestBodyMustExistForPutPatch",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Every Put and Patch operation must have a request body",
+    "rpcCode": "RPC-Put-V1-28, RPC-Patch-V1-12",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequestBodyNotAllowed",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "A get or delete operation must not accept a body parameter.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequestBodyOptional",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Flag optional request body -- common oversight.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequestSchemaForTrackedResourcesMustHaveTags",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "A tracked resource MUST always have tags as a top level optional property",
+    "rpcCode": "RPC-Put-V1-07",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequiredDefaultResponse",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequiredPropertiesMissingInResourceModel",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-03, RPC-Put-V1-08",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "RequiredReadOnlySystemData",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ReservedResourceNamesModelAsEnum",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "Service-defined (reserved) resource names should be represented as an enum type with modelAsString set to true, not as a static string in the path.",
+    "rpcCode": "RPC-ConstrainedCollections-V1-04",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ResourceHasXMsResourceEnabled",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "A 'Resource' definition must have x-ms-azure-resource extension enabled and set to true. This will indicate that the model is an Azure resource.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ResourceNameRestriction",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "This rule ensures that the authors explicitly define these restrictions as a regex on the resource name.",
+    "rpcCode": "RPC-Uri-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern' rule."
+  },
+  {
+    "id": "ResponseSchemaSpecifiedForSuccessStatusCode",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+    "rpcCode": "RPC-Put-V1-24",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "Rpaas_ResourceProvisioningState",
+    "engine": "native",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SchemaDescriptionOrTitle",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "All schemas should have a description or title.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/documentation-required' rule."
+  },
+  {
+    "id": "SchemaNamesConvention",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Schema names should be Pascal case.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": true,
+    "disableForTypeSpecDataPlaneReason": "Covered by TSP's '@azure-tools/typespec-azure-core/casing-style' rule."
+  },
+  {
+    "id": "SchemaTypeAndFormat",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Schema should use well-defined type and format.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SecurityDefinitionDescription",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "A security definition should have a description.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SecurityDefinitionsStructure",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SubscriptionIdParameterInOperations",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SubscriptionsAndResourceGroupCasing",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "The subscriptions and resourceGroup in resource uri should follow lower camel case.",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SuccessResponseBody",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "All success responses except 202 & 204 should define a response body.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SummaryAndDescriptionMustNotBeSame",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SystemDataDefinitionsCommonTypes",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "System data references must utilize common types.",
+    "rpcCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "SystemDataInPropertiesBag",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "System data must be defined as a top-level property, not in the properties bag.",
+    "rpcCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TagsAreNotAllowedForProxyResources",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "rpcCode": "RPC-Put-V1-31",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TenantLevelAPIsNotAllowed",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "Tenant level APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+    "rpcCode": "RPC-Uri-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TopLevelResourcesListByResourceGroup",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TopLevelResourcesListBySubscription",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Get-V1-05",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TrackedExtensionResourcesAreNotAllowed",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Extension resources are always considered to be proxy and must not be of the type tracked.",
+    "rpcCode": "RPC-Uri-V1-12",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TrackedResourceBeyondsThirdLevel",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Put-V1-19",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TrackedResourcePatchOperation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "TrackedResourcesMustHavePut",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Put-V1-22",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "UniqueClientParameterName",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "UniqueModelName",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "UniqueXmsEnumName",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "UniqueXmsExample",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "UnSupportedPatchProperties",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Patch may not change the name, location, or type of the resource.",
+    "rpcCode": "RPC-Patch-V1-02",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ValidFormats",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ValidQueryParametersForPointOperations",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "Point operations (GET, PUT, PATCH, DELETE) must not include any query parameters other than api-version.",
+    "rpcCode": "RPC-Uri-V1-13",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "ValidResponseCodeRequired",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "VersionConvention",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "API version should be a date in YYYY-MM-DD format, optionally suffixed with '-preview'.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "VersionPolicy",
+    "engine": "spectral",
+    "applicability": "DataPlane",
+    "severity": "warning",
+    "description": "Specify API version using `api-version` query parameter, not in path.",
+    "rpcCode": "",
+    "sources": [
+      "dataplane"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsClientName",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The 'x-ms-client-name' extension is used to change the name of a parameter or property in the generated code. By using the 'x-ms-client-name' extension, a name can be defined for use specifically in code generation, separately from the name on the wire. It can be used for query parameters and header parameters, as well as properties of schemas. This name is case sensitive.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsClientNameParameter",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "The `x-ms-client-name` extension is used to change the name of a parameter or property in the generated code. ",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsClientNameProperty",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "The `x-ms-client-name` extension is used to change the name of a parameter or property in the generated code.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsEnumValidation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsExamplesRequired",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "warning",
+    "description": "Verifies whether `x-ms-examples` are provided for each operation or not.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsIdentifierValidation",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XMSLongRunningOperationProperty",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+    "rpcCode": "RPC-Async-V1-15",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsPageableForListCalls",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "`x-ms-pageable` extension must be specified for LIST APIs.",
+    "rpcCode": "RPC-Get-V1-11",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsPageableListByRGAndSubscriptions",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "warning",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsPageableMustHaveCorrespondingResponse",
+    "engine": "native",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsParameterLocation",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsPathsMustOverloadPaths",
+    "engine": "spectral",
+    "applicability": "Both",
+    "severity": "error",
+    "description": "The `x-ms-paths` extension allows us to overload an existing path based on path parameters. We cannot specify an `x-ms-paths` without a path that already exists in the `paths` section.",
+    "rpcCode": "",
+    "sources": [
+      "common"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XmsResourceInPutResponse",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Put-V1-12",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  },
+  {
+    "id": "XMSSecretInResponse",
+    "engine": "spectral",
+    "applicability": "ARM",
+    "severity": "error",
+    "description": "",
+    "rpcCode": "RPC-Put-V1-13",
+    "sources": [
+      "arm"
+    ],
+    "disableForTypeSpec": false,
+    "disableForTypeSpecReason": "",
+    "disableForTypeSpecDataPlane": false,
+    "disableForTypeSpecDataPlaneReason": ""
+  }
+]

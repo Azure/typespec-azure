@@ -1,0 +1,12 @@
+[
+  {
+    "code": "XmsExamplesRequired",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get"
+    ],
+    "severity": 0
+  }
+]

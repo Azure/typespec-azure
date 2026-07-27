@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathParameterNames",
+    "message": "Inconsistent path parameter names \"bookName\" and \"bookId\".",
+    "path": [
+      "paths",
+      "/libraries/{libraryId}/books/{bookName}"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "code": "XMSLongRunningOperationProperty",
+    "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/start",
+      "post",
+      "responses",
+      "200",
+      "headers",
+      "Location"
+    ],
+    "severity": 0
+  }
+]

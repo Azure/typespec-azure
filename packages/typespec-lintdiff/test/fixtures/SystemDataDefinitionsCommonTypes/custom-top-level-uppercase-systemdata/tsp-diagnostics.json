@@ -1,0 +1,12 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property",
+    "severity": "warning",
+    "message": "Property \"SystemData\" is not valid in the resource envelope.  Please remove this property, or add it to the resource-specific property bag."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/casing-style",
+    "severity": "warning",
+    "message": "The names of Property types must use camelCase"
+  }
+]

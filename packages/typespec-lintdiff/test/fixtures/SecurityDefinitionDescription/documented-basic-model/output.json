@@ -1,0 +1,97 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "DocumentedBasicAuth": {
+      "type": "basic",
+      "description": "Basic authentication for this test service"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets": {
+      "get": {
+        "operationId": "Widgets_GetWidget",
+        "description": "Gets a widget",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DocumentedBasicAuth": {
+      "type": "object",
+      "description": "Basic authentication for this test service",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Http authentication",
+          "enum": [
+            "http"
+          ]
+        },
+        "scheme": {
+          "type": "string",
+          "description": "basic auth scheme",
+          "enum": [
+            "Basic"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "type",
+        "scheme"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "parameters": {}
+}

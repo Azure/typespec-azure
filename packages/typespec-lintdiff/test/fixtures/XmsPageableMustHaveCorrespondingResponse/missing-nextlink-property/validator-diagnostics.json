@@ -1,0 +1,12 @@
+[
+  {
+    "code": "XmsPageableMustHaveCorrespondingResponse",
+    "message": "The operation: 'ListWidgets' is defined with x-ms-pageable enabled,but can not find the corresponding nextLink property in the response, please add it.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get"
+    ],
+    "severity": 0
+  }
+]

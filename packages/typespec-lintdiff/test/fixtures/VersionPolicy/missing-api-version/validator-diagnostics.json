@@ -1,0 +1,13 @@
+[
+  {
+    "code": "VersionPolicy",
+    "message": "Operation does not define an \"api-version\" query parameter.",
+    "path": [
+      "paths",
+      "/widgets/{name}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

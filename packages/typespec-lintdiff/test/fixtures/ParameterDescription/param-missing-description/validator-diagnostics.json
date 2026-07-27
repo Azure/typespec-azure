@@ -1,0 +1,14 @@
+[
+  {
+    "code": "ParameterDescription",
+    "message": "Parameter should have a description.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

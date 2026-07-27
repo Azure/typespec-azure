@@ -1,0 +1,26 @@
+[
+  {
+    "code": "AvoidNestedProperties",
+    "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "config"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "AvoidNestedProperties",
+    "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "config",
+      "properties",
+      "settings"
+    ],
+    "severity": 0
+  }
+]

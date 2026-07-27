@@ -1,0 +1,38 @@
+[
+  {
+    "code": "SchemaNamesConvention",
+    "message": "Schema name should be Pascal case.",
+    "path": [
+      "definitions",
+      "Azure.Core.Foundations.Error"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "SchemaNamesConvention",
+    "message": "Schema name should be Pascal case.",
+    "path": [
+      "definitions",
+      "Azure.Core.Foundations.ErrorResponse"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "SchemaNamesConvention",
+    "message": "Schema name should be Pascal case.",
+    "path": [
+      "definitions",
+      "Azure.Core.Foundations.InnerError"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "SchemaNamesConvention",
+    "message": "Schema name should be Pascal case.",
+    "path": [
+      "definitions",
+      "widgetResponse"
+    ],
+    "severity": 0
+  }
+]

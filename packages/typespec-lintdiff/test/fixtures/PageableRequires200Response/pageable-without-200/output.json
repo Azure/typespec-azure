@@ -1,0 +1,89 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/widgets": {
+      "patch": {
+        "operationId": "PatchWidgets",
+        "description": "Patch widgets",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The request has been accepted for processing, but processing has not yet completed.",
+            "schema": {
+              "$ref": "#/definitions/WidgetList"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AcceptedList": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WidgetList"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "description": "A widget",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Widget name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "WidgetList": {
+      "type": "object",
+      "description": "Widget list",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "Values",
+          "items": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "Next link"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  "parameters": {}
+}

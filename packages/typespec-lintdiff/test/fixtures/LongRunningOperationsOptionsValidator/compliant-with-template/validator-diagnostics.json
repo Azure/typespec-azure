@@ -1,0 +1,11 @@
+[
+  {
+    "code": "LongRunningOperationsOptionsValidator",
+    "message": "A LRO Post operation with return schema must have \"x-ms-long-running-operation-options\" extension enabled.",
+    "path": [
+      "paths",
+      "/start/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/start"
+    ],
+    "severity": 0
+  }
+]

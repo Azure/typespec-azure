@@ -1,0 +1,104 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/jobs": {
+      "post": {
+        "operationId": "CreateJob",
+        "description": "Create a job",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Job",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          },
+          "202": {
+            "description": "Accepted response without Operation-Location",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "Location header"
+              }
+            }
+          }
+        },
+        "x-ms-long-running-operation": true
+      }
+    }
+  },
+  "definitions": {
+    "AcceptedResponse": {
+      "type": "object",
+      "description": "Accepted response without Operation-Location"
+    },
+    "Job": {
+      "type": "object",
+      "description": "A job",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Job ID"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    }
+  },
+  "parameters": {}
+}

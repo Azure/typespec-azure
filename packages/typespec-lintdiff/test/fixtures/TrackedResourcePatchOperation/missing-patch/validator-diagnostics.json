@@ -1,0 +1,11 @@
+[
+  {
+    "code": "TrackedResourcePatchOperation",
+    "message": "Tracked resource 'Widget' must have patch operation that at least supports the update of tags.",
+    "path": [
+      "definitions",
+      "Widget"
+    ],
+    "severity": 0
+  }
+]

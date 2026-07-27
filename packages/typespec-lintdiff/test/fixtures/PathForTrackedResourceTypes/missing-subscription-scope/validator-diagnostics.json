@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathForTrackedResourceTypes",
+    "message": "The path must be under a subscription and resource group for tracked resource types.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/widgets/{widgetName}"
+    ],
+    "severity": 0
+  }
+]

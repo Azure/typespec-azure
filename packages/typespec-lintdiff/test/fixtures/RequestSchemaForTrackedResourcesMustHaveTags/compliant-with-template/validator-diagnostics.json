@@ -1,0 +1,12 @@
+[
+  {
+    "code": "RequestSchemaForTrackedResourcesMustHaveTags",
+    "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/sub",
+      "put"
+    ],
+    "severity": 0
+  }
+]

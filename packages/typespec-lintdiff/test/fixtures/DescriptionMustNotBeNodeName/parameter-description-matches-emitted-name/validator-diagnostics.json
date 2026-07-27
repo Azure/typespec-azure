@@ -1,0 +1,15 @@
+[
+  {
+    "code": "DescriptionMustNotBeNodeName",
+    "message": "Description must not match the name of the node it is supposed to describe. Node name:'widgetName' Description:'widgetName.'",
+    "path": [
+      "paths",
+      "/widgets/{widgetName}",
+      "get",
+      "parameters",
+      "0",
+      "description"
+    ],
+    "severity": 0
+  }
+]

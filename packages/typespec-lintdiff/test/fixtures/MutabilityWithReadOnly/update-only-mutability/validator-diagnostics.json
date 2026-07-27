@@ -1,0 +1,17 @@
+[
+  {
+    "code": "MutabilityWithReadOnly",
+    "message": "When property is modeled as \"readOnly\": true then x-ms-mutability extension can only have \"read\" value. When property is modeled as \"readOnly\": false then applying x-ms-mutability extension with only \"read\" value is not allowed. Extension contains invalid values: 'update'.",
+    "path": [
+      "paths",
+      "/widgets/{id}",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties",
+      "status"
+    ],
+    "severity": 0
+  }
+]

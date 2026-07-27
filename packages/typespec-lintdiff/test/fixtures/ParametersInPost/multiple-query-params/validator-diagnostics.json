@@ -1,0 +1,24 @@
+[
+  {
+    "code": "ParametersInPost",
+    "message": "mode is a query parameter. Post operation must not contain any query parameter other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/doAction",
+      "post",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersInPost",
+    "message": "format is a query parameter. Post operation must not contain any query parameter other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/doAction",
+      "post",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "DefaultResponse",
+    "message": "Operation is missing a default response.",
+    "path": [
+      "paths",
+      "/widgets/details",
+      "get",
+      "responses"
+    ],
+    "severity": 0
+  }
+]

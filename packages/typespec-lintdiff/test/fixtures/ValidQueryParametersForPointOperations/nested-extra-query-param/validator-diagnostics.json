@@ -1,0 +1,24 @@
+[
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter expand should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/gadgets/{gadgetName}",
+      "get",
+      "parameters"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ValidQueryParametersForPointOperations",
+    "message": "Query parameter validationMode should be removed. Point operation 'put' MUST not have query parameters other than api-version.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/gadgets/{gadgetName}",
+      "put",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

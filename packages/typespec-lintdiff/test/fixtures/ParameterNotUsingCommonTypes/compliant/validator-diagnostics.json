@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ParameterNotUsingCommonTypes",
+    "message": "Not using the common-types defined parameter \"subscriptionId\".",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/widgets/{name}",
+      "get",
+      "parameters",
+      "0",
+      "name"
+    ],
+    "severity": 0
+  }
+]

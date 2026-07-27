@@ -1,0 +1,11 @@
+[
+  {
+    "code": "PathCharacters",
+    "message": "Path contains non-recommended characters.",
+    "path": [
+      "paths",
+      "/api[]"
+    ],
+    "severity": 0
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PutInOperationName",
+    "message": "'PUT' operation 'Widgets_Set' should use method name 'Create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config",
+      "put",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]

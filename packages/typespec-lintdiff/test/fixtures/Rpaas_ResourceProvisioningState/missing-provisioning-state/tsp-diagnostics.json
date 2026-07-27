@@ -1,0 +1,22 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+    "severity": "warning",
+    "message": "Specify the ARM common-types version using the @armCommonTypesVersion decorator on the service namespace or on each version of the service version enum."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern",
+    "severity": "warning",
+    "message": "The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParameter' to specify the name parameter with options to override default pattern RegEx expression."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    "severity": "warning",
+    "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'WidgetProperties' should have a documentation or description, use doc comment /** */ to provide it."
+  }
+]

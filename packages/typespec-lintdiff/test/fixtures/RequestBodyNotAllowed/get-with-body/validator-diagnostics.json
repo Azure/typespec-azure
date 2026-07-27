@@ -1,0 +1,15 @@
+[
+  {
+    "code": "RequestBodyNotAllowed",
+    "message": "A get or delete operation must not accept a body parameter.",
+    "path": [
+      "paths",
+      "/widgets/search",
+      "get",
+      "parameters",
+      "1",
+      "in"
+    ],
+    "severity": 0
+  }
+]

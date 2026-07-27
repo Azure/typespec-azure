@@ -1,0 +1,18 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "`value` property in pageable response should be type: array",
+    "path": [
+      "paths",
+      "/widgets",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties",
+      "value",
+      "type"
+    ],
+    "severity": 0
+  }
+]

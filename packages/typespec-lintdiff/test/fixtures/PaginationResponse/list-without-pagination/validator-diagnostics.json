@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PaginationResponse",
+    "message": "Operation might be pageable. Consider adding the x-ms-pageable extension.",
+    "path": [
+      "paths",
+      "/widgets",
+      "get"
+    ],
+    "severity": 0
+  }
+]

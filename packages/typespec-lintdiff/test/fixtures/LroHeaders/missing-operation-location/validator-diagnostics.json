@@ -1,0 +1,15 @@
+[
+  {
+    "code": "LroHeaders",
+    "message": "A 202 response should include an Operation-Location response header.",
+    "path": [
+      "paths",
+      "/jobs",
+      "post",
+      "responses",
+      "202",
+      "headers"
+    ],
+    "severity": 0
+  }
+]
