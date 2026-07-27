@@ -34,9 +34,9 @@
   "scripts": {
     "clean": "rimraf ./dist ./dist-dev ./temp ./samples/dist",
     "build-samples": "tsx ./samples/build.ts",
-    "build": "npm run build-samples && tsc -p tsconfig.build.json && vite build 2>&1",
+    "build": "pnpm build-samples && tsc -p tsconfig.build.json && vite build 2>&1",
     "preview": "pnpm build && vite preview",
-    "start": "npm run -s watch",
+    "start": "pnpm -s watch",
     "test": "vitest run",
     "test:ci": "vitest run",
     "test:watch": "vitest -w",

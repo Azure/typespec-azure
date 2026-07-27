@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.55.1
+
+### Bug Fixes
+
+- [#4804](https://github.com/Azure/typespec-azure/pull/4804) Fix return type for operations with optional body response: use `void` instead of `undefined` in union return types (e.g. `Promise<KeyValue | void>` instead of `Promise<KeyValue | undefined>`)
+- [#4817](https://github.com/Azure/typespec-azure/pull/4817) Simplify the generated SDK `User-Agent` telemetry prefix to follow the [Azure Core telemetry policy](https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy). The legacy internal layering tokens `azsdk-js-client` and `azsdk-js-api` are no longer emitted, so the user agent is now `[<application_id> ]azsdk-js-<package>/<version> <platform_info>`. Any caller-supplied application id is still forwarded and prepended.
+- [#4570](https://github.com/Azure/typespec-azure/pull/4570) Use the `catalog:` pnpm workspace specifier for the `tslib` dependency when generating `package.json` for the azure-sdk-for-js monorepo.
+
+
 ## 0.55.0
 
 ### Breaking Changes

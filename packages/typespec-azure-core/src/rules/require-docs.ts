@@ -8,6 +8,7 @@ import {
   Union,
   UnionVariant,
   createRule,
+  fileRef,
   getDiscriminatedTypes,
   getDiscriminator,
   getDoc,
@@ -83,6 +84,7 @@ function getVariantName(variant: UnionVariant): string | undefined {
 
 export const requireDocumentation = createRule({
   name: "documentation-required",
+  docs: fileRef.fromPackageRoot("src/rules/documentation-required.md"),
   description: "Require documentation over enums, models, and operations.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",

@@ -117,7 +117,6 @@ describe("@clientOption with getClientOptions getter", () => {
 
   it("should return values for multiple client options on same target", async () => {
     const { program } = await SimpleTesterWithService.compile(`
-      #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureBar", "value", "python")

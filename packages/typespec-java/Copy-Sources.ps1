@@ -3,62 +3,34 @@
 # so `@azure-tools/typespec-java` builds the same emitter while keeping its own
 # Azure-flavored `src/options.ts` (excluded from the copy).
 #
-# The desired core commit is pinned in core-commit.json. If that commit is newer
-# than the submodule's current checkout, this script temporarily checks it out to
-# copy the sources from, and always restores the submodule to its original SHA in
-# the finally block (repo-wide `pnpm build` runs this and CI checks git status).
+# The desired core commit is pinned in core-commit.json; CoreCommit.ps1's
+# Get-CoreSourceRoot returns a directory to read the emitter/generator sources from
+# (extracted from the pinned commit via `git archive` when it is newer than the
+# submodule's current checkout), without ever mutating the core/ submodule working
+# tree. Remove-CoreSourceRoot cleans up any temporary extraction afterwards.
 #
 # Mirrors the "Copy TypeScript code" step of autorest.java's Build-TypeSpec.ps1.
 
 $ErrorActionPreference = "Stop"
 
+# Disable progress rendering. Under a full parallel `pnpm build`, turbo runs each
+# task's process in its own background process group under the build's controlling
+# terminal. When a cmdlet here (notably `Copy-Item -Recurse`, which emits a
+# Write-Progress) renders progress, PowerShell touches that terminal from a
+# background process group and the OS stops the process with SIGTTIN/SIGTTOU -- it
+# never resumes, so the emitter build appears to hang forever (intermittently, and
+# only for this package since it is the only one that shells out to pwsh). Silencing
+# progress removes that terminal interaction entirely.
+$ProgressPreference = "SilentlyContinue"
+
 $packageRoot = $PSScriptRoot
 $repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
 $coreRoot = Join-Path $repoRoot "core"
 
-# Capture the submodule's current SHA so we can restore it no matter what.
-$originSha = (git -C $coreRoot rev-parse HEAD).Trim()
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to read the current SHA of the 'core' submodule at: $coreRoot`nMake sure it is checked out (git submodule update --init --recursive)."
-}
-
+. (Join-Path $packageRoot "CoreCommit.ps1")
+$core = Get-CoreSourceRoot -CoreRoot $coreRoot -PackageRoot $packageRoot
 try {
-    # core-commit.json is optional: when present it pins the core commit to copy
-    # sources from; when absent we just use the submodule's current checkout.
-    $configPath = Join-Path $packageRoot "core-commit.json"
-    $targetSha = $null
-    if (Test-Path $configPath) {
-        $targetSha = ((Get-Content -Raw $configPath | ConvertFrom-Json).sha).Trim()
-        if ([string]::IsNullOrWhiteSpace($targetSha)) {
-            Write-Error "No 'sha' found in $configPath."
-        }
-    }
-    else {
-        Write-Host "core-commit.json not found; using current core checkout $originSha."
-    }
-
-    if ($targetSha -and $targetSha -ne $originSha) {
-        # Make sure the target commit is available locally (it may be newer than
-        # what has been fetched); ignore failure if it is already present.
-        git -C $coreRoot fetch --quiet origin $targetSha 2>$null
-
-        # Only move forward: check out the target when it is a descendant (newer)
-        # of the current checkout. `merge-base --is-ancestor A B` exits 0 when A is
-        # an ancestor of B, i.e. B is newer than A.
-        git -C $coreRoot merge-base --is-ancestor $originSha $targetSha
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "Checking out newer core commit $targetSha (was $originSha)"
-            git -C $coreRoot checkout --quiet $targetSha
-            if ($LASTEXITCODE -ne 0) {
-                Write-Error "Failed to checkout core commit $targetSha."
-            }
-        }
-        else {
-            Write-Host "core-commit.json SHA $targetSha is not newer than current $originSha; using current checkout."
-        }
-    }
-
-    $emitterRoot = Resolve-Path (Join-Path $coreRoot "packages" "http-client-java" "emitter")
+    $emitterRoot = Join-Path $core.Root "emitter"
 
     Copy-Item -Path (Join-Path $emitterRoot "src") -Destination $packageRoot -Exclude "options.ts" -Recurse -Force
     Copy-Item -Path (Join-Path $emitterRoot "test") -Destination $packageRoot -Recurse -Force
@@ -67,15 +39,27 @@ try {
     # customization patch (core.patch) to the copy, so building emitter.jar
     # (Build-Generator.ps1) never mutates the core/ submodule. The patch paths are
     # relative to this generator folder.
-    $srcGenerator = Join-Path $coreRoot "packages" "http-client-java" "generator"
+    $srcGenerator = Join-Path $core.Root "generator"
     $destGenerator = Join-Path $packageRoot "generator"
     $patchFile = Join-Path $packageRoot "core.patch"
+
+    # The emitter.jar reactor (generator/pom.xml) only builds http-client-generator,
+    # http-client-generator-mgmt and http-client-generator-core. The two test modules
+    # below live in a separate (never-activated) Maven `test` profile and hold ~38MB
+    # of generated Java test sources that are not part of the emitter build, so skip
+    # copying them -- it is the bulk of the copy time. (The Azure emitter-tests
+    # project syncs http-client-generator-test straight from core via SyncTests.ps1,
+    # not from this copy.)
+    $excludedGeneratorModules = @("http-client-generator-test", "http-client-generator-clientcore-test")
 
     Write-Host "Copy generator sources from core"
     if (Test-Path $destGenerator) {
         Remove-Item $destGenerator -Recurse -Force
     }
-    Copy-Item -Path $srcGenerator -Destination $destGenerator -Recurse -Force
+    New-Item -ItemType Directory -Path $destGenerator | Out-Null
+    Get-ChildItem -Path $srcGenerator -Force |
+        Where-Object { $excludedGeneratorModules -notcontains $_.Name } |
+        ForEach-Object { Copy-Item -Path $_.FullName -Destination $destGenerator -Recurse -Force }
 
     Write-Host "Apply Azure customization patch to copied generator"
     # Run from the repo root with --directory so git apply resolves the patch's
@@ -88,6 +72,5 @@ try {
     }
 }
 finally {
-    # Always restore the submodule to the SHA it was at when this script started.
-    git -C $coreRoot checkout --quiet $originSha
+    Remove-CoreSourceRoot $core
 }

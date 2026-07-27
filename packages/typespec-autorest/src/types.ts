@@ -24,8 +24,7 @@ import type {
  * a particular service definition.
  */
 export type AutorestServiceRecord =
-  | AutorestUnversionedServiceRecord
-  | AutorestVersionedServiceRecord;
+  AutorestUnversionedServiceRecord | AutorestVersionedServiceRecord;
 
 export interface AutorestUnversionedServiceRecord extends AutorestEmitterResult {
   /** The service that generated this OpenAPI document */
@@ -60,6 +59,30 @@ export interface AutorestVersionedDocumentRecord extends AutorestEmitterResult {
 export interface OperationExamples {
   readonly operationId: string;
   readonly examples: LoadedExample[];
+}
+
+/**
+ * Machine-readable per-service manifest (`service.yaml`) that declares the ordered
+ * list of API versions for a service. See {@link ServiceYamlVersion}.
+ */
+export interface ServiceYaml {
+  /** The API versions of the service, ordered oldest to newest. */
+  readonly versions: ServiceYamlVersion[];
+}
+
+/** A single API version entry in a {@link ServiceYaml} manifest. */
+export interface ServiceYamlVersion {
+  /** The API version value (e.g. `2023-11-01`). */
+  readonly version: string;
+
+  /**
+   * Whether this version is generated from TypeSpec or is a legacy swagger version.
+   * The autorest emitter only ever produces `typespec` versions.
+   */
+  readonly source: "typespec" | "swagger";
+
+  /** Paths to the swagger/openapi file(s) for this version, relative to `service.yaml`. */
+  readonly "swagger-files": string[];
 }
 
 export interface AutorestEmitterResult {

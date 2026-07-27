@@ -1,0 +1,21 @@
+name: Setup Go
+description: Setup Go for typespec-go package development and CI
+inputs:
+  go-version:
+    required: false
+    description: Go version for setup-go
+    default: "1.26.1"
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup Go ${{ inputs.go-version }}
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: false
+
+    - name: Log Go version
+      shell: bash
+      run: go version

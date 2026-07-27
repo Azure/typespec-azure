@@ -4,6 +4,7 @@ import {
   Program,
   createAddDecoratorCodeFix,
   createRule,
+  fileRef,
   getPattern,
 } from "@typespec/compiler";
 
@@ -18,8 +19,9 @@ function createPatternCodeFix(diagnosticTarget: DiagnosticTarget) {
  */
 export const armResourceNamePatternRule = createRule({
   name: "arm-resource-name-pattern",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-name-pattern.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name-pattern",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-name-pattern",
   description: "The resource name parameter should be defined with a 'pattern' restriction.",
   messages: {
     default: `The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParameter' to specify the name parameter with options to override default pattern RegEx expression.`,

@@ -11,12 +11,11 @@ import { getPackageName } from "./utils.js";
 interface PackageFileOptions {
   exports?: Record<string, any>;
   dependencies?: Record<string, string>;
-  clientContextPaths?: string[];
 }
 
 export function buildPackageFile(
   model: ClientModel,
-  { exports, dependencies, clientContextPaths }: PackageFileOptions = {},
+  { exports, dependencies }: PackageFileOptions = {},
 ) {
   const config: PackageCommonInfoConfig = {
     description: getDescription(model),
@@ -35,7 +34,6 @@ export function buildPackageFile(
     hasLro: hasPollingOperations(model),
     monorepoPackageDirectory: model.options?.azureOutputDirectory,
     dependencies,
-    clientContextPaths,
   };
 
   const packageInfo: Record<string, any> = buildAzureMonorepoPackage(extendedConfig);
@@ -63,17 +61,15 @@ export function buildPackageFile(
  * - Adds LRO dependencies (`@azure/core-lro`, `@azure/abort-controller`) when the package has
  *   polling operations (for non-monorepo Azure packages).
  * - Updates exports (tshy or warp) when `exports` is provided.
- * - Updates `//metadata.constantPaths` when `clientContextPaths` is provided.
  */
 export function updatePackageFile(
   model: ClientModel,
   existingFilePathOrContent: string | Record<string, any>,
-  { exports, clientContextPaths }: PackageFileOptions = {},
+  { exports }: PackageFileOptions = {},
 ) {
   const hasLro = hasPollingOperations(model);
   const needsLroUpdate = hasLro;
   const needsExportsUpdate = exports;
-  const needsConstantPathsUpdate = clientContextPaths && clientContextPaths.length > 0;
 
   let packageInfo;
   if (typeof existingFilePathOrContent === "string") {
@@ -144,21 +140,6 @@ export function updatePackageFile(
       "@azure/core-lro": "^3.1.0",
       "@azure/abort-controller": "^2.1.2",
     };
-  }
-
-  // Update constantPaths metadata for Azure packages
-  if (needsConstantPathsUpdate && packageInfo["//metadata"]) {
-    const metadata = packageInfo["//metadata"];
-    // Filter out existing userAgentInfo entries
-    const nonUserAgentPaths = (metadata.constantPaths || []).filter(
-      (item: any) => item.prefix !== "userAgentInfo",
-    );
-    // Add new userAgentInfo entries from clientContextPaths
-    const newUserAgentPaths = clientContextPaths!.map((path) => ({
-      path: path,
-      prefix: "userAgentInfo",
-    }));
-    metadata.constantPaths = [...nonUserAgentPaths, ...newUserAgentPaths];
   }
 
   return {

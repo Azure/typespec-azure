@@ -1,4 +1,4 @@
-import { Model, createRule, getProperty } from "@typespec/compiler";
+import { Model, createRule, fileRef, getProperty } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 import { getProperties } from "./utils.js";
@@ -8,6 +8,7 @@ import { getProperties } from "./utils.js";
  */
 export const envelopePropertiesRules = createRule({
   name: "empty-updateable-properties",
+  docs: fileRef.fromPackageRoot("src/rules/empty-updateable-properties.md"),
   severity: "warning",
   description: "Should have updateable properties.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/empty-updateable-properties",

@@ -29,6 +29,8 @@ function parseCatalog(filePath: string): Record<string, string> {
       break;
     }
     if (!inCatalog) continue;
+    // Skip comment lines so they aren't parsed as fake entries.
+    if (line.trim().startsWith("#")) continue;
 
     const match = line.match(/^\s+"?([^":]+)"?\s*:\s*"?([^"]+)"?\s*$/);
     if (match) {
@@ -37,6 +39,48 @@ function parseCatalog(filePath: string): Record<string, string> {
   }
 
   return catalog;
+}
+
+/**
+ * Parses the comments in the `catalog:` section, associating each comment (or run
+ * of consecutive comments) with the dependency entry that immediately follows it.
+ * This lets us keep an explanatory comment attached to its entry when the catalog
+ * is re-sorted and re-serialized.
+ */
+function parseCatalogComments(content: string): Record<string, string[]> {
+  const comments: Record<string, string[]> = {};
+  const lines = content.split("\n");
+  let inCatalog = false;
+  let pending: string[] = [];
+
+  for (const line of lines) {
+    if (/^catalog:\s*$/.test(line)) {
+      inCatalog = true;
+      continue;
+    }
+    if (!inCatalog) continue;
+    // A non-indented, non-empty, non-comment line ends the catalog section
+    if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("#")) break;
+
+    const trimmed = line.trim();
+    if (trimmed.startsWith("#")) {
+      pending.push(trimmed);
+      continue;
+    }
+    if (trimmed === "") {
+      // Blank line breaks the association so comments only attach to an adjacent entry.
+      pending = [];
+      continue;
+    }
+
+    const match = line.match(/^\s+"?([^":]+)"?\s*:/);
+    if (match && pending.length > 0) {
+      comments[match[1].trim()] = pending;
+    }
+    pending = [];
+  }
+
+  return comments;
 }
 
 /**
@@ -50,11 +94,17 @@ function needsQuoting(version: string): boolean {
   return !/^[\^~]?[A-Za-z0-9][A-Za-z0-9.\-]*$/.test(version) || /^\d/.test(version);
 }
 
-/** Serializes a catalog object into YAML. */
-function serializeCatalog(catalog: Record<string, string>): string {
+/** Serializes a catalog object into YAML, re-emitting any associated comments. */
+function serializeCatalog(
+  catalog: Record<string, string>,
+  comments: Record<string, string[]> = {},
+): string {
   const lines = ["catalog:"];
   const sorted = Object.entries(catalog).sort(([a], [b]) => a.localeCompare(b));
   for (const [dep, version] of sorted) {
+    for (const comment of comments[dep] ?? []) {
+      lines.push(`  ${comment}`);
+    }
     const key = dep.startsWith("@") ? `"${dep}"` : dep;
     const val = needsQuoting(version) ? `"${version}"` : version;
     lines.push(`  ${key}: ${val}`);
@@ -87,7 +137,7 @@ function replaceCatalogSection(content: string, catalog: Record<string, string>)
   }
 
   const before = beforeCatalog.join("\n").replace(/\n+$/, "\n");
-  const catalogStr = "\n" + serializeCatalog(catalog);
+  const catalogStr = "\n" + serializeCatalog(catalog, parseCatalogComments(content));
   const after = afterCatalog.length > 0 ? "\n" + afterCatalog.join("\n") : "";
 
   return before + catalogStr + after;

@@ -5,6 +5,7 @@ import {
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
+  getRelativePathFromDirectory,
   getService,
   interpolatePath,
   listServices,
@@ -20,6 +21,7 @@ import {
 } from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
 import { getVersioningMutators } from "@typespec/versioning";
+import { isMap, isSeq, parseDocument, stringify as stringifyYaml } from "yaml";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -31,6 +33,8 @@ import type {
   AutorestEmitterResult,
   AutorestServiceRecord,
   AutorestVersionedServiceRecord,
+  ServiceYaml,
+  ServiceYamlVersion,
 } from "./types.js";
 import { AutorestEmitterContext } from "./utils.js";
 
@@ -49,6 +53,12 @@ interface ResolvedAutorestEmitterOptions extends AutorestDocumentEmitterOptions 
   readonly outputDir: string;
   readonly outputFile: string;
   readonly version?: string;
+
+  /**
+   * Controls emission of a `service.yaml` manifest at the project root.
+   * @default "auto"
+   */
+  readonly serviceYaml?: "auto" | "always" | "never";
 }
 
 const defaultOptions = {
@@ -117,6 +127,7 @@ export function resolveAutorestOptions(
     outputSplitting: resolvedOptions["output-splitting"],
     skipExampleCopying: resolvedOptions["skip-example-copying"],
     typeNameStrategy: resolvedOptions["type-name-strategy"],
+    serviceYaml: resolvedOptions["service-yaml"] ?? "auto",
   };
 }
 
@@ -303,6 +314,155 @@ async function emitAllServiceAtAllVersions(
     } else {
       await emitOutput(program, serviceRecord, options);
     }
+  }
+
+  await emitServiceYaml(program, services, options);
+}
+
+/**
+ * Emits a `service.yaml` manifest at the project root (next to `tspconfig.yaml`) describing
+ * the service's API versions. Whether the file is written depends on the `service-yaml` option:
+ * `"auto"` (default) only writes when the file already exists, `"always"` always writes, and
+ * `"never"` disables emission.
+ *
+ * When an existing `service.yaml` is present, its content is updated in place so that comments
+ * and any unrelated keys are preserved (see {@link updateServiceYamlDocument}).
+ */
+async function emitServiceYaml(
+  program: Program,
+  services: AutorestServiceRecord[],
+  options: ResolvedAutorestEmitterOptions,
+) {
+  const mode = options.serviceYaml ?? "auto";
+  if (mode === "never" || services.length === 0) {
+    return;
+  }
+
+  const path = resolvePath(program.projectRoot, "service.yaml");
+  const existingContent = await readFileIfExists(program, path);
+
+  if (mode === "auto" && existingContent === undefined) {
+    return;
+  }
+
+  if (services.length > 1) {
+    reportDiagnostic(program, {
+      code: "service-yaml-multiple-services",
+      target: NoTarget,
+    });
+  }
+
+  const manifest = buildServiceYaml(program, services[0]);
+  const content =
+    existingContent === undefined
+      ? stringifyYaml(manifest)
+      : updateServiceYamlDocument(existingContent, manifest);
+
+  await emitFile(program, {
+    path,
+    content,
+    newLine: options.newLine,
+  });
+}
+
+/**
+ * Updates the `versions` list of an existing `service.yaml` document while preserving the rest
+ * of the file: document-level comments, comments on unrelated keys, and per-version comments.
+ *
+ * Existing entries are merged rather than replaced:
+ * - versions the emitter regenerated are updated in place (keeping their comments/position),
+ * - versions the emitter no longer produces but that are *not* TypeSpec-sourced (for example
+ *   legacy swagger-only versions that predate the TypeSpec migration) are preserved in place so
+ *   hand-authored or migrated history is not lost,
+ * - versions marked `source: typespec` that the emitter no longer produces are removed, since a
+ *   stale TypeSpec entry would otherwise linger after the version is dropped from the spec, and
+ * - versions the emitter produced that are not yet present are appended in the generated order.
+ */
+function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): string {
+  const doc = parseDocument(existing);
+  const seq = doc.get("versions");
+
+  if (!isSeq(seq)) {
+    doc.set("versions", manifest.versions);
+    return doc.toString();
+  }
+
+  const manifestByVersion = new Map<string, ServiceYamlVersion>();
+  for (const version of manifest.versions) {
+    manifestByVersion.set(version.version, version);
+  }
+
+  const seen = new Set<string>();
+  const merged: (typeof seq.items)[number][] = [];
+
+  for (const item of seq.items) {
+    if (isMap(item)) {
+      const version = item.get("version");
+      if (typeof version === "string") {
+        const regenerated = manifestByVersion.get(version);
+        if (regenerated !== undefined) {
+          // Update regenerated versions in place, keeping their comments and position.
+          seen.add(version);
+          item.set("source", regenerated.source);
+          item.set("swagger-files", regenerated["swagger-files"]);
+        } else if (item.get("source") === "typespec") {
+          // This version claims to be TypeSpec-generated but the emitter no longer produces it,
+          // so it is stale and must be dropped.
+          continue;
+        }
+        // Any other existing entry (e.g. a legacy swagger-only version) is preserved as-is.
+      }
+    }
+    merged.push(item);
+  }
+
+  // Append versions produced by the emitter that were not already present.
+  for (const version of manifest.versions) {
+    if (!seen.has(version.version)) {
+      merged.push(doc.createNode(version));
+    }
+  }
+
+  seq.items = merged;
+  return doc.toString();
+}
+
+function buildServiceYaml(program: Program, serviceRecord: AutorestServiceRecord): ServiceYaml {
+  const versions = new Map<string, ServiceYamlVersion>();
+
+  const addFile = (version: string, outputFile: string) => {
+    const absoluteOutput = resolvePath(program.projectRoot, outputFile);
+    const relativePath = getRelativePathFromDirectory(program.projectRoot, absoluteOutput, false);
+    let entry = versions.get(version);
+    if (entry === undefined) {
+      entry = { version, source: "typespec", "swagger-files": [] };
+      versions.set(version, entry);
+    }
+    if (!entry["swagger-files"].includes(relativePath)) {
+      entry["swagger-files"].push(relativePath);
+    }
+  };
+
+  if (serviceRecord.versioned) {
+    for (const documentRecord of serviceRecord.versions) {
+      addFile(documentRecord.version, documentRecord.outputFile);
+    }
+  } else {
+    const version = resolveInfo(program, serviceRecord.service.type)?.version;
+    if (version !== undefined) {
+      addFile(version, serviceRecord.outputFile);
+    }
+  }
+
+  return { versions: [...versions.values()] };
+}
+
+async function readFileIfExists(program: Program, path: string): Promise<string | undefined> {
+  try {
+    const file = await program.host.readFile(path);
+    return file.text;
+  } catch {
+    return undefined;
   }
 }
 
