@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.10
+
+### Features
+
+- [#5043](https://github.com/Azure/typespec-azure/pull/5043) Expose the `required-fields-as-ctor-args` emitter option in `tspconfig.yaml`. It controls whether required model properties are generated as constructor arguments. The default remains `true`.
+  
+  ```yaml
+  options:
+    "@azure-tools/typespec-java":
+      required-fields-as-ctor-args: false
+  ```
+
+
 ## 0.45.9
 
 ### Bug Fixes

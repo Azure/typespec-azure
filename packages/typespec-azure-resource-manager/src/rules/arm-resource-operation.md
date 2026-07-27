@@ -1,6 +1,12 @@
 Validate that all ARM Resource operations are defined inside an interface, include an `api-version` parameter, and use the correct decorator for the HTTP verb.
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** API, SDK, Emitters
+
+Missing the resource decorators can leave operations unassociated with their resource - breaking the C# SDK and preventing resource-based reasoning, linting, and generation of resource-centric content (service generation, tests, portal).
+
+## ❌ Incorrect
 
 Operations must be inside an interface:
 
@@ -24,7 +30,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations
@@ -33,3 +39,7 @@ interface FooResources {
   createOrUpdate is ArmResourceCreateOrReplaceAsync<FooResource>;
 }
 ```
+
+## Suppression
+
+Requires C# SDK sign-off and careful review of any other violations. Use the standard resource types, or decorate with `@customAzureResource` when that is not possible, and use the operation templates.

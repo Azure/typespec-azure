@@ -1,13 +1,14 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/no-response-body
+This keeps ARM response schemas aligned with how clients interpret long-running or empty success responses versus success responses that return resource data.
 
-```
+## Impact
 
-ARM operation responses with status code 202 or 204 should not contain a response body. Operation responses with other success (2xx) status codes should contain a response body.
+- **Area:** API
 
-### For 202 and 204 status codes (response body should be empty)
+## For 202 and 204 status codes (response body should be empty)
 
-#### ❌ Incorrect
+A response - usually a 202 - carries a body that should be empty.
+
+### ❌ Incorrect
 
 ```tsp
 op walk(): ArmNoContentResponse & {
@@ -28,7 +29,7 @@ op walk(): ArmNoContentResponse & {
 }
 ```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 op walk(): ArmAcceptedResponse;
@@ -44,9 +45,9 @@ op walk(): ArmAcceptedResponse;
 }
 ```
 
-### For other success (2xx) response status codes (response body should not be empty)
+## For other success (2xx) response status codes (response body should not be empty)
 
-#### ❌ Incorrect
+### ❌ Incorrect
 
 ```tsp
 op walk(): CreatedResponse;
@@ -62,7 +63,7 @@ op walk(): CreatedResponse;
 }
 ```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 op walk(): ArmCreatedResponse<{
@@ -88,3 +89,7 @@ op walk(): ArmCreatedResponse<{
   }
 }
 ```
+
+## Suppression
+
+Suppress at will for 202, but never for 204. Use the standard operation and response templates.
