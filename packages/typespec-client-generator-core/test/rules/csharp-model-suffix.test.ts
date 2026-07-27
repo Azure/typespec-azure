@@ -240,12 +240,12 @@ describe("operation-aware body suffixes", () => {
       .expect(
         `model WidgetParameters { name: string; }
         @route("/widgets") @post
-        op create(@body body: [WidgetParameters]): void;`,
+        op create(@body body: [WidgetParameters, WidgetParameters]): void;`,
       )
       .toEmitDiagnostics({ code: ruleCode });
   });
 
-  it("handles recursive nested body models", async () => {
+  it("handles self-referencing immediate nested body models", async () => {
     await tester
       .expect(
         `model WidgetPatch { details: WidgetDetailsParameters; }
@@ -257,6 +257,18 @@ describe("operation-aware body suffixes", () => {
         op update(@path id: string, @body body: WidgetPatch): void;`,
       )
       .toEmitDiagnostics({ code: ruleCode });
+  });
+
+  it("does not inspect properties inside the first named nested model", async () => {
+    await tester
+      .expect(
+        `model WidgetPatch { details: WidgetDetails; }
+        model WidgetDetails { child: WidgetChildParameters; }
+        model WidgetChildParameters { name: string; }
+        @route("/widgets/{id}") @patch
+        op update(@path id: string, @body body: WidgetPatch): void;`,
+      )
+      .toBeValid();
   });
 
   it("classifies a named multipart PATCH body", async () => {

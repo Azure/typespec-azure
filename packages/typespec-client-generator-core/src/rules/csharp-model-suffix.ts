@@ -181,14 +181,18 @@ function collectBodyRoles(
           addRole(roles, body.type, directRole);
           collectNestedModels(body.type, directRole === "patch" ? "content" : directRole, roles);
         } else {
-          collectModels(body.type, directRole === "patch" ? "content" : directRole, roles);
+          collectFirstNamedModels(
+            body.type,
+            directRole === "patch" ? "content" : directRole,
+            roles,
+          );
         }
       }
 
       for (const response of operation.responses) {
         for (const content of response.responses) {
           if (content.body !== undefined) {
-            collectModels(content.body.type, "response", roles);
+            collectFirstNamedModels(content.body.type, "response", roles);
           }
         }
       }
@@ -205,14 +209,14 @@ function getDirectBodyRole(verb: string): BodyRole {
 function collectNestedModels(root: Model, role: BodyRole, roles: Map<Model, Set<BodyRole>>) {
   const visited = new Set<Type>([root]);
   for (const property of walkPropertiesInherited(root)) {
-    collectModels(property.type, role, roles, visited);
+    collectFirstNamedModels(property.type, role, roles, visited);
   }
   if (root.indexer !== undefined) {
-    collectModels(root.indexer.value, role, roles, visited);
+    collectFirstNamedModels(root.indexer.value, role, roles, visited);
   }
 }
 
-function collectModels(
+function collectFirstNamedModels(
   type: Type,
   role: BodyRole,
   roles: Map<Model, Set<BodyRole>>,
@@ -223,22 +227,24 @@ function collectModels(
 
   switch (type.kind) {
     case "Model":
-      if (type.name !== "") addRole(roles, type, role);
-      for (const property of walkPropertiesInherited(type)) {
-        collectModels(property.type, role, roles, visited);
-      }
       if (type.indexer !== undefined) {
-        collectModels(type.indexer.value, role, roles, visited);
+        collectFirstNamedModels(type.indexer.value, role, roles, visited);
+      } else if (type.name !== "") {
+        addRole(roles, type, role);
+      } else {
+        for (const property of walkPropertiesInherited(type)) {
+          collectFirstNamedModels(property.type, role, roles, visited);
+        }
       }
       break;
     case "Tuple":
       for (const value of type.values) {
-        collectModels(value, role, roles, visited);
+        collectFirstNamedModels(value, role, roles, visited);
       }
       break;
     case "Union":
       for (const variant of type.variants.values()) {
-        collectModels(variant.type, role, roles, visited);
+        collectFirstNamedModels(variant.type, role, roles, visited);
       }
       break;
   }

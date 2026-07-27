@@ -10,6 +10,9 @@ C# SDK model names should use these recommended suffixes:
 The rule checks the C#-resolved model name and respects `@clientName` overrides.
 It does not report models with conflicting roles, such as a model shared by PATCH and PUT
 operations or by a request and response.
+For nested request content, it checks only immediate properties of the body. It unwraps
+structural containers such as arrays, records, tuples, unions, and anonymous models, then
+stops at the first named model rather than inspecting that model's properties.
 
 #### ❌ Incorrect
 
