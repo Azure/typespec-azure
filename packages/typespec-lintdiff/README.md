@@ -17,7 +17,7 @@ migration decisions auditable.
 | `test/fixtures/` | **212** rule test-case directories (`<RuleName>/rule.md` + per-case `main.tsp`, emitted `output.json`, `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`). |
 | `test/harness/` | The validation/comparison harness (`validate.ts`, `cross-repo-*.ts`, `audit-*.ts`, `catalog.ts`, `generate/sync-rule-metadata.ts`, `analyze-noise.ts`, `compile-worker.ts`, `lib/`) and Python coverage helpers. |
 | `catalog/` | Coverage catalog: `CATALOG.md`, `catalog.json` (209 validator rules), `validator-rule-metadata.json`, `rule-metadata-audit.json`. |
-| `docs/` | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `validate-report.md`. |
+| `docs/` | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `SKILLS.md` (migration skills map), `validate-report.md`. |
 
 > The deeper analysis notes (phase reports, equivalence analysis, non-migrated / non-template /
 > broader-coverage rationale, future work) live in the source repo
@@ -27,6 +27,8 @@ migration decisions auditable.
 
 Related project skills live at the repo root under `.github/skills/`
 (`typespec-lint-*`, `lintdiff-*`) and are referenced from `.github/copilot-instructions.md`.
+See [`docs/SKILLS.md`](./docs/SKILLS.md) for a map of the skills and how they compose across the
+migration workflow.
 
 ## Migration status (from `docs/validate-report.md`)
 
