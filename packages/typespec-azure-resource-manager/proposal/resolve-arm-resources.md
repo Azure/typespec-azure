@@ -2,9 +2,9 @@
 
 ## Expected output
 
-`resolveArmResources(program)` should produce a complete, deterministic, version-aware description of the ARM provider shape represented by the TypeSpec program.
+`resolveArmResources(program)` should produce a complete, deterministic description of the ARM provider shape represented by the TypeSpec program.
 
-The API should make the version dimension explicit. For an unversioned TypeSpec program, it should return one provider result. For a versioned TypeSpec program, it should return provider results for each declared service version so downstream emitters and analyzers can reason about the resource shape that exists in each API version.
+The API should preserve the view represented by the `program` it receives. If the caller passes an unprojected versioned program, the result should represent the canonical provider view for that program. If the caller needs a per-version resource shape, it should pass a version-projected program, or use a helper that projects the program before calling `resolveArmResources`.
 
 Each provider result should contain:
 
@@ -24,13 +24,13 @@ Each resolved resource should include enough information for downstream emitters
 - parent and scope relationships
 - singleton metadata, when applicable
 
-The result should preserve the relationship between service versions and resolved resources. If a resource or operation exists only in some versions, that difference should be visible in the API result instead of requiring callers to run separate version projections and compare results themselves.
+The result should not hide versioning information that is present in the input program, but `resolveArmResources` should not require every caller to receive one result per declared service version. Version-specific analysis can be layered on top by running resource resolution against version-projected programs.
 
 The API should still avoid duplicate resources caused by versioning internals re-applying decorators on projected or realm-copied types.
 
 ## Output shape
 
-The API should return an object that makes both the provider and version dimensions explicit. The exact type names can change during implementation, but the contract should include the following concepts:
+The API should return an object that makes the provider dimension explicit. Version-specific views can be produced by passing version-projected programs to the same resolver, or by a helper that does that projection for callers. The exact type names can change during implementation, but the contract should include the following concepts:
 
 ```ts
 interface ArmResourcesResolutionResult {
@@ -39,11 +39,6 @@ interface ArmResourcesResolutionResult {
 
 interface ResolvedProvider {
   namespace: string;
-  versions: ResolvedProviderVersion[];
-}
-
-interface ResolvedProviderVersion {
-  version?: string;
   resources: ResolvedResource[];
   providerOperations: ArmResourceOperation[];
 }
@@ -71,6 +66,7 @@ type ArmResourceScope =
   | "Subscription"
   | "ResourceGroup"
   | "ManagementGroup"
+  | "ServiceGroup"
   | "Scope"
   | ResolvedResourceReference;
 
@@ -122,7 +118,7 @@ interface SingletonResourceInfo {
 
 ### `ResolvedResource`
 
-Each `ResolvedResource` describes one concrete ARM resource path in one provider version.
+Each `ResolvedResource` describes one concrete ARM resource path in the provider view represented by the input program.
 
 | Property               | Description                                                                                                                                                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

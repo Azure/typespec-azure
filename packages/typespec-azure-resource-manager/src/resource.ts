@@ -166,6 +166,15 @@ export interface ResolvedResourceInfo {
   resourceNameIsExplicit?: boolean;
 }
 
+export type ArmResourceScope =
+  | "Tenant"
+  | "Scope"
+  | "Subscription"
+  | "ResourceGroup"
+  | "ManagementGroup"
+  | "ServiceGroup"
+  | "ExternalResource";
+
 interface ResolvedResourceOperations {
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
@@ -181,7 +190,7 @@ interface ResolvedResourceOperations {
   /** The parent of this resource */
   parent?: ResolvedResource;
   /** The scope of this resource */
-  scope?: string;
+  scope?: ArmResourceScope;
 }
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
@@ -204,7 +213,7 @@ export interface ResolvedResource {
   /** The parent of this resource */
   parent?: ResolvedResource;
   /** The scope of this resource */
-  scope?: string | ResolvedResource;
+  scope?: ArmResourceScope | ResolvedResource;
   /** Singleton resource information, if the resource is a singleton */
   singleton?: SingletonResourceInfo;
 }
@@ -584,7 +593,7 @@ function getResourceScope(
   knownResources: ResolvedResource[],
   resource: ResolvedResource,
   resourcesToProcess: ResolvedResource[],
-): ResolvedResource | string | undefined {
+): ResolvedResource | ArmResourceScope | undefined {
   if (resource.scope !== undefined) return resource.scope;
   if (resource.parent !== undefined)
     return getResourceScope(knownResources, resource.parent, resourcesToProcess);
