@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Manifest } from "./detect-affected.ts";
 import {
   CONFIG,
   catalogEntryKey,
@@ -221,7 +222,7 @@ describe("catalogOfSpecifier", () => {
 });
 
 describe("packagesUsingCatalogEntries", () => {
-  const manifests = [
+  const manifests: Manifest[] = [
     { name: "emitter", dependencies: { "@typespec/http-client-python": "catalog:" } },
     { name: "pinned", dependencies: { "@typespec/http-client-python": "0.35.0" } },
     { name: "dev-only", devDependencies: { turbo: "catalog:" } },

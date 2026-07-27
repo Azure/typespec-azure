@@ -203,7 +203,7 @@ export function catalogOfSpecifier(specifier: string): string | undefined {
   return specifier.slice("catalog:".length).trim() || DEFAULT_CATALOG;
 }
 
-interface Manifest {
+export interface Manifest {
   name?: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
