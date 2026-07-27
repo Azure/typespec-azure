@@ -47,9 +47,11 @@
     "yaml": "catalog:"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@vitest/coverage-v8": "catalog:",

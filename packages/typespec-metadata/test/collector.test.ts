@@ -681,3 +681,91 @@ describe("multiple emitters per language", () => {
     expect(result["unknown"][1].emitterName).toBe("@typespec/json-schema");
   });
 });
+
+describe("apiVersion extraction", () => {
+  it("passes through 'all' as the resolved apiVersion", () => {
+    const optionMap = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/base/tsp-output", undefined, "all");
+
+    expect(result["python"][0].apiVersion).toBe("all");
+  });
+
+  it("passes through an actual resolved version string", () => {
+    const optionMap = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/base/tsp-output",
+      undefined,
+      "2023-10-01",
+    );
+
+    expect(result["python"][0].apiVersion).toBe("2023-10-01");
+  });
+
+  it("passes through 'multiple-versions' for multi-service configs", () => {
+    const optionMap = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/base/tsp-output",
+      undefined,
+      "multiple-versions",
+    );
+
+    expect(result["python"][0].apiVersion).toBe("multiple-versions");
+  });
+
+  it("leaves apiVersion undefined when no resolved version is provided", () => {
+    const optionMap = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/base/tsp-output");
+
+    expect(result["python"][0].apiVersion).toBeUndefined();
+  });
+
+  it("applies the same resolved apiVersion to all emitters", () => {
+    const optionMap = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+      "@azure-tools/typespec-java": {
+        "package-name": "com.azure:azure-keyvault-secrets",
+      },
+      "@azure-tools/typespec-csharp": {
+        "package-name": "Azure.Security.KeyVault.Secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/base/tsp-output",
+      undefined,
+      "2023-10-01",
+    );
+
+    expect(result["python"][0].apiVersion).toBe("2023-10-01");
+    expect(result["java"][0].apiVersion).toBe("2023-10-01");
+    expect(result["csharp"][0].apiVersion).toBe("2023-10-01");
+  });
+});
