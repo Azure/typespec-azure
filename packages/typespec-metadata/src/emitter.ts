@@ -21,13 +21,17 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
 
   // Resolve API version using TCGC
   const sdkContext = await createSdkContext(context as any);
-  const apiVersionsMap = sdkContext.sdkPackage.metadata.apiVersions;
   let resolvedApiVersion: string | undefined;
-  if (apiVersionsMap && apiVersionsMap.size > 0) {
-    if (apiVersionsMap.size > 1) {
-      resolvedApiVersion = "multiple-versions";
-    } else {
-      resolvedApiVersion = [...apiVersionsMap.values()][0];
+  if (sdkContext.apiVersion === "all") {
+    resolvedApiVersion = "all";
+  } else {
+    const apiVersionsMap = sdkContext.sdkPackage.metadata.apiVersions;
+    if (apiVersionsMap && apiVersionsMap.size > 0) {
+      if (apiVersionsMap.size > 1) {
+        resolvedApiVersion = "multiple-versions";
+      } else {
+        resolvedApiVersion = [...apiVersionsMap.values()][0];
+      }
     }
   }
 
