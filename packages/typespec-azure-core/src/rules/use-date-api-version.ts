@@ -16,13 +16,13 @@ function isRealDate(year: number, month: number, day: number): boolean {
   );
 }
 
-export const apiVersionDateFormatRule = createRule({
-  name: "api-version-date-format",
+export const useDateApiVersionRule = createRule({
+  name: "use-date-api-version",
   description:
     "Service API versions must use YYYY-MM-DD date format with an optional -preview suffix.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/api-version-date-format",
-  docs: fileRef.fromPackageRoot("src/rules/api-version-date-format.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-date-api-version",
+  docs: fileRef.fromPackageRoot("src/rules/use-date-api-version.md"),
   messages: {
     default: paramMessage`API version "${"version"}" must use the "YYYY-MM-DD" date format, optionally followed by a "-preview" suffix. For example "2022-11-18" or "2022-11-18-preview".`,
     invalidDate: paramMessage`API version "${"version"}" is not a valid date. Use a real "YYYY-MM-DD" date, optionally followed by a "-preview" suffix.`,

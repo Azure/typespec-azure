@@ -1,5 +1,4 @@
 import { defineLinter } from "@typespec/compiler";
-import { apiVersionDateFormatRule } from "./rules/api-version-date-format.js";
 import { authRequiredRule } from "./rules/auth-required.js";
 import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
@@ -41,6 +40,7 @@ import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
+import { useDateApiVersionRule } from "./rules/use-date-api-version.js";
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-operations.js";
 
@@ -87,7 +87,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noVersionInRouteRule,
-  apiVersionDateFormatRule,
+  useDateApiVersionRule,
   noDollarPrefixedQueryParamsRule,
 ];
 

@@ -1,7 +1,7 @@
 import { Tester } from "#test/test-host.js";
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { apiVersionDateFormatRule } from "../../src/rules/api-version-date-format.js";
+import { useDateApiVersionRule } from "../../src/rules/use-date-api-version.js";
 
 let tester: LinterRuleTester;
 
@@ -9,12 +9,12 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    apiVersionDateFormatRule,
+    useDateApiVersionRule,
     "@azure-tools/typespec-azure-core",
   );
 });
 
-describe("api-version-date-format", () => {
+describe("use-date-api-version", () => {
   it("is valid for a stable date version", async () => {
     await tester
       .expect(
@@ -90,7 +90,7 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
           message:
             'API version "v1" must use the "YYYY-MM-DD" date format, optionally followed by a "-preview" suffix. For example "2022-11-18" or "2022-11-18-preview".',
@@ -113,7 +113,7 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
           message:
             'API version "2021-6-4" must use the "YYYY-MM-DD" date format, optionally followed by a "-preview" suffix. For example "2022-11-18" or "2022-11-18-preview".',
@@ -136,7 +136,7 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
           message:
             'API version "2021-06-04-beta" must use the "YYYY-MM-DD" date format, optionally followed by a "-preview" suffix. For example "2022-11-18" or "2022-11-18-preview".',
@@ -159,7 +159,7 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
           message:
             'API version "2021-13-45" is not a valid date. Use a real "YYYY-MM-DD" date, optionally followed by a "-preview" suffix.',
@@ -182,7 +182,7 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
           message:
             'API version "2023-02-29" is not a valid date. Use a real "YYYY-MM-DD" date, optionally followed by a "-preview" suffix.',
@@ -207,11 +207,11 @@ describe("api-version-date-format", () => {
       )
       .toEmitDiagnostics([
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
         },
         {
-          code: "@azure-tools/typespec-azure-core/api-version-date-format",
+          code: "@azure-tools/typespec-azure-core/use-date-api-version",
           severity: "warning",
         },
       ]);
