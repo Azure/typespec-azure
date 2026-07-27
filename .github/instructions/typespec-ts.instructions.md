@@ -71,18 +71,25 @@ Integration (spector) tests generate real clients from specs, then assert on the
    though the rest of `test/integration/` is gone). It also copies assets to `./temp/assets`.
    It is a cross-platform Node script (`test/commands/copy-typespec.ts`) and runs the same
    on Windows, macOS, and Linux.
-2. `test/commands/gen-spector.js` picks the `azureModularTsps` list from
-   `test/commands/spector-list.js` (the only spec set) and runs `test/commands/run.ts`
-   for each entry, emitting into `test/azure-modular-integration/generated/<outputPath>`.
+2. `spector-runner --config spector.config.yaml` (the shared
+   `@azure-tools/spector-runner` CLI) reads the opt-in spec list from
+   `spector.config.yaml` and compiles each in parallel, emitting into
+   `test/azure-modular-integration/generated/<outputPath>`. Each spec compiles
+   using the committed `tspconfig.yaml` in its output folder (which names the
+   emitter + per-package options), then the config's per-instance hooks run.
    Generation is split into two phases via `--phase` (default `all` runs both):
-   - `--phase=client` emits the `src/*.ts` sources the tests import. It compiles via
-     `node <@typespec/compiler>/cmd/tsp.js compile` (resolved once per process) rather
-     than `npx tsp`, which avoids ~5 s/spec of npx re-resolution while keeping one fresh
-     subprocess per compile.
-   - `--phase=declarations` emits the tracked `src/index.d.ts` baseline (tsc `.d.ts` +
-     api-extractor rollup). Only `check:tree` consumes these, so the e2e script
-     `generate-and-run` runs the vitest suite in parallel with the
-     declaration regen, keeping the (slow) api-extractor work off the test critical path.
+   - `--phase compile` emits the `src/*.ts` sources the tests import (one fresh
+     `tsp compile` subprocess per spec), then runs the `postCompile` hook
+     (`test/commands/post-compile.js`) to write each package's `.gitignore` and a
+     self-contained test `tsconfig.json`.
+   - `--phase declarations` runs the `postCompileDeclarations` hook
+     (`test/commands/emit-declarations.ts`) per spec — tsc `.d.ts` +
+     api-extractor rollup into the tracked `src/index.d.ts` — **without
+     recompiling**. Only `check:tree` consumes these, so the e2e script
+     `generate-and-run` runs the vitest suite in parallel with the declaration
+     regen, keeping the (slow) api-extractor work off the test critical path.
+   Each hook is a short script that reads `SPECTOR_OUTPUT_DIR` (the spec's output
+   folder); the shared CLI sets it per instance.
 3. The vitest `integration-azure-modular` project then runs the `*.test.ts` assertions.
 
 `pnpm regen-test-baselines` (alias of `generate-tsp-only`, which runs both phases)
@@ -94,9 +101,9 @@ Each generated package writes a `.gitignore` that ignores everything except
 `src/index.d.ts`, `.gitignore`, and `tspconfig.yaml`. So a generated folder is full of
 files on disk (`src/*.ts`, `types/`, `temp/`), but git only tracks the rolled-up
 `src/index.d.ts` (produced by the api-extractor "dtsRollup" pass in the `declarations`
-phase of `run.ts`). The `client` phase rewrites `src/` and therefore _removes_
-`src/index.d.ts`; the `declarations` phase restores it byte-for-byte — so both phases
-must run before `check:tree`.
+phase, `test/commands/emit-declarations.ts`). The `compile` phase rewrites `src/` and
+therefore _removes_ `src/index.d.ts`; the `declarations` phase restores it byte-for-byte
+— so both phases must run before `check:tree`.
 
 ## CI: `e2e-test` job in `.github/workflows/ci-typescript.yml`
 
@@ -109,18 +116,21 @@ So a baseline that doesn't match freshly generated output (changed, missing, or 
 ## Gotchas
 
 - **Command scripts run on `node`, not `tsx`.** The `test/commands/*` scripts (including
-  `copy:typespec`, `gen-spector.js`, `check:tree`, and `gen:scenario-suites`) are executed
-  directly with `node`, which strips TypeScript types natively — this requires **Node >=
-  22.18**. When adding or editing one: import sibling `.ts` files with an explicit `.ts`
-  specifier (node does not remap `.js` -> `.ts` the way tsx did), and use `import type` for
-  type-only names from CommonJS deps such as `typescript` (`CompilerOptions`) and
-  `@microsoft/api-extractor` (`IExtractorConfigPrepareOptions`) — otherwise node tries to
-  load them as runtime named exports and throws. `copy:typespec` is cross-platform, so the
-  old Windows workaround (replicating Unix `rm`/`cp` by hand) is no longer needed.
+  `copy:typespec`, `check:tree`, `post-compile.js`, `emit-declarations.ts`, and
+  `gen:scenario-suites`) are executed directly with `node`, which strips TypeScript types
+  natively — this requires **Node >= 22.18**. When adding or editing one: import sibling
+  `.ts` files with an explicit `.ts` specifier (node does not remap `.js` -> `.ts` the way
+  tsx did), and use `import type` for type-only names from CommonJS deps such as
+  `typescript` (`CompilerOptions`) and `@microsoft/api-extractor`
+  (`IExtractorConfigPrepareOptions`) — otherwise node tries to load them as runtime named
+  exports and throws. The spector hooks are invoked by the shared `spector-runner` CLI as
+  shell commands (see `hooks` in `spector.config.yaml`); each reads `SPECTOR_OUTPUT_DIR`.
+  `copy:typespec` is cross-platform, so the old Windows workaround (replicating Unix
+  `rm`/`cp` by hand) is no longer needed.
 - **Never `git add -A` after regenerating baselines.** The api-extractor rollup step can
   intermittently fail to (re)write `src/index.d.ts` for a few specs (concurrent workers in
-  gen-spector share an api-extractor temp workspace per package). The folder still
-  regenerates, but the tracked rollup goes missing — which `git add -A` silently stages as
-  a deletion. Review `git status` for _unexpected_ deletions/additions and stage baseline
-  changes by explicit path before committing. If a baseline went missing this way, restore
-  it from the previous commit rather than re-deleting it.
+  the `declarations` phase share an api-extractor temp workspace per package). The folder
+  still regenerates, but the tracked rollup goes missing — which `git add -A` silently
+  stages as a deletion. Review `git status` for _unexpected_ deletions/additions and stage
+  baseline changes by explicit path before committing. If a baseline went missing this way,
+  restore it from the previous commit rather than re-deleting it.

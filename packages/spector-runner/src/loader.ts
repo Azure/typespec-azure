@@ -8,6 +8,7 @@ import {
   SpecOptionValue,
   SpectorConfig,
   SpectorConfigError,
+  SpectorHooks,
 } from "./types.js";
 
 function isOptionValue(value: unknown): value is SpecOptionValue {
@@ -67,6 +68,39 @@ function validateEntry(rawEntry: unknown, specPath: string): SpecEntry {
   return validateOptionsObject(rawEntry, specPath);
 }
 
+function validateOptionalString(value: unknown, key: string, source: string): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    throw new SpectorConfigError(`"${source}": "${key}" must be a string.`);
+  }
+  return value;
+}
+
+function validateHooks(rawHooks: unknown, source: string): SpectorHooks | undefined {
+  if (rawHooks === undefined) {
+    return undefined;
+  }
+  if (typeof rawHooks !== "object" || rawHooks === null || Array.isArray(rawHooks)) {
+    throw new SpectorConfigError(`"${source}": "hooks" must be a map of hook name to command.`);
+  }
+  const allowed = new Set(["postCompile", "postCompileDeclarations"]);
+  const hooks: SpectorHooks = {};
+  for (const [key, value] of Object.entries(rawHooks)) {
+    if (!allowed.has(key)) {
+      throw new SpectorConfigError(
+        `"${source}": unknown hook "${key}". Allowed: postCompile, postCompileDeclarations.`,
+      );
+    }
+    if (typeof value !== "string") {
+      throw new SpectorConfigError(`"${source}": hook "${key}" must be a command string.`);
+    }
+    hooks[key as keyof SpectorHooks] = value;
+  }
+  return hooks;
+}
+
 /**
  * Parse and validate a spector config from a YAML string.
  *
@@ -95,7 +129,14 @@ export function parseSpectorConfig(content: string, source = "<string>"): Specto
     specs[specPath] = validateEntry(rawEntry, specPath);
   }
 
-  return { specs };
+  const root = parsed as Record<string, unknown>;
+  return {
+    specs,
+    specsRoot: validateOptionalString(root.specsRoot, "specsRoot", source),
+    outputDir: validateOptionalString(root.outputDir, "outputDir", source),
+    compileConfig: validateOptionalString(root.compileConfig, "compileConfig", source),
+    hooks: validateHooks(root.hooks, source),
+  };
 }
 
 /**

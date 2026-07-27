@@ -68,6 +68,44 @@ specs:
       SpectorConfigError,
     );
   });
+
+  it("parses the optional top-level specsRoot/outputDir/compileConfig/hooks", () => {
+    const config = parseSpectorConfig(`
+specsRoot: temp/specs
+outputDir: out/{outputPath}
+compileConfig: tspconfig.yaml
+hooks:
+  postCompile: node ./post.js
+  postCompileDeclarations: node ./decl.ts
+specs:
+  a: true
+`);
+    expect(config.specsRoot).toBe("temp/specs");
+    expect(config.outputDir).toBe("out/{outputPath}");
+    expect(config.compileConfig).toBe("tspconfig.yaml");
+    expect(config.hooks).toEqual({
+      postCompile: "node ./post.js",
+      postCompileDeclarations: "node ./decl.ts",
+    });
+  });
+
+  it("leaves the optional top-level keys undefined when omitted", () => {
+    const config = parseSpectorConfig(`specs:\n  a: true`);
+    expect(config.specsRoot).toBeUndefined();
+    expect(config.outputDir).toBeUndefined();
+    expect(config.compileConfig).toBeUndefined();
+    expect(config.hooks).toBeUndefined();
+  });
+
+  it("throws on a non-string top-level setting or an unknown/invalid hook", () => {
+    expect(() => parseSpectorConfig(`specsRoot: 3\nspecs:\n  a: true`)).toThrow(SpectorConfigError);
+    expect(() => parseSpectorConfig(`hooks:\n  nope: x\nspecs:\n  a: true`)).toThrow(
+      SpectorConfigError,
+    );
+    expect(() => parseSpectorConfig(`hooks:\n  postCompile: 1\nspecs:\n  a: true`)).toThrow(
+      SpectorConfigError,
+    );
+  });
 });
 
 describe("isSpecEnabled / getSpecOptions", () => {

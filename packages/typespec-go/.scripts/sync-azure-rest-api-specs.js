@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 //
-// Syncs the subset of Azure/azure-rest-api-specs needed by tspcompile.js
+// Syncs the subset of Azure/azure-rest-api-specs needed by spector-runner.config.js
 // into ./temp/azure-rest-api-specs at a pinned commit. Uses a sparse,
 // blobless, shallow clone so that only the listed spec folders are
 // downloaded. Safe to re-run: skips work when the cache is already at

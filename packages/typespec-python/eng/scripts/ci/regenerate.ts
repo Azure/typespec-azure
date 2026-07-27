@@ -2,14 +2,13 @@
 /**
  * Regenerates Python SDK code from TypeSpec definitions.
  *
- * Uses in-process TypeSpec compilation to avoid subprocess spawning overhead.
- * Specs are compiled in parallel and the emitter writes the final `.py` files
- * directly inside the same process — no YAML-only intermediate, no batched
- * Python subprocess.  This single-phase pipeline is faster for the wrapper
- * use-case (azure flavor only, smaller spec set, Windows).
- *
- * Shared helpers/data live in `regenerate-common.ts` and are kept identical
- * with the upstream `@typespec/http-client-python` copy via `pnpm sync`.
+ * Spec selection comes from `spector.config.yaml` (see Azure/typespec-azure#4997);
+ * per-spec emitter options and output layout come from the upstream-synced tables
+ * in `regenerate-common.ts`. Each resulting task is compiled by spawning a
+ * `tsp compile` subprocess through the shared `@azure-tools/spector-runner`
+ * engine, so this wrapper and the Go/TS wrappers share one parallel-compile +
+ * reporting engine (the engine is intended to move into `core/` and be reused
+ * by upstream `@typespec/http-client-python`).
  */
 
 import { platform } from "os";
@@ -18,16 +17,24 @@ import pc from "picocolors";
 import { fileURLToPath } from "url";
 import { parseArgs } from "util";
 
-import { isSpecEnabled, loadSpectorConfig, SpectorConfig } from "@azure-tools/spector-runner";
+import type { CompileScenario, SpectorRunnerConfig } from "@azure-tools/spector-runner";
+import {
+  isSpecEnabled,
+  loadSpectorConfig,
+  runConfig,
+  SpectorConfig,
+} from "@azure-tools/spector-runner";
+import { rmSync } from "fs";
 
 import {
   buildTaskGroups,
+  defaultPackageName,
   getSubdirectories,
   prepareBaselineOfGeneratedCode,
   preprocess,
   RegenerateContext,
   RegenerateFlags,
-  runParallel,
+  TaskGroup,
 } from "./regenerate-common.js";
 
 const argv = parseArgs({
@@ -49,9 +56,9 @@ if (argv.values.help) {
 ${pc.bold("Usage:")} tsx regenerate.ts [options]
 
 ${pc.bold("Description:")}
-  Regenerates Python SDK code from TypeSpec definitions using in-process
-  compilation.  This avoids spawning a new Node.js process for each spec,
-  making it significantly faster.
+  Regenerates Python SDK code from TypeSpec definitions. Each spec is compiled
+  by spawning a \`tsp compile\` subprocess through the shared spector-runner
+  engine, run in parallel across specs.
 
 ${pc.bold("Options:")}
   ${pc.cyan("-f, --flavor <azure|unbranded>")}
@@ -139,6 +146,29 @@ function filterOptedIn(specs: string[]): { kept: string[]; skipped: string[] } {
   return { kept, skipped };
 }
 
+/**
+ * Flatten the upstream {@link buildTaskGroups} output into shared-engine
+ * {@link CompileScenario}s: one scenario per task. Each spec's option-sets and
+ * output dirs come from `buildTaskGroups` (upstream-synced data); this only maps
+ * that data onto the scenario shape the engine compiles.
+ */
+function groupsToScenarios(groups: TaskGroup[], ctx: RegenerateContext): CompileScenario[] {
+  const scenarios: CompileScenario[] = [];
+  for (const group of groups) {
+    for (const task of group.tasks) {
+      const packageName =
+        (task.options["package-name"] as string) || defaultPackageName(group.spec, ctx);
+      scenarios.push({
+        name: packageName,
+        entrypoint: task.spec,
+        emit: [ctx.pluginDir],
+        options: { [ctx.emitterName]: task.options },
+      });
+    }
+  }
+  return scenarios;
+}
+
 async function regenerateFlavor(
   flavor: string,
   name: string | undefined,
@@ -151,36 +181,54 @@ async function regenerateFlavor(
 
   const flags: RegenerateFlags = { flavor, debug, name };
 
-  await preprocess(flavor, GENERATED_FOLDER);
+  // Drive this flavor through the shared @azure-tools/spector-runner engine:
+  // `preRun` prepares the generator, the scenario builder expands the
+  // upstream-synced task groups, and `postScenario` wipes partial output on a
+  // failure (matching the previous in-process behavior).
+  const config: SpectorRunnerConfig = {
+    cwd: ctx.pluginDir,
+    jobs,
+    preRun: () => preprocess(flavor, GENERATED_FOLDER),
+    scenarios: async () => {
+      const azureSpecs = flavor === "azure" ? await getSubdirectories(AZURE_HTTP_SPECS, flags) : [];
+      const standardSpecs = await getSubdirectories(HTTP_SPECS, flags);
+      const { kept, skipped } = filterOptedIn([...azureSpecs, ...standardSpecs]);
+      if (skipped.length > 0) {
+        console.log(
+          pc.yellow(`Skipping ${skipped.length} spec(s) not opted into spector.config.yaml`),
+        );
+      }
 
-  const azureSpecs = flavor === "azure" ? await getSubdirectories(AZURE_HTTP_SPECS, flags) : [];
-  const standardSpecs = await getSubdirectories(HTTP_SPECS, flags);
-  const discovered = [...azureSpecs, ...standardSpecs];
-
-  const { kept: allSpecs, skipped } = filterOptedIn(discovered);
-  if (skipped.length > 0) {
-    console.log(pc.yellow(`Skipping ${skipped.length} spec(s) not opted into spector.config.yaml`));
-  }
-
-  const groups = buildTaskGroups(allSpecs, flags, ctx);
-  const totalTasks = groups.reduce((sum, g) => sum + g.tasks.length, 0);
-
-  console.log(pc.cyan(`Found ${allSpecs.length} specs (${totalTasks} total tasks) to compile`));
-  console.log(pc.cyan(`Using ${jobs} parallel jobs\n`));
+      const groups = buildTaskGroups(kept, flags, ctx);
+      const scenarios = groupsToScenarios(groups, ctx);
+      console.log(
+        pc.cyan(`Found ${kept.length} specs (${scenarios.length} total tasks) to compile`),
+      );
+      console.log(pc.cyan(`Using ${jobs} parallel jobs\n`));
+      return scenarios;
+    },
+    postScenario: (result) => {
+      if (!result.success) {
+        // Match the previous in-process behavior: wipe partial output on failure.
+        const outputDir = result.scenario.options?.[ctx.emitterName]?.["emitter-output-dir"] as
+          string | undefined;
+        if (outputDir) {
+          rmSync(outputDir, { recursive: true, force: true });
+        }
+      }
+    },
+  };
 
   const startTime = performance.now();
-  const results = await runParallel(groups, jobs, ctx);
+  const summary = await runConfig(config, { jobs });
   const duration = (performance.now() - startTime) / 1000;
 
-  const succeeded = Array.from(results.values()).filter((v) => v).length;
-  const failed = results.size - succeeded;
-
   console.log(pc.cyan(`\n${"=".repeat(60)}`));
-  console.log(pc.cyan(`Results: ${succeeded} succeeded, ${failed} failed`));
+  console.log(pc.cyan(`Results: ${summary.succeeded} succeeded, ${summary.failed} failed`));
   console.log(pc.cyan(`Time: ${duration.toFixed(1)}s`));
   console.log(pc.cyan(`${"=".repeat(60)}\n`));
 
-  return failed === 0;
+  return summary.failed === 0;
 }
 
 async function main(): Promise<void> {
@@ -195,7 +243,7 @@ async function main(): Promise<void> {
 
   console.log(pc.cyan(`\nRegeneration config:`));
   console.log(pc.cyan(`  Platform: ${isWindows ? "Windows" : "Unix"}`));
-  console.log(pc.cyan(`  Mode:     in-process compilation (single-phase)`));
+  console.log(pc.cyan(`  Mode:     tsp compile subprocess (spector-runner engine)`));
   console.log(pc.cyan(`  Jobs:     ${jobs}`));
   if (name) {
     console.log(pc.cyan(`  Filter:   ${name}`));

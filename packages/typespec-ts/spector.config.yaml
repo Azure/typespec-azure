@@ -3,6 +3,28 @@
 # Spec selection for @azure-tools/typespec-ts (opt-in).
 # See Azure/typespec-azure#4997. Keys are spec paths under temp/specs;
 # `outputPath` (when different from the key) is the generated folder.
+#
+# The shared `spector-runner` CLI drives the whole regeneration from this file:
+#   spector-runner --config spector.config.yaml --phase <all|compile|declarations>
+# Each spec compiles using the committed tspconfig.yaml in its output folder,
+# then the per-instance hooks run (see the hook scripts under test/commands).
+
+# Root the spec-path keys resolve against.
+specsRoot: temp/specs
+
+# Each spec's generated output folder.
+outputDir: test/azure-modular-integration/generated/{outputPath}
+
+# Compile using the committed tspconfig.yaml inside each output folder (it names
+# the emitter + per-package options), rather than synthesized --emit/--option.
+compileConfig: tspconfig.yaml
+
+# Per-instance lifecycle hooks (SPECTOR_OUTPUT_DIR points at the output folder).
+hooks:
+  # Cheap client post-processing: emit .gitignore + a self-contained test tsconfig.
+  postCompile: node ./test/commands/post-compile.js
+  # Public-surface baseline: tsc .d.ts + api-extractor rollup into src/index.d.ts.
+  postCompileDeclarations: node ./test/commands/emit-declarations.ts
 
 specs:
   versioning/removed:
