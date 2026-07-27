@@ -11,10 +11,18 @@ allowed-tools: shell
 
 ## Inputs
 
-You will receive a Spector case link under one of these roots:
+You will receive one or more Spector cases. Each case can be expressed as any of:
 
-- `https://github.com/microsoft/typespec/tree/main/packages/http-specs/specs/...`
-- `https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs/...`
+- A link under one of these roots:
+  - `https://github.com/microsoft/typespec/tree/main/packages/http-specs/specs/...`
+  - `https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs/...`
+- A spec path relative to `specs/` (for example, `type/model/empty`), optionally with the
+  spec type (`http-specs` or `azure-http-specs`) when it is ambiguous.
+- A pull request link (in `microsoft/typespec` or `Azure/typespec-azure`) that adds or
+  changes specs. Inspect the PR's changed files under `packages/http-specs/specs/` or
+  `packages/azure-http-specs/specs/` and treat each affected spec directory as a case.
+
+When multiple cases are provided, repeat the workflow below for each one.
 
 ## Output
 
@@ -27,13 +35,13 @@ You will receive a Spector case link under one of these roots:
 
 ## Workflow
 
-- [ ] Ensure dependencies are installed and `typespec-go` is built.
-- [ ] Identify the Spector case, spec type, and spec path.
-- [ ] Add the spec to the appropriate opt-in Spector config.
-- [ ] Regenerate the selected Go client with `pnpm tspcompile --filter=<module>`.
-- [ ] Read `mockapi.ts` and the generated client method signatures.
-- [ ] Write one `*_client_test.go` file per generated client.
-- [ ] Start Spector, run the generated module's Go tests, and stop Spector.
+1. Ensure dependencies are installed and `typespec-go` is built.
+2. Identify the Spector case, spec type, and spec path.
+3. Add the spec to the appropriate opt-in Spector config.
+4. Regenerate the selected Go client with `pnpm tspcompile --filter=<module>`.
+5. Read `mockapi.ts` and the generated client method signatures.
+6. Write one `*_client_test.go` file per generated client.
+7. Start Spector, run the generated module's Go tests, and stop Spector.
 
 ## Prerequisites
 
