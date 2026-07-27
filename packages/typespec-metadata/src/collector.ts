@@ -337,7 +337,13 @@ export async function collectLanguagePackages(
   }
 
   return {
-    languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir, resolvedApiVersion),
+    languages: buildLanguageMetadata(
+      optionMap,
+      params,
+      baseOutputDir,
+      defaultServiceDir,
+      resolvedApiVersion,
+    ),
     sourceConfigPath: program.compilerOptions.config,
   };
 }

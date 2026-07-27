@@ -1,5 +1,5 @@
-import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
 import { stringify as stringifyYaml } from "yaml";
 import packageJson from "../package.json" with { type: "json" };
 import { buildSpecMetadata, collectLanguagePackages } from "./collector.js";
