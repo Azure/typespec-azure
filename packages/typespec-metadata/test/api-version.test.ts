@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { parse as parseYaml } from "yaml";
 import type { MetadataSnapshot } from "../src/metadata.js";
-import { SimpleTester } from "./tester.js";
+import { EmitterTester } from "./tester.js";
 
 function emitMetadata(code: string, compilerOptions: Record<string, unknown> = {}) {
-  return SimpleTester.emit("@azure-tools/typespec-metadata", {}).compileAndDiagnose(code, {
+  return EmitterTester.compileAndDiagnose(code, {
     compilerOptions: {
       options: {
         "@azure-tools/typespec-python": {
@@ -47,10 +47,7 @@ describe("apiVersion in emitted metadata", () => {
   });
 
   it("service with api-version 'all' emits 'all' as apiVersion", async () => {
-    const [{ outputs }] = await SimpleTester.emit(
-      "@azure-tools/typespec-metadata",
-      {},
-    ).compileAndDiagnose(
+    const [{ outputs }] = await EmitterTester.compileAndDiagnose(
       `
       @service(#{
         title: "Widget Service",
