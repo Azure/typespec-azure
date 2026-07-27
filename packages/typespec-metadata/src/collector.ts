@@ -322,6 +322,7 @@ export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
   resolvedApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
   const params = extractParameters(optionMap);
@@ -343,6 +344,7 @@ export async function collectLanguagePackages(
       baseOutputDir,
       defaultServiceDir,
       resolvedApiVersion,
+      resolvedSdkType,
     ),
     sourceConfigPath: program.compilerOptions.config,
   };
@@ -491,6 +493,7 @@ export function buildLanguageMetadata(
   baseOutputDir: string,
   defaultServiceDir?: string,
   resolvedApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): Record<string, LanguagePackageMetadata[]> {
   const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
@@ -502,6 +505,7 @@ export function buildLanguageMetadata(
       baseOutputDir,
       defaultServiceDir,
       resolvedApiVersion,
+      resolvedSdkType,
     );
     const language = inferLanguageFromEmitterName(emitterName);
     if (!languagesDict[language]) {
@@ -520,6 +524,7 @@ function createLanguageMetadata(
   baseOutputDir: string,
   defaultServiceDir?: string,
   resolvedApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
 
@@ -596,6 +601,7 @@ function createLanguageMetadata(
     flavor: flavor ? String(flavor) : undefined,
     serviceDir,
     apiVersion: resolvedApiVersion,
+    sdkType: resolvedSdkType,
   };
 }
 

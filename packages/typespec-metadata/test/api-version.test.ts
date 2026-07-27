@@ -44,6 +44,7 @@ describe("apiVersion in emitted metadata", () => {
     const pythonMeta = snapshot.languages["python"];
     expect(pythonMeta).toBeDefined();
     expect(pythonMeta[0].apiVersion).toBe("v3");
+    expect(pythonMeta[0].sdkType).toBe("stable");
   });
 
   it("service with api-version 'all' emits 'all' as apiVersion", async () => {
@@ -77,6 +78,7 @@ describe("apiVersion in emitted metadata", () => {
 
     const snapshot = parseMetadata(outputs);
     expect(snapshot.languages["python"][0].apiVersion).toBe("all");
+    expect(snapshot.languages["python"][0].sdkType).toBe("stable");
   });
 
   it("service without versioning emits undefined apiVersion", async () => {
@@ -91,6 +93,7 @@ describe("apiVersion in emitted metadata", () => {
 
     const snapshot = parseMetadata(outputs);
     expect(snapshot.languages["python"][0].apiVersion).toBeUndefined();
+    expect(snapshot.languages["python"][0].sdkType).toBeUndefined();
   });
 
   it("multiple services emit 'multiple-versions' as apiVersion", async () => {
@@ -157,5 +160,85 @@ describe("apiVersion in emitted metadata", () => {
     const snapshot = parseMetadata(outputs);
     expect(snapshot.languages["python"][0].apiVersion).toBe("v2");
     expect(snapshot.languages["java"][0].apiVersion).toBe("v2");
+    expect(snapshot.languages["python"][0].sdkType).toBe("stable");
+    expect(snapshot.languages["java"][0].sdkType).toBe("stable");
+  });
+});
+
+describe("sdkType in emitted metadata", () => {
+  it("preview version with -preview suffix emits sdkType 'preview'", async () => {
+    const [{ outputs }] = await emitMetadata(`
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        \`2023-01-01\`,
+        \`2023-06-01-preview\`,
+      }
+
+      op test(): void;
+    `);
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("2023-06-01-preview");
+    expect(snapshot.languages["python"][0].sdkType).toBe("preview");
+  });
+
+  it("stable version without -preview suffix emits sdkType 'stable'", async () => {
+    const [{ outputs }] = await emitMetadata(`
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        \`2023-01-01\`,
+        \`2023-06-01\`,
+      }
+
+      op test(): void;
+    `);
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("2023-06-01");
+    expect(snapshot.languages["python"][0].sdkType).toBe("stable");
+  });
+
+  it("api-version 'all' with a preview version emits sdkType 'preview'", async () => {
+    const [{ outputs }] = await EmitterTester.compileAndDiagnose(
+      `
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        \`2023-01-01\`,
+        \`2023-06-01\`,
+        \`2024-01-01-preview\`,
+      }
+
+      op test(): void;
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-metadata": { "api-version": "all" },
+            "@azure-tools/typespec-python": {
+              "package-name": "azure-test-service",
+            },
+          },
+        },
+      },
+    );
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("all");
+    expect(snapshot.languages["python"][0].sdkType).toBe("preview");
   });
 });

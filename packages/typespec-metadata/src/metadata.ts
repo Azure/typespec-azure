@@ -28,6 +28,13 @@ export interface LanguagePackageMetadata {
    * - `undefined` when no API version information is available
    */
   apiVersion?: string;
+  /**
+   * Whether the SDK targets preview or stable API versions.
+   * - `"preview"` if any targeted API version is a preview version (matches `-preview` suffix or has `@previewVersion` decorator)
+   * - `"stable"` if all targeted API versions are stable
+   * - `undefined` when no API version information is available
+   */
+  sdkType?: "preview" | "stable";
 }
 
 export interface MetadataSnapshot {

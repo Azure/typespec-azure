@@ -1,3 +1,4 @@
+import type { SdkClientType, SdkHttpOperation } from "@azure-tools/typespec-client-generator-core";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
 import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
 import { stringify as stringifyYaml } from "yaml";
@@ -35,10 +36,17 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
     }
   }
 
+  // Resolve SDK type (preview/stable) by checking all client API versions
+  const resolvedSdkType = resolveSdkType(
+    sdkContext.sdkPackage.clients,
+    sdkContext.previewStringRegex,
+  );
+
   const languageResult = await collectLanguagePackages(
     context.program,
     commonOutputDir,
     resolvedApiVersion,
+    resolvedSdkType,
   );
 
   const snapshot: MetadataSnapshot = {
@@ -68,4 +76,49 @@ async function writeSnapshot(
     path: outputPath,
     content: serialized,
   });
+}
+
+/**
+ * Determine whether the SDK targets preview or stable API versions.
+ * Walks all clients (including sub-clients) and checks each version string
+ * against the preview regex.
+ *
+ * Note: The `@previewVersion` decorator is handled by TCGC internally during
+ * version filtering, so versions marked with it that don't match the regex
+ * are already excluded from `client.apiVersions` by the time we inspect them.
+ * Once TCGC exposes `isPreview` on its metadata, we can consume it directly.
+ */
+function resolveSdkType(
+  clients: SdkClientType<SdkHttpOperation>[],
+  previewStringRegex: RegExp,
+): "preview" | "stable" | undefined {
+  let hasAnyVersion = false;
+
+  function checkClient(client: SdkClientType<SdkHttpOperation>): boolean {
+    for (const version of client.apiVersions) {
+      hasAnyVersion = true;
+      if (previewStringRegex.test(version)) {
+        return true;
+      }
+    }
+
+    // Recurse into sub-clients
+    if (client.children) {
+      for (const child of client.children) {
+        if (checkClient(child)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  for (const client of clients) {
+    if (checkClient(client)) {
+      return "preview";
+    }
+  }
+
+  return hasAnyVersion ? "stable" : undefined;
 }
