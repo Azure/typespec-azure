@@ -1,4 +1,5 @@
 import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
+import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
 import { stringify as stringifyYaml } from "yaml";
 import packageJson from "../package.json" with { type: "json" };
 import { buildSpecMetadata, collectLanguagePackages } from "./collector.js";
@@ -18,7 +19,23 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   // Get the common tsp-output directory (parent of this emitter's output dir)
   const commonOutputDir = getDirectoryPath(getDirectoryPath(context.emitterOutputDir));
 
-  const languageResult = await collectLanguagePackages(context.program, commonOutputDir);
+  // Resolve API version using TCGC
+  const sdkContext = await createSdkContext(context as any);
+  const apiVersionsMap = sdkContext.sdkPackage.metadata.apiVersions;
+  let resolvedApiVersion: string | undefined;
+  if (apiVersionsMap && apiVersionsMap.size > 0) {
+    if (apiVersionsMap.size > 1) {
+      resolvedApiVersion = "multiple-versions";
+    } else {
+      resolvedApiVersion = [...apiVersionsMap.values()][0];
+    }
+  }
+
+  const languageResult = await collectLanguagePackages(
+    context.program,
+    commonOutputDir,
+    resolvedApiVersion,
+  );
 
   const snapshot: MetadataSnapshot = {
     emitterVersion: SNAPSHOT_VERSION,

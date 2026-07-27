@@ -44,6 +44,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
   },
   "dependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "yaml": "catalog:"
   },
   "peerDependencies": {

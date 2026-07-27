@@ -21,12 +21,11 @@ export interface LanguagePackageMetadata {
   /** Service directory path for this language emitter. */
   serviceDir?: string;
   /**
-   * API version configuration from the emitter's tspconfig `api-version` option.
-   * When a single string (e.g. "all", "latest", or a specific version like "2023-01-01"),
-   * it is emitted as-is. When a map from service namespace to version, it is emitted
-   * as a Record<string, string>.
+   * Resolved API version for this emitter.
+   * "all" when configured for all versions, "multi-service" for multi-service configs,
+   * or the actual resolved version string (e.g. "2023-10-01").
    */
-  apiVersions?: string | Record<string, string>;
+  apiVersion?: string;
 }
 
 export interface MetadataSnapshot {

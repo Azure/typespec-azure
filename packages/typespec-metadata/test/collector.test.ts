@@ -682,58 +682,47 @@ describe("multiple emitters per language", () => {
   });
 });
 
-describe("apiVersions extraction", () => {
-  it("should extract api-version string 'all'", () => {
+describe("apiVersion extraction", () => {
+  it("should pass through 'all' as the resolved apiVersion", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
-      "@azure-tools/typespec-python": {
-        "api-version": "all",
-      },
+      "@azure-tools/typespec-python": {},
     };
 
-    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    expect(result["python"][0].apiVersions).toBe("all");
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output", undefined, "all");
+    expect(result["python"][0].apiVersion).toBe("all");
   });
 
-  it("should extract api-version string 'latest'", () => {
+  it("should pass through an actual resolved version string", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
-      "@azure-tools/typespec-python": {
-        "api-version": "latest",
-      },
+      "@azure-tools/typespec-csharp": {},
     };
 
-    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    expect(result["python"][0].apiVersions).toBe("latest");
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/repos/tsp-output",
+      undefined,
+      "2023-10-01",
+    );
+    expect(result["csharp"][0].apiVersion).toBe("2023-10-01");
   });
 
-  it("should extract a specific api-version string", () => {
+  it("should pass through 'multiple-versions' for multi-service configs", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
-      "@azure-tools/typespec-csharp": {
-        "api-version": "2023-10-01",
-      },
+      "@azure-tools/typespec-java": {},
     };
 
-    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    expect(result["csharp"][0].apiVersions).toBe("2023-10-01");
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/repos/tsp-output",
+      undefined,
+      "multiple-versions",
+    );
+    expect(result["java"][0].apiVersion).toBe("multiple-versions");
   });
 
-  it("should extract api-version as a record (multi-service)", () => {
-    const optionMap: Record<string, Record<string, unknown>> = {
-      "@azure-tools/typespec-java": {
-        "api-version": {
-          "Contoso.WidgetManager": "2023-11-01",
-          "Contoso.WidgetManager.Budgets": "2024-01-01",
-        },
-      },
-    };
-
-    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    expect(result["java"][0].apiVersions).toEqual({
-      "Contoso.WidgetManager": "2023-11-01",
-      "Contoso.WidgetManager.Budgets": "2024-01-01",
-    });
-  });
-
-  it("should leave apiVersions undefined when api-version is not set", () => {
+  it("should leave apiVersion undefined when no resolved version is provided", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
       "@azure-tools/typespec-python": {
         "package-name": "azure-contoso",
@@ -741,6 +730,25 @@ describe("apiVersions extraction", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    expect(result["python"][0].apiVersions).toBeUndefined();
+    expect(result["python"][0].apiVersion).toBeUndefined();
+  });
+
+  it("should apply the same resolved apiVersion to all emitters", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-python": {},
+      "@azure-tools/typespec-java": {},
+      "@azure-tools/typespec-csharp": {},
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "/repos/tsp-output",
+      undefined,
+      "2024-06-01",
+    );
+    expect(result["python"][0].apiVersion).toBe("2024-06-01");
+    expect(result["java"][0].apiVersion).toBe("2024-06-01");
+    expect(result["csharp"][0].apiVersion).toBe("2024-06-01");
   });
 });

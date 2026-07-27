@@ -321,6 +321,7 @@ export interface LanguageCollectionResult {
 export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
+  resolvedApiVersion?: string,
 ): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
   const params = extractParameters(optionMap);
@@ -336,7 +337,13 @@ export async function collectLanguagePackages(
   }
 
   return {
-    languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir),
+    languages: buildLanguageMetadata(
+      optionMap,
+      params,
+      baseOutputDir,
+      defaultServiceDir,
+      resolvedApiVersion,
+    ),
     sourceConfigPath: program.compilerOptions.config,
   };
 }
@@ -483,6 +490,7 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  resolvedApiVersion?: string,
 ): Record<string, LanguagePackageMetadata[]> {
   const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
@@ -493,6 +501,7 @@ export function buildLanguageMetadata(
       params,
       baseOutputDir,
       defaultServiceDir,
+      resolvedApiVersion,
     );
     const language = inferLanguageFromEmitterName(emitterName);
     if (!languagesDict[language]) {
@@ -510,6 +519,7 @@ function createLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  resolvedApiVersion?: string,
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
 
@@ -578,21 +588,6 @@ function createLanguageMetadata(
     }
   }
 
-  // Extract api-version option (string or record of service→version)
-  const rawApiVersion = normalizedOptions["api-version"] ?? normalizedOptions["apiVersion"];
-  let apiVersions: string | Record<string, string> | undefined;
-  if (rawApiVersion != null) {
-    if (typeof rawApiVersion === "string") {
-      apiVersions = rawApiVersion;
-    } else if (typeof rawApiVersion === "object" && !Array.isArray(rawApiVersion)) {
-      const map: Record<string, string> = {};
-      for (const [k, v] of Object.entries(rawApiVersion as Record<string, unknown>)) {
-        map[k] = String(v);
-      }
-      apiVersions = map;
-    }
-  }
-
   return {
     emitterName,
     packageName,
@@ -600,7 +595,7 @@ function createLanguageMetadata(
     outputDir: relativeOutputDir,
     flavor: flavor ? String(flavor) : undefined,
     serviceDir,
-    apiVersions,
+    apiVersion: resolvedApiVersion,
   };
 }
 
