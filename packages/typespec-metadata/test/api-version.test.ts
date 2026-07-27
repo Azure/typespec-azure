@@ -1,9 +1,32 @@
+import { parse as parseYaml } from "yaml";
 import { describe, expect, it } from "vitest";
-import { createSdkContextForTester, SimpleTester } from "./tester.js";
+import type { MetadataSnapshot } from "../src/metadata.js";
+import { SimpleTester } from "./tester.js";
 
-describe("apiVersion resolution from TypeSpec input", () => {
-  it("single versioned service resolves to latest version", async () => {
-    const { program } = await SimpleTester.compile(`
+function emitMetadata(code: string, compilerOptions: Record<string, unknown> = {}) {
+  return SimpleTester.emit("@azure-tools/typespec-metadata", {}).compileAndDiagnose(code, {
+    compilerOptions: {
+      options: {
+        "@azure-tools/typespec-python": {
+          "package-name": "azure-test-service",
+        },
+        ...((compilerOptions.options as Record<string, unknown>) ?? {}),
+      },
+      ...Object.fromEntries(
+        Object.entries(compilerOptions).filter(([k]) => k !== "options"),
+      ),
+    },
+  });
+}
+
+function parseMetadata(outputs: Record<string, string>): MetadataSnapshot {
+  const content = Object.values(outputs)[0];
+  return parseYaml(content) as MetadataSnapshot;
+}
+
+describe("apiVersion in emitted metadata", () => {
+  it("single versioned service emits latest version as apiVersion", async () => {
+    const [{ outputs }] = await emitMetadata(`
       @service(#{
         title: "Widget Service",
       })
@@ -19,17 +42,15 @@ describe("apiVersion resolution from TypeSpec input", () => {
       op test(): void;
     `);
 
-    const context = await createSdkContextForTester(program);
-    const apiVersionsMap = context.sdkPackage.metadata.apiVersions;
-
-    // Single service → map has 1 entry → emitter resolves to that value
-    expect(apiVersionsMap.size).toBe(1);
-    const resolvedApiVersion = [...apiVersionsMap.values()][0];
-    expect(resolvedApiVersion).toBe("v3");
+    const snapshot = parseMetadata(outputs);
+    const pythonMeta = snapshot.languages["python"];
+    expect(pythonMeta).toBeDefined();
+    expect(pythonMeta[0].apiVersion).toBe("v3");
   });
 
-  it("service with api-version 'all' resolves to 'all'", async () => {
-    const { program } = await SimpleTester.compile(`
+  it("service with api-version 'all' emits 'all' as apiVersion", async () => {
+    const [{ outputs }] = await SimpleTester.emit("@azure-tools/typespec-metadata", {}).compileAndDiagnose(
+      `
       @service(#{
         title: "Widget Service",
       })
@@ -43,20 +64,25 @@ describe("apiVersion resolution from TypeSpec input", () => {
       }
 
       op test(): void;
-    `);
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-metadata": { "api-version": "all" },
+            "@azure-tools/typespec-python": {
+              "package-name": "azure-test-service",
+            },
+          },
+        },
+      },
+    );
 
-    const context = await createSdkContextForTester(program, {
-      "api-version": "all",
-    });
-    const apiVersionsMap = context.sdkPackage.metadata.apiVersions;
-
-    expect(apiVersionsMap.size).toBe(1);
-    const resolvedApiVersion = [...apiVersionsMap.values()][0];
-    expect(resolvedApiVersion).toBe("all");
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("all");
   });
 
-  it("service without versioning has empty apiVersions map → undefined", async () => {
-    const { program } = await SimpleTester.compile(`
+  it("service without versioning emits undefined apiVersion", async () => {
+    const [{ outputs }] = await emitMetadata(`
       @service(#{
         title: "Widget Service",
       })
@@ -65,24 +91,12 @@ describe("apiVersion resolution from TypeSpec input", () => {
       op test(): void;
     `);
 
-    const context = await createSdkContextForTester(program);
-    const apiVersionsMap = context.sdkPackage.metadata.apiVersions;
-
-    // Empty map → emitter resolves to undefined
-    expect(apiVersionsMap.size).toBe(0);
-    let resolvedApiVersion: string | undefined;
-    if (apiVersionsMap && apiVersionsMap.size > 0) {
-      if (apiVersionsMap.size > 1) {
-        resolvedApiVersion = "multiple-versions";
-      } else {
-        resolvedApiVersion = [...apiVersionsMap.values()][0];
-      }
-    }
-    expect(resolvedApiVersion).toBeUndefined();
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBeUndefined();
   });
 
-  it("multiple services resolve to 'multiple-versions'", async () => {
-    const { program } = await SimpleTester.compile(`
+  it("multiple services emit 'multiple-versions' as apiVersion", async () => {
+    const [{ outputs }] = await emitMetadata(`
       @service
       @versioned(VersionsA)
       namespace ServiceA {
@@ -109,17 +123,41 @@ describe("apiVersion resolution from TypeSpec input", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program);
-    const apiVersionsMap = context.sdkPackage.metadata.apiVersions;
+    const snapshot = parseMetadata(outputs);
+    const pythonMeta = snapshot.languages["python"];
+    expect(pythonMeta[0].apiVersion).toBe("multiple-versions");
+  });
 
-    // Multiple services → map has > 1 entry → emitter resolves to "multiple-versions"
-    expect(apiVersionsMap.size).toBe(2);
-    let resolvedApiVersion: string | undefined;
-    if (apiVersionsMap.size > 1) {
-      resolvedApiVersion = "multiple-versions";
-    } else {
-      resolvedApiVersion = [...apiVersionsMap.values()][0];
-    }
-    expect(resolvedApiVersion).toBe("multiple-versions");
+  it("apiVersion is applied to all language emitters", async () => {
+    const [{ outputs }] = await emitMetadata(
+      `
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      op test(): void;
+    `,
+      {
+        options: {
+          "@azure-tools/typespec-python": {
+            "package-name": "azure-test-service",
+          },
+          "@azure-tools/typespec-java": {
+            "package-name": "com.azure:azure-test-service",
+          },
+        },
+      },
+    );
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("v2");
+    expect(snapshot.languages["java"][0].apiVersion).toBe("v2");
   });
 });

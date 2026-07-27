@@ -1,6 +1,5 @@
-import { resolvePath, type EmitContext } from "@typespec/compiler";
-import { createTester, resolveVirtualPath } from "@typespec/compiler/testing";
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { resolvePath } from "@typespec/compiler";
+import { createTester } from "@typespec/compiler/testing";
 
 export const MetadataTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -8,6 +7,7 @@ export const MetadataTester = createTester(resolvePath(import.meta.dirname, ".."
     "@typespec/rest",
     "@typespec/versioning",
     "@azure-tools/typespec-client-generator-core",
+    "@azure-tools/typespec-metadata",
   ],
 });
 
@@ -17,17 +17,3 @@ export const SimpleTester = MetadataTester.import(
   "@typespec/versioning",
   "@azure-tools/typespec-client-generator-core",
 ).using("Http", "Rest", "Versioning", "Azure.ClientGenerator.Core");
-
-export async function createSdkContextForTester(
-  program: any,
-  options: Record<string, unknown> = {},
-) {
-  return createSdkContext(
-    {
-      program,
-      emitterOutputDir: resolveVirtualPath("tsp-output"),
-      options,
-    } as EmitContext<Record<string, unknown>>,
-    "@azure-tools/typespec-python",
-  );
-}
