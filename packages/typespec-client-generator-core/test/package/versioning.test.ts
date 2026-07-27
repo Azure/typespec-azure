@@ -1525,3 +1525,87 @@ it("multi-service client has no versionsEnum", async () => {
   ok(biClient.versionsEnum);
   strictEqual(biClient.versionsEnum.name, "VersionsB");
 });
+
+it("isPreview is false for stable versions", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.metadata.isPreview, false);
+});
+
+it("isPreview is undefined for unversioned service", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService;
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+  strictEqual(sdkPackage.metadata.isPreview, undefined);
+});
+
+it("isPreview is true for service with preview suffix version", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v2024_10_01_preview: "2024-10-01-preview",
+    }
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.metadata.isPreview, true);
+});
+
+it("isPreview is true for service with mixed stable and preview versions", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v2024_10_01: "2024-10-01",
+      v2024_11_01_preview: "2024-11-01-preview",
+    }
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.metadata.isPreview, true);
+});
+
+it("isPreview is true for service with @previewVersion decorator", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v2022_10_01: "2022-10-01",
+      #suppress "@azure-tools/typespec-azure-core/preview-version-last-member" "for test"
+      @previewVersion
+      v2022_11_01: "2022-11-01",
+      v2024_10_01: "2024-10-01",
+    }
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.metadata.isPreview, true);
+});
