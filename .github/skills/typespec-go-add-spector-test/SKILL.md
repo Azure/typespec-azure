@@ -105,8 +105,8 @@ When a known unsupported spec should be explicitly tracked but not generated, ad
 `false` with a nearby comment linking the issue:
 
 ```yaml
-  # requires union support: https://github.com/Azure/autorest.go/issues/1234
-  "type/union": false
+# requires union support: https://github.com/Azure/autorest.go/issues/1234
+"type/union": false
 ```
 
 ## 3. Generate the Client
