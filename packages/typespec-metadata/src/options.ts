@@ -11,11 +11,6 @@ export interface MetadataEmitterOptions {
    * Serialization format for the metadata snapshot.
    */
   format?: MetadataOutputFormat;
-  /**
-   * API version configuration passed through to TCGC for version resolution.
-   * Can be "all", a specific version string, or a per-service map.
-   */
-  "api-version"?: string;
 }
 
 export interface NormalizedMetadataEmitterOptions {
@@ -31,11 +26,10 @@ const FALLBACK_FILENAMES: Record<MetadataOutputFormat, string> = {
 
 export const metadataEmitterOptionsSchema: JSONSchemaType<MetadataEmitterOptions> = {
   type: "object",
-  additionalProperties: false,
+  additionalProperties: true,
   properties: {
     outputFile: { type: "string", nullable: true },
     format: { type: "string", enum: ["yaml", "json"], nullable: true },
-    "api-version": { type: "string", nullable: true },
   },
 };
 
