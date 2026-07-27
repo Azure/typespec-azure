@@ -72,6 +72,7 @@ export async function createSdkPackage<TServiceOperation extends SdkServiceOpera
             ? [...versions.values()][0].at(-1)
             : undefined,
       apiVersions: apiVersionsMap,
+      isPreview: computeIsPreview(context, versions),
     },
   };
   organizeNamespaces(context, sdkPackage);
@@ -201,4 +202,15 @@ async function computeCrossLanguageVersion(context: TCGCContext): Promise<string
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   return hex.substring(0, 12);
+}
+
+function computeIsPreview(
+  context: TCGCContext,
+  versions: Map<unknown, string[]>,
+): boolean | undefined {
+  const allVersions = [...versions.values()].flat();
+  if (allVersions.length === 0) {
+    return undefined;
+  }
+  return allVersions.some((v) => context.previewStringRegex.test(v));
 }
