@@ -1,9 +1,10 @@
 {
   "name": "Standard",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
-  "postCreateCommand": "git submodule update --recursive --init && mise trust && mise install && pnpm install",
+  "postCreateCommand": "git submodule update --recursive --init && mise trust && pnpm install",
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {
