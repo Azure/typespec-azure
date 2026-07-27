@@ -4,7 +4,7 @@
 // Runs `go test ./...` for every Go module (a directory containing a go.mod)
 // under test/local/, test/http-specs/ and test/azure-http-specs/. Discovery is
 // module-based (not test-file-based) so that directories holding hand-written
-// tests for specs that are currently disabled in tspcompile.js -- and therefore
+// tests for specs that are currently disabled in spector-runner.config.js -- and therefore
 // have no generated code or go.mod -- are skipped instead of failing with
 // "directory ... does not contain main module".
 //

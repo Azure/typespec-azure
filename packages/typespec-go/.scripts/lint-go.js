@@ -4,7 +4,7 @@
 // Runs golangci-lint and shadow against every Go module (a directory containing
 // a go.mod) under test/local/, test/http-specs/ and test/azure-http-specs/.
 // Discovery is module-based so directories holding hand-written tests for specs
-// currently disabled in tspcompile.js -- which have no generated code or go.mod
+// currently disabled in spector-runner.config.js -- which have no generated code or go.mod
 // after a fresh regenerate -- are skipped. Expects golangci-lint and `shadow`
 // to be available on PATH (installed by CI).
 

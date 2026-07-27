@@ -18,6 +18,9 @@
   },
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "bin": {
+    "spector-runner": "./cmd/spector-runner.js"
+  },
   "exports": {
     ".": {
       "import": "./dist/src/index.js"
@@ -25,6 +28,7 @@
     "./schema": "./schema/dist/SpectorConfig.json"
   },
   "files": [
+    "cmd/**",
     "dist/**",
     "!dist/test/**",
     "schema/dist/SpectorConfig.json"
@@ -41,7 +45,11 @@
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default"
   },
   "dependencies": {
+    "picocolors": "catalog:",
     "yaml": "catalog:"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:^",

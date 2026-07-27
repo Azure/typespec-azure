@@ -3222,6 +3222,9 @@ importers:
 
   packages/spector-runner:
     dependencies:
+      picocolors:
+        specifier: 'catalog:'
+        version: 1.1.1
       yaml:
         specifier: 'catalog:'
         version: 2.9.0

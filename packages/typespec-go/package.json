@@ -42,7 +42,7 @@
     "test:go:e2e": "pnpm spector --start && pnpm go-test && pnpm spector --stop",
     "go-test": "node .scripts/go-test.js",
     "lint:go": "node .scripts/lint-go.js",
-    "tspcompile": "node .scripts/tspcompile.js",
+    "tspcompile": "spector-runner --config-file .scripts/spector-runner.config.js",
     "spector": "node .scripts/spector.js",
     "sync-specs": "node .scripts/sync-azure-rest-api-specs.js",
     "diff-regen-code": "node ../../core/eng/emitter-diff/src/cli.ts --command \"npm run tspcompile\" --emitter-path packages/typespec-go --generated-code-path test/http-specs,test/azure-http-specs,test/local --setup \"git submodule update --init --recursive\" --setup \"pnpm install\" --setup \"npm run build:deps\"",
