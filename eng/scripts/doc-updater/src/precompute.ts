@@ -7,12 +7,12 @@
  * language instructions and thus resist prompt injection.
  *
  * Usage:
- *   npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]
+ *   node src/precompute.ts --config <name> --output <path> [--full-rebuild]
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { loadConfig } from "./config.js";
+import { loadConfig } from "./config.ts";
 import {
   getCommitDiff,
   getCommitDiffFromApi,
@@ -23,7 +23,7 @@ import {
   listCommitsSince,
   readKnowledge,
   readMeta,
-} from "./state.js";
+} from "./state.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -120,7 +120,7 @@ function parsePrecomputeArgs(): PrecomputeArgs {
 
   if (!parsed.config || !parsed.output) {
     console.error(
-      "Usage: npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]",
+      "Usage: node src/precompute.ts --config <name> --output <path> [--full-rebuild]",
     );
     process.exit(1);
   }
