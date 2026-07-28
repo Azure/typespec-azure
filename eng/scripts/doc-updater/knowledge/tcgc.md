@@ -258,3 +258,14 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Feedback Lessons (PR #4683)
 
 - In versioning (and any API-version) examples, use realistic **date-based** api-version identifiers (e.g. `2024-01-01`, enum members like `v2024_01_01: "2024-01-01"`) — NOT placeholder names like `av1`/`bv1`. Human reviewers rewrote placeholder versions to date-based ones. Keep the enum member name and its string value consistent (e.g. `v2024_05_01: "2024-05-01"`).
+
+## Collection Type Serialization Options (July 2026)
+
+- `SdkArrayType` and `SdkDictionaryType` gained an optional `serializationOptions?: SerializationOptions` property (`src/interfaces.ts`).
+- It is populated ONLY when the collection is a _named_ model carrying explicit serialization decorators, e.g. `@Xml.name("Foo") model Foo is Bar[];` or `@encodedName("application/xml", ...) model Foo is Bar[];`. Anonymous/inline arrays and records leave it `undefined`.
+- Rationale (`updateSerializationOptions`/`setSerializationOptions` in `src/types.ts`): for un-decorated collections the wrapping element name comes from the referencing property/model, so emitting a name on the collection itself would be spurious. `setSerializationOptions(context, type, [])` is called with an empty content-type list so only explicitly-defined info is captured.
+- Documented in guideline.md "Collection Types" bullet. No Spector spec needed — this is emitter-consumed type-graph metadata, covered by unit tests in `test/types/serialization-options.test.ts` (array model with `@Xml.name`, with `@encodedName`, and without decorators).
+
+## @clientLocation + scoped @client validation (July 2026)
+
+- Bug fix in `src/validations/types.ts`: `@clientLocation` name-collision validation now skips operations that belong to an explicit `@client` scoped to a _different_ language than the scope being validated (`isClientForOtherScopeOnly`). Prevents false-positive collisions for `is`-derived operations inside a `@client(..., "java")` interface. Internal validation only — no user-facing doc change.

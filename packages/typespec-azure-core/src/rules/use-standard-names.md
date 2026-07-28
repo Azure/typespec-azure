@@ -10,6 +10,12 @@ Ensure Azure Service operations follow the naming recommendations.
 | `PATCH` returning `201`              | Start with `create`, `update` or `createOrUpdate` |
 | `DELETE`                             | Start with `delete`                               |
 
+## Impact
+
+- **Area:** API, SDK
+
+Non-standard operation names reduce consistency across Azure APIs and their SDKs.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -29,3 +35,7 @@ op createPet is ResourceCreate<Pet>;
 ```tsp
 op listPets is ResourceList<Pet>;
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise follow the standard naming conventions.

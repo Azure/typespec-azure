@@ -1,5 +1,11 @@
 Azure services should not define anonymous models, union expressions, enum expressions, or scalar expressions inline. Instead, types must be defined as named declarations.
 
+## Impact
+
+- **Area:** SDK, API
+
+Anonymous inline types - models, unions, enums, or scalars - cannot be represented directly by many target languages, forcing awkward or unusable SDK types.
+
 ## Rationale
 
 Many target languages cannot represent inline union types or anonymous models directly and require them to be named types. By requiring named types in the specification, we ensure:
@@ -72,3 +78,7 @@ The following patterns are **not** flagged:
 - HTTP response envelope models (containing `@statusCode`, `@body`, `@header`, etc.)
 - Types defined inside standard library namespaces (`TypeSpec.*`, `Azure.*`)
 - Unions where all non-null variants are scalars (e.g. `string | int32`)
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise define the type as a named declaration.

@@ -201,7 +201,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Collection Types:**
 
-- [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) are converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types.
+- [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) are converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types. `SdkArrayType` and `SdkDictionaryType` also expose an optional `serializationOptions` property. It is only set when the collection is a named model that carries explicit serialization decorators — for example `@Xml.name("SignedIdentifiers") model SignedIdentifiers is SignedIdentifier[];` — in which case the wrapping element name comes from the collection model itself. For anonymous or inline arrays/records the property is left `undefined`, and the wrapping name is taken from the referencing property or model instead.
 
 **Nullable Types:**
 

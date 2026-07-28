@@ -1,5 +1,3 @@
-Check the ARM specification is not using types not supported in ARM.
-
 Primitive types currently unsupported in ARM:
 
 - int8
@@ -9,7 +7,13 @@ Primitive types currently unsupported in ARM:
 - uint32
 - uint64
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** SDK
+
+The data type cannot be modeled in SDKs.
+
+## ❌ Incorrect
 
 ```tsp
 model ResourceProperties {
@@ -17,10 +21,14 @@ model ResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model ResourceProperties {
   count: int32;
 }
 ```
+
+## Suppression
+
+Requires SDK sign-off. Use standard schemas and built-in types.
