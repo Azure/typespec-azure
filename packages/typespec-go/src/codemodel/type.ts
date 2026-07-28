@@ -22,11 +22,7 @@ export interface Docs {
 
 /** defines types used in generated code but do not go across the wire */
 export type SdkType =
-  | ArmClientOptions
-  | ClientOptions
-  | ParameterGroup
-  | ResponseEnvelope
-  | TokenCredential;
+  ArmClientOptions | ClientOptions | ParameterGroup | ResponseEnvelope | TokenCredential;
 
 /** defines types that go across the wire */
 export type WireType =

@@ -1,4 +1,4 @@
-import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import { Enum, Model, createRule, fileRef, getProperty, paramMessage } from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import { getArmResource } from "../resource.js";
@@ -7,6 +7,7 @@ import { getSourceProperty } from "./utils.js";
 
 export const armResourceProvisioningStateRule = createRule({
   name: "arm-resource-provisioning-state",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-provisioning-state.md"),
   severity: "warning",
   description: "Check for properly configured provisioningState property.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-provisioning-state",

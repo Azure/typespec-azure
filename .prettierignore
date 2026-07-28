@@ -102,10 +102,9 @@ packages/typespec-ts/test/azure-integration/generated/
 packages/typespec-ts/test/modular-integration/generated/
 packages/typespec-ts/test/azure-modular-integration/generated/
 
-# typespec-java emitter-tests is a standalone npm project (excluded from the pnpm
-# workspace) with its own .prettierrc.yaml that loads the typespec prettier plugin
-# from its own node_modules. Those aren't installed in the root format job, so root
-# prettier must not descend into it; the project formats itself via its own scripts.
+# typespec-java emitter-tests holds Maven+tsp e2e assets whose .tsp specs and
+# hand-written sources are synced verbatim from core (see SyncTests.ps1); root
+# prettier must not reformat these upstream-sourced files.
 packages/typespec-java/emitter-tests/
 # Emitter TypeScript sources (except options.ts) are copied from core at build time.
 packages/typespec-java/src/**

@@ -2,6 +2,7 @@ import {
   createRule,
   DecoratedType,
   DiagnosticTarget,
+  fileRef,
   paramMessage,
   Type,
 } from "@typespec/compiler";
@@ -12,6 +13,7 @@ import {
 
 export const noLegacyUsage = createRule({
   name: "no-legacy-usage",
+  docs: fileRef.fromPackageRoot("src/rules/no-legacy-usage.md"),
   description: "Linter warning against using elements from the Legacy namespace",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage",

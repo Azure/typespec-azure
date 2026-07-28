@@ -1,4 +1,4 @@
-import { Program, createRule } from "@typespec/compiler";
+import { Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
@@ -10,8 +10,9 @@ import { getArmResources } from "../resource.js";
  */
 export const armPostResponseCodesRule = createRule({
   name: "arm-post-operation-response-codes",
+  docs: fileRef.fromPackageRoot("src/rules/arm-post-operation-response-codes.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/post-operation-response-codes",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-post-operation-response-codes",
   description: "Ensure post operations have the appropriate status codes.",
   messages: {
     sync: `Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.`,

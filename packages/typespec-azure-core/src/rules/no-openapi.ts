@@ -3,12 +3,14 @@ import {
   Decorator,
   Type,
   createRule,
+  fileRef,
   getTypeName,
   paramMessage,
 } from "@typespec/compiler";
 
 export const noOpenAPIRule = createRule({
   name: "no-openapi",
+  docs: fileRef.fromPackageRoot("src/rules/no-openapi.md"),
   description:
     "Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest",
   severity: "warning",

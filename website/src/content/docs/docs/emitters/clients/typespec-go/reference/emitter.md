@@ -58,7 +58,7 @@ When true, unmarshalers will return an error when an unknown field is encountere
 
 **Type:** `string`
 
-Optional prefix to file names. For example, if you set your file prefix to "zzz*", all generated code files will begin with "zzz*".
+Optional prefix to file names. For example, if you set your file prefix to "zzz_", all generated code files will begin with "zzz_".
 
 ### `generate-fakes`
 
