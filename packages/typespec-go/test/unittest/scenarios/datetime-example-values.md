@@ -27,7 +27,6 @@ model TimesProperties {
 
   plainDate: plainDate;
   plainTime: plainTime;
-
   offset: offsetDateTime;
   offsetZulu: offsetDateTime;
 }
