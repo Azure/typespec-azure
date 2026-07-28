@@ -549,7 +549,10 @@ interface Employees {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -1598,7 +1601,10 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -1871,7 +1877,10 @@ model MoveResponse {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -2075,7 +2084,10 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -3623,7 +3635,10 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -3803,7 +3818,10 @@ model MoveResponse {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",

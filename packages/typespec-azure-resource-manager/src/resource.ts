@@ -849,7 +849,20 @@ function isListOperationMatch(
 ): boolean {
   const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
   const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
-  return resourcePath.startsWith(`${operationPath}/`);
+  if (resourcePath.startsWith(`${operationPath}/`)) return true;
+
+  // TODO: https://github.com/Azure/typespec-azure/issues/5080
+  // Define the complete rule for associating list operations with detected resources.
+  // Some ARM resources expose list operations at wider scopes than the resource identity,
+  // e.g. a resource-group-scoped resource can have both list-by-resource-group and
+  // list-by-subscription operations. Direct prefix matching handles list-by-parent paths,
+  // but not scope-widening list operations. For now, allow the known subscription-list
+  // to resource-group-resource case when the concrete provider/type path is identical.
+  return (
+    getPathScope(operationPath) === "Subscription" &&
+    getPathScope(resourcePath) === "ResourceGroup" &&
+    isSameResourceTypePath(operationPath, resourcePath)
+  );
 }
 
 function getListMatchDistance(
@@ -859,6 +872,78 @@ function getListMatchDistance(
   const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
   const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
   return resourcePath.length - operationPath.length;
+}
+
+function getPathScope(path: string): ArmResourceScope | undefined {
+  const scopePrefix = getScopePrefix(path);
+  if (scopePrefix === "") return "Tenant";
+
+  const segments = scopePrefix.split("/").filter((s) => s.length > 0);
+  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (
+    segments.length === 2 &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    isVariableSegment(segments[1])
+  )
+    return "Subscription";
+  if (
+    segments.length === 4 &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    isVariableSegment(segments[1]) &&
+    segments[2].toLowerCase() === "resourcegroups" &&
+    isVariableSegment(segments[3])
+  )
+    return "ResourceGroup";
+  if (
+    segments.length === 4 &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "managementgroups" &&
+    isVariableSegment(segments[3])
+  )
+    return "ManagementGroup";
+  if (
+    segments.length === 4 &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "servicegroups" &&
+    isVariableSegment(segments[3])
+  )
+    return "ServiceGroup";
+
+  return undefined;
+}
+
+function isSameResourceTypePath(leftPath: string, rightPath: string): boolean {
+  const left = getResourceTypePathFromPath(leftPath);
+  const right = getResourceTypePathFromPath(rightPath);
+  if (left === undefined || right === undefined) return false;
+  return (
+    left.provider.toLowerCase() === right.provider.toLowerCase() &&
+    left.types.map((x) => x.toLowerCase()).join("/") ===
+      right.types.map((x) => x.toLowerCase()).join("/")
+  );
+}
+
+function getResourceTypePathFromPath(path: string): ResourceType | undefined {
+  const segments = path.split("/").filter((s) => s.length > 0);
+  const providerIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+  if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
+
+  const provider = segments[providerIndex + 1];
+  if (isVariableSegment(provider)) return undefined;
+
+  const resourceSegments = segments.slice(providerIndex + 2);
+  if (resourceSegments.length === 0) return undefined;
+
+  const types: string[] = [];
+  for (let i = 0; i < resourceSegments.length; i += 2) {
+    const typeSegment = resourceSegments[i];
+    if (typeSegment === undefined || isVariableSegment(typeSegment)) return undefined;
+    types.push(typeSegment);
+  }
+
+  return { provider, types };
 }
 
 function getBestListOperationTarget(
