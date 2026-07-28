@@ -702,7 +702,9 @@ interface DocListItem {
 }
 
 // classifies a single doc line as a bullet/numbered list item, or undefined
-// when it isn't a list item.
+// when it isn't a list item. Leading whitespace is ignored on purpose: Go doc
+// comments do not support nested lists, so source indentation carries no
+// nesting meaning and every item is treated as a single-level list item.
 function matchDocListItem(line: string): DocListItem | undefined {
   const bullet = bulletListItemRegex.exec(line);
   if (bullet) {
@@ -740,6 +742,12 @@ function formatDocListItem(item: DocListItem, prefix: string): string {
 // Prose lines are word-wrapped exactly as comment() does; blank source lines
 // become blank comment lines ("//"), and a blank comment line is inserted
 // around lists (which Go requires to recognize them).
+//
+// Nested (multi-level) lists are not supported: the Go doc comment format
+// (go/doc/comment) has no concept of nested lists, and gofmt flattens any
+// indented sub-items to a single level. Accordingly every list item is rendered
+// at one level regardless of its source indentation (see matchDocListItem,
+// which ignores leading whitespace).
 function renderDocBody(text: string, prefix = "//"): string {
   const out = new Array<string>();
   let inList = false;
