@@ -1,0 +1,10 @@
+# Stub tspconfig used by .scripts/tspcompile.js when emitting against specs
+# imported from Azure/azure-rest-api-specs. Upstream specs ship their own
+# tspconfig.yaml with @azure-tools/typespec-go options (module, containing-
+# module, go-generate, etc.) that target sdk/azure-sdk-for-go. Pointing tsp at
+# this file via `--config` prevents those options from leaking into our
+# regenerated test output, while leaving the cached spec tree untouched.
+emit:
+  - "@azure-tools/typespec-go"
+options:
+  "@azure-tools/typespec-go": {}

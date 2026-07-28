@@ -10,6 +10,11 @@
 
 $ErrorActionPreference = "Stop"
 
+# See Copy-Sources.ps1: silence progress so no cmdlet touches the controlling
+# terminal from turbo's background process group (which would SIGTTIN/SIGTTOU-stop
+# this process and hang the parallel build).
+$ProgressPreference = "SilentlyContinue"
+
 $packageRoot = $PSScriptRoot
 $generatorRoot = Join-Path $packageRoot "generator"
 $generatorPom = Join-Path $generatorRoot "pom.xml"

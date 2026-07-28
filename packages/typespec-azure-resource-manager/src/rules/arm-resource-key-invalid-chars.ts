@@ -1,9 +1,17 @@
-import { Model, ModelProperty, createRule, getKeyName, paramMessage } from "@typespec/compiler";
+import {
+  Model,
+  ModelProperty,
+  createRule,
+  fileRef,
+  getKeyName,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getDecoratorParam, isInternalTypeSpec, isResource, isValidKey } from "./utils.js";
 
 export const armResourceKeyInvalidCharsRule = createRule({
   name: "arm-resource-key-invalid-chars",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-key-invalid-chars.md"),
   severity: "warning",
   description: "Arm resource key must contain only alphanumeric characters.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-key-invalid-chars",
