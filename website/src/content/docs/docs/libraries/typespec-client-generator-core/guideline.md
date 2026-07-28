@@ -144,6 +144,8 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
+`SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
+
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
 
 - `Individually` (1): The client can be instantiated directly by the user.
@@ -186,6 +188,18 @@ TCGC currently supports one kind of operation: [`SdkHttpOperation`](../reference
 `SdkHttpOperation` contains verb, path, URI template, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation.
 
 Each parameter for an HTTP operation has a `methodParameterSegments` property to indicate the mapping of one payload parameter with the path of one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mapping paths because of the implicit body parameter resolving from the TypeSpec HTTP library.
+
+#### Streaming and Server-Sent Events
+
+When the request body or a response is a streaming type, TCGC sets `streamMetadata` (an [`SdkStreamMetadata`](../reference/js-api/interfaces/sdkstreammetadata/)) on the corresponding `SdkBodyParameter` or `SdkMethodResponse`, describing the stream's content types.
+
+For server-sent event (SSE, `text/event-stream`) streams specifically, TCGC additionally sets `sseMetadata` (an [`SdkSseMetadata`](../reference/js-api/interfaces/sdkssemetadata/)) alongside `streamMetadata`. It is `undefined` for non-event streams such as JSONL. `SdkSseMetadata.events` has one [`SdkSseEventMetadata`](../reference/js-api/interfaces/sdksseeventmetadata/) entry per variant of the streamed `@events` union, giving emitters everything they need to (de)serialize each event without re-deriving it from raw TypeSpec:
+
+- `eventType`: the SSE `event:` field name (from the named union variant); `undefined` for unnamed variants, which are `message` events with no `event:` field.
+- `isTerminalEvent`: whether receiving this event terminates the stream (from `@terminalEvent`), so the client should disconnect.
+- `isEventEnvelope`: whether `type` describes an envelope wrapping a separate `@data` payload. When `false`, `type`/`payloadType` (and their content types) are identical.
+- `type` / `contentType`: the event type and its content type (the envelope when `isEventEnvelope` is `true`).
+- `payloadType` / `payloadContentType`: the event payload type and its content type.
 
 ### Type
 
