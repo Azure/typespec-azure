@@ -282,7 +282,11 @@ const WINDOWS_MAX_PATH = 260;
  */
 function postEmitToolErrorMessage(command: string, err: unknown, outputDir: string): string {
   const error = err as NodeJS.ErrnoException;
-  if (process.platform === "win32" && error.code === "ENOENT") {
+  if (
+    process.platform === "win32" &&
+    error.code === "ENOENT" &&
+    outputDir.length > WINDOWS_MAX_PATH
+  ) {
     return (
       `unable to run '${command}': the tool could not be launched. This is typically caused by the ` +
       `emitter output directory path (${outputDir.length} characters) exceeding the Windows maximum ` +
