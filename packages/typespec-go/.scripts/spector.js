@@ -8,6 +8,11 @@ const nodeModulesRoot =
 const httpSpecs = nodeModulesRoot + "@typespec/http-specs/specs";
 const azureHttpSpecs = nodeModulesRoot + "@azure-tools/azure-http-specs/specs";
 
+// Write the coverage report into the azure-http-specs package directory so the
+// shared /eng/pipelines/templates/upload-spector-coverage.yml template (used by
+// every emitter) can pick it up from the same conventional location.
+const coverageFile = nodeModulesRoot + "@azure-tools/azure-http-specs/spec-coverage.json";
+
 const switches = [];
 let execSyncOptions;
 
@@ -16,6 +21,8 @@ switch (process.argv[2]) {
     switches.push("serve");
     switches.push(httpSpecs);
     switches.push(azureHttpSpecs);
+    switches.push("--coverageFile");
+    switches.push(coverageFile);
     execSyncOptions = { stdio: "inherit" };
     break;
   case "--start":
@@ -23,6 +30,8 @@ switch (process.argv[2]) {
     switches.push("start");
     switches.push(httpSpecs);
     switches.push(azureHttpSpecs);
+    switches.push("--coverageFile");
+    switches.push(coverageFile);
     break;
   case "--stop":
     switches.push("server");

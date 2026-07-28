@@ -1,6 +1,16 @@
-Validate ARM PATCH operations. The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource.
+The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource.
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** API
+
+Inconsistent PATCH properties violate the RPC contract.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [ConsistentPatchProperties](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+
+## ❌ Incorrect
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
@@ -14,7 +24,7 @@ model MyBadPatch {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
@@ -27,3 +37,7 @@ model FooPatch {
   properties?: FooProperties;
 }
 ```
+
+## Suppression
+
+Suppress per the RPC guidelines; otherwise use the standard PATCH operations.

@@ -1,14 +1,20 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/secret-prop
-```
-
-When defining the model returned in an ARM operation, any property that contains sensitive information (such as passwords, keys, tokens, credentials, or other secrets) must be marked with `@secret`. This ensures that secrets are properly identified and handled according to ARM security guidelines.
+Marking these fields lets ARM and SDK tooling identify sensitive values and handle them according to security guidelines.
 
 :::note
 ARM RPC rule: [`RPC-v1-13`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)
 :::
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** SDK, API
+
+Returning a secret in a response violates the RPC contract unless the property is genuinely not a secret.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [XMSSecretInResponse](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+
+## ❌ Incorrect
 
 ```tsp
 model Data {
@@ -17,7 +23,7 @@ model Data {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Data {
@@ -34,3 +40,7 @@ Or create a reusable scalar marked with `@secret`:
 @secret
 scalar apiKey extends string;
 ```
+
+## Suppression
+
+Suppress only if the property is not actually a secret; otherwise mark it as a `password` type or with the `@secret` decorator.
