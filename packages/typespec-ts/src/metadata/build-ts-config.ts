@@ -53,17 +53,9 @@ export function buildTsConfig(model: ClientModel) {
 }
 
 /**
- * Computes the `include` list for the `config/tsconfig.src.*.json` files.
- *
- * The generated `warp.config.yml` exposes every client's entry point as a
- * separate public subpath export (e.g. `./devCenter` -> `./src/devCenter/index.ts`).
- * warp validates those declared exports against the emitted `dist` output, so
- * each exported source file must be a TypeScript project input; otherwise the
- * per-client barrels are never emitted and the build fails with `DIST_MISSING`.
- *
- * We therefore derive the `include` list from the same `exports` map used to
- * build `warp.config.yml`, keeping the two in sync. The root `../src/index.ts`
- * is always included as a fallback.
+ * Derives the tsconfig `include` list from the warp `exports` map so every
+ * exported client entry point is compiled and emitted to `dist`; if they drift
+ * out of sync, warp fails the build with `DIST_MISSING`. Root index is the fallback.
  */
 export function getSrcIncludePaths(exports?: Record<string, string>): string[] {
   const includes = new Set<string>(["../src/index.ts"]);
