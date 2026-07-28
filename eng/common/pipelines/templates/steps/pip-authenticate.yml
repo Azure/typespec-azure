@@ -1,0 +1,12 @@
+parameters:
+  ArtifactFeeds: "public/azure-sdk-for-python"
+
+steps:
+  # Authenticate pip to the Azure Artifacts feed and set an authenticated
+  # PIP_INDEX_URL, since pypi.org is blocked by CFSClean network isolation and
+  # anonymous feed access is throttled.
+  - task: PipAuthenticate@1
+    displayName: "Pip Authenticate"
+    inputs:
+      artifactFeeds: ${{ parameters.ArtifactFeeds }}
+      onlyAddExtraIndex: false

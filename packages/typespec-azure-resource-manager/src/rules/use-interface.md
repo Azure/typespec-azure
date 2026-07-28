@@ -13,7 +13,13 @@ See also:
 - [`use-operation-decorator`](./use-operation-decorator.md) — validates that operations use the correct decorator for the HTTP verb.
 - [`use-api-version`](./use-api-version.md) — validates that operations include an `api-version` parameter.
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** API, SDK, Emitters
+
+Defining resource operations outside interfaces can break ARM resource-operation modeling and downstream tooling assumptions, including resource-based SDK generation and linting.
+
+## ❌ Incorrect
 
 Operations must be inside an interface:
 
@@ -24,7 +30,7 @@ Operations must be inside an interface:
 op getFoos(...ApiVersionParameter): FooResource;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations
@@ -33,3 +39,7 @@ interface FooResources {
   createOrUpdate is ArmResourceCreateOrReplaceAsync<FooResource>;
 }
 ```
+
+## Suppression
+
+Requires C# SDK sign-off and careful review of any other violations. Prefer standard ARM resource operation templates and keep resource operations within `@armResourceOperations` interfaces.

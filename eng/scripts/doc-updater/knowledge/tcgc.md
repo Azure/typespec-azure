@@ -269,3 +269,26 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## @clientLocation + scoped @client validation (July 2026)
 
 - Bug fix in `src/validations/types.ts`: `@clientLocation` name-collision validation now skips operations that belong to an explicit `@client` scoped to a _different_ language than the scope being validated (`isClientForOtherScopeOnly`). Prevents false-positive collisions for `is`-derived operations inside a `@client(..., "java")` interface. Internal validation only — no user-facing doc change.
+
+## SdkClientType.versionsEnum (July 2026)
+
+- `SdkClientType` gained `versionsEnum?: SdkEnumType` (`src/interfaces.ts`, populated by `getVersionsEnum` in `src/clients.ts`). It is the API-versions enum for the client's service, `usage` includes `UsageFlags.ApiVersionEnum` (8), and it is the SAME object instance that appears in `SdkPackage.enums`.
+- `undefined` for unversioned services and for multi-service root clients (spanning >1 service). Sub-clients that map to a single service still get their own service's enum. Verified by `test/package/versioning.test.ts` ("client has versionsEnum reference", "multi-service client has no versionsEnum").
+- Context caches these per-service via `__serviceToVersionsSdkEnum` and exposes `getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType>` (emitter helper on `TCGCContext`/`SdkContext`).
+- Documented in guideline.md "Client" section. Emitter-consumed type-graph metadata — no Spector spec needed.
+
+## SSE Metadata (July 2026)
+
+- `SdkBodyParameter` and `SdkMethodResponse` gained `sseMetadata?: SdkSseMetadata`, set ALONGSIDE `streamMetadata` when the body/response is a server-sent event stream (`text/event-stream`, `SSEStream`). `undefined` for non-event streams like JSONL. Built by `buildSdkSseMetadata` in `src/http.ts`.
+- `SdkSseMetadata.events` is `SdkSseEventMetadata[]`, one entry per variant of the streamed `@events` union. Derived from `@typespec/events` event definitions plus the `@typespec/sse` `@terminalEvent` marker. Fields: `eventType?` (SSE `event:` name from named variant; undefined→`message` event), `isTerminalEvent`, `isEventEnvelope`, `type`/`contentType`, `payloadType`/`payloadContentType`. When `isEventEnvelope` is false, `type`==`payloadType` and content types match.
+- Kept separate from `SdkStreamMetadata` because SSE, streaming, and events are modeled by three distinct TypeSpec libraries (`@typespec/sse`, `@typespec/http`, `@typespec/events`).
+- Documented in guideline.md "Operation" section under a new "Streaming and Server-Sent Events" subsection (also introduced `streamMetadata` documentation there, which was previously undocumented). Tests: `test/methods/sse.test.ts`, `test/methods/streams.test.ts`. Emitter type-graph metadata — no Spector spec needed.
+
+## no-unnamed-types Linter Rule REMOVED (July 2026)
+
+- The `no-unnamed-types` rule was removed from `src/linter.ts` (both the rules array and `no-unnamed-types.rule.ts` / `.md` deleted). `reference/linter.md` no longer lists it — already consistent. Do NOT re-add it.
+- Rule source files were renamed to the `<name>.rule.ts` convention (e.g. `property-name-conflict.ts` → `property-name-conflict.rule.ts`); `csharp-no-url-suffix` still uses `.ts`.
+
+## Diagnostic Messages Externalized (July 2026)
+
+- Diagnostic message definitions were moved out of `src/lib.ts` into individual `src/diagnostics/<name>.md` files (loaded at build). Purely an authoring refactor; reference docs regenerate the same content. No user-facing doc action.

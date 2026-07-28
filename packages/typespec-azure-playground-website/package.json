@@ -33,7 +33,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./dist-dev ./temp ./samples/dist",
-    "build-samples": "tsx ./samples/build.ts",
+    "build-samples": "node ./samples/build.ts",
     "build": "pnpm build-samples && tsc -p tsconfig.build.json && vite build 2>&1",
     "preview": "pnpm build && vite preview",
     "start": "pnpm -s watch",

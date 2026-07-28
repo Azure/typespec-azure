@@ -1,5 +1,11 @@
 Prefer using `utcDateTime` when representing a datetime unless an offset is necessary. Most Azure services work with UTC times and `offsetDateTime` adds unnecessary complexity.
 
+## Impact
+
+- **Area:** SDK, API
+
+Times are clearest when expressed in UTC; `offsetDateTime` obscures intent.
+
 #### ❌ Incorrect
 
 As a model property:
@@ -41,3 +47,7 @@ model Bar {
 ```tsp
 op getTimestamp(): utcDateTime;
 ```
+
+## Suppression
+
+Suppress when there is a clear rationale for `offsetDateTime`; otherwise use `utcDateTime`.

@@ -1,11 +1,12 @@
-ARM service api-versions must:
+Use this rule to catch ordering mistakes across otherwise well-formed service versions. It complements [`arm-resource-invalid-version-format`](./arm-resource-invalid-version-format.md), which validates the format of each individual version string; `arm-version-progression` does not flag malformed version strings because those are reported by the format rule.
 
-1. Use a **unique date** — every entry's `YYYY-MM-DD` must differ from every other entry's date in the same `Versions` enum. A preview version and a stable version cannot share the same date (for example, `2026-04-28` and `2026-04-28-preview` together is not allowed).
-2. Be declared in **strictly increasing chronological order** from top to bottom.
+## Impact
 
-This rule complements [`arm-resource-invalid-version-format`](./arm-resource-invalid-version-format.md), which validates the format of each individual version string. `arm-version-progression` does not flag malformed version strings — those are reported by the format rule.
+- **Area:** API, SDK, Tooling
 
-#### ❌ Incorrect
+Out-of-order versions, or versions with matching dates, make specs unmaintainable and cause SDK problems.
+
+## ❌ Incorrect
 
 A preview and a stable version share the same date:
 
@@ -33,7 +34,7 @@ enum Versions {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @versioned(Versions)
@@ -60,3 +61,7 @@ enum Versions {
   v2024_06_02_preview: "2024-06-02-preview",
 }
 ```
+
+## Suppression
+
+Do not suppress. Ensure new api-versions are unique and monotonically increasing from top to bottom in the Versions enum.
