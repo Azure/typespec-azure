@@ -22,8 +22,8 @@ import { isSpecEnabled, loadSpectorConfig, SpectorConfig } from "@azure-tools/sp
 
 import {
   buildTaskGroups,
-  getSubdirectories,
   cleanGeneratedCodePreservingFixtures,
+  getSubdirectories,
   preprocess,
   RegenerateContext,
   RegenerateFlags,
