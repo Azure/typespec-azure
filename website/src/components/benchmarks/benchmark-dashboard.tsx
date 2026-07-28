@@ -337,11 +337,7 @@ function BenchmarkChart({
     selectedMetric && metricLabels.includes(selectedMetric) ? selectedMetric : metricLabels[0];
 
   useEffect(() => {
-    if (
-      onSelectedMetric &&
-      effectiveSelectedMetric &&
-      effectiveSelectedMetric !== selectedMetric
-    ) {
+    if (onSelectedMetric && effectiveSelectedMetric && effectiveSelectedMetric !== selectedMetric) {
       onSelectedMetric(effectiveSelectedMetric);
     }
   }, [effectiveSelectedMetric, onSelectedMetric, selectedMetric]);
