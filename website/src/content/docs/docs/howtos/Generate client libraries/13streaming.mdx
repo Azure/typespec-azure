@@ -128,6 +128,8 @@ op stream(@body request: { prompt: string }): SSEStream<ResponseEvents>;
 
 Mark a variant with `@terminalEvent` to indicate that receiving this event signals the end of the stream. Client emitters use this to know when to stop reading and close the connection.
 
+<ClientTabs>
+
 ```typespec
 import "@typespec/sse";
 import "@typespec/events";
@@ -153,9 +155,33 @@ union ChatEvents {
 op chat(@body request: { message: string }): SSEStream<ChatEvents>;
 ```
 
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
 ### Event envelopes
 
 When your SSE event wraps a separate payload, use `@Events.data` on the payload property to distinguish the envelope from its content. Emitters expose both the envelope type and the unwrapped payload type through `sseMetadata`.
+
+<ClientTabs>
 
 ```typespec
 import "@typespec/sse";
@@ -183,9 +209,33 @@ union ChatEvents {
 op chat(@body request: { message: string }): SSEStream<ChatEvents>;
 ```
 
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
 ### Unnamed (message) events
 
 A variant without a name in the union produces an SSE `message` event — the `event:` field is omitted on the wire. Use this when your service emits a single homogeneous event type.
+
+<ClientTabs>
 
 ```typespec
 import "@typespec/sse";
@@ -207,9 +257,33 @@ union BasicEvents {
 op receive(): SSEStream<BasicEvents>;
 ```
 
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
 ## SSE streaming request
 
 `SSEStream` can also be used as a request body when the client sends an event stream to the service.
+
+<ClientTabs>
 
 ```typespec
 import "@typespec/sse";
@@ -230,6 +304,28 @@ union InputEvents {
 
 op send(stream: SSEStream<InputEvents>): void;
 ```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
 
 ## Custom streaming body
 
