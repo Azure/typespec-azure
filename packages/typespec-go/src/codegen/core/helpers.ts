@@ -683,6 +683,104 @@ export function formatCommentAsBulletItem(prefix: string, docs: go.Docs): string
   return chunks.join("\n");
 }
 
+// matches a bullet list item, capturing the item's text.
+// Go doc comments recognize '-', '*' and '+' as bullet markers, each
+// followed by at least one space or tab (see https://go.dev/doc/comment#lists).
+const bulletListItemRegex = /^\s*[-*+][ \t]+(.*)$/;
+
+// matches a numbered list item, capturing the number and the item's text.
+// Go doc comments recognize a decimal number followed by '.' or ')' and at
+// least one space or tab as a numbered list item.
+const numberedListItemRegex = /^\s*(\d+)[.)][ \t]+(.*)$/;
+
+interface DocListItem {
+  kind: "bullet" | "numbered";
+  // the rendered marker without trailing space, e.g. "-" or "1.".
+  marker: string;
+  // the item's text (without the marker).
+  text: string;
+}
+
+// classifies a single doc line as a bullet/numbered list item, or undefined
+// when it isn't a list item.
+function matchDocListItem(line: string): DocListItem | undefined {
+  const bullet = bulletListItemRegex.exec(line);
+  if (bullet) {
+    return { kind: "bullet", marker: "-", text: bullet[1]! };
+  }
+  const numbered = numberedListItemRegex.exec(line);
+  if (numbered) {
+    return { kind: "numbered", marker: `${numbered[1]}.`, text: numbered[2]! };
+  }
+  return undefined;
+}
+
+// renders a single list item following the native Go doc comment convention:
+//
+//	//   - bullet item text that is wrapped
+//	//     onto aligned continuation lines
+//	//  1. numbered item text
+//
+// The item text is word-wrapped (reusing comment()) and continuation lines are
+// indented to align beneath the item text so that gofmt/go doc keep the list.
+function formatDocListItem(item: DocListItem, prefix: string): string {
+  const firstLead = item.kind === "bullet" ? `${prefix}   - ` : `${prefix}  ${item.marker} `;
+  const contLead = prefix + " ".repeat(firstLead.length - prefix.length);
+  // comment() emits lines of the form `${prefix} word...`; strip that lead and
+  // re-apply the list lead so wrapping (and its width) stay consistent with the
+  // rest of the generated comments.
+  const wrapped = comment(item.text, prefix, undefined, commentLength).split("\n");
+  return wrapped
+    .map((chunk, i) => `${i === 0 ? firstLead : contLead}${chunk.slice(prefix.length + 1)}`)
+    .join("\n");
+}
+
+// renders multi-line doc text into Go doc comment lines, preserving paragraph
+// breaks and formatting bullet/numbered lists per the native Go doc convention.
+// Prose lines are word-wrapped exactly as comment() does; blank source lines
+// become blank comment lines ("//"), and a blank comment line is inserted
+// around lists (which Go requires to recognize them).
+function renderDocBody(text: string, prefix = "//"): string {
+  const out = new Array<string>();
+  let inList = false;
+  const lastIsBlank = () => out.length === 0 || out[out.length - 1] === prefix;
+
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/\s+$/, "");
+    if (line.trim() === "") {
+      if (!lastIsBlank()) {
+        out.push(prefix);
+      }
+      inList = false;
+      continue;
+    }
+
+    const item = matchDocListItem(line);
+    if (item) {
+      // a list must be preceded by a blank comment line to be recognized.
+      if (!inList && !lastIsBlank()) {
+        out.push(prefix);
+      }
+      out.push(formatDocListItem(item, prefix));
+      inList = true;
+      continue;
+    }
+
+    // prose line: separate it from a preceding list with a blank comment line.
+    if (inList && !lastIsBlank()) {
+      out.push(prefix);
+    }
+    inList = false;
+    out.push(comment(line.trim(), prefix, undefined, commentLength));
+  }
+
+  // drop any trailing blank comment lines.
+  while (out.length > 0 && out[out.length - 1] === prefix) {
+    out.pop();
+  }
+  return out.join("\n");
+}
+
 // conditionally returns a doc comment on an entity that requires a prefix.
 // e.g.:
 // {Prefix} - {docs.summary}
@@ -703,10 +801,15 @@ export function formatDocCommentWithPrefix(prefix: string, docs: go.Docs): strin
     if (docs.summary) {
       docComment += "//\n";
     } else {
-      // only apply the prefix to the description if there was no summary
-      description = `${prefix} - ${description}`;
+      // only apply the prefix to the description if there was no summary. Keep
+      // the prefix on the first line so any following list is still rendered.
+      const nl = description.indexOf("\n");
+      description =
+        nl === -1
+          ? `${prefix} - ${description}`
+          : `${prefix} - ${description.slice(0, nl)}${description.slice(nl)}`;
     }
-    docComment += `${comment(`${description}`, "//", undefined, commentLength)}\n`;
+    docComment += `${renderDocBody(description, "//")}\n`;
   }
 
   return docComment;
@@ -730,7 +833,7 @@ export function formatDocComment(docs: go.Docs): string {
     if (docs.summary) {
       docComment += "//\n";
     }
-    docComment += `${comment(docs.description, "//", undefined, commentLength)}\n`;
+    docComment += `${renderDocBody(docs.description, "//")}\n`;
   }
 
   return docComment;

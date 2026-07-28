@@ -9,6 +9,7 @@ specs:
   "authentication/http/custom": { options: { module: customgroup } }
   "authentication/oauth2": { options: { module: oauth2group } }
   "authentication/union": { options: { module: unionauthgroup } }
+  documentation: { options: { module: documentationgroup } }
   "encode/bytes": { options: { module: bytesgroup } }
   "encode/datetime": { options: { module: datetimegroup, slice-elements-byval: true } }
   "encode/duration": { options: { module: durationgroup } }
