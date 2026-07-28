@@ -89,7 +89,7 @@ safe-outputs:
   noop:
     report-as-issue: false
   create-pull-request:
-    title-prefix: "[Automated][${{ github.event.inputs.config }}] "
+    title-prefix: "[Automated][${{ github.event.inputs.config }}][skip chg] "
     labels: [docs, "lib:${{ github.event.inputs.config }}"]
     max: 1
 
@@ -166,6 +166,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 - **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
 - **Sub-agents must NEVER call `create_pull_request`.** When delegating work to sub-agents, explicitly instruct them: "Do NOT call create_pull_request. Only read files, edit files, and report results back. The main agent will create the PR." Sub-agents should only use file reading and editing tools.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
+- **Do NOT add changelog files.** Never create or modify files under `.chronus/changes/` or run `pnpm change add`. This workflow's PRs skip the changelog requirement.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
