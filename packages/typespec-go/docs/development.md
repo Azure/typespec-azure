@@ -35,6 +35,28 @@ This guide outlines the steps to contributing to the emitter.
 
 The repo pins its tool versions in `mise.toml` at the repo root. If you use [mise](https://mise.jdx.dev/), running `mise install` will provision the expected versions of Node, Go, and the other tools.
 
+`mise install` only downloads the tools — it does not put them on your `PATH`. To make the provisioned versions available in your shell, we recommend using [shims](https://mise.jdx.dev/dev-tools/shims.html): mise creates a small launcher executable per tool binary, and you simply add the shims directory to your `PATH`. Shims are preferred over `mise activate` because activation installs a hook that shells out to `mise` on **every directory change** — which adds noticeable `cd` latency and, on Windows, fails on deep paths near the `MAX_PATH` limit (the child process's working directory is capped at 260 characters regardless of long-path settings). Shims have no per-directory hook.
+
+For PowerShell, add the shims directory to `PATH` in your profile:
+
+```terminal
+if (!(Test-Path $PROFILE)) { New-Item -Type File -Path $PROFILE -Force }
+Add-Content $PROFILE '$miseShims = "$HOME\AppData\Local\mise\shims"; if ((Test-Path $miseShims) -and ($env:PATH -notlike "*$miseShims*")) { $env:PATH = "$miseShims;$env:PATH" }'
+. $PROFILE
+```
+
+For bash or zsh, add the equivalent line to `~/.bashrc` or `~/.zshrc`:
+
+```terminal
+echo 'export PATH="$HOME/.local/share/mise/shims:$PATH"' >> ~/.bashrc   # or ~/.zshrc
+```
+
+Then restart your shell and confirm the tools resolve with `mise doctor` (or, for example, `go version` and `node --version`).
+
+> **Re-shim when the inventory of executables changes.** A shim is a version-agnostic launcher, so bumping the version of an already-shimmed tool needs no action — the existing shim resolves the new version automatically. But whenever `mise install` **adds a new tool or a new binary** (a brand-new entry in `mise.toml`, a tool update that ships an additional executable, or a global npm/pipx package), you must run `mise reshim` to create the missing shims. Forgetting to do so shows up as a *"command not found"* — or, worse, the command silently resolving to a different copy elsewhere on your `PATH`. Removing a tool likewise leaves a stale shim until you reshim.
+
+If you'd rather not put shims on your `PATH`, you can [activate mise](https://mise.jdx.dev/getting-started.html) instead (adds a shell hook that manages `PATH` per directory) or run individual commands through `mise exec -- <command>`.
+
 ## Step 1: Clone the repo
 
 We recommend [forking then cloning](https://github.com/Azure/azure-sdk/blob/main/docs/policies/repobranching.md) the repo.
@@ -151,6 +173,8 @@ pnpm diff-regen-code -- --baseline gh:<sha>
 ```
 
 This is the same tool the `go / emitter diff` PR check runs to post an informational diff of your emitter change; it never fails on a diff, only on a build/tool error.
+
+> **Windows path length.** After emitting, the emitter runs `go generate`, `gofmt`, and `go mod tidy` in the output directory. Windows caps a process's working directory at `MAX_PATH` (260 characters), so if the output path is too long these tools fail to launch and the emitter reports an error telling you to emit to a shorter directory. This is most likely to bite `pnpm diff-regen-code`, whose worktree cache lives under a deep `%TEMP%\emitter-diff-cache\...` path. Work around it by pointing `TMP`/`TEMP` at a short directory before running, for example `$env:TMP = 'C:\t'; $env:TEMP = 'C:\t'` (or run under WSL2, which has no such limit).
 
 ### Run the Go tests
 

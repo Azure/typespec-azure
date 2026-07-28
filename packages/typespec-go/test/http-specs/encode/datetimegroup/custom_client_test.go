@@ -6,9 +6,12 @@ package datetimegroup_test
 import (
 	"context"
 	"datetimegroup"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/stretchr/testify/require"
 )
@@ -198,4 +201,67 @@ func TestResponseHeaderClientUnixTimestamp(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp.Value)
 	require.WithinDuration(t, time.Unix(1686566864, 0), *resp.Value, 0)
+}
+
+// captureTransport records the outgoing request and returns a canned 204 so the
+// serialized wire value can be inspected without a live service.
+type captureTransport struct {
+	req *http.Request
+}
+
+func (c *captureTransport) Do(req *http.Request) (*http.Response, error) {
+	c.req = req
+	return &http.Response{
+		StatusCode: http.StatusNoContent,
+		Header:     http.Header{},
+		Body:       http.NoBody,
+		Request:    req,
+	}, nil
+}
+
+func newCaptureClient(t *testing.T) (*datetimegroup.DatetimeClient, *captureTransport) {
+	ct := &captureTransport{}
+	client, err := datetimegroup.NewDatetimeClientWithNoCredential("https://example.test", &datetimegroup.DatetimeClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Transport: ct,
+		},
+	})
+	require.NoError(t, err)
+	return client, ct
+}
+
+// TestMarshalNormalizesToUTC verifies that non-UTC datetime inputs are serialized
+// in UTC on the wire. The RFC3339 cases must emit an explicit .UTC() coercion since
+// RFC3339 is offset-preserving; the RFC7231 case must remain correct (GMT) even
+// though the emitter omits .UTC() for it. A same-instant round-trip check can't
+// catch this, so we assert on the serialized string directly.
+func TestMarshalNormalizesToUTC(t *testing.T) {
+	// 2022-08-26T20:38:00+02:00 == 2022-08-26T18:38:00Z
+	input := time.Date(2022, time.August, 26, 20, 38, 0, 0, time.FixedZone("UTC+2", 2*60*60))
+
+	t.Run("HeaderRFC3339", func(t *testing.T) {
+		client, ct := newCaptureClient(t)
+		_, err := client.NewDatetimeHeaderClient().RFC3339(context.Background(), input, nil)
+		require.NoError(t, err)
+		value := ct.req.Header["value"][0]
+		require.Contains(t, value, "18:38:00")
+		require.True(t, strings.HasSuffix(value, "Z"), "expected UTC (Z) offset, got %q", value)
+	})
+
+	t.Run("QueryRFC3339", func(t *testing.T) {
+		client, ct := newCaptureClient(t)
+		_, err := client.NewDatetimeQueryClient().RFC3339(context.Background(), input, nil)
+		require.NoError(t, err)
+		value := ct.req.URL.Query().Get("value")
+		require.Contains(t, value, "18:38:00")
+		require.True(t, strings.HasSuffix(value, "Z"), "expected UTC (Z) offset, got %q", value)
+	})
+
+	t.Run("HeaderRFC7231", func(t *testing.T) {
+		client, ct := newCaptureClient(t)
+		_, err := client.NewDatetimeHeaderClient().RFC7231(context.Background(), input, nil)
+		require.NoError(t, err)
+		value := ct.req.Header["value"][0]
+		require.Contains(t, value, "18:38:00 GMT", "expected GMT-normalized time, got %q", value)
+	})
 }

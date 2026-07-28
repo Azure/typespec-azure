@@ -176,7 +176,11 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
         context.program.reportDiagnostic({
           code: "gogenerate",
           severity: "error",
-          message: (<Error>err).message,
+          message: postEmitToolErrorMessage(
+            `go generate ${goGenerateFile}`,
+            err,
+            context.emitterOutputDir,
+          ),
           target: NoTarget,
         });
 
@@ -192,7 +196,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
       context.program.reportDiagnostic({
         code: "gofmt",
         severity: "error",
-        message: (<Error>err).message,
+        message: postEmitToolErrorMessage("gofmt -s -w .", err, context.emitterOutputDir),
         target: NoTarget,
       });
 
@@ -206,7 +210,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
       context.program.reportDiagnostic({
         code: "gomodtidy",
         severity: "error",
-        message: (<Error>err).message,
+        message: postEmitToolErrorMessage("go mod tidy", err, context.emitterOutputDir),
         target: NoTarget,
       });
 
@@ -255,6 +259,38 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
       throw error;
     }
   }
+}
+
+/**
+ * The Windows maximum path length. A process's current directory cannot exceed
+ * this, so launching a Go tool with a longer working directory fails.
+ */
+const WINDOWS_MAX_PATH = 260;
+
+/**
+ * Build the diagnostic message for a post-emit Go tool that failed to run.
+ *
+ * When a tool cannot be launched because the emitter output directory exceeds
+ * the Windows maximum path length, the underlying failure surfaces as a
+ * spurious ENOENT against the command shell rather than anything mentioning the
+ * path. In that case, replace the opaque error with an actionable explanation.
+ *
+ * @param command the command that was executed (for context in the message)
+ * @param err the error thrown by execSync
+ * @param outputDir the emitter output directory used as the working directory
+ * @returns the diagnostic message
+ */
+function postEmitToolErrorMessage(command: string, err: unknown, outputDir: string): string {
+  const error = err as NodeJS.ErrnoException;
+  if (process.platform === "win32" && error.code === "ENOENT") {
+    return (
+      `unable to run '${command}': the tool could not be launched. This is typically caused by the ` +
+      `emitter output directory path (${outputDir.length} characters) exceeding the Windows maximum ` +
+      `path length of ${WINDOWS_MAX_PATH}; Windows cannot use a working directory longer than this. ` +
+      `Emit to a shorter output directory. (output directory: ${outputDir})`
+    );
+  }
+  return error.message;
 }
 
 /**
