@@ -21,6 +21,7 @@ import "@typespec/streams";
 import "@typespec/sse";
 import "@typespec/events";
 ```
+
 :::
 
 ## JSONL streaming response
@@ -39,7 +40,11 @@ model Chunk {
 }
 
 @post
-op generate(@body request: { prompt: string }): JsonlStream<Chunk>;
+op generate(
+  @body request: {
+    prompt: string;
+  },
+): JsonlStream<Chunk>;
 ```
 
 ```python
@@ -99,7 +104,11 @@ union ResponseEvents {
 }
 
 @post
-op stream(@body request: { prompt: string }): SSEStream<ResponseEvents>;
+op stream(
+  @body request: {
+    prompt: string;
+  },
+): SSEStream<ResponseEvents>;
 ```
 
 ```python
@@ -152,7 +161,11 @@ union ChatEvents {
 }
 
 @post
-op chat(@body request: { message: string }): SSEStream<ChatEvents>;
+op chat(
+  @body request: {
+    message: string;
+  },
+): SSEStream<ChatEvents>;
 ```
 
 ```python
@@ -198,15 +211,24 @@ model ChatMessage {
 @events
 union ChatEvents {
   @contentType("application/json")
-  message: { done: false, @data message: ChatMessage },
+  message: {
+    done: false,
+    @data message: ChatMessage,
+  },
 
   @contentType("text/plain")
   @terminalEvent
-  done: { done: true },
+  done: {
+    done: true,
+  },
 }
 
 @post
-op chat(@body request: { message: string }): SSEStream<ChatEvents>;
+op chat(
+  @body request: {
+    message: string;
+  },
+): SSEStream<ChatEvents>;
 ```
 
 ```python
@@ -338,7 +360,9 @@ import "@typespec/streams";
 
 using TypeSpec.Streams;
 
-model AudioChunk { id: string; }
+model AudioChunk {
+  id: string;
+}
 
 @streamOf(AudioChunk)
 model AudioStream {
@@ -346,7 +370,11 @@ model AudioStream {
   @body body: bytes;
 }
 
-op synthesize(@body request: { text: string }): AudioStream;
+op synthesize(
+  @body request: {
+    text: string;
+  },
+): AudioStream;
 ```
 
 ```python
