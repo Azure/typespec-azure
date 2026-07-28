@@ -1,0 +1,12 @@
+{
+  "emitterVersion": "0.55.0",
+  "crossLanguageDefinitions": {
+    "CrossLanguagePackageId": "CollisionService",
+    "CrossLanguageDefinitionId": {
+      "@azure-rest/collision!Widget:interface": "CollisionService.Widget",
+      "@azure-rest/collision!WidgetCreate:interface": "CollisionService.Widget",
+      "@azure-rest/collision!CollisionServiceClient#createOther:member(1)": "CollisionService.createOther",
+      "@azure-rest/collision!CollisionServiceClient#createWidget:member(1)": "CollisionService.createWidget"
+    }
+  }
+}
