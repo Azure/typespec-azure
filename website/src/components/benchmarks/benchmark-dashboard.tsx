@@ -105,6 +105,7 @@ function shortLabel(label: string): string {
     .replace(/^emit\//, "")
     .replace(/@azure-tools\/typespec-azure-core\//, "azure-core/")
     .replace(/@azure-tools\/typespec-azure-resource-manager\//, "arm/")
+    .replace(/@azure-tools\/typespec-client-generator-core\//, "tcgc/")
     .replace(/@azure-tools\/typespec-autorest/, "autorest")
     .replace(/@typespec\/openapi3/, "openapi3")
     .replace(/@typespec\//, "");
@@ -121,19 +122,27 @@ function seriesColors(count: number): string[] {
 }
 
 /** Parse URL search params to get initial state */
-function getInitialParams(): { tab: Tab; spec: string; range: TimeRange; dataset: Dataset } {
+function getInitialParams(): {
+  tab: Tab;
+  spec: string;
+  range: TimeRange;
+  dataset: Dataset;
+  rule: string;
+} {
   if (typeof window === "undefined")
-    return { tab: "stages", spec: "all", range: "all", dataset: "main" };
+    return { tab: "stages", spec: "all", range: "all", dataset: "main", rule: "" };
   const params = new URLSearchParams(window.location.search);
   const tab = (params.get("tab") as Tab) || "stages";
   const spec = params.get("spec") || "all";
   const range = (params.get("range") as TimeRange) || "all";
   const dataset = (params.get("dataset") as Dataset) || "main";
+  const rule = params.get("rule") || "";
   return {
     tab: TABS.some((t) => t.key === tab) ? tab : "stages",
     spec,
     range: TIME_RANGES.some((r) => r.key === range) ? range : "all",
     dataset: dataset === "external" ? "external" : "main",
+    rule,
   };
 }
 
@@ -308,11 +317,40 @@ interface ChartSection {
   filter: (label: string) => boolean;
 }
 
-function BenchmarkChart({ data, section }: { data: FilteredData; section: ChartSection }) {
+function BenchmarkChart({
+  data,
+  section,
+  selectedMetric,
+  onSelectedMetric,
+}: {
+  data: FilteredData;
+  section: ChartSection;
+  selectedMetric?: string;
+  onSelectedMetric?: (metric: string) => void;
+}) {
   const metricLabels = useMemo(
     () => data.labels.filter(section.filter).sort(),
     [data, section.filter],
   );
+
+  const effectiveSelectedMetric =
+    selectedMetric && metricLabels.includes(selectedMetric) ? selectedMetric : metricLabels[0];
+
+  useEffect(() => {
+    if (
+      onSelectedMetric &&
+      effectiveSelectedMetric &&
+      effectiveSelectedMetric !== selectedMetric
+    ) {
+      onSelectedMetric(effectiveSelectedMetric);
+    }
+  }, [effectiveSelectedMetric, onSelectedMetric, selectedMetric]);
+
+  const displayedMetricLabels = onSelectedMetric
+    ? effectiveSelectedMetric
+      ? [effectiveSelectedMetric]
+      : []
+    : metricLabels;
 
   const points = useMemo<ChartPoint[]>(
     () => data.entries.map((e) => ({ commit: e.commit, timestamp: e.timestamp })),
@@ -321,16 +359,38 @@ function BenchmarkChart({ data, section }: { data: FilteredData; section: ChartS
 
   const series = useMemo<Series[]>(
     () =>
-      metricLabels.map((label) => ({
+      displayedMetricLabels.map((label) => ({
         label: shortLabel(label),
         data: data.entries.map((e) => e.metrics[label] ?? null),
       })),
-    [data, metricLabels],
+    [data, displayedMetricLabels],
   );
 
   if (metricLabels.length === 0) return null;
 
-  return <MultiSeriesChart title={section.title} points={points} series={series} />;
+  return (
+    <>
+      {onSelectedMetric && effectiveSelectedMetric && (
+        <div className="controls chartControls">
+          <div className="controlGroup">
+            <span className="controlLabel">Rule:</span>
+            <select
+              className="select"
+              value={effectiveSelectedMetric}
+              onChange={(e) => onSelectedMetric(e.target.value)}
+            >
+              {metricLabels.map((label) => (
+                <option key={label} value={label}>
+                  {shortLabel(label)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+      <MultiSeriesChart title={section.title} points={points} series={series} />
+    </>
+  );
 }
 
 function MetricSummary({ data }: { data: FilteredData }) {
@@ -614,6 +674,7 @@ export function BenchmarkDashboard() {
   const [selectedSpec, setSelectedSpec] = useState<string>(initialParams.spec);
   const [timeRange, setTimeRange] = useState<TimeRange>(initialParams.range);
   const [dataset, setDataset] = useState<Dataset>(initialParams.dataset);
+  const [selectedLinterRule, setSelectedLinterRule] = useState<string>(initialParams.rule);
 
   const historyUrl = useMemo(() => getHistoryUrl(dataset), [dataset]);
 
@@ -642,8 +703,14 @@ export function BenchmarkDashboard() {
 
   // Sync state to URL
   useEffect(() => {
-    updateUrlParams({ tab: activeTab, spec: selectedSpec, range: timeRange, dataset });
-  }, [activeTab, selectedSpec, timeRange, dataset]);
+    updateUrlParams({
+      tab: activeTab,
+      spec: selectedSpec,
+      range: timeRange,
+      dataset,
+      rule: selectedLinterRule,
+    });
+  }, [activeTab, selectedSpec, timeRange, dataset, selectedLinterRule]);
 
   // Derive filtered data
   const filteredData: FilteredData | null = useMemo(() => {
@@ -813,6 +880,8 @@ export function BenchmarkDashboard() {
         {activeTab === "linter" && (
           <BenchmarkChart
             data={filteredData}
+            selectedMetric={selectedLinterRule}
+            onSelectedMetric={setSelectedLinterRule}
             section={{
               title: "Linting Rules (ms)",
               filter: (l) => l.startsWith("linter/") && l !== "linter",
