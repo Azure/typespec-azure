@@ -110,6 +110,7 @@ words:
   - seti
   - stac
   - strconv
+  - stretchr
   - tcgc
   - tsmv
   - userrp

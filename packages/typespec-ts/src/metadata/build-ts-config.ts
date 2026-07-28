@@ -53,9 +53,26 @@ export function buildTsConfig(model: ClientModel) {
 }
 
 /**
+ * Derives the tsconfig `include` list from the warp `exports` map so every
+ * exported client entry point is compiled and emitted to `dist`; if they drift
+ * out of sync, warp fails the build with `DIST_MISSING`. Root index is the fallback.
+ */
+export function getSrcIncludePaths(exports?: Record<string, string>): string[] {
+  const includes = new Set<string>(["../src/index.ts"]);
+  if (exports) {
+    for (const value of Object.values(exports)) {
+      if (typeof value === "string" && value.endsWith(".ts")) {
+        includes.add(value.replace(/^\.\//, "../"));
+      }
+    }
+  }
+  return Array.from(includes);
+}
+
+/**
  * Builds config/tsconfig.src.esm.json — extends eng/tsconfigs/src.esm.json
  */
-export function buildTsSrcEsmConfig() {
+export function buildTsSrcEsmConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.esm.json",
     content: JSON.stringify(
@@ -64,7 +81,7 @@ export function buildTsSrcEsmConfig() {
         compilerOptions: {
           resolveJsonModule: true,
         },
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -75,7 +92,7 @@ export function buildTsSrcEsmConfig() {
 /**
  * Builds config/tsconfig.src.browser.json — extends eng/tsconfigs/src.browser.json
  */
-export function buildTsSrcBrowserConfig() {
+export function buildTsSrcBrowserConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.browser.json",
     content: JSON.stringify(
@@ -84,7 +101,7 @@ export function buildTsSrcBrowserConfig() {
         compilerOptions: {
           resolveJsonModule: true,
         },
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -95,7 +112,7 @@ export function buildTsSrcBrowserConfig() {
 /**
  * Builds config/tsconfig.src.react-native.json — extends eng/tsconfigs/src.react-native.json
  */
-export function buildTsSrcReactNativeConfig() {
+export function buildTsSrcReactNativeConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.react-native.json",
     content: JSON.stringify(
@@ -104,7 +121,7 @@ export function buildTsSrcReactNativeConfig() {
         compilerOptions: {
           resolveJsonModule: true,
         },
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -115,7 +132,7 @@ export function buildTsSrcReactNativeConfig() {
 /**
  * Builds config/tsconfig.src.cjs.json — extends eng/tsconfigs/src.cjs.json
  */
-export function buildTsSrcCjsConfig() {
+export function buildTsSrcCjsConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.cjs.json",
     content: JSON.stringify(
@@ -124,7 +141,7 @@ export function buildTsSrcCjsConfig() {
         compilerOptions: {
           resolveJsonModule: true,
         },
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,

@@ -7,9 +7,8 @@
 # Before running this script the 'tsp' profile must be built, 'mvn install -P local,tsp'.
 param (
   [int] $Parallelization = [Environment]::ProcessorCount,
-  # skip the emitter build in Setup.ps1 (only pack + install); use when the
-  # package was already built by a prior step (e.g. the repo-wide `pnpm build`
-  # in CI) to avoid a redundant second build
+  # skip the emitter build; use when the package was already built by a prior step
+  # (e.g. the repo-wide `pnpm build` in CI) to avoid a redundant second build
   [switch] $SkipBuild = $false
 )
 
@@ -122,6 +121,9 @@ $generateScript = {
   }
 
   $tspTrace = "--trace import-resolution --trace projection --trace typespec-java"
+  # The emitter is resolved by package name from emitter-tests/tspconfig.yaml via Node
+  # self-reference (this folder has no package.json, so the nearest one is the parent
+  # typespec-java package). No --emit needed.
   $tspCommand = "npx --no-install tsp compile $tspFile $tspOptions $tspTrace"
 
   # output of "tsp compile" seems trigger powershell error or exit, hence the "2>&1"
@@ -198,9 +200,25 @@ $generateSpecScript = {
   }
 }
 
-Push-Location $PSScriptRoot
+# This script lives at the typespec-java package root; the Maven/tsp e2e assets it
+# operates on are under ./emitter-tests, so it runs with the working directory pushed
+# into that folder (all ./tsp, ./src, ./specs paths are relative to it).
+Push-Location (Join-Path $PSScriptRoot "emitter-tests")
 try {
-  ./Setup.ps1 -SkipBuild:$SkipBuild
+  if (-not $SkipBuild) {
+    # Build the emitter (emitter.jar via Build-Generator.ps1 + tsc) from the
+    # workspace package. The e2e tests consume it directly from the built dist +
+    # generator, resolved by package name via tspconfig.yaml -- no .tgz.
+    Push-Location ..
+    try {
+      pnpm build
+      if ($LASTEXITCODE -ne 0) {
+        throw "Failed to build @azure-tools/typespec-java"
+      }
+    } finally {
+      Pop-Location
+    }
+  }
 
   New-Item -Path ./existingcode/src/main/java/tsptest/ -ItemType Directory -Force | Out-Null
 
@@ -232,16 +250,17 @@ try {
   Copy-Item -Path ./existingcode/src/main/java/tsptest/partialupdate -Destination ./src/main/java/tsptest/partialupdate -Recurse -Force
   Remove-Item ./existingcode -Recurse -Force
 
-  # generate for http-specs/azure-http-specs test sources
-  Copy-Item -Path node_modules/@typespec/http-specs/specs -Destination ./ -Recurse -Force
-  Copy-Item -Path node_modules/@azure-tools/azure-http-specs/specs -Destination ./ -Recurse -Force
+  # generate for http-specs/azure-http-specs test sources (installed under the
+  # typespec-java package's node_modules by the workspace `pnpm install`).
+  Copy-Item -Path ../node_modules/@typespec/http-specs/specs -Destination ./ -Recurse -Force
+  Copy-Item -Path ../node_modules/@azure-tools/azure-http-specs/specs -Destination ./ -Recurse -Force
 
   # Spec selection + per-spec emitter options live in the opt-in spector.config.yaml
   # (see Azure/typespec-azure#4997), resolved by the shared @azure-tools/spector-runner
   # package. resolve-spector-specs.js maps each opted-in spec to its tsp entry file
   # (preferring client.tsp over main.tsp) and emitter options; adding/removing a spec
   # is a one-line config change and disabling one is `false` with a comment.
-  $specsRoot = Join-Path $PSScriptRoot "specs"
+  $specsRoot = Join-Path $PSScriptRoot "emitter-tests/specs"
   $specPlan = node ./resolve-spector-specs.js $specsRoot | ConvertFrom-Json
 
   $job = $specPlan | ForEach-Object -Parallel $generateSpecScript -ThrottleLimit $Parallelization -AsJob
