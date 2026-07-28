@@ -9,7 +9,7 @@ title: "use-operation-decorator"
 Validate that ARM Resource operations use the correct decorator for the HTTP verb.
 
 :::note
-This rule only applies to custom operations. Operations using standard ARM resource templates (e.g. `ArmResourceRead`, `ArmResourceCreateOrReplaceAsync`) automatically satisfy this rule.
+This rule only applies to custom operations. Operations using standard ARM resource templates (e.g. `ArmResourceRead`, `ArmResourceCreateOrReplaceAsync`) automatically satisfy this rule unless the http verb is overridden in the spec with additional http verb decorators.
 :::
 
 | HTTP Verb | Required decorator(s)                                  |
