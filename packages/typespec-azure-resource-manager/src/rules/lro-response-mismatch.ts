@@ -99,7 +99,7 @@ function isHeaderOnlyModel(program: Program, type: Type): boolean {
 /**
  * Verify that the final result of an ARM LRO operation matches the expected response.
  */
-export const armLroResponseMismatchRule = createRule({
+export const lroResponseMismatchRule = createRule({
   name: "lro-response-mismatch",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-response-mismatch",

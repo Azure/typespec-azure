@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { armLroResponseMismatchRule } from "../../src/rules/arm-lro-response-mismatch.js";
+import { lroResponseMismatchRule } from "../../src/rules/lro-response-mismatch.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armLroResponseMismatchRule,
+    lroResponseMismatchRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
