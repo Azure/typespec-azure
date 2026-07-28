@@ -321,7 +321,7 @@ export interface LanguageCollectionResult {
 export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
-  resolvedApiVersion?: string,
+  fallbackApiVersion?: string,
   resolvedSdkType?: "preview" | "stable",
 ): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
@@ -343,7 +343,7 @@ export async function collectLanguagePackages(
       params,
       baseOutputDir,
       defaultServiceDir,
-      resolvedApiVersion,
+      fallbackApiVersion,
       resolvedSdkType,
     ),
     sourceConfigPath: program.compilerOptions.config,
@@ -492,7 +492,7 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
-  resolvedApiVersion?: string,
+  fallbackApiVersion?: string,
   resolvedSdkType?: "preview" | "stable",
 ): Record<string, LanguagePackageMetadata[]> {
   const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
@@ -504,7 +504,7 @@ export function buildLanguageMetadata(
       params,
       baseOutputDir,
       defaultServiceDir,
-      resolvedApiVersion,
+      fallbackApiVersion,
       resolvedSdkType,
     );
     const language = inferLanguageFromEmitterName(emitterName);
@@ -523,7 +523,7 @@ function createLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
-  resolvedApiVersion?: string,
+  fallbackApiVersion?: string,
   resolvedSdkType?: "preview" | "stable",
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
@@ -593,6 +593,10 @@ function createLanguageMetadata(
     }
   }
 
+  // Read api-version from this emitter's options first; fall back to TCGC resolution
+  const emitterApiVersion = normalizedOptions["api-version"];
+  const apiVersion = typeof emitterApiVersion === "string" ? emitterApiVersion : fallbackApiVersion;
+
   return {
     emitterName,
     packageName,
@@ -600,7 +604,7 @@ function createLanguageMetadata(
     outputDir: relativeOutputDir,
     flavor: flavor ? String(flavor) : undefined,
     serviceDir,
-    apiVersion: resolvedApiVersion,
+    apiVersion,
     sdkType: resolvedSdkType,
   };
 }

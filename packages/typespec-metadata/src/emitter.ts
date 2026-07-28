@@ -20,19 +20,15 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   // Get the common tsp-output directory (parent of this emitter's output dir)
   const commonOutputDir = getDirectoryPath(getDirectoryPath(context.emitterOutputDir));
 
-  // Resolve API version using TCGC
+  // Use TCGC for fallback API version resolution and SDK type detection
   const sdkContext = await createSdkContext(context as any);
-  let resolvedApiVersion: string | undefined;
-  if (sdkContext.apiVersion === "all") {
-    resolvedApiVersion = "all";
-  } else {
-    const apiVersionsMap = sdkContext.sdkPackage.metadata.apiVersions;
-    if (apiVersionsMap && apiVersionsMap.size > 0) {
-      if (apiVersionsMap.size > 1) {
-        resolvedApiVersion = "multiple-versions";
-      } else {
-        resolvedApiVersion = [...apiVersionsMap.values()][0];
-      }
+  const apiVersionsMap = sdkContext.sdkPackage.metadata.apiVersions;
+  let fallbackApiVersion: string | undefined;
+  if (apiVersionsMap && apiVersionsMap.size > 0) {
+    if (apiVersionsMap.size > 1) {
+      fallbackApiVersion = "multiple-versions";
+    } else {
+      fallbackApiVersion = [...apiVersionsMap.values()][0];
     }
   }
 
@@ -45,7 +41,7 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   const languageResult = await collectLanguagePackages(
     context.program,
     commonOutputDir,
-    resolvedApiVersion,
+    fallbackApiVersion,
     resolvedSdkType,
   );
 
