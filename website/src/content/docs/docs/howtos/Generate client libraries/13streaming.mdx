@@ -331,6 +331,8 @@ op send(stream: SSEStream<InputEvents>): void;
 
 For content types other than JSONL or `text/event-stream`, define a model with `@streamOf` and a `@body bytes` property.
 
+<ClientTabs>
+
 ```typespec
 import "@typespec/streams";
 
@@ -346,3 +348,25 @@ model AudioStream {
 
 op synthesize(@body request: { text: string }): AudioStream;
 ```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
