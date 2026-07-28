@@ -156,6 +156,8 @@ const LEGEND =
 export interface FormatOptions {
   /** Change threshold for highlighting (default: 5%). */
   threshold?: number;
+  /** Heading title (default: "⚡ Benchmark Results"). */
+  title?: string;
 }
 
 /** Format comparison results as a GitHub PR comment markdown. */
@@ -168,7 +170,7 @@ export function formatPrComment(
   const threshold = options.threshold ?? DEFAULT_THRESHOLD;
 
   const lines: string[] = [];
-  lines.push("## ⚡ Benchmark Results\n");
+  lines.push(`## ${options.title ?? "⚡ Benchmark Results"}\n`);
 
   // Average metrics across all specs
   const averaged = averageComparisonMetrics(comparisons);

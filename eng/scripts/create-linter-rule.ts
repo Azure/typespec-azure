@@ -192,18 +192,7 @@ function main(): void {
   const packageRoot = resolve(repoRoot, "packages", config.packageDir);
   const rulePath = resolve(packageRoot, "src", "rules", `${options.ruleName}.ts`);
   const testPath = resolve(packageRoot, "test", "rules", `${options.ruleName}.test.ts`);
-  const docsPath = resolve(
-    repoRoot,
-    "website",
-    "src",
-    "content",
-    "docs",
-    "docs",
-    "libraries",
-    config.docsLibraryDir,
-    "rules",
-    `${options.ruleName}.md`,
-  );
+  const docsPath = resolve(packageRoot, "src", "rules", `${options.ruleName}.md`);
   const linterPath = resolve(packageRoot, "src", "linter.ts");
 
   const fileTargets = [rulePath, testPath, docsPath];
@@ -219,13 +208,14 @@ function main(): void {
   }
 
   const ruleFile = [
-    'import { createRule } from "@typespec/compiler";',
+    'import { createRule, fileRef } from "@typespec/compiler";',
     "",
     `export const ${ruleIdentifier} = createRule({`,
     `  name: ${toDoubleQuotedString(options.ruleName)},`,
     `  description: ${toDoubleQuotedString(options.description)},`,
     '  severity: "warning",',
     `  url: ${toDoubleQuotedString(`https://azure.github.io/typespec-azure/docs/libraries/${config.docsLibraryDir}/rules/${options.ruleName}`)},`,
+    `  docs: fileRef.fromPackageRoot(${toDoubleQuotedString(`src/rules/${options.ruleName}.md`)}),`,
     "  messages: {",
     '    default: "TODO: Add default diagnostic message.",',
     "  },",
@@ -287,14 +277,6 @@ function main(): void {
   ].join("\n");
 
   const docsFile = [
-    "---",
-    `title: ${toDoubleQuotedString(options.ruleName)}`,
-    "---",
-    "",
-    '```text title="Full name"',
-    `${config.packageNpmName}/${options.ruleName}`,
-    "```",
-    "",
     "TODO: Add a description of what this rule checks and why it matters.",
     "",
     "#### ❌ Incorrect",

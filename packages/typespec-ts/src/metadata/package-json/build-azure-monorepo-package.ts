@@ -6,7 +6,6 @@ import { getCommonPackageScripts, getPackageCommonInfo } from "./package-common.
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {
   monorepoPackageDirectory?: string;
-  clientContextPaths?: string[];
 }
 
 /**
@@ -101,7 +100,6 @@ export function getAzureMonorepoPackageInfo(config: AzureMonorepoInfoConfig): Re
       homepage: `https://github.com/Azure/azure-sdk-for-js/tree/main/${config.monorepoPackageDirectory}/README.md`,
     }),
     prettier: "@azure/eslint-plugin-azure-sdk/prettier.json",
-    "//metadata": getMetadataInfo(config),
   };
 }
 
@@ -161,19 +159,4 @@ function getEsmScripts() {
     "test:node": "dev-tool run test:vitest",
     test: "tsc -b --noEmit && npm run test:node && npm run test:browser",
   };
-}
-
-function getMetadataInfo(config: AzureMonorepoInfoConfig) {
-  const metadata: Record<string, any> = {
-    constantPaths: [],
-  };
-  const paths = config.clientContextPaths;
-  for (const path of paths ?? []) {
-    metadata["constantPaths"].push({
-      path: path,
-      prefix: "userAgentInfo",
-    });
-  }
-
-  return metadata;
 }

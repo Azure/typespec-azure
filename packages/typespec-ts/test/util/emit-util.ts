@@ -248,6 +248,9 @@ export async function emitModularClientContextFromTypeSpec(
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
   });
   const dpgContext = await createDpgContextTestHelper(context.program);
+  if (options.packageDetails) {
+    dpgContext.emitterOptions!.packageDetails = options.packageDetails;
+  }
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;

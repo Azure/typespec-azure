@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.69.0",
+  "version": "0.70.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -53,7 +53,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
-    "regen-docs": "tspd doc .  --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
+    "regen-docs": "tspd doc .  --enable-experimental --llmstxt --rules-dir ../rules --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
   },
   "files": [
     "lib/**/*.tsp",

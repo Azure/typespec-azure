@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "tsx ./.scripts/build.ts",
+    "build": "node ./.scripts/build.ts",
     "build:web": "pnpm regen-all-packages-docs && astro check --minimumFailingSeverity hint && astro build",
     "preview": "astro preview",
-    "update-playground-versions": "tsx ./.scripts/update-playground-versions.ts",
+    "update-playground-versions": "node ./.scripts/update-playground-versions.ts",
     "regen-all-packages-docs": "pnpm -w --filter \"@azure-tools/typespec-azure-website...\" --filter \"!@typespec/monorepo\" --filter \"!@azure-tools/typespec-azure-monorepo\" run regen-docs",
     "astro": "astro"
   },
@@ -39,6 +39,9 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@azure-tools/typespec-java": "workspace:^",
+    "@azure-tools/typespec-python": "workspace:^",
+    "@azure-tools/typespec-ts": "workspace:^",
     "@types/hast": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

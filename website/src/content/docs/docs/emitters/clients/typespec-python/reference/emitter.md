@@ -93,7 +93,7 @@ License information for the generated client code.
 
 | Name          | Type     | Default | Description                                                                                                                                                                                                                      |
 | ------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | `string` |         | License name. The config is required. Predefined licenses are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
+| `name`        | `string` |         | License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
 | `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                    |
 | `link`        | `string` |         | License link.                                                                                                                                                                                                                    |
 | `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                  |
@@ -157,7 +157,17 @@ Whether to validate the versioning of the package. Defaults to `true`. If set to
 
 **Type:** `string`
 
-The subdirectory to generate the code in. If not specified, the code will be generated in the root folder. Note: if you're using this flag, you will need to add and maintain the versioning file yourself.
+The subdirectory (relative to the package namespace folder) to generate the code in. Use this to keep emitter-generated code separate from hand-written/customized code, so regeneration only overwrites the subdirectory and leaves your customizations untouched. If not specified, the code is generated directly in the package namespace folder. Note: if you're using this flag, you will need to add and maintain the versioning file (`_version.py`) yourself.
+
+Example: for `namespace: azure.storage.blob` with `generation-subdir: _generated`, generated code lands in `azure/storage/blob/_generated/` while your customized code lives in `azure/storage/blob/`. A typical `tspconfig.yaml` looks like:
+
+```yaml
+options:
+  "@azure-tools/typespec-python":
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-storage-blob"
+    namespace: "azure.storage.blob"
+    generation-subdir: "_generated"
+```
 
 ### `keep-setup-py`
 

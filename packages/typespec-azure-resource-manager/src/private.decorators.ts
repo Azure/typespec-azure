@@ -768,13 +768,7 @@ function callOperationDecorator(
   resourceType: Model,
   resourceName: string,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -806,13 +800,7 @@ function callLifecycleDecorator(
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -842,13 +830,7 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   targetResourceType: Model,
   extensionResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -879,13 +861,7 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   parentResourceType: Model,
   builtInResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -907,13 +883,7 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -979,13 +949,7 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (

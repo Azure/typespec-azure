@@ -4,7 +4,7 @@ import "./types-ref.tsp";
 import "./managed-identity-ref.tsp";
 import "./managed-identity-with-delegation-ref.tsp";
 import "./private-links-ref.tsp";
-import "./customer-managed-keys-ref.tsp";
+import "./customer-managed-keys.tsp";
 import "./extended-location-ref.tsp";
 import "./internal.tsp";
 import "./commontypes.private.decorators.tsp";
