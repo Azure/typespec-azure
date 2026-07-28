@@ -64,7 +64,7 @@ extends:
 
               - template: /eng/common/pipelines/templates/steps/login-to-github.yml
 
-              - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
+              - script: node core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
                   GH_TOKEN: $(GH_TOKEN)

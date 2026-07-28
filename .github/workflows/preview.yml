@@ -44,4 +44,4 @@ jobs:
       # for the remainder of the job since the mismatch is expected here.
       - run: pnpm config set verifyDepsBeforeRun false --location project
 
-      - run: pnpm tsx eng/scripts/pkg-pr-new.ts
+      - run: node eng/scripts/pkg-pr-new.ts
