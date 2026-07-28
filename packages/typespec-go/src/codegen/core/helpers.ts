@@ -737,11 +737,13 @@ function formatDocListItem(item: DocListItem, prefix: string): string {
     .join("\n");
 }
 
-// renders multi-line doc text into Go doc comment lines, preserving paragraph
-// breaks and formatting bullet/numbered lists per the native Go doc convention.
-// Prose lines are word-wrapped exactly as comment() does; blank source lines
-// become blank comment lines ("//"), and a blank comment line is inserted
-// around lists (which Go requires to recognize them).
+// renders multi-line doc text into Go doc comment lines, formatting
+// bullet/numbered lists per the native Go doc convention. Prose lines are
+// word-wrapped exactly as comment() does, and each source line starts a new
+// comment line. Blank comment lines ("//") are only emitted where Go requires
+// them, i.e. immediately before and after a list, so that gofmt/go doc
+// recognize it; blank source lines are otherwise not preserved, matching the
+// pre-existing behavior of comment().
 //
 // Nested (multi-level) lists are not supported: the Go doc comment format
 // (go/doc/comment) has no concept of nested lists, and gofmt flattens any
@@ -756,9 +758,8 @@ function renderDocBody(text: string, prefix = "//"): string {
   for (const raw of text.split("\n")) {
     const line = raw.replace(/\s+$/, "");
     if (line.trim() === "") {
-      if (!lastIsBlank()) {
-        out.push(prefix);
-      }
+      // a blank source line ends any list in progress. it doesn't emit a blank
+      // comment line; one is added below if it's required to delimit a list.
       inList = false;
       continue;
     }
