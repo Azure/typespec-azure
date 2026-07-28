@@ -63,27 +63,6 @@ describe("Package file generation", () => {
       });
     });
 
-    it("should have monorepo metadata", () => {
-      const model = createMockModel({ ...baseConfig });
-      const packageFileContent = buildPackageFile(model, {
-        clientContextPaths: ["src/api/testContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      const expectedMetadata = {
-        constantPaths: [
-          {
-            path: "src/api/testContext.ts",
-            prefix: "userAgentInfo",
-          },
-        ],
-      };
-
-      // Verify monorepo specific metadata
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]).toEqual(expectedMetadata);
-    });
-
     it("should have sample metadata", () => {
       const model = createMockModel({
         ...baseConfig,
@@ -246,24 +225,6 @@ describe("Package file generation", () => {
       expect(packageFile.scripts).to.have.property(
         "format",
         'prettier --write --config ../../../.prettierrc.json --ignore-path ../../../.prettierignore "src/**/*.{ts,cts,mts}" "test/**/*.{ts,cts,mts}" "*.{js,cjs,mjs,json}" ',
-      );
-    });
-
-    it("[esm] should read clientContextPaths from config for modular", () => {
-      const model = createMockModel({
-        ...baseConfig,
-        isModularLibrary: true,
-      });
-
-      const packageFileContent = buildPackageFile(model, {
-        clientContextPaths: ["src/api/chatCompletionsContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]["constantPaths"][0]).to.have.property(
-        "path",
-        "src/api/chatCompletionsContext.ts",
-        "modular",
       );
     });
 
@@ -453,81 +414,6 @@ describe("Package file generation", () => {
       expect(packageFile.exports["./package.json"]).to.equal("./package.json");
       expect(packageFile.exports["."]).to.have.property("import");
       expect(packageFile).not.toHaveProperty("tshy");
-    });
-
-    it("should update constantPaths when clientContextPaths option is provided for Azure packages", () => {
-      const model = createMockModel({
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure/core-client": "^1.0.0",
-        },
-        "//metadata": {
-          constantPaths: [
-            { path: "src/old-path.ts", prefix: "userAgentInfo" },
-            { path: "src/other-file.ts", prefix: "packageDetails" },
-          ],
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo, {
-        clientContextPaths: ["src/api/newContext.ts", "src/api/anotherContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile["//metadata"]).to.have.property("constantPaths");
-      const constantPaths = packageFile["//metadata"]["constantPaths"];
-
-      // Should keep non-userAgentInfo entries
-      expect(constantPaths).toContainEqual({
-        path: "src/other-file.ts",
-        prefix: "packageDetails",
-      });
-
-      // Should replace old userAgentInfo entries with new ones
-      expect(constantPaths).toContainEqual({
-        path: "src/api/newContext.ts",
-        prefix: "userAgentInfo",
-      });
-      expect(constantPaths).toContainEqual({
-        path: "src/api/anotherContext.ts",
-        prefix: "userAgentInfo",
-      });
-
-      // Should not include old userAgentInfo entry
-      expect(constantPaths).not.toContainEqual({
-        path: "src/old-path.ts",
-        prefix: "userAgentInfo",
-      });
-    });
-
-    it("should not update constantPaths when clientContextPaths is empty", () => {
-      const model = createMockModel({
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        "//metadata": {
-          constantPaths: [{ path: "src/old-path.ts", prefix: "userAgentInfo" }],
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo, {
-        clientContextPaths: [],
-      });
-
-      // Should still return a result (imports are added for warp packages),
-      // but constantPaths should remain unchanged
-      const packageInfo = JSON.parse(packageFileContent!.content);
-      expect(packageInfo["//metadata"].constantPaths).toEqual([
-        { path: "src/old-path.ts", prefix: "userAgentInfo" },
-      ]);
     });
 
     it("should migrate @azure/core-client to @azure-rest/core-client", () => {

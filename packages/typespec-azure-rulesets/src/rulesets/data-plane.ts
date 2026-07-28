@@ -20,7 +20,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-generic-numeric": true,
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
-    "@azure-tools/typespec-azure-core/no-unnamed-union": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-types": true,
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
@@ -48,7 +48,6 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
-    "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
