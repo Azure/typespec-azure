@@ -43,30 +43,23 @@ op generate(@body request: { prompt: string }): JsonlStream<Chunk>;
 ```
 
 ```python
-def generate(self, *, prompt: str, **kwargs: Any) -> Iterator[bytes]:
-    ...
+# unsupported
 ```
 
 ```csharp
-public virtual Response Generate(RequestContent content, RequestContext context = null);
-public virtual Task<Response> GenerateAsync(RequestContent content, RequestContext context = null);
+// unsupported
 ```
 
 ```typescript
-// JS CodeGen api layer
-export function generate(
-  context: Client,
-  prompt: string,
-  options: GenerateOptionalParams = { requestOptions: {} },
-): StreamableMethod;
+// unsupported
 ```
 
 ```java
-public BinaryData generate(BinaryData request);
+// unsupported
 ```
 
 ```go
-func (c *Client) Generate(ctx context.Context, request GenerateRequest, options *GenerateOptions) (GenerateResponse, error)
+// unsupported
 ```
 
 </ClientTabs>
@@ -110,30 +103,23 @@ op stream(@body request: { prompt: string }): SSEStream<ResponseEvents>;
 ```
 
 ```python
-def stream(self, *, prompt: str, **kwargs: Any) -> Iterator[bytes]:
-    ...
+# unsupported
 ```
 
 ```csharp
-public virtual Response Stream(RequestContent content, RequestContext context = null);
-public virtual Task<Response> StreamAsync(RequestContent content, RequestContext context = null);
+// unsupported
 ```
 
 ```typescript
-// JS CodeGen api layer
-export function stream(
-  context: Client,
-  prompt: string,
-  options: StreamOptionalParams = { requestOptions: {} },
-): StreamableMethod;
+// unsupported
 ```
 
 ```java
-public BinaryData stream(BinaryData request);
+// unsupported
 ```
 
 ```go
-func (c *Client) Stream(ctx context.Context, request StreamRequest, options *StreamOptions) (StreamResponse, error)
+// unsupported
 ```
 
 </ClientTabs>
