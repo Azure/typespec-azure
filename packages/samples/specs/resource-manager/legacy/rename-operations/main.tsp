@@ -56,4 +56,5 @@ interface Widgets {
   @Azure.ResourceManager.Legacy.renamePathParameter("widgetName", "resourceGroupName")
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   list is ArmResourceListByParent<Widget>;
+  listBySubscription is ArmListBySubscription<Widget>;
 }
