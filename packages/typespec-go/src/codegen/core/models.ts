@@ -269,12 +269,18 @@ function generateModelDefs(
           field.docs.description = "";
         }
         field.docs.description += `Field has constant value ${helpers.formatLiteralValue(field.type, false)}, any specified value is ignored.`;
+      } else if (field.type.kind === "rawJSON") {
+        // raw JSON is emitted as []byte, so document that the field contains raw
+        // JSON and that the caller is responsible for marshaling their data structure.
+        if (field.docs.description) {
+          field.docs.description += "\n";
+        } else {
+          field.docs.description = "";
+        }
+        field.docs.description += "The contents of this field are raw JSON.";
       }
       if (field.docs.description) {
         descriptionMods.push(field.docs.description);
-      } else if (field.type.kind === "rawJSON") {
-        // add a basic description if one isn't available
-        descriptionMods.push("The contents of this field are raw JSON.");
       }
       field.docs.description = descriptionMods.join("; ");
     }
