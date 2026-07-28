@@ -184,7 +184,8 @@ interface LroPaging {
     Product,
     VnetProfile,
     | ArmResponse<ProductListResult>
-    | (ArmAcceptedLroResponse & {
+    | (ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = ProductListResult> &
+        Azure.Core.Foundations.RetryAfterHeader> & {
         @TypeSpec.Http.bodyRoot
         _: ProductListResult;
       }),

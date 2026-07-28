@@ -1,0 +1,400 @@
+---
+title: Streaming Operations
+llmstxt: true
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc explains how to author TypeSpec streaming operations and what client emitters will generate for them.
+
+TypeSpec supports three kinds of streaming bodies via the `@typespec/streams`, `@typespec/sse`, and `@typespec/events` packages:
+
+- **`JsonlStream<T>`** — a newline-delimited JSON stream where every line is a JSON-encoded `T`.
+- **`SSEStream<TEvents>`** — a server-sent event stream (`text/event-stream`) carrying heterogeneous events described by an `@events` union.
+- **`HttpStream<T, ContentType>`** — a generic streaming body; using `ContentType = "text/event-stream"` with an `@events` union activates the same SSE metadata as `SSEStream`.
+
+:::note
+Import the required packages in your TypeSpec spec:
+
+```tsp
+import "@typespec/streams";
+import "@typespec/sse";
+import "@typespec/events";
+```
+
+:::
+
+## JSONL streaming response
+
+Use `JsonlStream<T>` when your service responds with newline-delimited JSON lines, each encoding a value of type `T`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/streams";
+
+using TypeSpec.Streams;
+
+model Chunk {
+  text: string;
+}
+
+@post
+op generate(
+  @body request: {
+    prompt: string;
+  },
+): JsonlStream<Chunk>;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+## SSE streaming response
+
+Use `SSEStream<TEvents>` to define a server-sent event stream. Events are described by a union decorated with `@Events.events`. Each named variant becomes an SSE event type; unnamed variants produce `message` events.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model ResponseCreated {
+  id: string;
+}
+
+model ResponseDelta {
+  delta: string;
+}
+
+@events
+union ResponseEvents {
+  @contentType("application/json")
+  responseCreated: ResponseCreated,
+
+  @contentType("application/json")
+  responseDelta: ResponseDelta,
+
+  @contentType("text/plain")
+  @terminalEvent
+  "[DONE]",
+}
+
+@post
+op stream(
+  @body request: {
+    prompt: string;
+  },
+): SSEStream<ResponseEvents>;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+### Terminal events
+
+Mark a variant with `@terminalEvent` to indicate that receiving this event signals the end of the stream. Client emitters use this to know when to stop reading and close the connection.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model DeltaEvent {
+  delta: string;
+}
+
+@events
+union ChatEvents {
+  @contentType("application/json")
+  delta: DeltaEvent,
+
+  @contentType("text/plain")
+  @terminalEvent
+  "[DONE]",
+}
+
+@post
+op chat(
+  @body request: {
+    message: string;
+  },
+): SSEStream<ChatEvents>;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+### Event envelopes
+
+When your SSE event wraps a separate payload, use `@Events.data` on the payload property to distinguish the envelope from its content. Emitters expose both the envelope type and the unwrapped payload type through `sseMetadata`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model ChatMessage {
+  role: string;
+  content: string;
+}
+
+@events
+union ChatEvents {
+  @contentType("application/json")
+  message: {
+    done: false,
+    @data message: ChatMessage,
+  },
+
+  @contentType("text/plain")
+  @terminalEvent
+  done: {
+    done: true,
+  },
+}
+
+@post
+op chat(
+  @body request: {
+    message: string;
+  },
+): SSEStream<ChatEvents>;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+### Unnamed (message) events
+
+A variant without a name in the union produces an SSE `message` event — the `event:` field is omitted on the wire. Use this when your service emits a single homogeneous event type.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model Info {
+  desc: string;
+}
+
+@events
+union BasicEvents {
+  @contentType("application/json")
+  Info,
+}
+
+op receive(): SSEStream<BasicEvents>;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+## SSE streaming request
+
+`SSEStream` can also be used as a request body when the client sends an event stream to the service.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model InputEvent {
+  data: string;
+}
+
+@events
+union InputEvents {
+  @contentType("application/json")
+  inputEvent: InputEvent,
+}
+
+op send(stream: SSEStream<InputEvents>): void;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>
+
+## Custom streaming body
+
+For content types other than JSONL or `text/event-stream`, define a model with `@streamOf` and a `@body bytes` property.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/streams";
+
+using TypeSpec.Streams;
+
+model AudioChunk {
+  id: string;
+}
+
+@streamOf(AudioChunk)
+model AudioStream {
+  @header contentType: "audio/mpeg";
+  @body body: bytes;
+}
+
+op synthesize(
+  @body request: {
+    text: string;
+  },
+): AudioStream;
+```
+
+```python
+# unsupported
+```
+
+```csharp
+// unsupported
+```
+
+```typescript
+// unsupported
+```
+
+```java
+// unsupported
+```
+
+```go
+// unsupported
+```
+
+</ClientTabs>

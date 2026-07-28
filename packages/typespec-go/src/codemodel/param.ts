@@ -17,9 +17,7 @@ export type FormBodyParameter = FormBodyCollectionParameter | FormBodyScalarPara
 
 /** the union of all header parameter types */
 export type HeaderParameter =
-  | HeaderCollectionParameter
-  | HeaderMapParameter
-  | HeaderScalarParameter;
+  HeaderCollectionParameter | HeaderMapParameter | HeaderScalarParameter;
 
 /** the union of all path parameter types */
 export type PathParameter = PathCollectionParameter | PathScalarParameter;
@@ -249,12 +247,7 @@ export interface PathScalarParameter extends HttpParameterBase {
 
 /** defines the possible types for a PathScalarParameter */
 export type PathScalarParameterType =
-  | type.Constant
-  | type.EncodedBytes
-  | type.Literal
-  | type.Scalar
-  | type.String
-  | type.Time;
+  type.Constant | type.EncodedBytes | type.Literal | type.Scalar | type.String | type.Time;
 
 /** a reference to an existing parameter */
 export interface ParameterRef {
@@ -303,12 +296,7 @@ export interface QueryScalarParameter extends HttpParameterBase {
 
 /** defines the possible types for a QueryScalarParameter */
 export type QueryScalarParameterType =
-  | type.Constant
-  | type.EncodedBytes
-  | type.Literal
-  | type.Scalar
-  | type.String
-  | type.Time;
+  type.Constant | type.EncodedBytes | type.Literal | type.Scalar | type.String | type.Time;
 
 /** the synthesized resume token parameter for LROs */
 export interface ResumeTokenParameter extends HttpParameterBase {

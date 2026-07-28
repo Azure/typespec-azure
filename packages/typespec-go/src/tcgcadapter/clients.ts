@@ -1344,9 +1344,7 @@ export class ClientAdapter {
 
       const paramLoc = opParam.onClient ? "client" : "method";
       let apiVersionParam:
-        | go.HeaderScalarParameter
-        | go.PathScalarParameter
-        | go.QueryScalarParameter;
+        go.HeaderScalarParameter | go.PathScalarParameter | go.QueryScalarParameter;
       switch (opParam.kind) {
         case "header":
           apiVersionParam = new go.HeaderScalarParameter(

@@ -1,4 +1,4 @@
-import { ModelProperty, Operation, createRule } from "@typespec/compiler";
+import { ModelProperty, Operation, createRule, fileRef } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 function getCaseInsensitiveHeader(
@@ -21,6 +21,7 @@ function getCaseInsensitiveHeader(
  */
 export const lroLocationHeaderRule = createRule({
   name: "lro-location-header",
+  docs: fileRef.fromPackageRoot("src/rules/lro-location-header.md"),
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-location-header",
   description: "A 202 response should include a Location response header.",

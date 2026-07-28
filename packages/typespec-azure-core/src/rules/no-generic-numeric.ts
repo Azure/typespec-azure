@@ -1,4 +1,4 @@
-import { Model, Scalar, createRule, paramMessage } from "@typespec/compiler";
+import { Model, Scalar, createRule, fileRef, paramMessage } from "@typespec/compiler";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([
@@ -10,6 +10,7 @@ const alternatives = new Map([
 
 export const noGenericNumericRule = createRule({
   name: "no-generic-numeric",
+  docs: fileRef.fromPackageRoot("src/rules/no-generic-numeric.md"),
   description: "Don't use generic types. Use more specific types instead.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-numeric",

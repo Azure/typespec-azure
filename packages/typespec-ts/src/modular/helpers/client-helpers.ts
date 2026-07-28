@@ -27,10 +27,7 @@ interface ClientParameterOptions {
 }
 
 type SdkParameter =
-  | SdkMethodParameter
-  | SdkEndpointParameter
-  | SdkCredentialParameter
-  | SdkHttpParameter;
+  SdkMethodParameter | SdkEndpointParameter | SdkCredentialParameter | SdkHttpParameter;
 
 export function hasDefaultValue(p: SdkParameter) {
   if (p.clientDefaultValue || p.__raw?.defaultValue || p.type.kind === "constant") {

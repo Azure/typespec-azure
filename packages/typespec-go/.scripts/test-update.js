@@ -22,7 +22,7 @@ const genSuites = resolve(scriptDir, "..", "test", "unittest", "gen-scenario-sui
 execSync(`node "${genSuites}"`, { stdio: "inherit" });
 
 const extra = process.argv.slice(2).join(" ");
-const cmdLine = `npx vitest run --pass-with-no-tests ${extra}`.trim();
+const cmdLine = `pnpm exec vitest run --pass-with-no-tests ${extra}`.trim();
 console.log(cmdLine);
 execSync(cmdLine, {
   stdio: "inherit",

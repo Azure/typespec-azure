@@ -1,10 +1,11 @@
-import { Namespace, createRule, paramMessage } from "@typespec/compiler";
+import { Namespace, createRule, fileRef, paramMessage } from "@typespec/compiler";
 
 import { getVersion } from "@typespec/versioning";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceInvalidVersionFormatRule = createRule({
   name: "arm-resource-invalid-version-format",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-invalid-version-format.md"),
   severity: "warning",
   description: "Check for valid versions.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-version-format",
