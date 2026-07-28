@@ -70,9 +70,6 @@ export function getSrcIncludePaths(exports?: Record<string, string>): string[] {
   if (exports) {
     for (const value of Object.values(exports)) {
       if (typeof value === "string" && value.endsWith(".ts")) {
-        // Export values are relative to the package root (e.g. "./src/foo/index.ts"),
-        // whereas tsconfig.src.*.json live in the `config/` subfolder, so they are
-        // referenced as "../src/foo/index.ts".
         includes.add(value.replace(/^\.\//, "../"));
       }
     }
