@@ -176,6 +176,7 @@ emit:
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"
+    - "@azure-tools/typespec-azure-rulesets/client-sdk"
 ```
 
 Run the external specs (fewer iterations, since they are heavy):
