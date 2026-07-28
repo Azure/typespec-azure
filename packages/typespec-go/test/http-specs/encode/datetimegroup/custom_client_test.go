@@ -230,6 +230,13 @@ func newCaptureClient(t *testing.T) (*datetimegroup.DatetimeClient, *captureTran
 	return client, ct
 }
 
+func rawHeaderValue(t *testing.T, header http.Header, key string) string {
+	t.Helper()
+	values := map[string][]string(header)[key]
+	require.NotEmpty(t, values)
+	return values[0]
+}
+
 // TestMarshalNormalizesToUTC verifies that non-UTC datetime inputs are serialized
 // in UTC on the wire. The RFC3339 cases must emit an explicit .UTC() coercion since
 // RFC3339 is offset-preserving; the RFC7231 case must remain correct (GMT) even
@@ -243,7 +250,7 @@ func TestMarshalNormalizesToUTC(t *testing.T) {
 		client, ct := newCaptureClient(t)
 		_, err := client.NewDatetimeHeaderClient().RFC3339(context.Background(), input, nil)
 		require.NoError(t, err)
-		value := ct.req.Header["value"][0]
+		value := rawHeaderValue(t, ct.req.Header, "value")
 		require.Contains(t, value, "18:38:00")
 		require.True(t, strings.HasSuffix(value, "Z"), "expected UTC (Z) offset, got %q", value)
 	})
@@ -261,7 +268,7 @@ func TestMarshalNormalizesToUTC(t *testing.T) {
 		client, ct := newCaptureClient(t)
 		_, err := client.NewDatetimeHeaderClient().RFC7231(context.Background(), input, nil)
 		require.NoError(t, err)
-		value := ct.req.Header["value"][0]
+		value := rawHeaderValue(t, ct.req.Header, "value")
 		require.Contains(t, value, "18:38:00 GMT", "expected GMT-normalized time, got %q", value)
 	})
 }
