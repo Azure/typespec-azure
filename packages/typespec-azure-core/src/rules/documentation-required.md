@@ -8,7 +8,7 @@ Missing documentation produces poor SDK reference docs and API documentation.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md).
 
 #### ❌ Incorrect
 
