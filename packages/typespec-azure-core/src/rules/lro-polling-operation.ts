@@ -1,4 +1,4 @@
-import { Operation, Program, Type, createRule } from "@typespec/compiler";
+import { Operation, Program, Type, createRule, fileRef } from "@typespec/compiler";
 import { getHeaderFieldName, isHeader } from "@typespec/http";
 import { getOperationLink } from "../decorators/operation-link.js";
 import {
@@ -22,6 +22,7 @@ function hasOperationLocation(program: Program, entity: Type): boolean {
 
 export const longRunningOperationsRequirePollingOperation = createRule({
   name: "long-running-polling-operation-required",
+  docs: fileRef.fromPackageRoot("src/rules/long-running-polling-operation-required.md"),
   description: "Long-running operations should have a linked polling operation.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/long-running-polling-operation-required",

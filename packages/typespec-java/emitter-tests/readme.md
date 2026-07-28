@@ -1,11 +1,17 @@
 # Test @azure-tools/typespec-java
 
-This project regenerates and tests `@azure-tools/typespec-java` (the branded Java emitter built in
-the parent `@azure-tools/typespec-java` package (`..`)) against the [http-specs] and [azure-http-specs] Spector
-suites and a set of local TypeSpec sources under [`tsp/`](./tsp).
+This folder holds the end-to-end (Spector + Maven/JUnit) tests for
+`@azure-tools/typespec-java` (the branded Java emitter built in the parent
+`@azure-tools/typespec-java` package (`..`)). It regenerates and tests the emitter
+against the [http-specs] and [azure-http-specs] Spector suites and a set of local
+TypeSpec sources under [`tsp/`](./tsp).
 
-It is a standalone npm + Maven project and is intentionally **not** part of the pnpm workspace. It
-consumes the emitter via the packed `.tgz` produced by `../Build-TypeSpec.ps1`.
+It is **part of the `@azure-tools/typespec-java` workspace package** — it has no
+`package.json` of its own. Its npm scripts (`regenerate`, `test:java:e2e`,
+`spector-*`) live in the parent `../package.json`, and it consumes the emitter
+directly from the workspace build (`../dist` + `../generator/.../emitter.jar`),
+resolved via [`tspconfig.yaml`](./tspconfig.yaml)'s local emitter path — no packed
+`.tgz`.
 
 ## Prerequisite
 
@@ -15,49 +21,55 @@ Install [Java](https://docs.microsoft.com/java/openjdk/download) 11 or above. (V
 
 Install [Maven](https://maven.apache.org/download.cgi). (Verify by running `mvn --version`)
 
-## Build emitter, install, and generate code
+Run `pnpm install` at the repo root once to install workspace dependencies (spector,
+http-specs, etc.).
 
-Run from this (`emitter-tests`) folder:
+## Build emitter and generate code
+
+Run from the parent (`packages/typespec-java`) folder:
 
 ```pwsh
-pwsh ./Generate.ps1
+pnpm run regenerate
 ```
 
-`Generate.ps1` calls `Setup.ps1` (which builds the emitter jar + `.tgz` via
-`../Build-TypeSpec.ps1` and `npm install`s it here), then regenerates the SDK from the local
-`tsp/` sources and the [http-specs]/[azure-http-specs] specs into the (gitignored) `src/main/java`
-folder. This takes a while.
-
-To only (re)build and install the emitter without regenerating, run `pwsh ./Setup.ps1`.
+`regenerate` runs [`Generate.ps1`](../Generate.ps1), which builds the emitter
+(`pnpm build`), then regenerates the SDK from the local `tsp/` sources and the
+[http-specs]/[azure-http-specs] specs into the (gitignored) `src/main/java` folder.
+This takes a while.
 
 ## Run the Spector tests
 
+From `packages/typespec-java`:
+
 ```pwsh
-pwsh ./Spector-Tests.ps1
+pnpm run test:java:e2e
 ```
 
-This starts the `tsp-spector` mock server, runs the JUnit tests (`mvn clean test`) against the
-generated SDK, then stops the server. It also writes `tsp-spector-coverage-java.json`.
+This runs [`Spector-Tests.ps1`](../Spector-Tests.ps1): it starts the `tsp-spector`
+mock server, runs the JUnit tests (`mvn clean test`) against the generated SDK, then
+stops the server. It also writes `tsp-spector-coverage-java.json`.
 
-To start/stop the mock server manually (for example to run individual tests from your IDE):
+To start/stop the mock server manually (for example to run individual tests from your
+IDE), from `packages/typespec-java`:
 
 ```shell
-npm run spector-start   # or: npm run spector-serve  (foreground)
-npm run spector-stop
+pnpm run spector-start   # or: pnpm run spector-serve  (foreground)
+pnpm run spector-stop
 ```
 
 ## Sync hand-written tests and specs from core
 
-The hand-written JUnit tests under `src/test/java` and the local specs under `tsp/` are synced from
-the unbranded test project in the `core/` submodule
-(`core/packages/http-client-java/http-client-generator-test`). Refresh them with:
+The hand-written JUnit tests under `src/test/java` and the local specs under `tsp/`
+are synced from the unbranded test project in the `core/` submodule
+(`core/packages/http-client-java/http-client-generator-test`). Refresh them from
+`packages/typespec-java` with:
 
 ```pwsh
-pwsh ./SyncTests.ps1
+pnpm run sync-tests
 ```
 
-The Azure-specific customization classes under `customization/` are hand-maintained here and are
-**not** synced from core.
+The Azure-specific customization classes under `customization/` are hand-maintained
+here and are **not** synced from core.
 
 ## Generate code for a single TypeSpec source
 
@@ -65,19 +77,16 @@ The Azure-specific customization classes under `customization/` are hand-maintai
 npx tsp compile <target.tsp>
 ```
 
-Useful for a quick check that a change to the emitter behaves as expected. Generated code is written
-to `tsp-output/` for inspection.
+Useful for a quick check that a change to the emitter behaves as expected. Generated
+code is written to `tsp-output/` for inspection.
 
 ## Troubleshooting
 
 ### New version of `@typespec/compiler` etc.
 
-Force a clean install by deleting `node_modules` and `package-lock.json`, then re-run `Setup.ps1`:
-
-```shell
-rm -rf node_modules
-rm package-lock.json
-```
+Peer/dependency versions are managed by the workspace `catalog:` / `workspace:^`
+protocols in the parent `package.json`. Run `pnpm install` at the repo root to pick up
+new versions.
 
 [http-specs]: https://github.com/microsoft/typespec/tree/main/packages/http-specs
 [azure-http-specs]: https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs

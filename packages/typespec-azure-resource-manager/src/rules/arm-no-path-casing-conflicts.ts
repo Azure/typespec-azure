@@ -1,5 +1,6 @@
 import {
   createRule,
+  fileRef,
   getSourceLocation,
   Operation,
   paramMessage,
@@ -14,6 +15,7 @@ import { isInternalTypeSpec } from "./utils.js";
  */
 export const armNoPathCasingConflictsRule = createRule({
   name: "arm-no-path-casing-conflicts",
+  docs: fileRef.fromPackageRoot("src/rules/arm-no-path-casing-conflicts.md"),
   severity: "warning",
   description: "Operation paths must be unique when compared case-insensitively.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-path-casing-conflicts",

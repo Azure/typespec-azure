@@ -1,4 +1,4 @@
-import { createRule, Program } from "@typespec/compiler";
+import { createRule, fileRef, Program } from "@typespec/compiler";
 import { getArmResources, getResourceBaseType, ResourceBaseType } from "../resource.js";
 import { getInterface } from "./utils.js";
 
@@ -7,6 +7,7 @@ import { getInterface } from "./utils.js";
  */
 export const improperSubscriptionListOperationRule = createRule({
   name: "improper-subscription-list-operation",
+  docs: fileRef.fromPackageRoot("src/rules/improper-subscription-list-operation.md"),
   severity: "warning",
   description: `Tenant and Extension resources should not define a list by subscription operation.`,
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/improper-subscription-list-operation",

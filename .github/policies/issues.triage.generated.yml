@@ -30,9 +30,9 @@ configuration:
                 - hasLabel:
                     label: emitter:python
                 - hasLabel:
-                    label: emitter:typescript
-                - hasLabel:
                     label: emitter:go
+                - hasLabel:
+                    label: emitter:typescript
                 - hasLabel:
                     label: emitter:java
                 - hasLabel:
@@ -70,9 +70,9 @@ configuration:
               - labelAdded:
                   label: emitter:python
               - labelAdded:
-                  label: emitter:typescript
-              - labelAdded:
                   label: emitter:go
+              - labelAdded:
+                  label: emitter:typescript
               - labelAdded:
                   label: emitter:java
               - labelAdded:
@@ -111,9 +111,9 @@ configuration:
               - labelRemoved:
                   label: emitter:python
               - labelRemoved:
-                  label: emitter:typescript
-              - labelRemoved:
                   label: emitter:go
+              - labelRemoved:
+                  label: emitter:typescript
               - labelRemoved:
                   label: emitter:java
               - labelRemoved:
@@ -143,9 +143,9 @@ configuration:
                 - hasLabel:
                     label: emitter:python
                 - hasLabel:
-                    label: emitter:typescript
-                - hasLabel:
                     label: emitter:go
+                - hasLabel:
+                    label: emitter:typescript
                 - hasLabel:
                     label: emitter:java
                 - hasLabel:

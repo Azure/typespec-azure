@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.70.0
+
+### Features
+
+- [#4541](https://github.com/Azure/typespec-azure/pull/4541) Add `csharp-no-url-suffix` linter rule that flags model properties ending with `Url` and suggests using `Uri` suffix instead, following .NET SDK naming conventions. Includes auto-fix to add `@@clientName` decorator in client.tsp.
+- [#4716](https://github.com/Azure/typespec-azure/pull/4716) Add a `client-location-conflict` warning when `@clientLocation` moves multiple parameters with the same name but different types to the same client. This commonly happens when `@clientLocation` is applied to a templated parameter that is instantiated with different types, which previously produced a broken, hard-to-understand client. Move the parameter on each operation instead so it has a consistent type on the client.
+
+### Bug Fixes
+
+- [#4881](https://github.com/Azure/typespec-azure/pull/4881) Preserve serialization options on collection/array (and dictionary) models that carry explicit serialization decorators, e.g. `@Xml.name("Foo") model Foo is Bar[];`. Previously the XML name on such models was lost. `SdkArrayType` and `SdkDictionaryType` now expose an optional `serializationOptions` that is populated when the model has explicitly defined XML/JSON serialization info.
+- [#4878](https://github.com/Azure/typespec-azure/pull/4878) Fix false `duplicate-client-name` reported when `@client` and `@clientLocation` are mixed on different language scopes. Operations belonging to a `@client` scoped to a specific language are no longer relocated by an inherited `@clientLocation` when validating other scopes.
+- [#4644](https://github.com/Azure/typespec-azure/pull/4644) Verify all path parameters are preserved in `@override` customizations. The check now resolves the original operation's realized HTTP route to determine its path parameters, instead of relying on the `@path` decorator in the type graph. This correctly handles parameters that carry `@path` but are not part of the realized route (for example an ARM key surfaced by a templated provider action) as well as `@path` parameters nested inside a plain model or `@bodyRoot`. The corresponding override parameter is matched by name rather than position so overrides that add or reorder parameters no longer produce false `override-parameters-mismatch` diagnostics.
+
+
+## 0.69.2
+
+### Features
+
+- [111845d](https://github.com/Azure/typespec-azure/commit/111845d46f5cbd3c32b39f7fc89a05c2f6f7908c) Add `csharp-no-url-suffix` linter rule that flags model properties ending with `Url` and suggests using `Uri` suffix instead, following .NET SDK naming conventions. Includes auto-fix to add `@@clientName` decorator in client.tsp.
+
+
 ## 0.69.1
 
 ### Features

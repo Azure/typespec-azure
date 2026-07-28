@@ -1,9 +1,10 @@
-import { createRule, Interface, Namespace, paramMessage } from "@typespec/compiler";
+import { createRule, fileRef, Interface, Namespace, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getClient } from "../decorators.js";
 
 export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
+  docs: fileRef.fromPackageRoot("src/rules/require-client-suffix.md"),
   description: "Client names should end with 'Client'.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix",

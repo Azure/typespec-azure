@@ -1,8 +1,9 @@
-import { createRule, ignoreDiagnostics, Operation } from "@typespec/compiler";
+import { createRule, fileRef, ignoreDiagnostics, Operation } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 export const noQueryExplodeRule = createRule({
   name: "no-query-explode",
+  docs: fileRef.fromPackageRoot("src/rules/no-query-explode.md"),
   description: "It is recommended to serialize query parameter without explode: true",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode",
