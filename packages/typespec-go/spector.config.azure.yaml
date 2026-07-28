@@ -71,9 +71,9 @@ specs:
   "client/overload/client.tsp": { options: { module: overloadgroup } }
   "client/structure/client-operation-group/client.tsp": { options: { module: clientopgroup } }
   "client/structure/default/client.tsp": { options: { module: defaultgroup } }
-  "client/structure/multi-client/client.tsp": { options: {module: multiclientgroup } }
-  "client/structure/renamed-operation/client.tsp": { options: {module: renamedopgroup } }
-  "client/structure/two-operation-group/client.tsp": { options: {module: twoopgroup } }
+  "client/structure/multi-client/client.tsp": { options: { module: multiclientgroup } }
+  "client/structure/renamed-operation/client.tsp": { options: { module: renamedopgroup } }
+  "client/structure/two-operation-group/client.tsp": { options: { module: twoopgroup } }
   "resiliency/srv-driven": { options: { module: srvdrivennewgroup } }
   "resiliency/srv-driven/old.tsp": { options: { module: srvdrivenoldgroup } }
 
