@@ -1,9 +1,11 @@
 import {
   createRule,
   getNamespaceFullName,
-  listServices,
+  isService,
   paramMessage,
+  type Program,
   resolvePath,
+  type Namespace,
   type Statement,
 } from "@typespec/compiler";
 import {
@@ -30,28 +32,27 @@ export const noServiceNsInClientRule = createRule({
         }
         processed = true;
 
-        const clientTspPath = resolvePath(context.program.projectRoot, "client.tsp");
+        const clientTspPath = resolvePath(
+          context.program.projectRoot,
+          "client.tsp",
+        );
         const clientScript = context.program.sourceFiles.get(clientTspPath);
         if (!clientScript) {
           return;
         }
 
-        const serviceNamespaces = listServices(context.program)
-          .map((service) => getNamespaceFullName(service.type))
-          .filter((serviceNamespace) => serviceNamespace.length > 0)
-          .sort((left, right) => right.length - left.length);
-
-        if (serviceNamespaces.length === 0) {
-          return;
-        }
-
         for (const namespaceDecl of getNamespaceDeclarations(clientScript)) {
-          const matchingServiceNamespace = serviceNamespaces.find((serviceNamespace) => {
-            return (
-              namespaceDecl.fullName === serviceNamespace ||
-              namespaceDecl.fullName.startsWith(`${serviceNamespace}.`)
-            );
-          });
+          const namespace = context.program.checker.getTypeForNode(
+            namespaceDecl.lookupNode,
+          );
+          if (namespace.kind !== "Namespace") {
+            continue;
+          }
+
+          const matchingServiceNamespace = findEnclosingServiceNamespace(
+            namespace,
+            context.program,
+          );
 
           if (!matchingServiceNamespace) {
             continue;
@@ -72,10 +73,13 @@ export const noServiceNsInClientRule = createRule({
 
 interface NamespaceDeclaration {
   fullName: string;
+  lookupNode: NamespaceStatementNode;
   node: NamespaceStatementNode;
 }
 
-function getNamespaceDeclarations(script: TypeSpecScriptNode): NamespaceDeclaration[] {
+function getNamespaceDeclarations(
+  script: TypeSpecScriptNode,
+): NamespaceDeclaration[] {
   return collectNamespaceDeclarations(script.statements, []);
 }
 
@@ -90,7 +94,9 @@ function collectNamespaceDeclarations(
       continue;
     }
 
-    declarations.push(...collectNamespaceStatementDeclarations(statement, parentSegments));
+    declarations.push(
+      ...collectNamespaceStatementDeclarations(statement, parentSegments),
+    );
   }
 
   return declarations;
@@ -116,12 +122,15 @@ function collectNamespaceStatementDeclarations(
   const declarations: NamespaceDeclaration[] = [
     {
       fullName: segments.join("."),
+      lookupNode: current,
       node: statement,
     },
   ];
 
   if (Array.isArray(current.statements)) {
-    declarations.push(...collectNamespaceDeclarations(current.statements, segments));
+    declarations.push(
+      ...collectNamespaceDeclarations(current.statements, segments),
+    );
   }
 
   return declarations;
@@ -131,4 +140,21 @@ function isNamespaceStatementNode(
   statement: NamespaceStatementNode | readonly Statement[] | undefined,
 ): statement is NamespaceStatementNode {
   return statement !== undefined && !Array.isArray(statement);
+}
+
+function findEnclosingServiceNamespace(
+  namespace: Namespace,
+  program: Program,
+): string | undefined {
+  let current: Namespace | undefined = namespace;
+
+  while (current) {
+    if (isService(program, current)) {
+      return getNamespaceFullName(current);
+    }
+
+    current = current.namespace;
+  }
+
+  return undefined;
 }

@@ -8,7 +8,8 @@ import { noServiceNsInClientRule } from "../../src/rules/no-service-ns-in-client
 import { createClientCustomizationInput, SimpleBaseTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
-const diagnosticCode = "@azure-tools/typespec-client-generator-core/no-service-ns-in-client";
+const diagnosticCode =
+  "@azure-tools/typespec-client-generator-core/no-service-ns-in-client";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -91,6 +92,26 @@ describe("no-service-ns-in-client", () => {
           `,
           `
           namespace Azure.ResourceManager;
+
+          model Helper {
+            value: string;
+          }
+          `,
+        ),
+      )
+      .toBeValid();
+  });
+
+  it("does not flag a parent namespace of the service namespace", async () => {
+    await tester
+      .expect(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace My.Service;
+          `,
+          `
+          namespace My;
 
           model Helper {
             value: string;
