@@ -1,0 +1,266 @@
+---
+title: Streaming Operations
+llmstxt: true
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc explains how to author TypeSpec streaming operations and what client emitters will generate for them.
+
+TypeSpec supports three kinds of streaming bodies via the `@typespec/streams`, `@typespec/sse`, and `@typespec/events` packages:
+
+- **`JsonlStream<T>`** — a newline-delimited JSON stream where every line is a JSON-encoded `T`.
+- **`SSEStream<TEvents>`** — a server-sent event stream (`text/event-stream`) carrying heterogeneous events described by an `@events` union.
+- **`HttpStream<T, ContentType>`** — a generic streaming body; using `ContentType = "text/event-stream"` with an `@events` union activates the same SSE metadata as `SSEStream`.
+
+:::note
+Import the required packages in your TypeSpec spec:
+
+```tsp
+import "@typespec/streams";
+import "@typespec/sse";
+import "@typespec/events";
+```
+:::
+
+## JSONL streaming response
+
+Use `JsonlStream<T>` when your service responds with newline-delimited JSON lines, each encoding a value of type `T`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/streams";
+
+using TypeSpec.Streams;
+
+model Chunk {
+  text: string;
+}
+
+@post
+op generate(@body request: { prompt: string }): JsonlStream<Chunk>;
+```
+
+```python
+def generate(self, *, prompt: str, **kwargs: Any) -> Iterator[bytes]:
+    ...
+```
+
+```csharp
+public virtual Response Generate(RequestContent content, RequestContext context = null);
+public virtual Task<Response> GenerateAsync(RequestContent content, RequestContext context = null);
+```
+
+```typescript
+// JS CodeGen api layer
+export function generate(
+  context: Client,
+  prompt: string,
+  options: GenerateOptionalParams = { requestOptions: {} },
+): StreamableMethod;
+```
+
+```java
+public BinaryData generate(BinaryData request);
+```
+
+```go
+func (c *Client) Generate(ctx context.Context, request GenerateRequest, options *GenerateOptions) (GenerateResponse, error)
+```
+
+</ClientTabs>
+
+## SSE streaming response
+
+Use `SSEStream<TEvents>` to define a server-sent event stream. Events are described by a union decorated with `@Events.events`. Each named variant becomes an SSE event type; unnamed variants produce `message` events.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model ResponseCreated {
+  id: string;
+}
+
+model ResponseDelta {
+  delta: string;
+}
+
+@events
+union ResponseEvents {
+  @contentType("application/json")
+  responseCreated: ResponseCreated,
+
+  @contentType("application/json")
+  responseDelta: ResponseDelta,
+
+  @contentType("text/plain")
+  @terminalEvent
+  "[DONE]",
+}
+
+@post
+op stream(@body request: { prompt: string }): SSEStream<ResponseEvents>;
+```
+
+```python
+def stream(self, *, prompt: str, **kwargs: Any) -> Iterator[bytes]:
+    ...
+```
+
+```csharp
+public virtual Response Stream(RequestContent content, RequestContext context = null);
+public virtual Task<Response> StreamAsync(RequestContent content, RequestContext context = null);
+```
+
+```typescript
+// JS CodeGen api layer
+export function stream(
+  context: Client,
+  prompt: string,
+  options: StreamOptionalParams = { requestOptions: {} },
+): StreamableMethod;
+```
+
+```java
+public BinaryData stream(BinaryData request);
+```
+
+```go
+func (c *Client) Stream(ctx context.Context, request StreamRequest, options *StreamOptions) (StreamResponse, error)
+```
+
+</ClientTabs>
+
+### Terminal events
+
+Mark a variant with `@terminalEvent` to indicate that receiving this event signals the end of the stream. Client emitters use this to know when to stop reading and close the connection.
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model DeltaEvent {
+  delta: string;
+}
+
+@events
+union ChatEvents {
+  @contentType("application/json")
+  delta: DeltaEvent,
+
+  @contentType("text/plain")
+  @terminalEvent
+  "[DONE]",
+}
+
+@post
+op chat(@body request: { message: string }): SSEStream<ChatEvents>;
+```
+
+### Event envelopes
+
+When your SSE event wraps a separate payload, use `@Events.data` on the payload property to distinguish the envelope from its content. Emitters expose both the envelope type and the unwrapped payload type through `sseMetadata`.
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model ChatMessage {
+  role: string;
+  content: string;
+}
+
+@events
+union ChatEvents {
+  @contentType("application/json")
+  message: { done: false, @data message: ChatMessage },
+
+  @contentType("text/plain")
+  @terminalEvent
+  done: { done: true },
+}
+
+@post
+op chat(@body request: { message: string }): SSEStream<ChatEvents>;
+```
+
+### Unnamed (message) events
+
+A variant without a name in the union produces an SSE `message` event — the `event:` field is omitted on the wire. Use this when your service emits a single homogeneous event type.
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model Info {
+  desc: string;
+}
+
+@events
+union BasicEvents {
+  @contentType("application/json")
+  Info,
+}
+
+op receive(): SSEStream<BasicEvents>;
+```
+
+## SSE streaming request
+
+`SSEStream` can also be used as a request body when the client sends an event stream to the service.
+
+```typespec
+import "@typespec/sse";
+import "@typespec/events";
+
+using TypeSpec.SSE;
+using TypeSpec.Events;
+
+model InputEvent {
+  data: string;
+}
+
+@events
+union InputEvents {
+  @contentType("application/json")
+  inputEvent: InputEvent,
+}
+
+op send(stream: SSEStream<InputEvents>): void;
+```
+
+## Custom streaming body
+
+For content types other than JSONL or `text/event-stream`, define a model with `@streamOf` and a `@body bytes` property.
+
+```typespec
+import "@typespec/streams";
+
+using TypeSpec.Streams;
+
+model AudioChunk { id: string; }
+
+@streamOf(AudioChunk)
+model AudioStream {
+  @header contentType: "audio/mpeg";
+  @body body: bytes;
+}
+
+op synthesize(@body request: { text: string }): AudioStream;
+```
