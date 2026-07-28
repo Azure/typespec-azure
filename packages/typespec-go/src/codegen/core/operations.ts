@@ -179,9 +179,9 @@ export function generateOperations(
       // it must be done before the imports are written out
       if (go.isLROMethod(method)) {
         // generate Begin method
-        opText += generateLROBeginMethod(method, options, imports, indent);
+        opText += generateLROBeginMethod(method, options, imports, indent, azureARM);
       }
-      opText += generateOperation(method, options, imports, indent);
+      opText += generateOperation(method, options, imports, indent, azureARM);
       opText += createProtocolRequest(azureARM, method, imports, indent);
       if (method.kind !== "lroMethod") {
         // LRO responses are handled elsewhere, with the exception of pageable LROs
@@ -692,12 +692,67 @@ function generateNilChecks(
 }
 
 /**
+ * returns the expression used to obtain the client's service endpoint, or undefined
+ * when the endpoint can't be determined from the client alone.
+ *
+ * @param client the client for which to obtain the endpoint expression
+ * @param azureARM indicates if the client is an ARM client
+ * @returns the endpoint expression or undefined
+ */
+function getClientEndpointExpr(client: go.Client, azureARM: boolean): string | undefined {
+  if (azureARM) {
+    // for ARM, the endpoint is handled via the azcore/arm.Client
+    return "client.internal.Endpoint()";
+  }
+  if (client.instance?.kind === "templatedHost") {
+    // NOTE: this is an Autorest-only compat case. the host is assembled per
+    // method as it can require method params, so there's no client endpoint.
+    return undefined;
+  }
+  const hostParams = client.parameters.filter((param) => param.kind === "uriParam");
+  if (hostParams.length === 1) {
+    return `client.${hostParams[0].name}`;
+  }
+  return undefined;
+}
+
+/**
+ * emits code that resolves a relative next link against the client's service endpoint.
+ * services are allowed to return a next link that's relative to the endpoint (e.g.
+ * "/foo/page/2"), however runtime.FetcherForNextLink requires an absolute URL. absolute
+ * next links are passed through unmodified.
+ *
+ * @param nextLinkVar the name of the local var containing the next link
+ * @param endpointExpr the expression used to obtain the client's service endpoint
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the code to resolve a relative next link
+ */
+function emitRelativeNextLinkResolution(
+  nextLinkVar: string,
+  endpointExpr: string,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  imports.add("net/url");
+  let text = `${indent.get()}// the service can return a next link that's relative to the endpoint, however\n`;
+  text += `${indent.get()}// runtime.FetcherForNextLink requires an absolute URL, so resolve it here.\n`;
+  text += `${indent.get()}if ${nextLinkVar} != "" {\n`;
+  text += `${indent.push().get()}if u, err := url.Parse(${nextLinkVar}); err == nil && !u.IsAbs() {\n`;
+  text += `${indent.push().get()}${nextLinkVar} = runtime.JoinPaths(${endpointExpr}, ${nextLinkVar})\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.pop().get()}}\n`;
+  return text;
+}
+
+/**
  * emits code that calls runtime.NewPager
  *
  * @param method the pageable method
  * @param options emitter options
  * @param imports the import manager currently in scope
  * @param indent the indentation helper currently in scope
+ * @param azureARM indicates if the client is an ARM client
  * @returns the complete call to runtime.NewPager(...)
  */
 function emitPagerDefinition(
@@ -705,6 +760,7 @@ function emitPagerDefinition(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   imports.add("context");
   let text = `runtime.NewPager(runtime.PagingHandler[${method.returns.name}]{\n`;
@@ -806,6 +862,11 @@ function emitPagerDefinition(
       }
       case "nextLink": {
         const nextLinkPath = helpers.buildNextLinkPath(method.strategy);
+        // a custom next page operation builds the request itself, so the next
+        // link must be passed through to it unmodified.
+        const endpointExpr = method.strategy.method
+          ? undefined
+          : getClientEndpointExpr(method.receiver.type, azureARM);
         let nextLinkVar: string;
         if (method.kind === "pageableMethod") {
           text += `${indent.get()}nextLink := ""\n`;
@@ -813,8 +874,14 @@ function emitPagerDefinition(
           text += `${indent.get()}if page != nil {\n`;
           text += `${indent.push().get()}nextLink = *page.${nextLinkPath}\n`;
           text += `${indent.pop().get()}}\n`;
+        } else if (endpointExpr) {
+          text += `${indent.get()}nextLink := *page.${nextLinkPath}\n`;
+          nextLinkVar = "nextLink";
         } else {
           nextLinkVar = `*page.${nextLinkPath}`;
+        }
+        if (endpointExpr) {
+          text += emitRelativeNextLinkResolution(nextLinkVar, endpointExpr, imports, indent);
         }
         text += `${indent.get()}resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), ${nextLinkVar}, func(ctx context.Context) (*policy.Request, error) {\n`;
         text += `${indent.push().get()}return client.${method.naming.requestMethod}(${reqParams})\n`;
@@ -937,6 +1004,7 @@ function generateOperation(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
@@ -965,7 +1033,7 @@ function generateOperation(
   text += `func ${getClientReceiverDefinition(method.receiver)} ${methodName}(${params}) (${returns.join(", ")}) {\n`;
   if (method.kind === "pageableMethod") {
     text += `${indent.get()}return `;
-    text += emitPagerDefinition(method, options, imports, indent);
+    text += emitPagerDefinition(method, options, imports, indent, azureARM);
     text += "}\n\n";
     return text;
   }
@@ -2122,6 +2190,7 @@ function generateLROBeginMethod(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "api");
@@ -2144,7 +2213,7 @@ function generateLROBeginMethod(
     pollerTypeParam = `[*runtime.Pager${pollerTypeParam}]`;
     pollerType = "&pager";
     text += `${indent.get()}pager := `;
-    text += emitPagerDefinition(method, options, imports, indent);
+    text += emitPagerDefinition(method, options, imports, indent, azureARM);
   }
 
   text += `${indent.get()}if options == nil || options.ResumeToken == "" {\n`;

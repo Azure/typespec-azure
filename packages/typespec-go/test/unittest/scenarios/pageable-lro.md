@@ -102,7 +102,15 @@ func (client *PageableLROsClient) BeginListPrivateEndPoints(ctx context.Context,
 			return page.NextLink != nil && len(*page.NextLink) > 0
 		},
 		Fetcher: func(ctx context.Context, page *PageableLROsClientListPrivateEndPointsResponse) (PageableLROsClientListPrivateEndPointsResponse, error) {
-			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), *page.NextLink, func(ctx context.Context) (*policy.Request, error) {
+			nextLink := *page.NextLink
+			// the service can return a next link that's relative to the endpoint, however
+			// runtime.FetcherForNextLink requires an absolute URL, so resolve it here.
+			if nextLink != "" {
+				if u, err := url.Parse(nextLink); err == nil && !u.IsAbs() {
+					nextLink = runtime.JoinPaths(client.internal.Endpoint(), nextLink)
+				}
+			}
+			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), nextLink, func(ctx context.Context) (*policy.Request, error) {
 				return client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, options)
 			}, nil)
 			if err != nil {
