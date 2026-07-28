@@ -3,12 +3,12 @@ import { Model, Program, createRule, getProperty, paramMessage } from "@typespec
 import { AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
 import { getArmResources } from "../resource.js";
 
-export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
-  name: "arm-relationship-base-type-required-properties",
+export const useRelationshipRequiredPropertiesRule = createRule({
+  name: "use-relationship-required-properties",
   severity: "warning",
   description:
     "Resources decorated with @azureBaseType for the Relationship base type must be extension resources with the required Relationship schema.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-relationship-base-type-required-properties",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-relationship-required-properties",
   messages: {
     missingProperties: paramMessage`Relationship resources must include required properties: ${"missing"}.`,
     notExtension: "Relationship resources must be extension resources.",

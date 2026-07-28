@@ -1,9 +1,9 @@
 ---
-title: arm-relationship-base-type-required-properties
+title: use-relationship-required-properties
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties
+@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties
 ```
 
 Resources decorated with `@azureBaseType` for the Relationship base type must be extension resources with the required Relationship schema.
