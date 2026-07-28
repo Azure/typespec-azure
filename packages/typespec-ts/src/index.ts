@@ -533,9 +533,7 @@ export async function $onEmit(context: EmitContext) {
       // Update warp.config.yml for Azure monorepo packages
       updateBuilders.push((model: ClientModel) => buildWarpConfig(model, modularPackageInfo));
 
-      // Keep the tsconfig.src.*.json `include` lists in sync with the warp
-      // exports so every declared client entry point is compiled and emitted
-      // to `dist` (otherwise warp fails the build with DIST_MISSING).
+      // Re-sync tsconfig.src.*.json `include` with the warp exports
       updateBuilders.push(() => buildTsSrcEsmConfig(modularPackageInfo["exports"]));
       updateBuilders.push(() => buildTsSrcBrowserConfig(modularPackageInfo["exports"]));
       if (option.generateReactNativeTarget) {
