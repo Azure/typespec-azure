@@ -26,10 +26,11 @@ const FALLBACK_FILENAMES: Record<MetadataOutputFormat, string> = {
 
 export const metadataEmitterOptionsSchema: JSONSchemaType<MetadataEmitterOptions> = {
   type: "object",
-  additionalProperties: false,
+  additionalProperties: true,
   properties: {
     outputFile: { type: "string", nullable: true },
     format: { type: "string", enum: ["yaml", "json"], nullable: true },
+    "api-version": { type: "string", nullable: true },
   },
 };
 

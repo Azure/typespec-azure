@@ -67,9 +67,9 @@ describe("apiVersion in emitted metadata", () => {
       {
         compilerOptions: {
           options: {
+            "@azure-tools/typespec-metadata": { "api-version": "all" },
             "@azure-tools/typespec-python": {
               "package-name": "azure-test-service",
-              "api-version": "all",
             },
           },
         },
