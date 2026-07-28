@@ -1,5 +1,11 @@
 Azure Data Plane services should use standard operations defined in the Azure Core library.
 
+## Impact
+
+- **Area:** API, SDK
+
+Custom operations that bypass the standard templates can lose the resource semantics used by emitters and tooling.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -26,3 +32,7 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 op myResourceRead is Operations.ResourceRead<MyResource>;
 op myResourceCreate is Operations.ResourceCreate<MyResource>;
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use the standard operation templates.

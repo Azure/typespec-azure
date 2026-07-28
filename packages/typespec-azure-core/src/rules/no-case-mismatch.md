@@ -4,6 +4,12 @@ Validate that no two types have the same name with different casing. Having type
 Template instances are not checked by this rule since they are not distinct type declarations.
 :::
 
+## Impact
+
+- **Area:** SDK
+
+Type names that differ only by casing cannot be generated into most SDK languages.
+
 #### ❌ Incorrect
 
 Two models that differ only by casing:
@@ -39,3 +45,7 @@ model FailOver {
   priority: int32;
 }
 ```
+
+## Suppression
+
+Suppress only if the API somehow allows it, and then rename the types with client SDK decorators. Otherwise make type names unique when compared case-insensitively.

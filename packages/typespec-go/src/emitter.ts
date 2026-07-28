@@ -16,6 +16,73 @@ import { AdapterError } from "./tcgcadapter/errors.js";
 
 export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
   try {
+    // if there's an existing go.mod file, we'll use its module
+    // identity instead of the provided value. this ensures we
+    // get the correct major version suffix (if any). if there's
+    // no go.mod file (e.g. the first time an SDK is generated) we
+    // fall back to the provided value.
+    let moduleIdentity: string | undefined;
+    let currentDir = context.emitterOutputDir;
+    while (true) {
+      const goModFile = path.join(currentDir, "go.mod");
+      if (existsSync(goModFile)) {
+        const goModFileContent = readFileSync(goModFile, "utf8");
+        // the module identity is specified on the "module" directive, e.g.
+        //   module github.com/Azure/azure-sdk-for-go/sdk/foo/v2
+        const match = goModFileContent.match(/^module\s+(\S+)/m);
+        if (!match) {
+          context.program.reportDiagnostic({
+            code: "gomod",
+            severity: "error",
+            message: `failed to find module directive in ${goModFile}`,
+            target: NoTarget,
+          });
+          return;
+        }
+        moduleIdentity = match[1];
+        break;
+      }
+
+      // move to the parent directory
+      const parentDir = path.dirname(currentDir);
+      if (parentDir === currentDir) {
+        // we've reached the filesystem root without finding a go.mod.
+        // this is expected the first time an SDK is generated, in which
+        // case we fall back to the provided module identity.
+        break;
+      }
+      currentDir = parentDir;
+    }
+
+    // if we discovered an existing go.mod, prefer the identity from go.mod
+    // so we pick up the correct major version suffix. module and
+    // containing-module are mutually exclusive, so update whichever was
+    // provided.
+    if (moduleIdentity) {
+      const providedModule = context.options.module ?? context.options["containing-module"];
+      // ensure the existing go.mod's major version isn't behind the requested
+      // value (a suffix-less identity is v1). a stale go.mod would otherwise
+      // silently downgrade the module identity, so treat it as an error.
+      if (providedModule) {
+        const discoveredMajor = majorVersion(moduleIdentity);
+        const providedMajor = majorVersion(providedModule);
+        if (discoveredMajor < providedMajor) {
+          context.program.reportDiagnostic({
+            code: "gomod",
+            severity: "error",
+            message: `the existing go.mod module identity '${moduleIdentity}' (major version v${discoveredMajor}) is behind the requested module identity '${providedModule}' (major version v${providedMajor})`,
+            target: NoTarget,
+          });
+          return;
+        }
+      }
+      if (context.options.module) {
+        context.options.module = moduleIdentity;
+      } else if (context.options["containing-module"]) {
+        context.options["containing-module"] = moduleIdentity;
+      }
+    }
+
     const adapter = await Adapter.create(context);
     const codeModel = adapter.tcgcToGoCodeModel();
 
@@ -206,6 +273,19 @@ function truncateStack(stack: string, finalFrame: string): string {
     }
   }
   return stack;
+}
+
+/**
+ * extracts the major version from a Go module identity's version suffix.
+ * e.g. "github.com/foo/bar/v2" returns 2. modules without a suffix are v0/v1,
+ * so 1 is returned.
+ *
+ * @param identity the Go module identity
+ * @returns the major version
+ */
+function majorVersion(identity: string): number {
+  const match = identity.match(/\/v(\d+)$/);
+  return match ? parseInt(match[1], 10) : 1;
 }
 
 /**
