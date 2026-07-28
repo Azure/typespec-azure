@@ -38,9 +38,6 @@ specs:
     { options: { module: coreclientlocationmoverootclientgroup } }
   "azure/client-generator-core/deserialize-empty-string-as-null":
     { options: { module: emptystringgroup } }
-  # fakes reference an unexported model (my_model), so fake generation is disabled for this scenario
-  "azure/client-generator-core/exact-name":
-    { options: { module: exactnamegroup, generate-fakes: false } }
   "azure/client-generator-core/flatten-property": { options: { module: flattengroup } }
   "azure/client-generator-core/hierarchy-building": { options: { module: hierarchygroup } }
   "azure/client-generator-core/next-link-verb":
@@ -81,6 +78,8 @@ specs:
 
   # --- Not generated yet (tracked skips) ---
   "azure/client-generator-core/alternate-type": false
+  # emitter bug: generated fakes reference an unexported model (my_model)
+  "azure/client-generator-core/exact-name": false
   # emitter error: didn't find HTTP response for kind boolean (@responseAsBool on HEAD)
   "azure/client-generator-core/response-as-bool": false
   # disabled until new TCGC version released
