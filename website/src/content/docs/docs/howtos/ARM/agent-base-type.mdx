@@ -109,8 +109,10 @@ model ContosoResponseProperties is ResponseProperties {
   ...DefaultProvisioningStateProperty;
 }
 
-model ApplianceConversation
-  is AgentConversation<ContosoConversationProperties, ContosoApplianceAgent> {
+model ApplianceConversation is AgentConversation<
+  ContosoConversationProperties,
+  ContosoApplianceAgent
+> {
   ...ResourceNameParameter<ApplianceConversation>;
 }
 
