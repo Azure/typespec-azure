@@ -35,6 +35,11 @@ const packageRoot = join(here, "..", "..");
 const repoRoot = join(packageRoot, "..", "..");
 const sourceRoot = join(repoRoot, "core", "packages", "http-client-python");
 
+const GITIGNORE_LOCAL_BLOCK_BEGIN =
+  "# Generated SDK fixtures with hand-authored/customized code required by tests. (begin)";
+const GITIGNORE_LOCAL_BLOCK_END =
+  "# Generated SDK fixtures with hand-authored/customized code required by tests. (end)";
+
 /**
  * Paths (POSIX, relative to the package root on both sides) that should be
  * synced from the upstream @typespec/http-client-python package.
@@ -243,6 +248,55 @@ function syncDevRequirements(srcAbs: string, destAbs: string, stats: SyncStats):
   stats.copied.push(relPath);
 }
 
+/** Copy only the ignore rules between the fixture block markers. */
+function syncGitignore(srcAbs: string, destAbs: string, stats: SyncStats): void {
+  const relPath = ".gitignore";
+
+  if (!fs.existsSync(srcAbs)) {
+    stats.missing.push(relPath);
+    return;
+  }
+
+  const srcText = fs.readFileSync(srcAbs, "utf8");
+  const destText = fs.readFileSync(destAbs, "utf8");
+  const srcBlockStart = srcText.indexOf(GITIGNORE_LOCAL_BLOCK_BEGIN);
+  const srcBlockEnd = srcText.indexOf(GITIGNORE_LOCAL_BLOCK_END, srcBlockStart);
+  const destBlockStart = destText.indexOf(GITIGNORE_LOCAL_BLOCK_BEGIN);
+  const destBlockEnd = destText.indexOf(GITIGNORE_LOCAL_BLOCK_END, destBlockStart);
+
+  if (srcBlockStart === -1 || srcBlockEnd === -1) {
+    throw new Error(
+      `Source ${relPath} must contain the block delimited by ` +
+        `${GITIGNORE_LOCAL_BLOCK_BEGIN} and ${GITIGNORE_LOCAL_BLOCK_END}.`,
+    );
+  }
+  if (destBlockStart === -1 || destBlockEnd === -1) {
+    throw new Error(
+      `Destination ${relPath} must contain the block delimited by ` +
+        `${GITIGNORE_LOCAL_BLOCK_BEGIN} and ${GITIGNORE_LOCAL_BLOCK_END}.`,
+    );
+  }
+
+  const srcContentStart = srcBlockStart + GITIGNORE_LOCAL_BLOCK_BEGIN.length;
+  const destContentStart = destBlockStart + GITIGNORE_LOCAL_BLOCK_BEGIN.length;
+  const newText =
+    destText.slice(0, destContentStart) +
+    srcText.slice(srcContentStart, srcBlockEnd) +
+    destText.slice(destBlockEnd);
+
+  if (newText === destText) {
+    stats.unchanged.push(relPath);
+    return;
+  }
+  if (check) {
+    stats.drifted.push(relPath);
+    return;
+  }
+
+  fs.writeFileSync(destAbs, newText, "utf8");
+  stats.copied.push(relPath);
+}
+
 function syncFile(srcAbs: string, destAbs: string, relPath: string, stats: SyncStats): void {
   const srcBuf = fs.readFileSync(srcAbs);
   const destBuf = readBytes(destAbs);
@@ -377,6 +431,9 @@ function main(): void {
     join(packageRoot, "dev_requirements.txt"),
     stats,
   );
+
+  // Special-case merge: update only the marked generated fixture ignore rules.
+  syncGitignore(join(sourceRoot, ".gitignore"), join(packageRoot, ".gitignore"), stats);
 
   if (stats.copied.length) {
     console.log(pc.green(pc.bold(`Copied (${stats.copied.length}):`)));

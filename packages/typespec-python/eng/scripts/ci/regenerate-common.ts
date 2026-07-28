@@ -14,10 +14,8 @@
  */
 
 import { compile, NodeHost } from "@typespec/compiler";
-import { execSync } from "child_process";
 import { existsSync, rmSync } from "fs";
-import { access, cp, mkdir, mkdtemp, readdir, writeFile } from "fs/promises";
-import { tmpdir } from "os";
+import { access, mkdir, readdir, writeFile } from "fs/promises";
 import { dirname, join, relative, resolve } from "path";
 import pc from "picocolors";
 
@@ -183,6 +181,9 @@ export const AZURE_EMITTER_OPTIONS: Record<
   ],
   "client/overload": {
     namespace: "client.overload",
+  },
+  "encode/boolean": {
+    namespace: "encode.boolean",
   },
   "encode/duration": {
     namespace: "encode.duration",
@@ -652,6 +653,46 @@ export async function runParallel(
   return results;
 }
 
+/** Removes generated SDK packages except tracked fixtures with customized code required by tests. */
+export async function cleanGeneratedCodePreservingFixtures(generatedFolder: string): Promise<void> {
+  const testsGeneratedDir = resolve(generatedFolder, "../tests/generated");
+  const preservedFixturePaths = new Set([
+    // Keeps patch_added_operation in _operations/_patch.py for shared patch tests.
+    "azure/authentication-api-key",
+    // Keeps the same operation patch for the unbranded test run.
+    "unbranded/authentication-api-key",
+    // Keeps the hand-authored CustomizedClient wrapper outside _generated.
+    "azure/generation-subdir",
+    // Keeps the hand-authored AddedClient wrapper outside _generated.
+    "azure/generation-subdir2",
+    // Keeps the CustomizedClient wrapper for the unbranded test run.
+    "unbranded/generation-subdir",
+    // Keeps the AddedClient wrapper for the unbranded test run.
+    "unbranded/generation-subdir2",
+    // Keeps custom GeoJSON serializers and deserializers registered in models/_patch.py.
+    "azure/azure-client-generator-core-alternate-type",
+  ]);
+
+  console.log(pc.cyan(`\n${"=".repeat(60)}`));
+  console.log(pc.cyan(`Cleaning generated test packages`));
+  console.log(pc.cyan(`${"=".repeat(60)}\n`));
+
+  for (const flavor of ["azure", "unbranded"]) {
+    const flavorDir = join(testsGeneratedDir, flavor);
+    if (!existsSync(flavorDir)) continue;
+
+    const entries = await readdir(flavorDir, { withFileTypes: true });
+    for (const entry of entries) {
+      const relativePath = `${flavor}/${entry.name}`;
+      if (preservedFixturePaths.has(relativePath)) continue;
+
+      const path = join(flavorDir, entry.name);
+      console.log(pc.dim(`Deleting ${path}`));
+      rmSync(path, { recursive: true, force: true });
+    }
+  }
+}
+
 /**
  * Pre-create the marker files that the test harness expects to find before
  * regeneration so it can verify they're cleared/preserved correctly.
@@ -694,100 +735,4 @@ export async function preprocess(flavor: string, generatedFolder: string): Promi
       await writeFile(join(targetFolder, file), content);
     }),
   );
-}
-
-/**
- * Resets the `tests/generated/{azure,unbranded}` baseline by sparse-checking-out
- * `eng/tools/azure-sdk-tools/emitter/generated` from the Azure/azure-sdk-for-python repo, then
- * deleting a couple of fully-generated package folders so regeneration has to
- * recreate them from scratch (smoke test of full-emit path).
- *
- * `generatedFolder` is the per-repo `generator/` directory; baseline lands at
- * `<generatedFolder>/../tests/generated`.
- */
-export async function prepareBaselineOfGeneratedCode(generatedFolder: string): Promise<void> {
-  const repoUrl = "https://github.com/Azure/azure-sdk-for-python.git";
-  const branch = "typespec-python-generated-tests";
-  const sourceSubdir = "eng/tools/azure-sdk-tools/emitter/generated";
-  const testsGeneratedDir = resolve(generatedFolder, "../tests/generated");
-
-  console.log(pc.cyan(`\n${"=".repeat(60)}`));
-  console.log(pc.cyan(`Resetting baseline from ${repoUrl} (${branch}/${sourceSubdir})`));
-  console.log(pc.cyan(`${"=".repeat(60)}\n`));
-
-  // Wipe tests/generated
-  if (existsSync(testsGeneratedDir)) {
-    console.log(pc.dim(`Removing ${testsGeneratedDir}`));
-    rmSync(testsGeneratedDir, { recursive: true, force: true });
-  }
-
-  // Sparse-checkout the baseline folder into a temp directory
-  const tempDir = await mkdtemp(join(tmpdir(), "azsdk-baseline-"));
-  try {
-    console.log(pc.dim(`Cloning into ${tempDir}`));
-    const run = (cmd: string) =>
-      execSync(cmd, { cwd: tempDir, stdio: ["ignore", "ignore", "inherit"] });
-
-    run(`git init`);
-    run(`git config core.longpaths true`);
-    run(`git remote add origin ${repoUrl}`);
-    run(`git config core.sparseCheckout true`);
-    run(`git sparse-checkout init --cone`);
-    run(`git sparse-checkout set ${sourceSubdir}`);
-    run(`git fetch --depth 1 origin ${branch}`);
-    run(`git checkout FETCH_HEAD`);
-
-    // we don't copy whole generated folder, just the specific subfolders needed for tests
-    // to verify correct preservation/deletion of files and folders during regeneration,
-    // to avoid accidentally including any manually edited code that might be in the repo
-    // and cause confusion when it doesn't get updated during regeneration
-    const legacyCodePathNeededForTests = [
-      "azure/authentication-api-key",
-      "unbranded/authentication-api-key",
-      "azure/authentication-union",
-      "azure/generation-subdir",
-      "azure/generation-subdir2",
-      "unbranded/generation-subdir",
-      "unbranded/generation-subdir2",
-      "azure/azure-client-generator-core-alternate-type",
-    ];
-
-    const sourceRoot = join(tempDir, ...sourceSubdir.split("/"));
-    for (const subPath of legacyCodePathNeededForTests) {
-      const segments = subPath.split("/");
-      const src = join(sourceRoot, ...segments);
-      const dest = join(testsGeneratedDir, ...segments);
-      if (!existsSync(src)) {
-        console.warn(pc.yellow(`Baseline folder not found: ${src}`));
-        continue;
-      }
-      console.log(pc.dim(`Copying ${subPath} -> ${dest}`));
-      await mkdir(dirname(dest), { recursive: true });
-      await cp(src, dest, { recursive: true });
-    }
-
-    console.log(pc.green(`Baseline reset complete.\n`));
-  } finally {
-    rmSync(tempDir, { recursive: true, force: true });
-  }
-
-  // Smoke test the full-emit path: delete a couple of fully-generated package
-  // folders and every README.md so regeneration has to recreate them.
-  const deleteIfExists = (path: string) => {
-    if (!existsSync(path)) return;
-    console.log(pc.dim(`Deleting ${path}`));
-    rmSync(path, { recursive: true, force: true });
-  };
-
-  deleteIfExists(join(testsGeneratedDir, "azure", "authentication-http-custom"));
-  deleteIfExists(join(testsGeneratedDir, "unbranded", "encode-array"));
-
-  if (existsSync(testsGeneratedDir)) {
-    const entries = await readdir(testsGeneratedDir, { recursive: true, withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isFile() && entry.name === "README.md") {
-        deleteIfExists(join(entry.parentPath, entry.name));
-      }
-    }
-  }
 }
