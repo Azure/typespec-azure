@@ -56,6 +56,7 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkSseMetadata,
   SdkStreamMetadata,
   SdkTerminationStatus,
   SdkType,
@@ -181,23 +182,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getOverriddenClientMethod(context, operation) ?? operation,
     );
 
-    if (responseType?.__raw?.kind !== "Model" || responseType.kind !== "model" || !pagingMetadata) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "unexpected-pageable-operation-return-type",
-          target: operation,
-          format: {
-            operationName: operation.name,
-          },
-        }),
-      );
-      // return as page method with no paging info
-      return diagnostics.wrap({
-        ...baseServiceMethod,
-        kind: "paging",
-        pagingMetadata: {},
-      });
-    }
+    compilerAssert(
+      responseType?.__raw?.kind === "Model" && responseType.kind === "model" && !!pagingMetadata,
+      "The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.",
+      operation,
+    );
 
     const resultSegments = mapFirstSegmentForResultSegments(
       pagingMetadata.output.pageItems.path,
@@ -667,9 +656,11 @@ function getSdkMethodResponse(
 
   // Propagate stream metadata from HTTP responses to method response
   let streamMetadata: SdkStreamMetadata | undefined;
+  let sseMetadata: SdkSseMetadata | undefined;
   for (const response of responses) {
     if (response.streamMetadata) {
       streamMetadata = response.streamMetadata;
+      sseMetadata = response.sseMetadata;
       break;
     }
   }
@@ -679,6 +670,7 @@ function getSdkMethodResponse(
     type,
     ...(optional !== undefined && { optional }),
     ...(streamMetadata && { streamMetadata }),
+    ...(sseMetadata && { sseMetadata }),
   };
 }
 

@@ -1,5 +1,11 @@
 Azure services favor using an extensible union to define the discriminator property. This allow the service to add new discriminated models without being breaking.
 
+## Impact
+
+- **Area:** SDK
+
+A string discriminator leaves the discriminant values unknown, making SDKs less usable.
+
 #### ❌ Incorrect
 
 - Missing explicit property
@@ -51,3 +57,7 @@ union PetKind {
   string,
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use an open union as the discriminator.

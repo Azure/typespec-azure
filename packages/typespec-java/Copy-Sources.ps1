@@ -13,6 +13,16 @@
 
 $ErrorActionPreference = "Stop"
 
+# Disable progress rendering. Under a full parallel `pnpm build`, turbo runs each
+# task's process in its own background process group under the build's controlling
+# terminal. When a cmdlet here (notably `Copy-Item -Recurse`, which emits a
+# Write-Progress) renders progress, PowerShell touches that terminal from a
+# background process group and the OS stops the process with SIGTTIN/SIGTTOU -- it
+# never resumes, so the emitter build appears to hang forever (intermittently, and
+# only for this package since it is the only one that shells out to pwsh). Silencing
+# progress removes that terminal interaction entirely.
+$ProgressPreference = "SilentlyContinue"
+
 $packageRoot = $PSScriptRoot
 $repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
 $coreRoot = Join-Path $repoRoot "core"

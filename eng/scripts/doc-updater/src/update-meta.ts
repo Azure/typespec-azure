@@ -5,11 +5,11 @@
  * run knows where to start.
  *
  * Usage:
- *   npx tsx src/update-meta.ts --config <name> --commit <hash>
+ *   node src/update-meta.ts --config <name> --commit <hash>
  */
 
-import { loadConfig } from "./config.js";
-import { getLatestMergedAutomatedPr, writeMeta } from "./state.js";
+import { loadConfig } from "./config.ts";
+import { getLatestMergedAutomatedPr, writeMeta } from "./state.ts";
 
 function parseArgs(): { config: string; commit: string } {
   const args = process.argv.slice(2);
@@ -25,7 +25,7 @@ function parseArgs(): { config: string; commit: string } {
   }
 
   if (!config || !commit) {
-    console.error("Usage: npx tsx src/update-meta.ts --config <name> --commit <hash>");
+    console.error("Usage: node src/update-meta.ts --config <name> --commit <hash>");
     process.exit(1);
   }
 
