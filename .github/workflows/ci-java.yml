@@ -48,23 +48,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # The emitter compiles against these peer packages; Generate.ps1 -> Setup.ps1
-      # -> Build-TypeSpec.ps1 runs `pnpm build` for the emitter, which needs them
-      # already built.
+      # The emitter compiles against these peer packages; `pnpm run regenerate`
+      # (Generate.ps1) runs `pnpm build` for the emitter, which needs them already
+      # built.
       - name: Build dependencies
         run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
 
-      # emitter-tests is a standalone npm+Maven project (not in the pnpm
-      # workspace). Generate.ps1 calls Setup.ps1 (builds the emitter + Azure jar,
-      # npm install) and regenerates the SDK from the spector specs into the
-      # gitignored src/main/java. Spector-Tests.ps1 then runs the JUnit tests
-      # against the Spector mock server.
+      # The e2e tests live in the same @azure-tools/typespec-java package (Maven+tsp
+      # assets under emitter-tests/). `pnpm run regenerate` builds the emitter and
+      # regenerates the SDK from the spector specs into the gitignored src/main/java;
+      # `pnpm run test:java:e2e` runs the JUnit tests against the Spector mock server.
       - name: Regenerate
-        shell: pwsh
-        run: ./Generate.ps1
-        working-directory: packages/typespec-java/emitter-tests
+        run: pnpm run regenerate
+        working-directory: packages/typespec-java
 
       - name: Spector tests
-        shell: pwsh
-        run: ./Spector-Tests.ps1
-        working-directory: packages/typespec-java/emitter-tests
+        run: pnpm run test:java:e2e
+        working-directory: packages/typespec-java
