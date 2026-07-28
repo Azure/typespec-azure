@@ -265,16 +265,20 @@ function syncGitignore(srcAbs: string, destAbs: string, stats: SyncStats): void 
   const destBlockEnd = destText.indexOf(GITIGNORE_LOCAL_BLOCK_END, destBlockStart);
 
   if (srcBlockStart === -1 || srcBlockEnd === -1) {
-    throw new Error(
-      `Source ${relPath} must contain the block delimited by ` +
-        `${GITIGNORE_LOCAL_BLOCK_BEGIN} and ${GITIGNORE_LOCAL_BLOCK_END}.`,
+    console.warn(
+      pc.yellow(
+        `Warning: Source ${relPath} does not contain the generated fixture block; skipping ${relPath} sync.`,
+      ),
     );
+    return;
   }
   if (destBlockStart === -1 || destBlockEnd === -1) {
-    throw new Error(
-      `Destination ${relPath} must contain the block delimited by ` +
-        `${GITIGNORE_LOCAL_BLOCK_BEGIN} and ${GITIGNORE_LOCAL_BLOCK_END}.`,
+    console.warn(
+      pc.yellow(
+        `Warning: Destination ${relPath} does not contain the generated fixture block; skipping ${relPath} sync.`,
+      ),
     );
+    return;
   }
 
   const srcContentStart = srcBlockStart + GITIGNORE_LOCAL_BLOCK_BEGIN.length;
