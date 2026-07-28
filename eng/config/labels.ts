@@ -1,7 +1,7 @@
 // cspell:ignore bfff
 
-import { CommonLabels } from "../../core/eng/common/config/labels.js";
-import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.js";
+import { CommonLabels } from "../../core/eng/common/config/labels.ts";
+import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.ts";
 
 /**
  * Labels that are used to categorize issue for which area they belong to.
