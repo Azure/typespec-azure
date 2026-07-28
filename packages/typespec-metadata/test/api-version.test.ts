@@ -163,6 +163,87 @@ describe("apiVersion in emitted metadata", () => {
     expect(snapshot.languages["python"][0].sdkType).toBe("stable");
     expect(snapshot.languages["java"][0].sdkType).toBe("stable");
   });
+
+  it("'multiple-versions' supersedes 'all' for multi-service specs", async () => {
+    const [{ outputs }] = await EmitterTester.compileAndDiagnose(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA {
+          av1,
+          av2,
+        }
+        interface AI {
+          @route("/aTest")
+          aTest(@query("api-version") apiVersion: VersionsA): void;
+        }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB {
+          bv1,
+          bv2,
+        }
+        interface BI {
+          @route("/bTest")
+          bTest(@query("api-version") apiVersion: VersionsB): void;
+        }
+      }
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-python": {
+              "package-name": "azure-test-service",
+              "api-version": "all",
+            },
+          },
+        },
+      },
+    );
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("multiple-versions");
+  });
+
+  it("different languages can have different api-version settings", async () => {
+    const [{ outputs }] = await EmitterTester.compileAndDiagnose(
+      `
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        v1,
+        v2,
+        v3,
+      }
+
+      op test(): void;
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-python": {
+              "package-name": "azure-test-service",
+              "api-version": "all",
+            },
+            "@azure-tools/typespec-java": {
+              "package-name": "com.azure:azure-test-service",
+            },
+          },
+        },
+      },
+    );
+
+    const snapshot = parseMetadata(outputs);
+    expect(snapshot.languages["python"][0].apiVersion).toBe("all");
+    expect(snapshot.languages["java"][0].apiVersion).toBe("v3");
+  });
 });
 
 describe("sdkType in emitted metadata", () => {
@@ -239,6 +320,28 @@ describe("sdkType in emitted metadata", () => {
 
     const snapshot = parseMetadata(outputs);
     expect(snapshot.languages["python"][0].apiVersion).toBe("all");
+    expect(snapshot.languages["python"][0].sdkType).toBe("preview");
+  });
+
+  it("@previewVersion decorator takes precedence over regex for sdkType", async () => {
+    const [{ outputs }] = await emitMetadata(`
+      @service(#{
+        title: "Widget Service",
+      })
+      @versioned(WidgetService.Versions)
+      namespace WidgetService;
+
+      enum Versions {
+        \`2023-01-01\`,
+        @previewVersion
+        \`2024-06-01\`,
+      }
+
+      op test(): void;
+    `);
+
+    const snapshot = parseMetadata(outputs);
+    // "2024-06-01" doesn't match -preview regex, but @previewVersion marks it as preview
     expect(snapshot.languages["python"][0].sdkType).toBe("preview");
   });
 });

@@ -593,9 +593,15 @@ function createLanguageMetadata(
     }
   }
 
-  // Read api-version from this emitter's options first; fall back to TCGC resolution
+  // Read api-version from this emitter's options first; fall back to TCGC resolution.
+  // "multiple-versions" (from TCGC multi-service detection) always supersedes any per-emitter value.
   const emitterApiVersion = normalizedOptions["api-version"];
-  const apiVersion = typeof emitterApiVersion === "string" ? emitterApiVersion : fallbackApiVersion;
+  const apiVersion =
+    fallbackApiVersion === "multiple-versions"
+      ? "multiple-versions"
+      : typeof emitterApiVersion === "string"
+        ? emitterApiVersion
+        : fallbackApiVersion;
 
   return {
     emitterName,

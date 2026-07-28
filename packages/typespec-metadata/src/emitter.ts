@@ -1,6 +1,14 @@
+import { isPreviewVersion } from "@azure-tools/typespec-azure-core";
 import type { SdkClientType, SdkHttpOperation } from "@azure-tools/typespec-client-generator-core";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
-import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
+import {
+  emitFile,
+  getDirectoryPath,
+  resolvePath,
+  type EmitContext,
+  type Program,
+} from "@typespec/compiler";
+import { getVersions } from "@typespec/versioning";
 import { stringify as stringifyYaml } from "yaml";
 import packageJson from "../package.json" with { type: "json" };
 import { buildSpecMetadata, collectLanguagePackages } from "./collector.js";
@@ -34,6 +42,7 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
 
   // Resolve SDK type (preview/stable) by checking all client API versions
   const resolvedSdkType = resolveSdkType(
+    context.program,
     sdkContext.sdkPackage.clients,
     sdkContext.previewStringRegex,
   );
@@ -76,18 +85,33 @@ async function writeSnapshot(
 
 /**
  * Determine whether the SDK targets preview or stable API versions.
- * Walks all clients (including sub-clients) and checks each version string
- * against the preview regex.
  *
- * Note: The `@previewVersion` decorator is handled by TCGC internally during
- * version filtering, so versions marked with it that don't match the regex
- * are already excluded from `client.apiVersions` by the time we inspect them.
- * Once TCGC exposes `isPreview` on its metadata, we can consume it directly.
+ * Priority:
+ * 1. `@previewVersion` decorator on any version enum member (always wins)
+ * 2. Regex match against the `previewStringRegex` on client API version strings
  */
 function resolveSdkType(
+  program: Program,
   clients: SdkClientType<SdkHttpOperation>[],
   previewStringRegex: RegExp,
 ): "preview" | "stable" | undefined {
+  // First check: @previewVersion decorator on version enum members
+  for (const client of clients) {
+    if (!client.__raw?.services) continue;
+    for (const serviceNs of client.__raw.services) {
+      const versionResult = getVersions(program, serviceNs);
+      if (versionResult.length === 2 && versionResult[1]) {
+        const versionMap = versionResult[1];
+        for (const version of versionMap.getVersions()) {
+          if (isPreviewVersion(program, version.enumMember)) {
+            return "preview";
+          }
+        }
+      }
+    }
+  }
+
+  // Second check: regex match on client API version strings
   let hasAnyVersion = false;
 
   function checkClient(client: SdkClientType<SdkHttpOperation>): boolean {

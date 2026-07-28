@@ -47,10 +47,13 @@
     "yaml": "catalog:"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@typespec/compiler": "workspace:^"
+    "@typespec/compiler": "workspace:^",
+    "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
