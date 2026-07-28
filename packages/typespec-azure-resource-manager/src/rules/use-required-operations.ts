@@ -11,12 +11,7 @@ import { resolveArmResources, ResolvedResource } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 type RequiredOperation =
-  | "read"
-  | "createOrUpdate"
-  | "update"
-  | "delete"
-  | "list-by-parent"
-  | "list-by-subscription";
+  "read" | "createOrUpdate" | "update" | "delete" | "list-by-parent" | "list-by-subscription";
 
 type RequiredOperationsMessages = {
   default: ReturnType<typeof paramMessage>;
