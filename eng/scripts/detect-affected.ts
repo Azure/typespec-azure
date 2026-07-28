@@ -21,6 +21,15 @@ import { pathToFileURL } from "node:url";
 // TO ADD A NEW UPSTREAM LIBRARY (e.g. a new typespec-azure-* package that an
 // emitter depends on): nothing to do — the workspace graph picks it up
 // automatically as soon as the emitter declares the dependency.
+//
+// EXCEPTION — upstreams consumed from npm via the pnpm catalog (e.g.
+// `@typespec/http-client-python`): these are not workspace packages, so the
+// graph cannot see them. Bumping one edits only the root `pnpm-workspace.yaml`,
+// which pnpm attributes to the root package alone, leaving every emitter
+// unaffected (Azure/typespec-azure#5010). `pnpm-workspace.yaml` is therefore in
+// `sharedExtra`: any change to it triggers all targets. It changes rarely and
+// always affects dependency resolution repo-wide, so this is deliberately blunt
+// rather than trying to work out which catalog entry moved.
 // -----------------------------------------------------------------------------
 
 interface Target {
@@ -35,7 +44,7 @@ interface Config {
   submodulePath: string;
   /** Globs whose sole change should NOT trigger anything; passed to pnpm via `--changed-files-ignore-pattern`. */
   ignore: string[];
-  /** Paths that trigger every target (shared CI infrastructure). */
+  /** Paths that trigger every target (shared CI infra + the root pnpm workspace file). */
   sharedExtra: string[];
   targets: Record<string, Target>;
 }
@@ -79,7 +88,8 @@ export function matchesAny(file: string, patterns: string[]): boolean {
  * A target fires on any of three signals: its package is in the pnpm-derived
  * affected set, OR one of the two things the graph cannot see changed — the
  * `core` submodule pointer (which every emitter depends on, so it triggers all
- * targets), or a non-package `extra` CI-infra path.
+ * targets), or an `extra` path outside any package (CI infra, and the root
+ * `pnpm-workspace.yaml` — see the header comment).
  *
  * @param affectedPackages Target package OR any graph-dependent of a meaningfully
  *   changed package (from `pnpm --filter "...[base]"`).
