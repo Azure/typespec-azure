@@ -2,7 +2,7 @@
 
 ## 0.45.11
 
-### Bug Fixes
+### Features
 
 - [#5090](https://github.com/Azure/typespec-azure/pull/5090) Sync core to microsoft/typespec commit `d320a53b`. Return response headers as a model from the convenience method when the operation has response headers (core [#11420](https://github.com/microsoft/typespec/pull/11420)).
 
