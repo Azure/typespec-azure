@@ -21,6 +21,7 @@ specs:
   "azure/client-generator-core/api-version/query/client.tsp":
     { options: { module: apiversionquerygroup } }
   "azure/client-generator-core/client-default-value": { options: { module: defaultvaluegroup } }
+  "azure/client-generator-core/client-doc": { options: { module: clientdocgroup } }
   "azure/client-generator-core/client-initialization/default":
     { options: { module: clientinitdefaultgroup } }
   "azure/client-generator-core/client-initialization/individually":
@@ -57,11 +58,13 @@ specs:
   "azure/payload/pageable": { options: { module: pageablegroup } }
   "azure/resource-manager/common-properties": { options: { module: commonpropsgroup } }
   "azure/resource-manager/large-header": { options: { module: largeheadergroup } }
+  "azure/resource-manager/management-group": { options: { module: managementgroupgroup } }
   "azure/resource-manager/non-resource": { options: { module: nonresourcegroup } }
   "azure/resource-manager/operation-templates": { options: { module: templatesgroup } }
   "azure/resource-manager/resources":
     { options: { module: resources, factory-gather-all-params: false } }
   "azure/special-headers/client-request-id": { options: { module: xmsclientreqidgroup } }
+  "azure/special-headers/conditional-request": { options: { module: azurecondreqgroup } }
   "azure/versioning/previewVersion":
     - options: { module: previewversiongroup, api-version: "2024-12-01-preview" }
     - options: { module: previewversiongroupspecificversion, api-version: "2024-06-01" }
@@ -79,3 +82,7 @@ specs:
 
   # --- Not generated yet (tracked skips) ---
   "azure/client-generator-core/alternate-type": false
+  # emitter bug: generated fakes reference an unexported model (my_model)
+  "azure/client-generator-core/exact-name": false
+  # emitter error: didn't find HTTP response for kind boolean (@responseAsBool on HEAD)
+  "azure/client-generator-core/response-as-bool": false
