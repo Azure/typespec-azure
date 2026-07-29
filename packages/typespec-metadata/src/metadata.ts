@@ -20,6 +20,21 @@ export interface LanguagePackageMetadata {
   flavor?: string;
   /** Service directory path for this language emitter. */
   serviceDir?: string;
+  /**
+   * Resolved API version for this emitter.
+   * - `"all"` when configured for all versions
+   * - `"multiple-versions"` for multi-service configs with more than one API version entry
+   * - An actual resolved version string (e.g. `"2023-10-01"`) for a single version
+   * - `undefined` when no API version information is available
+   */
+  apiVersion?: string;
+  /**
+   * Whether the SDK targets preview or stable API versions.
+   * - `"preview"` if any targeted API version is a preview version (matches `-preview` suffix or has `@previewVersion` decorator)
+   * - `"stable"` if all targeted API versions are stable
+   * - `undefined` when no API version information is available
+   */
+  sdkType?: "preview" | "stable";
 }
 
 export interface MetadataSnapshot {

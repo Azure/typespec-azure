@@ -72,7 +72,11 @@ specs:
   "client/naming": { options: { module: naminggroup } }
   "client/naming/enum-conflict/client.tsp": { options: { module: enumconflictgroup } }
   "client/overload/client.tsp": { options: { module: overloadgroup } }
+  "client/structure/client-operation-group/client.tsp": { options: { module: clientopgroup } }
   "client/structure/default/client.tsp": { options: { module: defaultgroup } }
+  "client/structure/multi-client/client.tsp": { options: { module: multiclientgroup } }
+  "client/structure/renamed-operation/client.tsp": { options: { module: renamedopgroup } }
+  "client/structure/two-operation-group/client.tsp": { options: { module: twoopgroup } }
   "resiliency/srv-driven": { options: { module: srvdrivennewgroup } }
   "resiliency/srv-driven/old.tsp": { options: { module: srvdrivenoldgroup } }
 
@@ -82,11 +86,3 @@ specs:
   "azure/client-generator-core/exact-name": false
   # emitter error: didn't find HTTP response for kind boolean (@responseAsBool on HEAD)
   "azure/client-generator-core/response-as-bool": false
-  # disabled until new TCGC version released
-  "client/structure/client-operation-group/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/multi-client/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/renamed-operation/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/two-operation-group/client.tsp": false
