@@ -10,13 +10,13 @@ Post-generation transforms are a last resort. Before reaching for `go-generate`,
 
 Many common customizations are already supported, for example:
 
-- renaming clients, methods, models, properties, and enum values with `@clientName` (see [Renaming Types](../../../howtos/Generate%20client%20libraries/09renaming.mdx));
-- restructuring the client hierarchy, adding sub-clients, or moving methods between clients with `@client`, `@operationGroup`, and `@clientLocation` (see [Clients](../../../howtos/Generate%20client%20libraries/03client.mdx));
-- reshaping the public surface with `@override`, `@access`, and `@usage` (see [Basic methods](../../../howtos/Generate%20client%20libraries/04method.mdx));
+- renaming clients, methods, models, properties, and enum values with `@clientName` (see [Renaming Types](https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/09renaming/));
+- restructuring the client hierarchy, adding sub-clients, or moving methods between clients with `@client`, `@operationGroup`, and `@clientLocation` (see [Clients](https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/03client/));
+- reshaping the public surface with `@override`, `@access`, and `@usage` (see [Basic methods](https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/04method/));
 - replacing generated doc comments with `@clientDoc`;
 - scoping any of the above to Go only by passing the `"go"` scope argument, so other languages are unaffected.
 
-See [How to generate client libraries](../../../howtos/Generate%20client%20libraries/00howtogen.mdx) for the full set of customizations.
+See [How to generate client libraries](https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/00howtogen/) for the full set of customizations.
 
 Reach for `go-generate` only when the change has no TypeSpec equivalent—for example, adding Go build tags or otherwise editing generated content in ways the emitter has no concept of.
 
