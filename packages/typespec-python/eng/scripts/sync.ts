@@ -15,8 +15,8 @@
  * nothing.
  *
  * Usage:
- *   tsx eng/scripts/sync.ts          # write mode: overwrite local files
- *   tsx eng/scripts/sync.ts --check  # check mode: exit non-zero on drift (CI)
+ *   node eng/scripts/sync.ts          # write mode: overwrite local files
+ *   node eng/scripts/sync.ts --check  # check mode: exit non-zero on drift (CI)
  */
 import fs from "fs";
 import { dirname, join, relative, sep } from "path";
@@ -145,7 +145,7 @@ const argv = parseArgs({
 
 if (argv.values.help) {
   console.log(`
-${pc.bold("Usage:")} tsx eng/scripts/sync.ts [options]
+${pc.bold("Usage:")} node eng/scripts/sync.ts [options]
 
 ${pc.bold("Description:")}
   Copy the files (and recursive directories) listed in INCLUDES from
@@ -400,7 +400,7 @@ function main(): void {
     console.error(
       pc.red(
         `\nSynced files have drifted from core/packages/http-client-python.\n` +
-          `Run 'pnpm sync' (or 'tsx eng/scripts/sync.ts') and commit the result.`,
+          `Run 'pnpm sync' (or 'node eng/scripts/sync.ts') and commit the result.`,
       ),
     );
     process.exit(1);

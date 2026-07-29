@@ -112,23 +112,23 @@ jobs:
       - script: pnpm run build
         displayName: Build (turbo cache restore)
 
-      # emitter-tests is a standalone npm+Maven project (not in the pnpm
-      # workspace). The turbo cache only restores dist/** outputs, not the
-      # Maven emitter.jar, so run Generate.ps1 WITHOUT -SkipBuild: it builds the
-      # emitter jar, then regenerates the SDK from the spector specs.
-      # Spector-Tests.ps1 starts the mock server, runs the JUnit tests and
-      # produces tsp-spector-coverage-java.json.
-      - pwsh: ./Generate.ps1
+      # The e2e tests live in the @azure-tools/typespec-java package (Maven+tsp
+      # assets under emitter-tests/). The turbo cache only restores dist/** outputs,
+      # not the Maven emitter.jar, so `pnpm run regenerate` builds the emitter jar,
+      # then regenerates the SDK from the spector specs. `pnpm run test:java:e2e`
+      # starts the mock server, runs the JUnit tests and produces
+      # tsp-spector-coverage-java.json.
+      - pwsh: pnpm run regenerate
         displayName: "Regenerate Java test code"
-        workingDirectory: packages/typespec-java/emitter-tests
+        workingDirectory: packages/typespec-java
 
-      - pwsh: ./Spector-Tests.ps1
+      - pwsh: pnpm run test:java:e2e
         displayName: "Run Java spector tests"
-        workingDirectory: packages/typespec-java/emitter-tests
+        workingDirectory: packages/typespec-java
 
       - template: /eng/pipelines/templates/upload-spector-coverage.yml
         parameters:
-          PackagePath: packages/typespec-java/emitter-tests
+          PackagePath: packages/typespec-java
           GeneratorName: "@azure-tools/typespec-java"
 
   - job: spector_ts
