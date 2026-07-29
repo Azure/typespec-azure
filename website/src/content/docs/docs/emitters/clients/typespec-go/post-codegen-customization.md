@@ -2,7 +2,23 @@
 title: Post-codegen customization
 ---
 
-Generated Go SDKs are meant to be regenerated whenever the spec changes, so you should never edit the emitted files by hand—your changes would be lost on the next run. When you need to tweak the generated code (for example, to rename a symbol, add a build tag, or adjust a comment), use the emitter's `go-generate` option to run a **post-generation transform** as part of emission.
+Generated Go SDKs are meant to be regenerated whenever the spec changes, so you should never edit the emitted files by hand—your changes would be lost on the next run. When a customization genuinely cannot be expressed in TypeSpec, use the emitter's `go-generate` option to run a **post-generation transform** as part of emission, so the change is reapplied on every regeneration.
+
+## Prefer client customization in `client.tsp`
+
+Post-generation transforms are a last resort. Before reaching for `go-generate`, check whether the change can be expressed with the client customization decorators from `@azure-tools/typespec-client-generator-core` in your `client.tsp`. Customizing there is language-aware, validated by the compiler, visible to every emitter, and stays correct as the spec evolves—whereas a transform is an opaque text rewrite that silently breaks when the generated code changes shape.
+
+Many common customizations are already supported, for example:
+
+- renaming clients, methods, models, properties, and enum values with `@clientName` (see [Renaming Types](../../../howtos/Generate%20client%20libraries/09renaming.mdx));
+- restructuring the client hierarchy, adding sub-clients, or moving methods between clients with `@client`, `@operationGroup`, and `@clientLocation` (see [Clients](../../../howtos/Generate%20client%20libraries/03client.mdx));
+- reshaping the public surface with `@override`, `@access`, and `@usage` (see [Basic methods](../../../howtos/Generate%20client%20libraries/04method.mdx));
+- replacing generated doc comments with `@clientDoc`;
+- scoping any of the above to Go only by passing the `"go"` scope argument, so other languages are unaffected.
+
+See [How to generate client libraries](../../../howtos/Generate%20client%20libraries/00howtogen.mdx) for the full set of customizations.
+
+Reach for `go-generate` only when the change has no TypeSpec equivalent—for example, adding Go build tags or otherwise editing generated content in ways the emitter has no concept of.
 
 ## How it works
 
