@@ -1780,7 +1780,23 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform
 | type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
 | name | `string` | Tool name/identifier.                                                                        |
 
-### `ConversationItem` {#Azure.ResourceManager.BaseTypes.Agents.ConversationItem}
+### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
+
+Properties for a conversation resource holding the items and metadata
+exchanged between a client and an agent.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
+```
+
+#### Properties
+
+| Name       | Type                                                                            | Description                                                |
+| ---------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| createdAt? | `utcDateTime`                                                                   | Timestamp of when the conversation was created. Read-only. |
+| input      | [`InputItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputItem) | Content input to the conversation. Required on create.     |
+
+### `InputItem` {#Azure.ResourceManager.BaseTypes.Agents.InputItem}
 
 A single item exchanged within a conversation.
 
@@ -1793,7 +1809,7 @@ that variant are populated, so all variant-specific fields are optional:
 - `Compaction`: `summary`
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
+model Azure.ResourceManager.BaseTypes.Agents.InputItem
 ```
 
 #### Properties
@@ -1802,7 +1818,7 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
 | ---------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | id?        | `string`                                                                                  | Unique identifier of the item. Read-only (assigned by the service).                                               |
 | type       | [`ItemType`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ItemType)             | The item type discriminator. Determines which variant this item represents.                                       |
-| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items.                                                       |
+| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items. Read-only.                                            |
 | content?   | `string`                                                                                  | The text content of the message. Applies to `Message` items.                                                      |
 | callId?    | `string`                                                                                  | Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. |
 | name?      | `string`                                                                                  | The name of the function (tool) to invoke. Applies to `FunctionCall` items.                                       |
@@ -1810,21 +1826,6 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
 | output?    | `string`                                                                                  | The output produced by the function (tool) call. Applies to `FunctionCallOutput` items.                           |
 | summary?   | `string`                                                                                  | Summary of the compacted conversation history. Applies to `Compaction` items.                                     |
 | status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the item. Read-only.                                                                                |
-
-### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
-
-Properties for a conversation resource holding the items and metadata
-exchanged between a client and an agent.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
-```
-
-#### Properties
-
-| Name       | Type          | Description                                                |
-| ---------- | ------------- | ---------------------------------------------------------- |
-| createdAt? | `utcDateTime` | Timestamp of when the conversation was created. Read-only. |
 
 ### `PreviousResponseProperty` {#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty}
 
@@ -1910,12 +1911,12 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 
 #### Properties
 
-| Name       | Type                                                                                          | Description                                                                                                          |
-| ---------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| createdAt? | `utcDateTime`                                                                                 | Timestamp of when the response was created. Read-only.                                                               |
-| model?     | `string`                                                                                      | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
-| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus)     | The status of the response. Read-only.                                                                               |
-| input      | [`ConversationItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ConversationItem) | Content input to the model. Required on create.                                                                      |
+| Name       | Type                                                                                      | Description                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| createdAt? | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
+| model?     | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
+| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
+| input      | [`InputItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputItem)           | Content input to the model. Required on create.                                                                      |
 
 ### `ItemType` {#Azure.ResourceManager.BaseTypes.Agents.ItemType}
 

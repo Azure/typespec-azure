@@ -186,6 +186,9 @@ model ConversationProperties {
   /** Timestamp of when the conversation was created. Read-only. */
   @visibility(Lifecycle.Read)
   createdAt?: utcDateTime;
+
+  /** Content input to the conversation. Required on create. */
+  input: InputItem;
 }
 
 /**
@@ -232,7 +235,7 @@ enum ItemType {
  *   - `FunctionCallOutput`: `callId`, `output`
  *   - `Compaction`: `summary`
  */
-model ConversationItem {
+model InputItem {
   /** Unique identifier of the item. Read-only (assigned by the service). */
   @visibility(Lifecycle.Read)
   id?: string;
@@ -240,7 +243,8 @@ model ConversationItem {
   /** The item type discriminator. Determines which variant this item represents. */
   type: ItemType;
 
-  /** The role of the message author. Applies to `Message` items. */
+  /** The role of the message author. Applies to `Message` items. Read-only. */
+  @visibility(Lifecycle.Read)
   role?: MessageRole;
 
   /** The text content of the message. Applies to `Message` items. */
@@ -316,7 +320,7 @@ model ResponseProperties {
   status?: ResponseStatus;
 
   /** Content input to the model. Required on create. */
-  input: ConversationItem;
+  input: InputItem;
 }
 
 /**
