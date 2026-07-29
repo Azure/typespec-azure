@@ -722,6 +722,11 @@ function normalizePathForResourceIdentity(path: string): string {
     .join("/");
 }
 
+function trimScopePrefix(path: string): string {
+  const scopePrefix = getScopePrefix(path);
+  return scopePrefix === "" ? path : path.slice(scopePrefix.length);
+}
+
 function isResourceIdentityOperation(kind: ArmOperationKind): boolean {
   return kind === "read" || kind === "createOrUpdate";
 }
@@ -865,8 +870,12 @@ function getListMatchDistance(
   operation: ArmResourceOperation,
   resource: ResolvedResourceOperations,
 ): number {
-  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
-  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  const operationPath = trimScopePrefix(
+    normalizePathForResourceIdentity(operation.httpOperation.path),
+  );
+  const resourcePath = trimScopePrefix(
+    normalizePathForResourceIdentity(resource.resourceInstancePath),
+  );
   return resourcePath.length - operationPath.length;
 }
 
