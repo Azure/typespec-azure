@@ -1,0 +1,16 @@
+[
+  {
+    "code": "OperationsApiSchemaUsesCommonTypes",
+    "message": "Operations API path must follow the schema provided in the common types.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/operations",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

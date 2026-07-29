@@ -30,6 +30,7 @@ import { mutabilityWithReadOnlyRule } from "./rules/mutability-with-read-only.js
 import { nestedResourcesMustHaveListOperationRule } from "./rules/nested-resources-must-have-list-operation.js";
 import { nonApplicationJsonTypeRule } from "./rules/non-application-json-type.js";
 import { operationIdNounVerbRule } from "./rules/operation-id-noun-verb.js";
+import { operationsApiSchemaUsesCommonTypesRule } from "./rules/operations-api-schema-uses-common-types.js";
 import { parametersSchemaAsTypeObjectRule } from "./rules/parameters-schema-as-type-object.js";
 import { parametersInPostRule } from "./rules/parameters-in-post.js";
 import { pageableRequires200ResponseRule } from "./rules/pageable-requires-200-response.js";
@@ -98,6 +99,7 @@ const rules = [
   nonApplicationJsonTypeRule,
   noErrorCodeResponsesRule,
   operationIdNounVerbRule,
+  operationsApiSchemaUsesCommonTypesRule,
   patchInOperationNameRule,
   pageableRequires200ResponseRule,
   parametersSchemaAsTypeObjectRule,
@@ -171,6 +173,7 @@ const enabledRules = {
   [`tsp-lintdiff-local-linter/${nonApplicationJsonTypeRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${noErrorCodeResponsesRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${operationIdNounVerbRule.name}`]: true,
+  [`tsp-lintdiff-local-linter/${operationsApiSchemaUsesCommonTypesRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${patchInOperationNameRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${pageableRequires200ResponseRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${parametersSchemaAsTypeObjectRule.name}`]: true,

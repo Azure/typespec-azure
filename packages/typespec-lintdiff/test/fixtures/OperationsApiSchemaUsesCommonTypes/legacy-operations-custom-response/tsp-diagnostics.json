@@ -20,21 +20,6 @@
     "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
   },
   {
-    "code": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
-    "severity": "warning",
-    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/xms-examples-required",
-    "severity": "warning",
-    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
-    "severity": "warning",
-    "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -93,5 +78,10 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operations-api-schema-uses-common-types",
+    "severity": "warning",
+    "message": "Operations API '/providers/Microsoft.TestService/operations' must return the common-types `OperationListResult` schema. Declare it with \"interface Operations extends Azure.ResourceManager.Operations {}\" instead of a service-defined response model."
   }
 ]
