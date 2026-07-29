@@ -1,16 +1,10 @@
 # Change Log - @azure-tools/typespec-ts
 
-## 0.56.0
-
-### Features
-
-- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+## 0.55.2
 
 ### Bug Fixes
 
-- [#5038](https://github.com/Azure/typespec-azure/pull/5038) Add the license header to emitted `.mts`/`.mjs` files (e.g. the browser and react-native static helper variants such as `get-binary-stream-response-browser.mts`), which were previously skipped because the source-code detection only matched `.ts`/`.js` extensions.
 - [#4872](https://github.com/Azure/typespec-azure/pull/4872) Fix multi-client package build failures by syncing the generated `config/tsconfig.src.*.json` `include` lists with the `warp.config.yml` exports, so every client entry point is compiled and emitted to `dist` (previously warp failed with `DIST_MISSING`).
-- [#4585](https://github.com/Azure/typespec-azure/pull/4585) [typespec-ts] fix platform import issue for customization
 
 
 ## 0.55.1
