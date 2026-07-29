@@ -686,36 +686,10 @@ export function formatCommentAsBulletItem(prefix: string, docs: go.Docs): string
 // matches a bullet list item, capturing the item's text.
 // Go doc comments recognize '-', '*' and '+' as bullet markers, each
 // followed by at least one space or tab (see https://go.dev/doc/comment#lists).
-const bulletListItemRegex = /^\s*[-*+][ \t]+(.*)$/;
-
-// matches a numbered list item, capturing the number and the item's text.
-// Go doc comments recognize a decimal number followed by '.' or ')' and at
-// least one space or tab as a numbered list item.
-const numberedListItemRegex = /^\s*(\d+)[.)][ \t]+(.*)$/;
-
-interface DocListItem {
-  kind: "bullet" | "numbered";
-  // the rendered marker without trailing space, e.g. "-" or "1.".
-  marker: string;
-  // the item's text (without the marker).
-  text: string;
-}
-
-// classifies a single doc line as a bullet/numbered list item, or undefined
-// when it isn't a list item. Leading whitespace is ignored on purpose: Go doc
-// comments do not support nested lists, so source indentation carries no
-// nesting meaning and every item is treated as a single-level list item.
-function matchDocListItem(line: string): DocListItem | undefined {
-  const bullet = bulletListItemRegex.exec(line);
-  if (bullet) {
-    return { kind: "bullet", marker: "-", text: bullet[1]! };
-  }
-  const numbered = numberedListItemRegex.exec(line);
-  if (numbered) {
-    return { kind: "numbered", marker: `${numbered[1]}.`, text: numbered[2]! };
-  }
-  return undefined;
-}
+// The primitives live in the code model so the TCGC adapter agrees with the
+// generator on what a list item is; see codemodel/docs.ts.
+const matchDocListItem = go.matchDocListItem;
+type DocListItem = go.DocListItem;
 
 // renders a single list item following the native Go doc comment convention:
 //
@@ -737,6 +711,14 @@ function formatDocListItem(item: DocListItem, prefix: string): string {
     .join("\n");
 }
 
+// reports whether text contains at least one non-blank line that isn't a list
+// item, i.e. a line that go/doc/comment will see with zero indentation.
+function hasProseLine(text: string): boolean {
+  return text
+    .split("\n")
+    .some((line) => line.trim() !== "" && matchDocListItem(line) === undefined);
+}
+
 // renders multi-line doc text into Go doc comment lines, formatting
 // bullet/numbered lists per the native Go doc convention. Prose lines are
 // word-wrapped exactly as comment() does, and each source line starts a new
@@ -745,14 +727,37 @@ function formatDocListItem(item: DocListItem, prefix: string): string {
 // recognize it; blank source lines are otherwise not preserved, matching the
 // pre-existing behavior of comment().
 //
+// hasPrecedingProse must be true when the caller already emitted a prose line
+// above this body (e.g. a summary, or the "Name -" prefix line). It selects
+// whether lists are rendered at all, per the rule described below.
+//
+// Go's comment parser (go/doc/comment) first removes the *common* leading
+// whitespace of every non-blank line before it looks for lists. So if a comment
+// consists solely of list items, their shared indentation is stripped and the
+// list degrades into a plain paragraph, which gofmt then rewrites (i.e. the
+// emitted comment isn't idempotent). A single prose line anywhere in the
+// comment pins the common indentation to zero and keeps the list intact, no
+// matter whether the list comes first. Lists are therefore only rendered when
+// the comment has at least one prose line; otherwise the text is emitted as
+// plain wrapped prose, which is what gofmt produces and what this emitter
+// produced before lists were understood. Callers that can supply a lead-in line
+// (a summary, or a "Name -" prefix) do so, which keeps such lists renderable.
+//
 // Nested (multi-level) lists are not supported: the Go doc comment format
 // (go/doc/comment) has no concept of nested lists, and gofmt flattens any
 // indented sub-items to a single level. Accordingly every list item is rendered
 // at one level regardless of its source indentation (see matchDocListItem,
 // which ignores leading whitespace).
-function renderDocBody(text: string, prefix = "//"): string {
+function renderDocBody(text: string, prefix = "//", hasPrecedingProse = false): string {
   const out = new Array<string>();
+  // whether a list is being accumulated. A blank source line ends it, so that a
+  // blank-separated run of items is rendered as a "loose" list.
   let inList = false;
+  // whether the last emitted line belongs to a list. Unlike inList this
+  // survives blank source lines, because prose must always be separated from a
+  // preceding list by a blank comment line for the list to end there.
+  let afterList = false;
+  const renderLists = hasPrecedingProse || hasProseLine(text);
   const lastIsBlank = () => out.length === 0 || out[out.length - 1] === prefix;
 
   for (const raw of text.split("\n")) {
@@ -764,22 +769,25 @@ function renderDocBody(text: string, prefix = "//"): string {
       continue;
     }
 
-    const item = matchDocListItem(line);
+    const item = renderLists ? matchDocListItem(line) : undefined;
     if (item) {
-      // a list must be preceded by a blank comment line to be recognized.
+      // a list must be separated from preceding prose by a blank comment line
+      // to be recognized.
       if (!inList && !lastIsBlank()) {
         out.push(prefix);
       }
       out.push(formatDocListItem(item, prefix));
       inList = true;
+      afterList = true;
       continue;
     }
 
     // prose line: separate it from a preceding list with a blank comment line.
-    if (inList && !lastIsBlank()) {
+    if (afterList && !lastIsBlank()) {
       out.push(prefix);
     }
     inList = false;
+    afterList = false;
     out.push(comment(line.trim(), prefix, undefined, commentLength));
   }
 
@@ -810,15 +818,12 @@ export function formatDocCommentWithPrefix(prefix: string, docs: go.Docs): strin
     if (docs.summary) {
       docComment += "//\n";
     } else {
-      // only apply the prefix to the description if there was no summary. Keep
-      // the prefix on the first line so any following list is still rendered.
-      const nl = description.indexOf("\n");
-      description =
-        nl === -1
-          ? `${prefix} - ${description}`
-          : `${prefix} - ${description.slice(0, nl)}${description.slice(nl)}`;
+      // only apply the prefix to the description if there was no summary. When
+      // the description opens with a list item the prefix lands on its own line
+      // so the item isn't absorbed into it.
+      description = go.prefixDocWithName(prefix, description);
     }
-    docComment += `${renderDocBody(description, "//")}\n`;
+    docComment += `${renderDocBody(description, "//", true)}\n`;
   }
 
   return docComment;
@@ -842,7 +847,7 @@ export function formatDocComment(docs: go.Docs): string {
     if (docs.summary) {
       docComment += "//\n";
     }
-    docComment += `${renderDocBody(docs.description, "//")}\n`;
+    docComment += `${renderDocBody(docs.description, "//", !!docs.summary)}\n`;
   }
 
   return docComment;

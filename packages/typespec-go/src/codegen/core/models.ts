@@ -276,7 +276,17 @@ function generateModelDefs(
         // add a basic description if one isn't available
         descriptionMods.push("The contents of this field are raw JSON.");
       }
-      field.docs.description = descriptionMods.join("; ");
+      if (
+        descriptionMods.length > 1 &&
+        go.startsWithDocListItem(descriptionMods[descriptionMods.length - 1]!)
+      ) {
+        // the description opens with a list item, so it can't share a line with
+        // the modifiers; joining them would demote the first item to prose.
+        const description = descriptionMods.pop()!;
+        field.docs.description = `${descriptionMods.join("; ")}\n${description}`;
+      } else {
+        field.docs.description = descriptionMods.join("; ");
+      }
     }
 
     const serDeFormat = helpers.getSerDeFormat(model, pkg);
