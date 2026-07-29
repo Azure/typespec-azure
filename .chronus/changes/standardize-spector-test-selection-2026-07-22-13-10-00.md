@@ -3,7 +3,6 @@ changeKind: internal
 packages:
   - "@azure-tools/typespec-go"
   - "@azure-tools/typespec-python"
-  - "@azure-tools/typespec-ts"
   - "@azure-tools/typespec-java"
 ---
 
