@@ -22,7 +22,7 @@ import { isSpecEnabled, loadSpectorConfig, type SpectorConfig } from "@azure-too
 
 import {
   buildTaskGroups,
-  cleanGeneratedCodePreservingFixtures,
+  cleanGeneratedCode,
   getSubdirectories,
   preprocess,
   type RegenerateContext,
@@ -205,7 +205,7 @@ async function main(): Promise<void> {
   const startTime = performance.now();
   let success: boolean;
 
-  await cleanGeneratedCodePreservingFixtures(GENERATED_FOLDER);
+  await cleanGeneratedCode(GENERATED_FOLDER);
 
   if (flavor) {
     success = await regenerateFlavor(flavor, name, debug, jobs);
