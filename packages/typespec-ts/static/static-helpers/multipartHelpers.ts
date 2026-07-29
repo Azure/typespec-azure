@@ -1,4 +1,4 @@
-import { NodeReadableStream } from "./platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 /**
  * Valid values for the contents of a binary file.
