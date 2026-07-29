@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.11
+
+### Features
+
+- Return response headers as a model from the convenience method when the operation has response headers (core [#11420](https://github.com/microsoft/typespec/pull/11420)).
+
+
 ## 0.45.10
 
 ### Features
