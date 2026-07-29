@@ -1,9 +1,15 @@
 import { defineLinter } from "@typespec/compiler";
 import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
+import { noServiceNsInClientRule } from "./rules/no-service-ns-in-client.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 
-const rules = [requireClientSuffixRule, propertyNameConflictRule, csharpNoUrlSuffixRule];
+const rules = [
+  requireClientSuffixRule,
+  propertyNameConflictRule,
+  csharpNoUrlSuffixRule,
+  noServiceNsInClientRule,
+];
 
 const csharpRules = [propertyNameConflictRule, csharpNoUrlSuffixRule];
 
