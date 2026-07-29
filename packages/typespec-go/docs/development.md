@@ -198,6 +198,7 @@ This repo manages Node with [mise](https://mise.jdx.dev/), so `node` resolves to
    ```
 
    The command hangs while the compiler child waits for a debugger. (The "Debugger listening…" banner is buffered by `exec` and won't print until the child exits — this is expected.)
+
 4. In VS Code, press F5 and select the **Attach to Default Port** launch configuration. Execution stops at the compiler's entry point; press Continue (F5) once and it runs to your breakpoint after the emitter loads. With `--debugger` the specs run one at a time, so omit `--filter` only if you intend to step through every spec in turn.
 
 ## Step 4: Update emitter documentation
