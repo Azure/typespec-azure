@@ -2018,8 +2018,9 @@
           "readOnly": true
         },
         "content": {
-          "type": "string",
-          "description": "The text content of the message. Applies to `Message` items."
+          "type": "object",
+          "description": "The content of the message. Applies to `Message` items.",
+          "additionalProperties": {}
         },
         "callId": {
           "type": "string",

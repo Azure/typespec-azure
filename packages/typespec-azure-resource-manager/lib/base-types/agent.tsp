@@ -247,8 +247,8 @@ model InputItem {
   @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. */
-  content?: string;
+  /** The content of the message. Applies to `Message` items. */
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. */
   callId?: string;
@@ -346,9 +346,9 @@ model ResponseItem {
   @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. Read-only. */
+  /** The content of the message. Applies to `Message` items. Read-only. */
   @visibility(Lifecycle.Read)
-  content?: string;
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. Read-only. */
   @visibility(Lifecycle.Read)
