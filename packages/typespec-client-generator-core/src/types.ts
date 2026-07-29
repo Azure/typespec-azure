@@ -18,6 +18,7 @@ import {
   Tuple,
   Type,
   Union,
+  compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
@@ -222,8 +223,8 @@ export function addEncodeInfo(
       innerType.encode = "bytes";
     }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
+    // integer and boolean types are allowed to be encoded as string
     if (encodeData) {
       if (encodeData?.encoding) {
         (innerType as any).encode = encodeData.encoding;
@@ -759,42 +760,31 @@ function addDiscriminatorToModelType(
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
-            if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-constant",
-                  target: childModel,
-                  format: { discriminator: property.name },
-                }),
-              );
-            } else if (typeof property.type.value !== "string") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-string",
-                  target: type,
-                  format: {
-                    discriminator: property.name,
-                    discriminatorValue: String(property.type.value),
-                  },
-                }),
-              );
-            } else {
-              // map string value type to enum value type
-              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
-                for (const value of discriminatorType.values) {
-                  if (value.value === property.type.value) {
-                    property.type = value;
-                  }
+            compilerAssert(
+              property.type.kind === "constant" || property.type.kind === "enumvalue",
+              `Discriminator "${property.name}" has to be constant`,
+              childModel,
+            );
+            compilerAssert(
+              typeof property.type.value === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            // map string value type to enum value type
+            if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+              for (const value of discriminatorType.values) {
+                if (value.value === property.type.value) {
+                  property.type = value;
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
-              property.discriminator = true;
-              if (model.discriminatedSubtypes === undefined) {
-                model.discriminatedSubtypes = {};
-              }
-              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
-              discriminatorProperty = property;
             }
+            childModelSdkType.discriminatorValue = property.type.value as string;
+            property.discriminator = true;
+            if (model.discriminatedSubtypes === undefined) {
+              model.discriminatedSubtypes = {};
+            }
+            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            discriminatorProperty = property;
           }
         }
       }
@@ -823,6 +813,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -836,6 +827,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -939,8 +931,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -2537,6 +2528,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions

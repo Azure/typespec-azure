@@ -27,7 +27,7 @@ model ScopeParameter<Type extends string = string> {
 
 /**
  * Base parameters for an extension target.
- * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource).
+ * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource).
  *
  */
 @resourceBaseParametersOf(Resource)
@@ -45,7 +45,7 @@ model TargetBaseParameters<Resource extends {}> {
 }
 
 /** The path parameters for a target resource for an extension
- * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource).
+ * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource).
  */
 model TargetParameters<Resource extends {}> {
   ...TargetBaseParameters<Resource>;
@@ -64,7 +64,7 @@ model ExtensionProviderNamespace<Resource extends {}> {
 }
 
 /** The provider namespace (if any) for a target resource for an extension
- * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource)
+ * @template Resource The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource)
  */
 model TargetProviderNamespace<Resource extends {}> {
   @resourceParameterBaseFor(
@@ -84,7 +84,7 @@ model TargetProviderNamespace<Resource extends {}> {
 }
 
 /** The path parameters for an extension resource at the given target
- * @template TargetResource The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource).
+ * @template TargetResource The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource).
  * @template Resource The extension resource.
  */
 model ExtensionInstanceParameters<TargetResource extends {}, Resource extends {}> {
@@ -94,7 +94,7 @@ model ExtensionInstanceParameters<TargetResource extends {}, Resource extends {}
 }
 
 /** The path parameters for a collection of extension resources at the given target
- * @template TargetResource The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource).
+ * @template TargetResource The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource).
  * @template ExtensionResource The extension resource.
  */
 model ExtensionParentParameters<TargetResource extends {}, ExtensionResource extends {}> {
@@ -118,6 +118,20 @@ model ManagementGroup<ParameterName extends valueof string = "managementGroupNam
   @segment("managementGroups")
   @key(ParameterName)
   @doc("The management group ID.")
+  name: string;
+}
+
+/** A service group
+ * @template ParameterName The name of the 'name' parameter of the service group (usually serviceGroupName or serviceGroupId).
+ */
+@tenantResource
+@armVirtualResource("Microsoft.Management")
+model ServiceGroup<ParameterName extends valueof string = "serviceGroupName"> {
+  @path
+  @minLength(1)
+  @segment("serviceGroups")
+  @key(ParameterName)
+  @doc("The service group name.")
   name: string;
 }
 

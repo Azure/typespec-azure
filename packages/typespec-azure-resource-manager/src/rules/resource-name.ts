@@ -3,6 +3,7 @@ import {
   ModelProperty,
   SemanticNodeListener,
   createRule,
+  fileRef,
   getProperty,
 } from "@typespec/compiler";
 import * as http from "@typespec/http";
@@ -15,6 +16,7 @@ import { isReadonlyProperty } from "../utils.js";
  */
 export const resourceNameRule = createRule({
   name: "resource-name",
+  docs: fileRef.fromPackageRoot("src/rules/resource-name.md"),
   severity: "warning",
   description: "Check the resource name.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name",

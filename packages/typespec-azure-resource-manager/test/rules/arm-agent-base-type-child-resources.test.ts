@@ -34,7 +34,7 @@ describe("arm-agent-base-type-child-resources", () => {
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+        @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -72,7 +72,7 @@ describe("arm-agent-base-type-child-resources", () => {
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+        @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -106,7 +106,7 @@ describe("arm-agent-base-type-child-resources", () => {
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+        @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -140,7 +140,7 @@ describe("arm-agent-base-type-child-resources", () => {
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+        @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -165,7 +165,7 @@ describe("arm-agent-base-type-child-resources", () => {
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "SomethingElse", version: "2024-06-01" })
+        @azureBaseType(#{ baseType: BaseType.Relationship, version: "2024-06-01" })
         model MyResource is TrackedResource<MyProperties> {
           @key("myResourceName") @segment("myResources") name: string;
         }

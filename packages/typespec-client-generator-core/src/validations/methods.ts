@@ -13,7 +13,6 @@ function validateClientNameNotOnOverriddenMethods(context: TCGCContext) {
     if (clientNameOverride) {
       reportDiagnostic(context.program, {
         code: "client-name-ineffective",
-        messageId: "override",
         target: override,
         format: {
           name: clientNameOverride,

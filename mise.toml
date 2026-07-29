@@ -1,5 +1,10 @@
 [tools]
 python = "3.12"
 uv = "latest"
+go = "1.26.1"
 java = "microsoft-11"
 maven = "3.9.16"
+node = "26"
+
+[settings]
+idiomatic_version_file_enable_tools = ["pnpm"]
