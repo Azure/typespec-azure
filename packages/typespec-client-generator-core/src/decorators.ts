@@ -13,6 +13,8 @@ import {
   isErrorModel,
   isList,
   isNumeric,
+  isNumericType,
+  isStringType,
   Model,
   ModelProperty,
   Namespace,
@@ -1784,6 +1786,16 @@ export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" 
 
 const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
 
+function isBooleanScalar(program: Program, type: Type): boolean {
+  if (type.kind !== "Scalar") return false;
+  let current: Scalar | undefined = type;
+  while (current) {
+    if (current.name === "boolean") return true;
+    current = current.baseScalar;
+  }
+  return false;
+}
+
 export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
@@ -1791,6 +1803,25 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   scope?: LanguageScopes,
 ) => {
   const actualValue = isNumeric(value) ? value.asNumber() : value;
+
+  // Validate that the value type matches the property type
+  const propertyType = target.type;
+  if (propertyType.kind === "Scalar") {
+    const valueType = isNumeric(value) ? "numeric" : typeof value;
+    const isMatch =
+      (typeof value === "string" && isStringType(context.program, propertyType)) ||
+      (isNumeric(value) && isNumericType(context.program, propertyType)) ||
+      (typeof value === "boolean" && isBooleanScalar(context.program, propertyType));
+
+    if (!isMatch) {
+      reportDiagnostic(context.program, {
+        code: "client-default-value-type-mismatch",
+        format: { valueType, propertyType: propertyType.name },
+        target,
+      });
+    }
+  }
+
   setScopedDecoratorData(
     context,
     $clientDefaultValue,
