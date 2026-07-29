@@ -35,14 +35,14 @@ rawjson-as-bytes: true
 package testmodule
 
 type ContainsRawJSON struct {
-	// REQUIRED; This field is raw JSON, marshal your data structure into the []byte.
+	// REQUIRED; The contents of this field are raw JSON.
 	Anything1 []byte
 
-	// REQUIRED; This field is raw JSON, marshal your data structure into the []byte.
+	// REQUIRED; The contents of this field are raw JSON.
 	Anything2 []byte
 
 	// Additional properties supplied by the caller.
-	// This field is raw JSON, marshal your data structure into the []byte.
+	// The contents of this field are raw JSON.
 	Extras []byte
 }
 ```

@@ -277,8 +277,7 @@ function generateModelDefs(
         } else {
           field.docs.description = "";
         }
-        field.docs.description +=
-          "This field is raw JSON, marshal your data structure into the []byte.";
+        field.docs.description += "The contents of this field are raw JSON.";
       }
       if (field.docs.description) {
         descriptionMods.push(field.docs.description);
