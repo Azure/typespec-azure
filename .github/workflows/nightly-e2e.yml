@@ -58,7 +58,7 @@ jobs:
           - name: Java
             lang: java
             package-filter: "@azure-tools/typespec-java"
-            working-directory: packages/typespec-java/emitter-tests
+            working-directory: packages/typespec-java
             mise-install-args: "java maven"
             run-prepare: false
             run-regenerate: true
