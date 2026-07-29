@@ -1779,10 +1779,15 @@ export class ClientAdapter {
     // since HEAD requests don't return a type, we must check this before checking sdkResponseType
     if (
       method.httpMethod === "head" &&
-      this.ta.ctx.emitContext.options["head-as-boolean"] === true
+      (helpers.hasDecorator("@responseAsBool", sdkMethod.decorators) ||
+        this.ta.ctx.emitContext.options["head-as-boolean"] === true)
     ) {
       respEnv.result = new go.HeadAsBooleanResult("Success");
       respEnv.result.docs.summary = "Success indicates if the operation succeeded or failed.";
+      // NOTE: tcgc models a boolean response type for us. however, we use the presence of
+      // a response type as a predicate to mean "this operation returns a modeled response"
+      // which would send us down an incorrect code path. so we clear it here instead.
+      sdkResponseType = undefined;
     }
 
     if (!sdkResponseType) {

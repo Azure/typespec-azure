@@ -187,10 +187,18 @@ Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverabl
 
 ### Debug
 
-To debug the emitter:
+This repo manages Node with [mise](https://mise.jdx.dev/), so `node` resolves to a mise shim (`…/mise/shims/node.exe`). VS Code's JavaScript Debug Terminal implements auto-attach by wrapping the `node` it launches, and the mise shim bypasses that wrapper — so breakpoints set in the emitter never bind (you'll notice the terminal never prints "Debugger attached."). Pass `--debugger` to sidestep this: it launches the compiler child with `--inspect-brk=9229`, so the child opens its own inspector on a fixed port and waits for you to attach explicitly, independent of the mise shim.
 
-1. Set a breakpoint in the TypeScript source.
-2. In the VS Code JavaScript Debug Terminal, run `pnpm tspcompile` (optionally with `--filter`) from the [Regenerate the Go fixtures](#regenerate-the-go-fixtures) section.
+1. Build the emitter (`pnpm build:deps`) so the compiled `dist/` matches your source — breakpoints bind through source maps against `dist/`, so a stale build makes them drift.
+2. Set a breakpoint in the TypeScript source.
+3. In a terminal, run `pnpm tspcompile` with `--debugger` and a `--filter` for the test you're debugging:
+
+   ```terminal
+   pnpm tspcompile --filter=TestName --debugger
+   ```
+
+   The command hangs while the compiler child waits for a debugger. (The "Debugger listening…" banner is buffered by `exec` and won't print until the child exits — this is expected.)
+4. In VS Code, press F5 and select the **Attach to Default Port** launch configuration. Execution stops at the compiler's entry point; press Continue (F5) once and it runs to your breakpoint after the emitter loads. With `--debugger` the specs run one at a time, so omit `--filter` only if you intend to step through every spec in turn.
 
 ## Step 4: Update emitter documentation
 

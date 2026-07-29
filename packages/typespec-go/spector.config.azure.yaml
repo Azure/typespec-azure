@@ -43,6 +43,7 @@ specs:
   "azure/client-generator-core/next-link-verb":
     { options: { module: nextlinkverbgroup, slice-elements-byval: true } }
   "azure/client-generator-core/override/client.tsp": { options: { module: overridegroup } }
+  "azure/client-generator-core/response-as-bool": { options: { module: headasboolgroup } }
   "azure/client-generator-core/usage": { options: { module: coreusagegroup } }
   "azure/core/basic": { options: { module: basicgroup } }
   "azure/core/lro/rpc": { options: { module: lrorpcgroup } }
@@ -84,5 +85,3 @@ specs:
   "azure/client-generator-core/alternate-type": false
   # emitter bug: generated fakes reference an unexported model (my_model)
   "azure/client-generator-core/exact-name": false
-  # emitter error: didn't find HTTP response for kind boolean (@responseAsBool on HEAD)
-  "azure/client-generator-core/response-as-bool": false
