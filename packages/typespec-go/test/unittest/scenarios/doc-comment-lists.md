@@ -27,9 +27,9 @@ model BulletPointsModel {
 }
 
 /**
- * - The whole doc comment is a list, with no prose line anywhere.
- * - Go strips the common indentation of every line before looking for lists, so an indented list here would be demoted to a paragraph and re-flowed by gofmt.
- * - The "PureListModel -" prefix moves onto its own line, which restores a prose line and keeps the list indented.
+ * - A doc comment that is nothing but a list, with no prose line anywhere.
+ * - Go strips the common indentation of every line before looking for lists, so an indented list here would be demoted to a paragraph.
+ * - The "PureListModel -" prefix moves onto its own line, restoring a prose line that keeps the list renderable.
  */
 model PureListModel {
   /**
@@ -40,7 +40,7 @@ model PureListModel {
 
   /**
    * - An optional property whose documentation is nothing but a list.
-   * - Nothing supplies a prose line here, so the text falls back to plain wrapped prose rather than an unrenderable list.
+   * - Nothing supplies a prose line here, so this falls back to plain wrapped prose.
    */
   optional?: string;
 }
@@ -98,10 +98,10 @@ type BulletPointsModel struct {
 
 // PureListModel -
 //
-//   - The whole doc comment is a list, with no prose line anywhere.
+//   - A doc comment that is nothing but a list, with no prose line anywhere.
 //   - Go strips the common indentation of every line before looking for lists, so an indented list here would be demoted to a
-//     paragraph and re-flowed by gofmt.
-//   - The "PureListModel -" prefix moves onto its own line, which restores a prose line and keeps the list indented.
+//     paragraph.
+//   - The "PureListModel -" prefix moves onto its own line, restoring a prose line that keeps the list renderable.
 type PureListModel struct {
 	// REQUIRED
 	//
@@ -110,7 +110,7 @@ type PureListModel struct {
 	Required *string
 
 	// - An optional property whose documentation is nothing but a list.
-	// - Nothing supplies a prose line here, so the text falls back to plain wrapped prose rather than an unrenderable list.
+	// - Nothing supplies a prose line here, so this falls back to plain wrapped prose.
 	Optional *string
 }
 ```

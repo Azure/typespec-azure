@@ -280,8 +280,8 @@ function generateModelDefs(
         descriptionMods.length > 1 &&
         go.startsWithDocListItem(descriptionMods[descriptionMods.length - 1]!)
       ) {
-        // the description opens with a list item, so it can't share a line with
-        // the modifiers; joining them would demote the first item to prose.
+        // a leading list item can't share a line with the modifiers; joining
+        // them would demote it to prose.
         const description = descriptionMods.pop()!;
         field.docs.description = `${descriptionMods.join("; ")}\n${description}`;
       } else {
