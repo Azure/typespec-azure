@@ -843,26 +843,22 @@ function parseKnownProviderlessResourcePath(
   return undefined;
 }
 
-function isListOperationMatch(
+function isListOperationPrefixMatch(
   operation: ArmResourceOperation,
   resource: ResolvedResourceOperations,
 ): boolean {
   const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
   const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
-  if (resourcePath.startsWith(`${operationPath}/`)) return true;
+  return resourcePath.startsWith(`${operationPath}/`);
+}
 
-  // TODO: https://github.com/Azure/typespec-azure/issues/5080
-  // Define the complete rule for associating list operations with detected resources.
-  // Some ARM resources expose list operations at wider scopes than the resource identity,
-  // e.g. a resource-group-scoped resource can have both list-by-resource-group and
-  // list-by-subscription operations. Direct prefix matching handles list-by-parent paths,
-  // but not scope-widening list operations. For now, allow the known subscription-list
-  // to resource-group-resource case when the concrete provider/type path is identical.
-  return (
-    getPathScope(operationPath) === "Subscription" &&
-    getPathScope(resourcePath) === "ResourceGroup" &&
-    isSameResourceTypePath(operationPath, resourcePath)
-  );
+function isListOperationResourceTypeMatch(
+  operation: ArmResourceOperation,
+  resource: ResolvedResourceOperations,
+): boolean {
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return isSameResourceTypePath(operationPath, resourcePath);
 }
 
 function getListMatchDistance(
@@ -874,49 +870,9 @@ function getListMatchDistance(
   return resourcePath.length - operationPath.length;
 }
 
-function getPathScope(path: string): ArmResourceScope | undefined {
-  const scopePrefix = getScopePrefix(path);
-  if (scopePrefix === "") return "Tenant";
-
-  const segments = scopePrefix.split("/").filter((s) => s.length > 0);
-  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
-  if (
-    segments.length === 2 &&
-    segments[0].toLowerCase() === "subscriptions" &&
-    isVariableSegment(segments[1])
-  )
-    return "Subscription";
-  if (
-    segments.length === 4 &&
-    segments[0].toLowerCase() === "subscriptions" &&
-    isVariableSegment(segments[1]) &&
-    segments[2].toLowerCase() === "resourcegroups" &&
-    isVariableSegment(segments[3])
-  )
-    return "ResourceGroup";
-  if (
-    segments.length === 4 &&
-    segments[0].toLowerCase() === "providers" &&
-    segments[1].toLowerCase() === "microsoft.management" &&
-    segments[2].toLowerCase() === "managementgroups" &&
-    isVariableSegment(segments[3])
-  )
-    return "ManagementGroup";
-  if (
-    segments.length === 4 &&
-    segments[0].toLowerCase() === "providers" &&
-    segments[1].toLowerCase() === "microsoft.management" &&
-    segments[2].toLowerCase() === "servicegroups" &&
-    isVariableSegment(segments[3])
-  )
-    return "ServiceGroup";
-
-  return undefined;
-}
-
 function isSameResourceTypePath(leftPath: string, rightPath: string): boolean {
-  const left = getResourceTypePathFromPath(leftPath);
-  const right = getResourceTypePathFromPath(rightPath);
+  const left = parseArmResourceCollectionPath(leftPath);
+  const right = parseArmResourceInstancePath(rightPath)?.resourceType;
   if (left === undefined || right === undefined) return false;
   return (
     left.provider.toLowerCase() === right.provider.toLowerCase() &&
@@ -925,7 +881,7 @@ function isSameResourceTypePath(leftPath: string, rightPath: string): boolean {
   );
 }
 
-function getResourceTypePathFromPath(path: string): ResourceType | undefined {
+function parseArmResourceCollectionPath(path: string): ResourceType | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
   if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
@@ -953,14 +909,26 @@ function getBestListOperationTarget(
   let best: ResolvedResourceOperations | undefined;
   let bestDistance = Number.POSITIVE_INFINITY;
   for (const resource of resources) {
-    if (!isListOperationMatch(operation, resource)) continue;
+    if (!isListOperationPrefixMatch(operation, resource)) continue;
     const distance = getListMatchDistance(operation, resource);
     if (distance < bestDistance) {
       best = resource;
       bestDistance = distance;
     }
   }
-  return best;
+  if (best !== undefined) return best;
+
+  // TODO: https://github.com/Azure/typespec-azure/issues/5080
+  // Define the complete rule for associating list operations with detected resources.
+  // Some ARM resources expose list operations at scopes different from the resource identity,
+  // e.g. a resource-group-scoped resource can have subscription- or tenant-level list operations.
+  // Direct prefix matching handles list-by-parent paths; concrete provider/type equality handles
+  // cross-scope list paths without letting list operations create resource identities.
+  for (const resource of resources) {
+    if (isListOperationResourceTypeMatch(operation, resource)) return resource;
+  }
+
+  return undefined;
 }
 
 function isActionOperationMatch(
