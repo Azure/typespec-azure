@@ -54,7 +54,7 @@ interface Config {
    * whose only changes are test files is still reported as affected (so its own
    * target runs and executes the new/updated tests), but the change does NOT
    * propagate to its graph dependents. In other words the "ignore test changes"
-   * behaviour applies only to *upstream* packages, not to the package that owns
+   * behavior applies only to *upstream* packages, not to the package that owns
    * the tests (Azure/typespec-azure test-only PRs must still run their target).
    */
   testPattern: string[];
@@ -153,7 +153,7 @@ function getChangedFiles(base: string, head: string): string[] {
  * Each `testPattern` glob is passed as its own `--test-pattern`. Unlike the
  * ignore globs, a test-only change still reports the owning package as affected
  * (so a test-only PR runs that package's target), it just does not propagate to
- * the package's dependents. This keeps the "ignore test changes" behaviour
+ * the package's dependents. This keeps the "ignore test changes" behavior
  * scoped to *upstream* packages only.
  */
 function getAffectedPackages(base: string, ignore: string[], testPattern: string[]): Set<string> {
