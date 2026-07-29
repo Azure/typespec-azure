@@ -43,7 +43,7 @@ catalogs:
       specifier: ~4.20.1
       version: 4.20.1
     '@azure-rest/core-client':
-      specifier: ^2.3.1
+      specifier: ^2.7.0
       version: 2.8.0
     '@azure-tools/codegen':
       specifier: ~2.10.1
@@ -61,7 +61,7 @@ catalogs:
       specifier: ^1.5.0
       version: 1.7.0
     '@azure/core-rest-pipeline':
-      specifier: ^1.14.0
+      specifier: ^1.24.0
       version: 1.25.0
     '@azure/core-util':
       specifier: ^1.4.0
