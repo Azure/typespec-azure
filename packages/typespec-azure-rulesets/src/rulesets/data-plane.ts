@@ -44,8 +44,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,
     "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
-    "@azure-tools/typespec-azure-core/no-version-in-route": true,
-    "@azure-tools/typespec-azure-core/use-date-api-version": true,
     "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params": true,
 
     // TCGC rules
