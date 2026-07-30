@@ -11,6 +11,7 @@ import type {
   VersionedView,
 } from "./types.js";
 
+import { getSourceLocation, type SourceLocation } from "@typespec/compiler";
 import { isOperationIdentity } from "./types.js";
 
 /**
@@ -49,6 +50,7 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
           "OperationRemoved",
           baseOp.identity,
           `Operation ${baseOp.identity.method} ${baseOp.identity.path} was removed.`,
+          getOperationSourceLocation(baseOp.httpOperation.operation),
         ),
       );
     }
@@ -61,6 +63,7 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
           "OperationAdded",
           headOp.identity,
           `Operation ${headOp.identity.method} ${headOp.identity.path} was added.`,
+          getOperationSourceLocation(headOp.httpOperation.operation),
         ),
       );
     }
@@ -69,7 +72,15 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
   for (const [key, baseOp] of baseOps) {
     const headOp = headOps.get(key);
     if (headOp) {
-      diffs.push(...diffOperations(baseOp.canonical, headOp.canonical, baseOp.identity));
+      const opDiffs = diffOperations(baseOp.canonical, headOp.canonical, baseOp.identity);
+      // Attach operation source location to all operation-relative diffs
+      const opLoc = getOperationSourceLocation(headOp.httpOperation.operation);
+      for (const diff of opDiffs) {
+        if (!diff.operationSourceLocation && opLoc) {
+          diff.operationSourceLocation = opLoc;
+        }
+      }
+      diffs.push(...opDiffs);
     }
   }
 
@@ -81,9 +92,22 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
 }
 
 /**
+ * Get the source location of a TypeSpec operation, preferring user code.
+ */
+function getOperationSourceLocation(operation: any): SourceLocation | undefined {
+  if (!operation) return undefined;
+  return getSourceLocation(operation, { locateId: true }) ?? getSourceLocation(operation) ?? undefined;
+}
+
+/**
  * Helper to create an operation-level diff (added/removed).
  */
-function makeOperationDiff(kind: DiffKind, identity: OperationIdentity, message: string): ApiDiff {
+function makeOperationDiff(
+  kind: DiffKind,
+  identity: OperationIdentity,
+  message: string,
+  operationSourceLocation?: SourceLocation,
+): ApiDiff {
   const diffIdentity: OperationDiffIdentity = {
     operation: identity,
     component: "request",
@@ -94,6 +118,7 @@ function makeOperationDiff(kind: DiffKind, identity: OperationIdentity, message:
     kind,
     identity: diffIdentity,
     message,
+    operationSourceLocation,
   };
 }
 

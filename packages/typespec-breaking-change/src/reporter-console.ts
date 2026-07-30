@@ -2,6 +2,7 @@ import type { SourceLocation } from "@typespec/compiler";
 import type { AnalysisResult, Finding } from "./types.js";
 import { isOperationIdentity } from "./types.js";
 import { formatSuppressionHint } from "./suppression-guidance.js";
+import { resolveFindingLocation } from "./resolve-location.js";
 
 const SUMMARY_SEPARATOR = "─────────────────────────────";
 
@@ -59,7 +60,7 @@ function formatFinding(finding: Finding): string {
 
   lines.push(`  Element: ${finding.diff.identity.element}`);
   lines.push(`  Phase: ${formatVersionPair(finding)}`);
-  lines.push(`  Location: ${formatLocation(getFindingLocation(finding))}`);
+  lines.push(`  Location: ${formatLocation(resolveFindingLocation(finding))}`);
 
   if (finding.suppressed && finding.suppressionReason) {
     lines.push(`  Reason: ${finding.suppressionReason}`);
@@ -114,10 +115,6 @@ function countSuppressed(findings: Finding[]): number {
 
 function countIgnored(findings: Finding[]): number {
   return findings.filter((finding) => finding.severity === "ignore" && !finding.suppressed).length;
-}
-
-function getFindingLocation(finding: Finding): SourceLocation | undefined {
-  return finding.diff.baseSourceLocation ?? finding.diff.headSourceLocation;
 }
 
 function getLineNumber(location: SourceLocation): number {

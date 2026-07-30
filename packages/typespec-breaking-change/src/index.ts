@@ -34,6 +34,7 @@ export {
 export { resolveOrigin } from "./origin.js";
 export * from "./orchestrator.js";
 export * from "./policy.js";
+export { resolveFindingLocation } from "./resolve-location.js";
 export * from "./reporter-console.js";
 export * from "./reporter-github.js";
 export * from "./reporter-json.js";

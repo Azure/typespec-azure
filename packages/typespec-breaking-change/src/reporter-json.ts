@@ -2,6 +2,7 @@ import type { SourceLocation } from "@typespec/compiler";
 import type { AnalysisResult, AnalysisSummary, Finding, TimingInfo } from "./types.js";
 import { isOperationIdentity } from "./types.js";
 import { formatSuppressionGuidance } from "./suppression-guidance.js";
+import { resolveFindingLocation } from "./resolve-location.js";
 
 /**
  * Full structured JSON report — aligned with typespec-suppressions report pattern.
@@ -88,7 +89,7 @@ export function formatJsonReport(result: AnalysisResult, options?: JsonReportOpt
 }
 
 function mapFinding(finding: Finding): JsonFinding {
-  const location = getFindingLocation(finding);
+  const location = resolveFindingLocation(finding);
   const baseFinding: JsonFinding = {
     kind: finding.diff.kind,
     severity: finding.severity,
@@ -131,10 +132,6 @@ function mapFinding(finding: Finding): JsonFinding {
   }
 
   return baseFinding;
-}
-
-function getFindingLocation(finding: Finding): SourceLocation | undefined {
-  return finding.diff.baseSourceLocation ?? finding.diff.headSourceLocation;
 }
 
 function getLineNumber(location: SourceLocation): number {

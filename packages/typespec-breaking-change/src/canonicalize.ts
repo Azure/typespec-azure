@@ -4,7 +4,7 @@ import {
   HttpCanonicalizer,
   OperationHttpCanonicalization,
 } from "@typespec/http-canonicalization";
-import { listHttpOperationsIn } from "@typespec/http";
+import { listHttpOperationsIn, type HttpOperation } from "@typespec/http";
 import { getOperationIdentity, identityKey } from "./operation-identity.js";
 import type { OperationIdentity } from "./types.js";
 
@@ -16,6 +16,8 @@ export interface CanonicalizedOperation {
   identity: OperationIdentity;
   /** The canonicalized HTTP operation (request/response shapes with wire types). */
   canonical: OperationHttpCanonicalization;
+  /** The original HTTP operation (for source location tracing). */
+  httpOperation: HttpOperation;
 }
 
 /**
@@ -51,7 +53,7 @@ export function canonicalizeOperations(
       httpOp.operation,
     ) as OperationHttpCanonicalization;
 
-    operations.set(key, { identity, canonical });
+    operations.set(key, { identity, canonical, httpOperation: httpOp });
   }
 
   return { operations, canonicalizer };

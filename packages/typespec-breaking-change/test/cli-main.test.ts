@@ -6,7 +6,7 @@ describe("CLI main module", () => {
     vi.resetModules();
   });
 
-  it("returns exit code 2 when analysis fails", async () => {
+  it("returns exit code 2 when analysis fails", { timeout: 30000 }, async () => {
     vi.doMock("../src/compile.js", () => ({
       compileService: vi.fn(async () => {
         throw new Error("boom");

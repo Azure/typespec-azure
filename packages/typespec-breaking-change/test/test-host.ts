@@ -15,4 +15,4 @@ export const TesterWithSuppressions = createTester(resolvePath(import.meta.dirna
   ],
 })
   .importLibraries()
-  .using("Http", "Versioning");
+  .using("Http", "Versioning", "Azure.BreakingChange");

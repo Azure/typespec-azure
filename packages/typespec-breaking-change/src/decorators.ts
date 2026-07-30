@@ -97,9 +97,11 @@ export function $approvedBreakingChange(
   target: Type,
   reason: string,
   kind?: string,
+  since?: string,
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
   const normalizedKind = getDecoratorStringValue(kind);
+  const normalizedSince = getDecoratorStringValue(since);
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -111,6 +113,7 @@ export function $approvedBreakingChange(
     target,
     resolvedKind,
     normalizedReason,
+    normalizedSince,
   );
 }
 
@@ -178,10 +181,11 @@ function addSuppression(
   target: Type,
   kind: DiffKind | undefined,
   reason: string,
+  version?: string,
 ): void {
   const stateMap = program.stateMap(stateKey);
   const existing: SuppressionMetadata[] = stateMap.get(target) ?? [];
-  stateMap.set(target, [...existing, { kind, reason }]);
+  stateMap.set(target, [...existing, { kind, reason, version }]);
 }
 
 function findSuppressionsWith(

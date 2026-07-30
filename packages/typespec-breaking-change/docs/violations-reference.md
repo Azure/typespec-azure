@@ -1,788 +1,1079 @@
-# Breaking Change Violations Reference
+# Violations Reference
 
-This document describes all violation types detected by `@azure-tools/typespec-breaking-change`,
-organized by category. Each entry explains what the violation means, when it's triggered, its
-default severity, and how to suppress it if the change is intentional.
+This reference is organized around the tool's two comparison phases.
 
----
+- **Phase A (`same-version`)** compares two separate compilations of the **same** api-version. Any diff here is a likely projection or modeling bug, not a "breaking vs. safe" change classification.
+- **Phase B (`cross-version`)** compares a newer api-version to the previous stable api-version. **Only Phase B uses the breaking (`error`) vs. safe (`ignore`) classification from `src/policy.ts`.**
 
-## Suppression Overview
+## Phase B summary table
 
-When a breaking change is **intentional and approved**, you can suppress the violation by adding
-a decorator to the affected type or property in your TypeSpec source:
+The table below is **Phase B only**.
 
-### Phase B (cross-version) suppression
+| Rule | DiffKind(s) | Phase B Severity | Category | Link |
+|---|---|---|---|---|
+| `service-level` | `ApiVersionRemoved`, `AuthSchemeRemoved`, `OAuthScopeRemoved` | `error` | Service surface | [Service-level violations](#service-level-violations) |
+| `service-level` | `ApiVersionAdded`, `AuthSchemeAdded`, `OAuthScopeAdded` | `ignore` | Service surface | [Service-level violations](#service-level-violations) |
+| `operation-lifecycle` | `OperationRemoved`, `OperationRouteChanged` | `error` | Operations | [Operation lifecycle violations](#operation-lifecycle-violations) |
+| `operation-lifecycle` | `OperationAdded` | `ignore` | Operations | [Operation lifecycle violations](#operation-lifecycle-violations) |
+| `request-narrowing` | `RequestPathParameterAdded`, `RequestPathParameterRemoved`, `RequestQueryParameterAdded` (required only), `RequestQueryParameterRemoved`, `RequestHeaderAdded` (required only), `RequestHeaderRemoved`, `RequestParameterRenamed`, `RequestParameterMadeRequired`, `RequestParameterLocationChanged`, `RequestPropertyAdded` (required only), `RequestPropertyRemoved`, `RequestPropertyRenamed`, `RequestPropertyTypeChanged`, `RequestPropertyTypeNarrowed`, `RequestPropertyMadeRequired`, `RequestTypeChanged`, `RequestTypeNarrowed`, `RequestConstraintStrengthened`, `RequestContentTypeRemoved`, `EnumerationMemberRemoved`, `EnumerationClosed` | `error` | Request contract | [Request contract violations](#request-contract-violations) |
+| `request-widening` | `RequestQueryParameterAdded` (optional only), `RequestHeaderAdded` (optional only), `RequestParameterMadeOptional`, `RequestPropertyAdded` (optional only), `RequestPropertyTypeWidened`, `RequestPropertyMadeOptional`, `RequestTypeWidened`, `RequestConstraintRelaxed`, `RequestContentTypeAdded` | `ignore` | Request contract | [Request contract violations](#request-contract-violations) |
+| `response-contract-weakened` | `ResponsePropertyRemoved`, `ResponsePropertyRenamed`, `ResponsePropertyTypeChanged`, `ResponsePropertyMadeOptional`, `ResponseConstraintRelaxed`, `ResponseStatusCodeRemoved`, `ResponseContentTypeRemoved`, `ResponseHeaderRemoved` | `error` | Response contract | [Response contract violations](#response-contract-violations) |
+| `response-narrowing` | `ResponsePropertyAdded`, `ResponsePropertyTypeNarrowed`, `ResponsePropertyMadeRequired`, `ResponseTypeNarrowed`, `ResponseConstraintStrengthened`, `ResponseStatusCodeAdded`, `ResponseContentTypeAdded`, `ResponseHeaderAdded`, `ErrorResponseAdded`, `ErrorResponseRemoved` | `ignore` | Response contract | [Response contract violations](#response-contract-violations) |
+| `response-widening` | `ResponsePropertyTypeWidened`, `ResponseTypeChanged`, `ResponseTypeWidened` | `error` | Response contract | [Response contract violations](#response-contract-violations) |
+| `type-kind-change` | `TypeKindChanged`, `RequestTypeKindChanged`, `ResponseTypeKindChanged`, `DiscriminatorChanged` | `error` | Shared type system | [Shared type-system violations](#shared-type-system-violations) |
+| `encoding-change` | `RequestEncodingChanged`, `ResponseEncodingChanged` | `error` | Serialization | [Shared type-system violations](#shared-type-system-violations) |
+| `default-value-change` | `RequestParameterDefaultChanged`, `RequestPropertyDefaultChanged`, `DefaultValueAdded`, `DefaultValueRemoved`, `DefaultValueChanged` | `ignore` | Defaults | [Default-value violations](#default-value-violations) |
+| `service-level` | `EnumerationMemberAdded`, `EnumerationOpened` | `ignore` | Enums | [Shared type-system violations](#shared-type-system-violations) |
+
+## Suppressing Phase B findings with `@approvedBreakingChange`
+
+Use `@approvedBreakingChange` only for **Phase B** findings that are intentionally approved.
+
+### Setup
+
+Add the library to your TypeSpec project and import it:
 
 ```typespec
-@approvedBreakingChange("Reason for this change", "ViolationKind")
-model MyModel {
-  // ... the affected property
-}
+import "@azure-tools/typespec-breaking-change";
+using Azure.BreakingChange;
 ```
 
-### Phase A (same-version) suppression
+### Usage
 
 ```typespec
-@approvedUnversionedChange("Reason for this change", "ViolationKind")
-model MyModel {
-  // ...
-}
+@approvedBreakingChange("reason")
+@approvedBreakingChange("reason", "ResponsePropertyRemoved")
+@approvedBreakingChange("reason", "ResponsePropertyRemoved", "2026-01-01")
 ```
 
-### Decorator parameters
+### Parameters
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `reason` | Yes | Human-readable explanation of why this breaking change is approved |
-| `kind` | No | Specific `DiffKind` to suppress (e.g., `"ResponsePropertyRemoved"`). If omitted, suppresses ALL violation kinds on this type. |
-| `version` | No | Only suppress for versions >= this value (e.g., `"2025-01-01"`) |
-| `path` | No | Only suppress for elements matching this path suffix (e.g., `"properties.legacyField"`) |
+| Parameter | Meaning |
+|---|---|
+| `reason` | Required explanation recorded on the suppression. |
+| `kind` | Optional `DiffKind`. If omitted, the suppression matches every Phase B diff on that target. |
+| `since` | Optional third positional string argument. It is a lower bound on the **head** api-version, so the suppression applies only when `headVersion >= since`. |
 
-### Placement rules
+### `since` examples
 
-1. **On the affected property** — most precise, suppresses only that property's violations
-2. **On the parent model** — suppresses all violations within that model
-3. **On the origin declaration** — when a model is shared across operations, suppressing on the declaration suppresses all occurrences
-
----
-
-## Phase A: Same-Version Violations
-
-Phase A compares the **same api-version** between base (main branch) and head (PR branch).
-Any detected change in a released version is a violation — the api-version contract must not change.
-
-**Default severity**: All Phase A violations are `error` (rule: `phase-a-any-change`).
-
-Any `DiffKind` listed below can appear in Phase A. The key difference from Phase B is that
-**ALL changes are errors** in Phase A, because a released version's contract is frozen.
-
-**Example**: You have `2024-01-01` in both main and your PR, but you changed a property name
-in the PR's version of `2024-01-01`. This is a Phase A violation.
+Suppress every `ResponsePropertyRemoved` finding on and after `2026-01-01`:
 
 ```typespec
-// To suppress:
-@approvedUnversionedChange("Fix typo in property name, backward compatible via alias", "RequestPropertyRenamed")
 model Widget {
-  newName: string;
-}
-```
-
----
-
-## Phase B: Cross-Version Violations
-
-Phase B compares consecutive versions (each new/changed version vs. the previous **stable** version).
-Severity depends on the direction and nature of the change.
-
----
-
-### Service-Level Violations
-
-#### `ApiVersionRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | service-level |
-| **Triggered when** | An api-version that existed in the previous stable version is no longer present |
-| **Why it's breaking** | Clients targeting that version will receive errors |
-
-```typespec
-@approvedBreakingChange("Retiring deprecated version per lifecycle policy", "ApiVersionRemoved")
-@versioned(Versions)
-namespace Microsoft.Widget;
-```
-
-#### `ApiVersionAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | service-level |
-| **Triggered when** | A new api-version is added |
-| **Why it's safe** | Adding versions is always backward-compatible |
-
-#### `AuthSchemeRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | service-level |
-| **Triggered when** | An authentication scheme (e.g., Bearer, ApiKey) is removed |
-| **Why it's breaking** | Clients using that auth scheme will fail |
-
-```typespec
-@approvedBreakingChange("Migrating from API key to OAuth only", "AuthSchemeRemoved")
-@service(#{ title: "Widget Service" })
-namespace Microsoft.Widget;
-```
-
-#### `AuthSchemeAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | service-level |
-| **Triggered when** | A new authentication scheme is added |
-| **Why it's safe** | Existing clients continue to use their current scheme |
-
-#### `OAuthScopeRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | service-level |
-| **Triggered when** | An OAuth scope is removed from the required scopes |
-| **Why it's breaking** | Clients with tokens scoped to that value may lose access |
-
-#### `OAuthScopeAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | service-level |
-| **Triggered when** | A new OAuth scope is added |
-| **Why it's safe** | Adding scopes doesn't affect existing tokens |
-
----
-
-### Operation-Level Violations
-
-#### `OperationRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | operation-lifecycle |
-| **Triggered when** | An HTTP operation (method + path) no longer exists |
-| **Why it's breaking** | Clients calling this endpoint will receive 404 |
-
-```typespec
-@approvedBreakingChange("Operation deprecated in 2024-01, removed per policy", "OperationRemoved")
-namespace Microsoft.Widget;
-```
-
-#### `OperationAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | operation-lifecycle |
-| **Triggered when** | A new HTTP operation is introduced |
-| **Why it's safe** | Existing clients don't call endpoints they don't know about |
-
-#### `OperationRouteChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | operation-lifecycle |
-| **Triggered when** | An operation's HTTP method or path structure changes |
-| **Why it's breaking** | Clients targeting the old route will get 404 or method-not-allowed |
-
----
-
-### Request Parameter Violations
-
-#### `RequestPathParameterAdded`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A new path parameter is added to the URL template |
-| **Why it's breaking** | Changes the URL structure; existing client code won't include the new segment |
-
-#### `RequestPathParameterRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A path parameter is removed from the URL template |
-| **Why it's breaking** | Clients still sending the parameter will hit a different route |
-
-#### `RequestQueryParameterAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore (if optional) / error (if required) |
-| **Rule** | request-narrowing or request-widening |
-| **Triggered when** | A new query parameter is added |
-| **Why** | Optional query params are backward-compatible. Required ones break clients that don't send them. |
-
-```typespec
-// Only needed if the parameter is required:
-@approvedBreakingChange("Required filter param for performance", "RequestQueryParameterAdded")
-op listWidgets(@query filter: string): Widget[];
-```
-
-#### `RequestQueryParameterRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A query parameter no longer exists |
-| **Why it's breaking** | Clients sending this parameter may get validation errors |
-
-#### `RequestHeaderAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore (if optional) / error (if required) |
-| **Rule** | request-narrowing or request-widening |
-| **Triggered when** | A new request header is added |
-| **Why** | Same as query parameters — optional is safe, required breaks clients |
-
-#### `RequestHeaderRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A request header no longer exists |
-| **Why it's breaking** | Clients sending this header may get unexpected behavior |
-
-#### `RequestParameterRenamed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A parameter's wire name changes |
-| **Why it's breaking** | Clients using the old name will not match the new name |
-
-#### `RequestParameterMadeRequired`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A previously optional parameter is now required |
-| **Why it's breaking** | Existing clients that didn't send this parameter will now fail validation |
-
-```typespec
-@approvedBreakingChange("Making region required for routing", "RequestParameterMadeRequired")
-op createWidget(@query region: string): Widget;
-```
-
-#### `RequestParameterMadeOptional`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | A required parameter becomes optional |
-| **Why it's safe** | Clients already sending it continue to work |
-
-#### `RequestParameterDefaultChanged`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | default-value-change |
-| **Triggered when** | The default value of a parameter changes |
-| **Why it's typically safe** | Clients that explicitly set the value are unaffected; only implicit behavior changes |
-
-#### `RequestParameterLocationChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A parameter moves from one location to another (e.g., query → header) |
-| **Why it's breaking** | Clients send the parameter in the wrong location |
-
----
-
-### Request Body Property Violations
-
-#### `RequestPropertyAdded`
-
-| | |
-|-|-|
-| **Severity** | error (if required) / ignore (if optional) |
-| **Rule** | request-narrowing or request-widening |
-| **Triggered when** | A new property is added to the request body |
-| **Why** | Required properties break clients that don't include them. Optional properties are safe. |
-
-```typespec
-model CreateWidgetRequest {
-  @approvedBreakingChange("Tags now required for resource governance", "RequestPropertyAdded")
-  tags: Record<string>;
-}
-```
-
-#### `RequestPropertyRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A property is removed from the request body schema |
-| **Why it's breaking** | Clients sending this property may get validation errors or silent data loss |
-
-#### `RequestPropertyRenamed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A request property's wire name changes |
-| **Why it's breaking** | Clients using the old name will not populate the renamed field |
-
-#### `RequestPropertyTypeChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | The type of a request property changes (e.g., string → integer) |
-| **Why it's breaking** | Clients sending the old type will fail validation |
-
-#### `RequestPropertyTypeNarrowed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A request property's type becomes more restrictive (e.g., `string` → `"foo" | "bar"`) |
-| **Why it's breaking** | Clients sending values outside the new range will be rejected |
-
-#### `RequestPropertyTypeWidened`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | A request property's type becomes less restrictive |
-| **Why it's safe** | All previously-valid values remain valid |
-
-#### `RequestPropertyMadeRequired`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A previously optional request property becomes required |
-| **Why it's breaking** | Existing requests without this property will fail |
-
-```typespec
-model WidgetProperties {
-  @approvedBreakingChange("SKU is now mandatory for billing", "RequestPropertyMadeRequired")
-  sku: WidgetSku;
-}
-```
-
-#### `RequestPropertyMadeOptional`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | A required request property becomes optional |
-| **Why it's safe** | Clients already sending it continue to work |
-
-#### `RequestPropertyDefaultChanged`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | default-value-change |
-| **Triggered when** | The default value of a request property changes |
-| **Why it's typically safe** | Clients that explicitly set values are unaffected |
-
----
-
-### Request Type & Encoding Violations
-
-#### `RequestTypeChanged` / `RequestTypeNarrowed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | The overall request body type changes or becomes more restrictive |
-| **Why it's breaking** | Clients sending the old shape/range will be rejected |
-
-#### `RequestTypeWidened`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | The request body type accepts more values |
-| **Why it's safe** | All previously-valid payloads remain valid |
-
-#### `RequestTypeKindChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | type-kind-change |
-| **Triggered when** | The fundamental type kind changes (e.g., model → scalar, enum → union) |
-| **Why it's breaking** | Complete incompatibility between old and new wire format |
-
-#### `RequestEncodingChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | encoding-change |
-| **Triggered when** | The encoding of a value changes (e.g., `rfc3339` → `unixTimestamp`) |
-| **Why it's breaking** | Clients encoding values in the old format will produce invalid data |
-
-#### `RequestConstraintStrengthened`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A constraint becomes more restrictive (e.g., `@maxLength(100)` → `@maxLength(50)`) |
-| **Why it's breaking** | Values that were previously valid may now be rejected |
-
-#### `RequestConstraintRelaxed`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | A constraint becomes less restrictive |
-| **Why it's safe** | All previously-valid values remain valid |
-
-#### `RequestContentTypeAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | request-widening |
-| **Triggered when** | A new content type is accepted for requests |
-| **Why it's safe** | Existing content types remain valid |
-
-#### `RequestContentTypeRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | A content type is no longer accepted for requests |
-| **Why it's breaking** | Clients using that content type will get 415 Unsupported Media Type |
-
----
-
-### Response Property Violations
-
-#### `ResponsePropertyAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A new property appears in the response body |
-| **Why it's safe** | Well-behaved clients ignore unknown properties |
-
-#### `ResponsePropertyRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A property is removed from the response body |
-| **Why it's breaking** | Clients that read this property will get null/missing data |
-
-```typespec
-model WidgetProperties {
-  @approvedBreakingChange("Legacy status moved to provisioningState", "ResponsePropertyRemoved")
+  @approvedBreakingChange(
+    "Legacy field removed beginning with 2026-01-01",
+    "ResponsePropertyRemoved",
+    "2026-01-01"
+  )
   legacyStatus?: string;
 }
 ```
 
-#### `ResponsePropertyRenamed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A response property's wire name changes |
-| **Why it's breaking** | Clients deserializing by name will miss the value |
-
-#### `ResponsePropertyTypeChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | The type of a response property changes |
-| **Why it's breaking** | Clients expecting the old type will fail to deserialize |
-
-#### `ResponsePropertyTypeNarrowed`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A response property's type becomes more restrictive |
-| **Why it's safe** | Clients handle a subset of previous values |
-
-#### `ResponsePropertyTypeWidened`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-widening |
-| **Triggered when** | A response property's type becomes less restrictive (e.g., enum gains a member) |
-| **Why it's breaking** | Clients may receive values they don't handle (e.g., unknown enum member) |
+Without `since`, the same suppression matches every cross-version comparison that reaches this declaration:
 
 ```typespec
-@approvedBreakingChange("Adding 'Suspended' status, SDKs handle unknown", "ResponsePropertyTypeWidened")
-union ProvisioningState { "Succeeded", "Failed", "Suspended" }
+model Widget {
+  @approvedBreakingChange("Legacy field removal is approved", "ResponsePropertyRemoved")
+  legacyStatus?: string;
+}
 ```
 
-#### `ResponsePropertyMadeRequired`
+Place the decorator on the most specific declaration you can: property > model > operation > namespace.
 
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A response property becomes required (always present) |
-| **Why it's safe** | Clients get more data than before, not less |
+## Phase A: same-version findings are projection bugs, not breaking-change classifications
 
-#### `ResponsePropertyMadeOptional`
+Phase A compares the **same api-version** produced by two separate compilations (for example, base branch vs. PR branch). If the same operation or model compiles to different wire shapes for the same version, that indicates a version projection inconsistency or modeling bug.
 
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A previously required response property becomes optional |
-| **Why it's breaking** | Clients expecting the property to always be present may null-deref |
+These findings:
 
----
+- do **not** have a breaking vs. safe classification,
+- always use rule `phase-a-any-change`, and
+- are always reported as `error`.
 
-### Response Type & Encoding Violations
+Representative Phase A example:
 
-#### `ResponseTypeChanged` / `ResponseTypeWidened`
+```diff
+ // base compilation of 2025-01-01
+ op get(): Widget;
+ model Widget {
+-  etag?: string;
++  etag: string;
+ }
+```
 
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-widening |
-| **Triggered when** | The response body type changes or accepts a wider range |
-| **Why it's breaking** | Clients may receive unexpected shapes |
+That is not interpreted as "making `etag` required is a breaking change in Phase B". Instead, it means **the same released version produced two different wire contracts**, which is almost always a bug.
 
-#### `ResponseTypeNarrowed`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | The response body type is more constrained |
-| **Why it's safe** | Clients handle a subset of previous values |
-
-#### `ResponseTypeKindChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | type-kind-change |
-| **Triggered when** | The fundamental response type kind changes |
-| **Why it's breaking** | Complete wire format incompatibility |
-
-#### `ResponseEncodingChanged`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | encoding-change |
-| **Triggered when** | The encoding of a response value changes |
-| **Why it's breaking** | Clients decoding in the old format will produce incorrect values |
-
-#### `ResponseConstraintStrengthened`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A response constraint becomes more restrictive |
-| **Why it's safe** | Clients receive a tighter guarantee |
-
-#### `ResponseConstraintRelaxed`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A response constraint becomes less restrictive |
-| **Why it's breaking** | Clients relying on the constraint may encounter values outside the expected range |
-
----
-
-### Response Structure Violations
-
-#### `ResponseStatusCodeAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A new HTTP status code is returned |
-| **Why it's safe** | Well-behaved clients handle unexpected status codes |
-
-#### `ResponseStatusCodeRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | An HTTP status code is no longer returned |
-| **Why it's breaking** | Clients with specific handlers for that status code lose functionality |
-
-#### `ResponseContentTypeAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A new response content type is available |
-| **Why it's safe** | Clients continue to receive their preferred content type |
-
-#### `ResponseContentTypeRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A response content type is no longer available |
-| **Why it's breaking** | Clients requesting that content type will get a different format |
-
-#### `ResponseHeaderAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | A new response header is included |
-| **Why it's safe** | Clients ignore unknown headers |
-
-#### `ResponseHeaderRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | response-contract-weakened |
-| **Triggered when** | A response header is removed |
-| **Why it's breaking** | Clients reading that header lose access to its data |
-
-#### `ErrorResponseAdded` / `ErrorResponseRemoved`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | response-narrowing |
-| **Triggered when** | An error response is added or removed |
-| **Why it's safe** | Error response changes don't break successful-path clients |
-
----
-
-### Enumeration & Discriminator Violations
-
-#### `EnumerationMemberAdded`
-
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | service-level |
-| **Triggered when** | A new member is added to an enum/union |
-| **Why it's typically safe** | Clients should handle unknown enum values gracefully |
-
-> **Note**: If this enum is used in a **response**, adding members is actually a
-> `ResponsePropertyTypeWidened` from the client's perspective. The tool may emit both.
-
-#### `EnumerationMemberRemoved`
-
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | An enum/union member is removed |
-| **Why it's breaking** | Clients sending the removed value will get validation errors |
+If you must suppress a known Phase A issue, use `@approvedUnversionedChange`, not `@approvedBreakingChange`:
 
 ```typespec
-@approvedBreakingChange("Removing deprecated 'Legacy' tier", "EnumerationMemberRemoved")
-union WidgetTier { "Free", "Standard", "Premium" }
+model Widget {
+  @approvedUnversionedChange("Known projection bug while refactoring", "ResponsePropertyMadeRequired")
+  etag: string;
+}
 ```
 
-#### `EnumerationOpened`
+## Phase B detailed reference
 
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | service-level |
-| **Triggered when** | A fixed (closed) enum becomes an extensible (open) enum/union |
-| **Why it's safe** | All existing values remain valid |
+The sections below are organized by the exact `DiffKind` values from `src/diff-kind.ts`. Each section shows representative TypeSpec before/after diffs. Suppression examples use `@approvedBreakingChange` because Phase B is the only phase with breaking-change approvals. Ignore-only entries usually omit suppression snippets because there is no Phase B error to suppress.
 
-#### `EnumerationClosed`
+## Service-level violations
 
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | request-narrowing |
-| **Triggered when** | An extensible enum becomes fixed |
-| **Why it's breaking** | Clients sending custom/extended values will be rejected |
+### API version lifecycle (`ApiVersionRemoved`, `ApiVersionAdded`)
 
-#### `DiscriminatorChanged`
+- `ApiVersionRemoved` → `error`, rule `service-level`
+- `ApiVersionAdded` → `ignore`, rule `service-level`
 
-| | |
-|-|-|
-| **Severity** | error |
-| **Rule** | type-kind-change |
-| **Triggered when** | The discriminator property of a polymorphic type changes |
-| **Why it's breaking** | Clients using the old discriminator can't deserialize the new format |
+```diff
+ enum Versions {
+   v2024_01_01: "2024-01-01",
+-  v2025_01_01: "2025-01-01",
+ }
+```
 
----
+```diff
+ enum Versions {
+   v2024_01_01: "2024-01-01",
++  v2025_01_01: "2025-01-01",
+ }
+```
 
-### Default Value Violations
+```typespec
+@approvedBreakingChange(
+  "2024-01-01 is retired after the published support window",
+  "ApiVersionRemoved",
+  "2025-01-01"
+)
+@versioned(Versions)
+namespace Demo;
+```
 
-#### `DefaultValueAdded` / `DefaultValueRemoved` / `DefaultValueChanged`
+### Authentication scheme lifecycle (`AuthSchemeRemoved`, `AuthSchemeAdded`)
 
-| | |
-|-|-|
-| **Severity** | ignore |
-| **Rule** | default-value-change |
-| **Triggered when** | A default value is added, removed, or changed |
-| **Why it's typically safe** | Clients that explicitly set values are unaffected. Only implicit behavior changes. |
+- `AuthSchemeRemoved` → `error`, rule `service-level`
+- `AuthSchemeAdded` → `ignore`, rule `service-level`
 
-> **Note**: While these are `ignore` by default, a default value change in a **response**
-> could affect clients that rely on specific default behavior. Review on a case-by-case basis.
+```diff
+ @useAuth(BearerAuth)
+-@useAuth(ApiKeyAuth)
+ namespace Demo;
+```
 
----
+```diff
+ @useAuth(BearerAuth)
++@useAuth(ApiKeyAuth)
+ namespace Demo;
+```
 
-## Rule Categories
+```typespec
+@approvedBreakingChange("API key auth is retired in favor of OAuth", "AuthSchemeRemoved")
+@service(#{ title: "Demo" })
+namespace Demo;
+```
 
-| Rule | Description | Direction |
-|------|-------------|-----------|
-| `phase-a-any-change` | Any modification to a released version | Both |
-| `service-level` | Changes to service-wide concerns (versions, auth) | Both |
-| `operation-lifecycle` | Operations added/removed/rerouted | Both |
-| `request-narrowing` | Request contract becomes more restrictive | Request |
-| `request-widening` | Request contract becomes less restrictive | Request |
-| `response-contract-weakened` | Response provides less than before | Response |
-| `response-narrowing` | Response provides more/tighter guarantees | Response |
-| `response-widening` | Response type accepts wider range | Response |
-| `type-kind-change` | Fundamental type structure change | Both |
-| `encoding-change` | Wire encoding format change | Both |
-| `default-value-change` | Default value modification | Both |
+### OAuth scope lifecycle (`OAuthScopeRemoved`, `OAuthScopeAdded`)
 
----
+- `OAuthScopeRemoved` → `error`, rule `service-level`
+- `OAuthScopeAdded` → `ignore`, rule `service-level`
 
-## Quick Reference: Breaking vs. Safe
+```diff
+ @useAuth(OAuth2Auth<["demo.read", "demo.write"]>)
+-@useAuth(OAuth2Auth<["demo.manage"]>)
+ namespace Demo;
+```
 
-| Change Direction | Request | Response |
-|------------------|---------|----------|
-| **Add required** | ❌ Breaking | ✅ Safe (stronger guarantee) |
-| **Add optional** | ✅ Safe | ✅ Safe |
-| **Remove** | ❌ Breaking | ❌ Breaking |
-| **Narrow type** | ❌ Breaking (rejects values) | ✅ Safe (tighter guarantee) |
-| **Widen type** | ✅ Safe (accepts more) | ❌ Breaking (unexpected values) |
-| **Make required** | ❌ Breaking | ✅ Safe |
-| **Make optional** | ✅ Safe | ❌ Breaking |
+```diff
+ @useAuth(OAuth2Auth<["demo.read", "demo.write"]>)
++@useAuth(OAuth2Auth<["demo.manage"]>)
+ namespace Demo;
+```
+
+```typespec
+@approvedBreakingChange("Legacy manage scope is retired", "OAuthScopeRemoved")
+namespace Demo;
+```
+
+## Operation lifecycle violations
+
+### Operation lifecycle (`OperationRemoved`, `OperationAdded`)
+
+- `OperationRemoved` → `error`, rule `operation-lifecycle`
+- `OperationAdded` → `ignore`, rule `operation-lifecycle`
+
+```diff
+ interface Widgets {
+-  @route("/widgets/{id}")
+-  @delete
+-  delete(@path id: string): void;
+ }
+```
+
+```diff
+ interface Widgets {
++  @route("/widgets/{id}:sync")
++  @post
++  sync(@path id: string): Widget;
+ }
+```
+
+```typespec
+interface Widgets {
+  @approvedBreakingChange("Delete was deprecated in the previous stable API", "OperationRemoved")
+  @route("/widgets/{id}")
+  @delete
+  delete(@path id: string): void;
+}
+```
+
+### Operation route changes (`OperationRouteChanged`)
+
+- `OperationRouteChanged` → `error`, rule `operation-lifecycle`
+
+```diff
+ @route("/widgets/{id}")
++@route("/tenants/{tenantId}/widgets/{id}")
+ @get
+ op getWidget(@path id: string): Widget;
+```
+
+```typespec
+@approvedBreakingChange("Tenant segment is required for global routing", "OperationRouteChanged")
+@route("/tenants/{tenantId}/widgets/{id}")
+@get
+op getWidget(@path tenantId: string, @path id: string): Widget;
+```
+
+## Request contract violations
+
+### Path parameters (`RequestPathParameterAdded`, `RequestPathParameterRemoved`)
+
+- `RequestPathParameterAdded` → `error`, rule `request-narrowing`
+- `RequestPathParameterRemoved` → `error`, rule `request-narrowing`
+
+```diff
+-@route("/widgets/{id}")
++@route("/subscriptions/{subscriptionId}/widgets/{id}")
+ op getWidget(@path id: string): Widget;
+```
+
+```diff
+-@route("/subscriptions/{subscriptionId}/widgets/{id}")
++@route("/widgets/{id}")
+ op getWidget(@path id: string): Widget;
+```
+
+```typespec
+@approvedBreakingChange("Subscription is now part of the resource identity", "RequestPathParameterAdded")
+op getWidget(@path subscriptionId: string, @path id: string): Widget;
+```
+
+### Query parameters (`RequestQueryParameterAdded`, `RequestQueryParameterRemoved`)
+
+- `RequestQueryParameterAdded` → `error` when the new query parameter is required; `ignore` when it is optional
+- `RequestQueryParameterRemoved` → `error`, rule `request-narrowing`
+
+Required addition:
+
+```diff
+-op listWidgets(): Widget[];
++op listWidgets(@query region: string): Widget[];
+```
+
+Optional addition:
+
+```diff
+-op listWidgets(): Widget[];
++op listWidgets(@query region?: string): Widget[];
+```
+
+Removal:
+
+```diff
+-op listWidgets(@query filter?: string): Widget[];
++op listWidgets(): Widget[];
+```
+
+```typespec
+op listWidgets(
+  @approvedBreakingChange("Region is required for sharded lookup", "RequestQueryParameterAdded")
+  @query region: string,
+): Widget[];
+```
+
+### Headers (`RequestHeaderAdded`, `RequestHeaderRemoved`)
+
+- `RequestHeaderAdded` → `error` when the new header is required; `ignore` when it is optional
+- `RequestHeaderRemoved` → `error`, rule `request-narrowing`
+
+Required addition:
+
+```diff
+-op createWidget(@body body: CreateWidgetRequest): Widget;
++op createWidget(@header("x-region") region: string, @body body: CreateWidgetRequest): Widget;
+```
+
+Optional addition:
+
+```diff
+-op createWidget(@body body: CreateWidgetRequest): Widget;
++op createWidget(@header("x-region") region?: string, @body body: CreateWidgetRequest): Widget;
+```
+
+Removal:
+
+```diff
+-op createWidget(@header("x-ms-client-request-id") clientRequestId?: string, @body body: CreateWidgetRequest): Widget;
++op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+```typespec
+op createWidget(
+  @approvedBreakingChange("Regional affinity header is mandatory", "RequestHeaderAdded")
+  @header("x-region") region: string,
+  @body body: CreateWidgetRequest,
+): Widget;
+```
+
+### Parameter rename (`RequestParameterRenamed`)
+
+- `RequestParameterRenamed` → `error`, rule `request-narrowing`
+
+```diff
+-op listWidgets(@query pageSize?: int32): Widget[];
++op listWidgets(@query maxPageSize?: int32): Widget[];
+```
+
+```typespec
+op listWidgets(
+  @approvedBreakingChange("Wire name aligned with REST guideline", "RequestParameterRenamed")
+  @query maxPageSize?: int32,
+): Widget[];
+```
+
+### Parameter requiredness (`RequestParameterMadeRequired`, `RequestParameterMadeOptional`)
+
+- `RequestParameterMadeRequired` → `error`, rule `request-narrowing`
+- `RequestParameterMadeOptional` → `ignore`, rule `request-widening`
+
+```diff
+-op listWidgets(@query region?: string): Widget[];
++op listWidgets(@query region: string): Widget[];
+```
+
+```diff
+-op listWidgets(@query apiVersion: string): Widget[];
++op listWidgets(@query apiVersion?: string): Widget[];
+```
+
+```typespec
+op listWidgets(
+  @approvedBreakingChange("Region is now required for routing", "RequestParameterMadeRequired")
+  @query region: string,
+): Widget[];
+```
+
+### Parameter defaults (`RequestParameterDefaultChanged`)
+
+- `RequestParameterDefaultChanged` → `ignore`, rule `default-value-change`
+
+```diff
+-op listWidgets(@query pageSize: int32 = 50): Widget[];
++op listWidgets(@query pageSize: int32 = 100): Widget[];
+```
+
+Because Phase B severity is `ignore`, no suppression is usually needed.
+
+### Parameter location (`RequestParameterLocationChanged`)
+
+- `RequestParameterLocationChanged` → `error`, rule `request-narrowing`
+
+```diff
+-op listWidgets(@query region?: string): Widget[];
++op listWidgets(@header("x-region") region?: string): Widget[];
+```
+
+```typespec
+op listWidgets(
+  @approvedBreakingChange("Region moved to header to match gateway policy", "RequestParameterLocationChanged")
+  @header("x-region") region?: string,
+): Widget[];
+```
+
+### Request body properties (`RequestPropertyAdded`, `RequestPropertyRemoved`)
+
+- `RequestPropertyAdded` → `error` when the new property is required; `ignore` when it is optional
+- `RequestPropertyRemoved` → `error`, rule `request-narrowing`
+
+Required addition:
+
+```diff
+ model CreateWidgetRequest {
+   name: string;
++  sku: string;
+ }
+```
+
+Optional addition:
+
+```diff
+ model CreateWidgetRequest {
+   name: string;
++  sku?: string;
+ }
+```
+
+Removal:
+
+```diff
+ model CreateWidgetRequest {
+   name: string;
+-  tags?: Record<string>;
+ }
+```
+
+```typespec
+model CreateWidgetRequest {
+  name: string;
+
+  @approvedBreakingChange("SKU is now mandatory for billing", "RequestPropertyAdded")
+  sku: string;
+}
+```
+
+### Request property rename (`RequestPropertyRenamed`)
+
+- `RequestPropertyRenamed` → `error`, rule `request-narrowing`
+
+```diff
+ model CreateWidgetRequest {
+-  displayName: string;
++  name: string;
+ }
+```
+
+```typespec
+model CreateWidgetRequest {
+  @approvedBreakingChange("Wire name normalized to `name`", "RequestPropertyRenamed")
+  name: string;
+}
+```
+
+### Request property type evolution (`RequestPropertyTypeChanged`, `RequestPropertyTypeNarrowed`, `RequestPropertyTypeWidened`)
+
+- `RequestPropertyTypeChanged` → `error`, rule `request-narrowing`
+- `RequestPropertyTypeNarrowed` → `error`, rule `request-narrowing`
+- `RequestPropertyTypeWidened` → `ignore`, rule `request-widening`
+
+Changed kind:
+
+```diff
+ model CreateWidgetRequest {
+-  size: string;
++  size: int32;
+ }
+```
+
+Narrowed:
+
+```diff
+ model CreateWidgetRequest {
+-  tier: string;
++  tier: "Free" | "Standard";
+ }
+```
+
+Widened:
+
+```diff
+ model CreateWidgetRequest {
+-  tier: "Free" | "Standard";
++  tier: string;
+ }
+```
+
+```typespec
+model CreateWidgetRequest {
+  @approvedBreakingChange("Only supported tiers remain allowed", "RequestPropertyTypeNarrowed")
+  tier: "Free" | "Standard";
+}
+```
+
+### Request property requiredness (`RequestPropertyMadeRequired`, `RequestPropertyMadeOptional`)
+
+- `RequestPropertyMadeRequired` → `error`, rule `request-narrowing`
+- `RequestPropertyMadeOptional` → `ignore`, rule `request-widening`
+
+```diff
+ model CreateWidgetRequest {
+-  location?: string;
++  location: string;
+ }
+```
+
+```diff
+ model CreateWidgetRequest {
+-  location: string;
++  location?: string;
+ }
+```
+
+```typespec
+model CreateWidgetRequest {
+  @approvedBreakingChange("Location is required for placement", "RequestPropertyMadeRequired")
+  location: string;
+}
+```
+
+### Request property defaults (`RequestPropertyDefaultChanged`)
+
+- `RequestPropertyDefaultChanged` → `ignore`, rule `default-value-change`
+
+```diff
+ model CreateWidgetRequest {
+-  replicas?: int32 = 1;
++  replicas?: int32 = 3;
+ }
+```
+
+Because Phase B severity is `ignore`, no suppression is usually needed.
+
+### Request body type evolution (`RequestTypeChanged`, `RequestTypeNarrowed`, `RequestTypeWidened`)
+
+- `RequestTypeChanged` → `error`, rule `request-narrowing`
+- `RequestTypeNarrowed` → `error`, rule `request-narrowing`
+- `RequestTypeWidened` → `ignore`, rule `request-widening`
+
+Changed:
+
+```diff
+-op createWidget(@body body: string): Widget;
++op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+Narrowed:
+
+```diff
+-op createWidget(@body body: string): Widget;
++op createWidget(@body body: "small" | "large"): Widget;
+```
+
+Widened:
+
+```diff
+-op createWidget(@body body: "small" | "large"): Widget;
++op createWidget(@body body: string): Widget;
+```
+
+```typespec
+@approvedBreakingChange("Request body is now structured", "RequestTypeChanged")
+op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+### Request type kind (`RequestTypeKindChanged`)
+
+- `RequestTypeKindChanged` → `error`, rule `type-kind-change`
+
+```diff
+-op createWidget(@body body: string): Widget;
++op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+```typespec
+@approvedBreakingChange("Request body moved from scalar to object payload", "RequestTypeKindChanged")
+op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+### Request encoding (`RequestEncodingChanged`)
+
+- `RequestEncodingChanged` → `error`, rule `encoding-change`
+
+```diff
+-op search(@query createdAfter: utcDateTime): Widget[];
++op search(@query @encode("unixTimestamp") createdAfter: utcDateTime): Widget[];
+```
+
+```typespec
+op search(
+  @approvedBreakingChange("Gateway now requires unix timestamps", "RequestEncodingChanged")
+  @query @encode("unixTimestamp") createdAfter: utcDateTime,
+): Widget[];
+```
+
+### Request constraints (`RequestConstraintStrengthened`, `RequestConstraintRelaxed`)
+
+- `RequestConstraintStrengthened` → `error`, rule `request-narrowing`
+- `RequestConstraintRelaxed` → `ignore`, rule `request-widening`
+
+```diff
+ model CreateWidgetRequest {
+-  @maxLength(100)
++  @maxLength(50)
+   name: string;
+ }
+```
+
+```diff
+ model CreateWidgetRequest {
+-  @maxLength(50)
++  @maxLength(100)
+   name: string;
+ }
+```
+
+```typespec
+model CreateWidgetRequest {
+  @approvedBreakingChange("Shorter names are required by the backing store", "RequestConstraintStrengthened")
+  @maxLength(50)
+  name: string;
+}
+```
+
+### Request content types (`RequestContentTypeAdded`, `RequestContentTypeRemoved`)
+
+- `RequestContentTypeAdded` → `ignore`, rule `request-widening`
+- `RequestContentTypeRemoved` → `error`, rule `request-narrowing`
+
+```diff
+-@header contentType: "application/json"
++@header contentType: "application/json" | "application/merge-patch+json"
+ op updateWidget(...): Widget;
+```
+
+```diff
+-@header contentType: "application/json" | "application/xml"
++@header contentType: "application/json"
+ op updateWidget(...): Widget;
+```
+
+```typespec
+@approvedBreakingChange("XML payloads are no longer accepted", "RequestContentTypeRemoved")
+op updateWidget(@body body: UpdateWidgetRequest): Widget;
+```
+
+## Response contract violations
+
+### Response body properties (`ResponsePropertyAdded`, `ResponsePropertyRemoved`)
+
+- `ResponsePropertyAdded` → `ignore`, rule `response-narrowing`
+- `ResponsePropertyRemoved` → `error`, rule `response-contract-weakened`
+
+```diff
+ model Widget {
+   id: string;
++  etag?: string;
+ }
+```
+
+```diff
+ model Widget {
+   id: string;
+-  etag?: string;
+ }
+```
+
+```typespec
+model Widget {
+  id: string;
+
+  @approvedBreakingChange("etag moved to a response header", "ResponsePropertyRemoved")
+  etag?: string;
+}
+```
+
+### Response property rename (`ResponsePropertyRenamed`)
+
+- `ResponsePropertyRenamed` → `error`, rule `response-contract-weakened`
+
+```diff
+ model Widget {
+-  displayName?: string;
++  name?: string;
+ }
+```
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Wire name normalized to `name`", "ResponsePropertyRenamed")
+  name?: string;
+}
+```
+
+### Response property type evolution (`ResponsePropertyTypeChanged`, `ResponsePropertyTypeNarrowed`, `ResponsePropertyTypeWidened`)
+
+- `ResponsePropertyTypeChanged` → `error`, rule `response-contract-weakened`
+- `ResponsePropertyTypeNarrowed` → `ignore`, rule `response-narrowing`
+- `ResponsePropertyTypeWidened` → `error`, rule `response-widening`
+
+Changed:
+
+```diff
+ model Widget {
+-  size?: string;
++  size?: int32;
+ }
+```
+
+Narrowed:
+
+```diff
+ model Widget {
+-  provisioningState?: string;
++  provisioningState?: "Succeeded" | "Failed";
+ }
+```
+
+Widened:
+
+```diff
+ model Widget {
+-  provisioningState?: "Succeeded" | "Failed";
++  provisioningState?: string;
+ }
+```
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Clients are prepared for new provisioning states", "ResponsePropertyTypeWidened")
+  provisioningState?: string;
+}
+```
+
+### Response property requiredness (`ResponsePropertyMadeRequired`, `ResponsePropertyMadeOptional`)
+
+- `ResponsePropertyMadeRequired` → `ignore`, rule `response-narrowing`
+- `ResponsePropertyMadeOptional` → `error`, rule `response-contract-weakened`
+
+```diff
+ model Widget {
+-  location?: string;
++  location: string;
+ }
+```
+
+```diff
+ model Widget {
+-  location: string;
++  location?: string;
+ }
+```
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Location can be absent for legacy records", "ResponsePropertyMadeOptional")
+  location?: string;
+}
+```
+
+### Response body type evolution (`ResponseTypeChanged`, `ResponseTypeNarrowed`, `ResponseTypeWidened`)
+
+- `ResponseTypeChanged` → `error`, rule `response-widening`
+- `ResponseTypeNarrowed` → `ignore`, rule `response-narrowing`
+- `ResponseTypeWidened` → `error`, rule `response-widening`
+
+Changed:
+
+```diff
+-op getWidget(): Widget;
++op getWidget(): string;
+```
+
+Narrowed:
+
+```diff
+-op getState(): string;
++op getState(): "Succeeded" | "Failed";
+```
+
+Widened:
+
+```diff
+-op getState(): "Succeeded" | "Failed";
++op getState(): string;
+```
+
+```typespec
+@approvedBreakingChange("Response now returns a new envelope shape", "ResponseTypeChanged")
+op getWidget(): WidgetEnvelope;
+```
+
+### Response type kind (`ResponseTypeKindChanged`)
+
+- `ResponseTypeKindChanged` → `error`, rule `type-kind-change`
+
+```diff
+-op getWidget(): string;
++op getWidget(): Widget;
+```
+
+```typespec
+@approvedBreakingChange("Response changed from scalar to structured payload", "ResponseTypeKindChanged")
+op getWidget(): Widget;
+```
+
+### Response encoding (`ResponseEncodingChanged`)
+
+- `ResponseEncodingChanged` → `error`, rule `encoding-change`
+
+```diff
+ model Widget {
+-  updatedAt?: utcDateTime;
++  @encode("unixTimestamp")
++  updatedAt?: utcDateTime;
+ }
+```
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Timestamps are now emitted as unix seconds", "ResponseEncodingChanged")
+  @encode("unixTimestamp")
+  updatedAt?: utcDateTime;
+}
+```
+
+### Response constraints (`ResponseConstraintStrengthened`, `ResponseConstraintRelaxed`)
+
+- `ResponseConstraintStrengthened` → `ignore`, rule `response-narrowing`
+- `ResponseConstraintRelaxed` → `error`, rule `response-contract-weakened`
+
+```diff
+ model Widget {
+-  @maxLength(100)
++  @maxLength(50)
+   name?: string;
+ }
+```
+
+```diff
+ model Widget {
+-  @maxLength(50)
++  @maxLength(100)
+   name?: string;
+ }
+```
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Legacy data can exceed the previous maximum", "ResponseConstraintRelaxed")
+  @maxLength(100)
+  name?: string;
+}
+```
+
+### Response status codes (`ResponseStatusCodeAdded`, `ResponseStatusCodeRemoved`)
+
+- `ResponseStatusCodeAdded` → `ignore`, rule `response-narrowing`
+- `ResponseStatusCodeRemoved` → `error`, rule `response-contract-weakened`
+
+```diff
+ op createWidget(...):
+   Widget | CreatedResponse;
++  @statusCode _: 202;
+```
+
+```diff
+ op createWidget(...):
+   Widget | CreatedResponse;
+-  @statusCode _: 202;
+```
+
+```typespec
+@approvedBreakingChange("202 Accepted is no longer returned after synchronous rollout", "ResponseStatusCodeRemoved")
+op createWidget(...): Widget;
+```
+
+### Response content types (`ResponseContentTypeAdded`, `ResponseContentTypeRemoved`)
+
+- `ResponseContentTypeAdded` → `ignore`, rule `response-narrowing`
+- `ResponseContentTypeRemoved` → `error`, rule `response-contract-weakened`
+
+```diff
+-@produces("application/json")
++@produces("application/json", "application/problem+json")
+ op getWidget(...): Widget;
+```
+
+```diff
+-@produces("application/json", "application/xml")
++@produces("application/json")
+ op getWidget(...): Widget;
+```
+
+```typespec
+@approvedBreakingChange("XML responses are removed", "ResponseContentTypeRemoved")
+@get
+op getWidget(...): Widget;
+```
+
+### Response headers (`ResponseHeaderAdded`, `ResponseHeaderRemoved`)
+
+- `ResponseHeaderAdded` → `ignore`, rule `response-narrowing`
+- `ResponseHeaderRemoved` → `error`, rule `response-contract-weakened`
+
+```diff
+ model GetWidgetResponseHeaders {
++  etag?: string;
+ }
+```
+
+```diff
+ model GetWidgetResponseHeaders {
+-  etag?: string;
+ }
+```
+
+```typespec
+model GetWidgetResponseHeaders {
+  @approvedBreakingChange("etag moved into the body payload", "ResponseHeaderRemoved")
+  etag?: string;
+}
+```
+
+### Error responses (`ErrorResponseAdded`, `ErrorResponseRemoved`)
+
+- `ErrorResponseAdded` → `ignore`, rule `response-narrowing`
+- `ErrorResponseRemoved` → `ignore`, rule `response-narrowing`
+
+```diff
+ op getWidget(...): Widget |
++  NotFoundError;
+```
+
+```diff
+ op getWidget(...): Widget |
+-  NotFoundError;
+```
+
+Because Phase B severity is `ignore`, no suppression is usually needed.
+
+## Shared type-system violations
+
+### Shared kind changes (`TypeKindChanged`)
+
+- `TypeKindChanged` → `error`, rule `type-kind-change`
+
+```diff
+-model WidgetStatus {
+-  value: string;
+-}
++enum WidgetStatus {
++  active,
++  disabled,
++}
+```
+
+```typespec
+@approvedBreakingChange("Status moved from object to enum payload", "TypeKindChanged")
+enum WidgetStatus {
+  active,
+  disabled,
+}
+```
+
+### Enumeration member lifecycle (`EnumerationMemberAdded`, `EnumerationMemberRemoved`)
+
+- `EnumerationMemberAdded` → `ignore`, rule `service-level`
+- `EnumerationMemberRemoved` → `error`, rule `request-narrowing`
+
+```diff
+ union WidgetTier {
+   "Free",
+   "Standard",
++  "Premium",
+ }
+```
+
+```diff
+ union WidgetTier {
+   "Free",
+   "Standard",
+-  "Legacy",
+ }
+```
+
+```typespec
+@approvedBreakingChange("Legacy tier is retired", "EnumerationMemberRemoved")
+union WidgetTier {
+  "Free",
+  "Standard",
+}
+```
+
+### Enumeration openness (`EnumerationOpened`, `EnumerationClosed`)
+
+- `EnumerationOpened` → `ignore`, rule `service-level`
+- `EnumerationClosed` → `error`, rule `request-narrowing`
+
+```diff
+-@closed
+ union WidgetState {
+   "Running",
+   "Stopped",
+ }
+```
+
+```diff
++@closed
+ union WidgetState {
+   "Running",
+   "Stopped",
+ }
+```
+
+```typespec
+@approvedBreakingChange("Custom extension values are no longer accepted", "EnumerationClosed")
+@closed
+union WidgetState {
+  "Running",
+  "Stopped",
+}
+```
+
+### Discriminator changes (`DiscriminatorChanged`)
+
+- `DiscriminatorChanged` → `error`, rule `type-kind-change`
+
+```diff
+-@discriminator("kind")
++@discriminator("type")
+ model WidgetBase {}
+```
+
+```typespec
+@approvedBreakingChange("Polymorphic payloads now use `type`", "DiscriminatorChanged")
+@discriminator("type")
+model WidgetBase {}
+```
+
+## Default-value violations
+
+### Default values (`DefaultValueAdded`, `DefaultValueRemoved`, `DefaultValueChanged`)
+
+- `DefaultValueAdded` → `ignore`, rule `default-value-change`
+- `DefaultValueRemoved` → `ignore`, rule `default-value-change`
+- `DefaultValueChanged` → `ignore`, rule `default-value-change`
+
+Added:
+
+```diff
+ model CreateWidgetRequest {
++  replicas?: int32 = 3;
+ }
+```
+
+Removed:
+
+```diff
+ model CreateWidgetRequest {
+-  replicas?: int32 = 3;
+ }
+```
+
+Changed:
+
+```diff
+ model CreateWidgetRequest {
+-  replicas?: int32 = 1;
++  replicas?: int32 = 3;
+ }
+```
+
+Because Phase B severity is `ignore`, no suppression is usually needed.

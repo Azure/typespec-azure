@@ -122,6 +122,13 @@ export interface ApiDiff {
 
   /** Human-readable description of the diff. */
   message: string;
+
+  /**
+   * Source location of the operation declaration in user code.
+   * Used as the final fallback when origin and direct source locations are unavailable.
+   * Always populated for operation-relative diffs.
+   */
+  operationSourceLocation?: SourceLocation;
 }
 
 /**
