@@ -196,6 +196,7 @@ export async function emitGoFor(
   if (codeModel.options.generateExamples) {
     await emitter.emitExamples();
   }
+  await emitter.emitApiViewPropertiesFile();
 
   return files;
 }
@@ -289,6 +290,12 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     const resolved = resolveGoFile(files, name ?? "");
     // Format real generated Go like the emitter does; leave the sentinel as-is.
     return resolved === NOT_GENERATED ? resolved : gofmt(resolved);
+  },
+
+  // Snapshot of the APIView cross-language definition ID file.
+  "json apiview-properties": async (tsp, _args, configs, inputFiles) => {
+    const files = await emitGoFor(tsp, emitterOptionsFrom(configs), inputFiles);
+    return files.get("testdata/apiview-properties.json") ?? NOT_GENERATED;
   },
 };
 

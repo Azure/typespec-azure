@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as go from "../codemodel/index.js";
+import { generateApiViewProperties } from "./core/apiview-properties.js";
 import { generateClientFactory } from "./core/client-factory.js";
 import { generateCloudConfig } from "./core/cloud-config.js";
 import { generateConstants } from "./core/constants.js";
@@ -239,6 +240,14 @@ export class Emitter {
     const metadata = generateMetadataFile(this.codeModel);
     if (metadata.length > 0) {
       await this.fs.write("testdata/_metadata.json", metadata);
+    }
+  }
+
+  /** writes the APIView cross-language definition ID file */
+  async emitApiViewPropertiesFile(): Promise<void> {
+    const apiViewProperties = generateApiViewProperties(this.codeModel);
+    if (apiViewProperties.length > 0) {
+      await this.fs.write("testdata/apiview-properties.json", apiViewProperties);
     }
   }
 

@@ -119,6 +119,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
     await emitter.emitExamples();
     await emitter.emitLicenseFile();
     await emitter.emitMetadataFile();
+    await emitter.emitApiViewPropertiesFile();
 
     const goGenerateFile = context.options["go-generate"];
     const goGenerateFileExists = goGenerateFile
