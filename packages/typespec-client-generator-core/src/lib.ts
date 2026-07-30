@@ -544,6 +544,14 @@ export const $lib = createTypeSpecLibrary({
           "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
       },
     },
+    "convenient-api-requires-scope": {
+      ...doc("convenient-api-requires-scope"),
+      severity: "warning",
+      messages: {
+        default:
+          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    },
     "replace-parameter-not-found": {
       ...doc("replace-parameter-not-found"),
       severity: "error",

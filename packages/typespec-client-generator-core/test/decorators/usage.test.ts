@@ -149,11 +149,11 @@ it("usage and convenience", async () => {
       }
 
       @put
-      @convenientAPI(true)
+      @convenientAPI(true, "python")
       op putModel(@body body: Fish): void;
 
       @get
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       op getModel(): Fish;
     }
   `);
@@ -169,11 +169,11 @@ it("usage and convenience", async () => {
       }
 
       @put
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       op putModel(@body body: Dog): void;
 
       @get
-      @convenientAPI(true)
+      @convenientAPI(true, "python")
       op getModel(): Dog;
     }
   `);

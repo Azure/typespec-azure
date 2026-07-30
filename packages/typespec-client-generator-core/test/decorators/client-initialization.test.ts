@@ -142,13 +142,13 @@ it("client accessor", async () => {
           @route("/op1")
           
           @post
-          @convenientAPI(true)
+          @convenientAPI(true, "python")
           op op1(@path p1: string, @query q1: string): void;
 
           @route("/op2")
           
           @post
-          @convenientAPI(true)
+          @convenientAPI(true, "python")
           op op2(@path p1: string): void;
       }
       `,
@@ -698,13 +698,13 @@ it("sub client initialized individually", async () => {
         @route("/op1")
         
         @post
-        @convenientAPI(true)
+        @convenientAPI(true, "python")
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
         
         @post
-        @convenientAPI(true)
+        @convenientAPI(true, "python")
         op op2(@path p1: string): void;
     }
     `,

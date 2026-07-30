@@ -422,6 +422,14 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+
+  // Emit warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "convenient-api-requires-scope",
+      target: context.decoratorTarget,
+    });
+  }
 };
 
 function getConvenientOrProtocolValue(

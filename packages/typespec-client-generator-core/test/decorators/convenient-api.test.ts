@@ -1,4 +1,4 @@
-import { t } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
@@ -10,7 +10,7 @@ async function convenientAPITestHelper(
   globalValue: boolean,
 ): Promise<void> {
   const { program, test } = await SimpleTesterWithService.compile(t.code`
-    @convenientAPI(${String(convenientValue)})
+    @convenientAPI(${String(convenientValue)}, "python")
     op ${t.op("test")}(): void;
   `);
   const context = await createSdkContextForTester(program);
@@ -47,7 +47,7 @@ describe("@convenientAPI", () => {
   it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
     const { program, test } = await SimpleTesterWithService.compile(
       t.code`
-      @convenientAPI
+      @convenientAPI(true, "python")
       op ${t.op("test")}(): void;
     `,
       {
@@ -77,7 +77,7 @@ describe("@convenientAPI on interface", () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         interface MyOperations {
           @route("/test1")
           op ${t.op("test1")}(): void;
@@ -97,9 +97,9 @@ describe("@convenientAPI on interface", () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         interface MyOperations {
-          @convenientAPI(true)
+          @convenientAPI(true, "python")
           @route("/test1")
           op ${t.op("test1")}(): void;
           @route("/test2")
@@ -120,7 +120,7 @@ describe("@convenientAPI on namespace", () => {
     // Test by applying decorator in an augmentation style within TestService
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       namespace TestService2 {
         @route("/test1")
         op ${t.op("test1")}(): void;
@@ -142,9 +142,9 @@ describe("@convenientAPI on namespace", () => {
   it("operation level convenientAPI overrides namespace level", async () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       namespace TestService2 {
-        @convenientAPI(true)
+        @convenientAPI(true, "python")
         @route("/test1")
         op ${t.op("test1")}(): void;
         @route("/test2")
@@ -165,7 +165,7 @@ describe("@convenientAPI on namespace", () => {
   it("propagates convenientAPI from parent namespace to child namespace", async () => {
     const { program, test1 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       namespace TestService2 {
         @route("/test1")
         op ${t.op("test1")}(): void;
@@ -185,7 +185,7 @@ describe("@convenientAPI with interface in namespace", () => {
   it("operation inherits from interface when namespace has no decorator", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       namespace MyService {
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         interface MyOperations {
           op ${t.op("test1")}(): void;
         }
@@ -198,9 +198,9 @@ describe("@convenientAPI with interface in namespace", () => {
 
   it("interface decorator takes precedence over namespace decorator", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
-      @convenientAPI(true)
+      @convenientAPI(true, "python")
       namespace MyService {
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         interface MyOperations {
           op ${t.op("test1")}(): void;
         }
@@ -213,11 +213,11 @@ describe("@convenientAPI with interface in namespace", () => {
 
   it("operation decorator takes precedence over interface and namespace", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
-      @convenientAPI(false)
+      @convenientAPI(false, "python")
       namespace MyService {
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         interface MyOperations {
-          @convenientAPI(true)
+          @convenientAPI(true, "python")
           op ${t.op("test1")}(): void;
         }
       }
@@ -333,7 +333,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/conversations/{conversation_id}/items/{item_id}")
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         op getConversationItem(
           @path conversation_id: string,
           @path item_id: string,
@@ -367,7 +367,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/data")
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         op getData(
           @header status: StatusEnum,
         ): Response;
@@ -399,7 +399,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/resources/{type}/{id}")
-        @convenientAPI(false)
+        @convenientAPI(false, "python")
         op getResource(
           @path type: ResourceType,
           @path id: string,
@@ -416,5 +416,71 @@ describe("@convenientAPI(false) with enum parameters", () => {
       resourceType.usage & UsageFlags.Input,
       "ResourceType should have Input usage even with convenientAPI(false)",
     );
+  });
+});
+
+describe("@convenientAPI requires scope diagnostic", () => {
+  it("emits warning when @convenientAPI is used without scope on operation", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true)
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+        severity: "warning",
+        message:
+          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    ]);
+  });
+
+  it("emits warning when @convenientAPI is used without scope on interface", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(false)
+        interface MyOps {
+          op test(): void;
+        }
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+        severity: "warning",
+        message:
+          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    ]);
+  });
+
+  it("does not emit warning when @convenientAPI is scoped", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "java")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 0);
   });
 });
