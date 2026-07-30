@@ -286,7 +286,7 @@ it("sets client default value for operation parameters", async () => {
 });
 
 it("mixed with @alternateType", async () => {
-  const diagnostics = await SimpleTesterWithService.diagnose(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     @route("/items")
     @get
     op getItems(
@@ -296,9 +296,15 @@ it("mixed with @alternateType", async () => {
       
     ): void;
   `);
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
-  });
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.kind, "basic");
+
+  const pageSizeParam = method.parameters.find((p) => p.name === "pageSize")!;
+  ok(pageSizeParam);
+  strictEqual(pageSizeParam.clientDefaultValue, "10");
 });
 
 describe("type mismatch diagnostics", () => {

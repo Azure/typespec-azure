@@ -1804,19 +1804,25 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
 ) => {
   const actualValue = isNumeric(value) ? value.asNumber() : value;
 
-  // Validate that the value type matches the property type
-  const propertyType = target.type;
-  if (propertyType.kind === "Scalar") {
+  // Validate that the value type matches the property type (or the alternate type if present)
+  const alternateTypeDecorator = target.decorators.find(
+    (d) => d.definition?.name === "@alternateType",
+  );
+  const typeToCheck = alternateTypeDecorator
+    ? (alternateTypeDecorator.args[0]?.value as Type)
+    : target.type;
+
+  if (typeToCheck.kind === "Scalar") {
     const valueType = isNumeric(value) ? "numeric" : typeof value;
     const isMatch =
-      (typeof value === "string" && isStringType(context.program, propertyType)) ||
-      (isNumeric(value) && isNumericType(context.program, propertyType)) ||
-      (typeof value === "boolean" && isBooleanScalar(context.program, propertyType));
+      (typeof value === "string" && isStringType(context.program, typeToCheck)) ||
+      (isNumeric(value) && isNumericType(context.program, typeToCheck)) ||
+      (typeof value === "boolean" && isBooleanScalar(context.program, typeToCheck));
 
     if (!isMatch) {
       reportDiagnostic(context.program, {
         code: "client-default-value-type-mismatch",
-        format: { valueType, propertyType: propertyType.name },
+        format: { valueType, propertyType: typeToCheck.name },
         target,
       });
       return; // Don't store mismatched default value
