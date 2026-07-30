@@ -1966,6 +1966,54 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 | Queued     | `"Queued"`     | The response is queued for execution. |
 | InProgress | `"InProgress"` | The response is in progress.          |
 
+## Azure.ResourceManager.BaseTypes.Relationships
+
+### `Relationship` {#Azure.ResourceManager.BaseTypes.Relationships.Relationship}
+
+Model template for a Relationship extension resource.
+Applies the Relationship base type decorator automatically.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                      |
+| ---------- | -------------------------------------------------------------------------------- |
+| Properties | RP-specific properties for the relationship (must extend RelationshipProperties) |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `RelationshipProperties` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties}
+
+Required properties for a relationship resource.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<ProvisioningState>
+```
+
+#### Template Parameters
+
+| Name              | Description                                 |
+| ----------------- | ------------------------------------------- |
+| ProvisioningState | The relationship provisioning state values. |
+
+#### Properties
+
+| Name               | Type                                             | Description                                                           |
+| ------------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | ARM-managed. Must include the base type descriptor for this resource. |
+| sourceId           | `string`                                         | The relationship source identifier.                                   |
+| sourceTenant       | `string`                                         | The tenant identifier of the relationship source.                     |
+| targetId           | `string`                                         | The relationship target identifier.                                   |
+| targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
+| provisioningState? | `ProvisioningState`                              | The provisioning state of the relationship.                           |
+
 ## Azure.ResourceManager.CommonTypes
 
 ### `AccessRule` {#Azure.ResourceManager.CommonTypes.AccessRule}
