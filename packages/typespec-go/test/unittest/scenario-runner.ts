@@ -292,10 +292,17 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     return resolved === NOT_GENERATED ? resolved : gofmt(resolved);
   },
 
-  // Snapshot of the APIView cross-language definition ID file.
+  // Snapshot of the APIView cross-language definition ID file. Emitted paths are
+  // relative to emitterOutputDir, so a containing-module scenario nests it under
+  // the package subdirectory; match on the suffix to cover both layouts.
   "json apiview-properties": async (tsp, _args, configs, inputFiles) => {
     const files = await emitGoFor(tsp, emitterOptionsFrom(configs), inputFiles);
-    return files.get("testdata/apiview-properties.json") ?? NOT_GENERATED;
+    for (const [fileName, content] of files) {
+      if (fileName.endsWith("testdata/apiview-properties.json")) {
+        return content;
+      }
+    }
+    return NOT_GENERATED;
   },
 };
 

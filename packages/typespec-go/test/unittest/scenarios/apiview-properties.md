@@ -50,7 +50,7 @@ interface WidgetOps {
 }
 ```
 
-# The APIView cross-language definition ID file isn't emitted for a containing module
+# The APIView cross-language definition ID file is emitted for a containing module
 
 ## TypeSpec
 
@@ -69,12 +69,21 @@ interface WidgetOps {
 ```
 
 ```yaml
-containing-module: github.com/contoso/module
-emitter-output-dir: "{output-dir}/widgets"
+containing-module: github.com/contoso/widget/v2
+emitter-output-dir: {output-dir}/subpkg
 ```
 
 ```json apiview-properties
-// (file was not generated)
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget/subpkg.Widget": "Widgets.Widget",
+    "widget/subpkg.WidgetsClient": "Widgets",
+    "widget/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
 ```
 
 # The APIView cross-language definition ID file includes the ARM ClientFactory accessors

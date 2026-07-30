@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import * as path from "path";
 import * as go from "../../codemodel/index.js";
 import { fixUpMethodName } from "./operations.js";
 
@@ -22,18 +23,11 @@ interface ApiViewProperties {
  * @returns the JSON content or the empty string when there's nothing to emit
  */
 export function generateApiViewProperties(codeModel: go.CodeModel): string {
-  if (codeModel.root.kind !== "module") {
-    // the module-relative package path is only knowable when emitting a module
-    return "";
-  }
+  const rootPkg =
+    codeModel.root.kind === "module" ? codeModel.root : codeModel.root.package;
 
   const definitionIDs = new Map<string, string>();
-  collectPackage(
-    codeModel.root,
-    go.getPackageName(codeModel.root),
-    codeModel.type,
-    definitionIDs,
-  );
+  collectPackage(rootPkg, relPackageName(rootPkg), codeModel.type, definitionIDs);
 
   if (definitionIDs.size === 0) {
     return "";
@@ -48,6 +42,25 @@ export function generateApiViewProperties(codeModel: go.CodeModel): string {
   };
 
   return JSON.stringify(properties, null, 2) + "\n";
+}
+
+/**
+ * returns the package path relative to its module root, which is how the Go
+ * APIView parser qualifies every line ID. e.g. azblob or azblob/blob
+ *
+ * @param pkg the package for which to compute the name
+ * @returns the module-relative package path
+ */
+function relPackageName(pkg: go.PackageContent): string {
+  if (pkg.kind === "module") {
+    return go.getPackageName(pkg);
+  }
+  const parent = pkg.parent;
+  const parentName =
+    parent.kind === "containingModule"
+      ? path.basename(parent.identity.replace(/\/v\d+$/, ""))
+      : relPackageName(parent);
+  return `${parentName}/${pkg.name}`;
 }
 
 /**
