@@ -38,3 +38,14 @@ model RequestOptions {
   sortOrder?: string;
 }
 ```
+
+## Suppression
+
+If the mismatch is intentional (e.g., when combined with `@alternateType` that changes the client-facing type), suppress the diagnostic with a justification:
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch" "default matches alternateType"
+@Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
+@Azure.ClientGenerator.Core.alternateType(string)
+@query pageSize?: int32;
+```
