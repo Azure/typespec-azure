@@ -4,6 +4,12 @@ Validates that `RpcOperation` request bodies are used correctly. Operations usin
 This rule only applies to `@get` and `@delete` operations. Other HTTP verbs like `@post`, `@put`, and `@patch` can have request bodies.
 :::
 
+## Impact
+
+- **Area:** API
+
+An `RpcOperation` with an improperly modeled request body produces an unclear API contract.
+
 #### ❌ Incorrect
 
 GET operation with a request body:
@@ -71,3 +77,7 @@ op createWidget is RpcOperation<
   Widget
 >;
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise model the request body with the standard patterns.

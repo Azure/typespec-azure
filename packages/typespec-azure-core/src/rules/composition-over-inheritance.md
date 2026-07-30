@@ -1,5 +1,11 @@
 Models that extend a base model without a discriminator should use composition (`...` spread or `model is`) instead of inheritance (`extends`). If polymorphism is intended, add the `@discriminator` decorator on the base model.
 
+## Impact
+
+- **Area:** SDK
+
+Deep inheritance is hard for SDKs to represent and reduces client usability.
+
 #### ❌ Incorrect
 
 Inheritance without a discriminator:
@@ -70,3 +76,7 @@ model Dog extends Pet {
   bark: boolean;
 }
 ```
+
+## Suppression
+
+Suppress when inheritance is genuinely required; otherwise prefer `model is` or spread (`...`) instead of `extends`.

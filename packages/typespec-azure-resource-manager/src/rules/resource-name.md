@@ -1,6 +1,12 @@
-Check the resource name. ARM resource model names must contain only alphanumeric characters (starting with an uppercase letter), and the `name` property must be a read-only `@path` parameter.
+ARM resource model names must contain only alphanumeric characters (starting with an uppercase letter), and the `name` property must be a read-only `@path` parameter.
 
-#### ❌ Incorrect
+## Impact
+
+- **Area:** API, SDK
+
+Invalid characters in a resource name violate the RPC contract and produce invalid client parameter names, preventing SDK generation.
+
+## ❌ Incorrect
 
 Missing `@path` decorator on `name`:
 
@@ -12,7 +18,7 @@ model FooResource is TrackedResource<{}> {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 Underscore in model name:
 
@@ -22,10 +28,14 @@ model Foo_Resource is TrackedResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<{}> {
   ...ResourceNameParameter<FooResource>;
 }
 ```
+
+## Suppression
+
+Treat like any invalid resource name and require a fix. Use only valid characters.

@@ -4,6 +4,21 @@ import { TemplateWithMarkers } from "../../../core/packages/compiler/src/testing
 import { createSdkContext, CreateSdkContextOptions } from "../src/context.js";
 import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 
+/** Create a multiline test string without its shared source indentation. */
+export function d(strings: TemplateStringsArray, ...values: unknown[]): string {
+  const result = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+  return dedent(result);
+}
+
+function dedent(str: string): string {
+  str = str.replace(/^\n|\n[ ]*$/g, "");
+  const indent = str.match(/^[ \t]+/)?.[0] ?? "";
+  return str
+    .split("\n")
+    .map((line) => (line.startsWith(indent) ? line.slice(indent.length) : line))
+    .join("\n");
+}
+
 export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
   emitterName?: string;
 }

@@ -33,6 +33,10 @@ jobs:
         run: pnpm run regenerate
         working-directory: packages/typespec-python
 
+      - name: Check for unstaged changes
+        run: pnpm run check-unstaged
+        working-directory: packages/typespec-python
+
       - name: Pre-build wheels
         working-directory: packages/typespec-python
         run: |

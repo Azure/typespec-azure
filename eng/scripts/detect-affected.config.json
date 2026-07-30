@@ -1,7 +1,8 @@
 {
   "submodulePath": "core",
-  "ignore": ["**/test/**", "**/tests/**", "**/*.test.ts", "**/*.md"],
-  "sharedExtra": [".github/actions/setup/**"],
+  "ignore": ["**/*.md"],
+  "ignoreUpstream": ["**/test/**", "**/tests/**", "**/*.test.ts"],
+  "sharedExtra": [".github/actions/setup/**", "pnpm-workspace.yaml"],
   "targets": {
     "python": {
       "package": "@azure-tools/typespec-python",
