@@ -1,9 +1,9 @@
-This diagnostic is issued when the type of the value passed to `@clientDefaultValue` does not match the type of the property it is applied to.
+This diagnostic is issued when the type of the value passed to `@clientDefaultValue` does not match the type of the property it is applied to. When `@alternateType` is present, the default value is validated against the alternate type instead.
 
 ## Impact
 
-- **Area:** Client default values. Catches mismatches where a string default is applied to a numeric property (or vice versa), which would produce an incorrect default in generated SDKs.
-- **Not affected:** Properties without `@clientDefaultValue`, or properties where the value type already matches.
+- **Area:** Client default values. Catches mismatches where a string default is applied to a numeric property (or vice versa). When a type mismatch is detected, the client default value is **discarded** and will not appear in generated SDKs.
+- **Not affected:** Properties without `@clientDefaultValue`, properties where the value type matches, or properties where `@alternateType` makes the value type valid.
 
 ## ❌ Incorrect Usage
 
@@ -39,13 +39,20 @@ model RequestOptions {
 }
 ```
 
-## Suppression
-
-If the mismatch is intentional (e.g., when combined with `@alternateType` that changes the client-facing type), suppress the diagnostic with a justification:
+Or use `@alternateType` to change the client-facing type so it matches the default value:
 
 ```typespec
-#suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch" "default matches alternateType"
 @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
 @Azure.ClientGenerator.Core.alternateType(string)
-@query pageSize?: int32;
+@query pageSize?: int32; // no warning — default matches alternate type
+```
+
+## Suppression
+
+If you suppress this diagnostic, be aware that the mismatched client default value is still **discarded** — suppression only silences the warning, it does not cause the value to be applied.
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch" "intentional mismatch"
+@Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
+@query pageSize?: int32; // warning suppressed, but default value is still ignored
 ```
