@@ -536,20 +536,11 @@ export const $lib = createTypeSpecLibrary({
           "@clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.",
       },
     },
-    "client-option-requires-scope": {
-      ...doc("client-option-requires-scope"),
+    "decorator-requires-scope": {
+      ...doc("decorator-requires-scope"),
       severity: "warning",
       messages: {
-        default:
-          "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
-      },
-    },
-    "convenient-api-requires-scope": {
-      ...doc("convenient-api-requires-scope"),
-      severity: "warning",
-      messages: {
-        default:
-          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+        default: paramMessage`@${"decoratorName"} should be applied with a language scope of ${"allowedScopes"}.`,
       },
     },
     "replace-parameter-not-found": {

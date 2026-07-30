@@ -149,16 +149,18 @@ it("usage and convenience", async () => {
       }
 
       @put
-      @convenientAPI(true, "python")
+      @convenientAPI(true, "java")
       op putModel(@body body: Fish): void;
 
       @get
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       op getModel(): Fish;
     }
   `);
 
-  const context = await createSdkContextForTester(program);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   strictEqual(getUsage(context, Fish), UsageFlags.Input | UsageFlags.Json);
 
   const { program: anotherProgram, Dog } = await SimpleTester.compile(t.code`
@@ -169,16 +171,18 @@ it("usage and convenience", async () => {
       }
 
       @put
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       op putModel(@body body: Dog): void;
 
       @get
-      @convenientAPI(true, "python")
+      @convenientAPI(true, "java")
       op getModel(): Dog;
     }
   `);
 
-  const anotherContext = await createSdkContextForTester(anotherProgram);
+  const anotherContext = await createSdkContextForTester(anotherProgram, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   strictEqual(getUsage(anotherContext, Dog), UsageFlags.Output | UsageFlags.Json);
 });
 

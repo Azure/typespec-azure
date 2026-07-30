@@ -10,13 +10,16 @@ async function convenientAPITestHelper(
   globalValue: boolean,
 ): Promise<void> {
   const { program, test } = await SimpleTesterWithService.compile(t.code`
-    @convenientAPI(${String(convenientValue)}, "python")
+    @convenientAPI(${String(convenientValue)}, "java")
     op ${t.op("test")}(): void;
   `);
-  const context = await createSdkContextForTester(program);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
 
   const actual = shouldGenerateConvenient(
     await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
       "generate-protocol-methods": false,
       "generate-convenience-methods": globalValue,
     }),
@@ -47,13 +50,13 @@ describe("@convenientAPI", () => {
   it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
     const { program, test } = await SimpleTesterWithService.compile(
       t.code`
-      @convenientAPI(true, "python")
+      @convenientAPI(true, "java")
       op ${t.op("test")}(): void;
     `,
       {
         compilerOptions: {
           options: {
-            "@azure-tools/typespec-python": {
+            "@azure-tools/typespec-java": {
               "generate-protocol-methods": false,
               "generate-convenience-methods": false,
             },
@@ -61,7 +64,9 @@ describe("@convenientAPI", () => {
         },
       },
     );
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     const actual = shouldGenerateConvenient(context, test);
     strictEqual(actual, true);
@@ -77,7 +82,7 @@ describe("@convenientAPI on interface", () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         interface MyOperations {
           @route("/test1")
           op ${t.op("test1")}(): void;
@@ -86,7 +91,9 @@ describe("@convenientAPI on interface", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     // Test the core functionality - shouldGenerateConvenient should return false
     strictEqual(shouldGenerateConvenient(context, test1), false);
@@ -97,9 +104,9 @@ describe("@convenientAPI on interface", () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         interface MyOperations {
-          @convenientAPI(true, "python")
+          @convenientAPI(true, "java")
           @route("/test1")
           op ${t.op("test1")}(): void;
           @route("/test2")
@@ -107,7 +114,9 @@ describe("@convenientAPI on interface", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     // Test the override behavior
     strictEqual(shouldGenerateConvenient(context, test1), true);
@@ -120,7 +129,7 @@ describe("@convenientAPI on namespace", () => {
     // Test by applying decorator in an augmentation style within TestService
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       namespace TestService2 {
         @route("/test1")
         op ${t.op("test1")}(): void;
@@ -128,7 +137,9 @@ describe("@convenientAPI on namespace", () => {
         op ${t.op("test2")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
     strictEqual(shouldGenerateConvenient(context, test2), false);
@@ -142,16 +153,18 @@ describe("@convenientAPI on namespace", () => {
   it("operation level convenientAPI overrides namespace level", async () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       namespace TestService2 {
-        @convenientAPI(true, "python")
+        @convenientAPI(true, "java")
         @route("/test1")
         op ${t.op("test1")}(): void;
         @route("/test2")
         op ${t.op("test2")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), true);
     strictEqual(shouldGenerateConvenient(context, test2), false);
@@ -165,13 +178,15 @@ describe("@convenientAPI on namespace", () => {
   it("propagates convenientAPI from parent namespace to child namespace", async () => {
     const { program, test1 } = await SimpleTester.compile(t.code`
       @service
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       namespace TestService2 {
         @route("/test1")
         op ${t.op("test1")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
 
@@ -185,44 +200,50 @@ describe("@convenientAPI with interface in namespace", () => {
   it("operation inherits from interface when namespace has no decorator", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       namespace MyService {
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         interface MyOperations {
           op ${t.op("test1")}(): void;
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("interface decorator takes precedence over namespace decorator", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
-      @convenientAPI(true, "python")
+      @convenientAPI(true, "java")
       namespace MyService {
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         interface MyOperations {
           op ${t.op("test1")}(): void;
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("operation decorator takes precedence over interface and namespace", async () => {
     const { program, test1 } = await SimpleTesterWithService.compile(t.code`
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       namespace MyService {
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         interface MyOperations {
-          @convenientAPI(true, "python")
+          @convenientAPI(true, "java")
           op ${t.op("test1")}(): void;
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateConvenient(context, test1), true);
   });
@@ -283,7 +304,7 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
   it("namespace level decorator with scope applies to all operations", async () => {
     const testCode = t.code`
       @service
-      @convenientAPI(false, "python")
+      @convenientAPI(false, "java")
       namespace TestService3 {
         @route("/test1")
         op ${t.op("test1")}(): void;
@@ -292,22 +313,22 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
       }
     `;
 
-    // python should get convenientAPI=false
+    // java should get convenientAPI=false (since decorator is scoped to java)
     {
       const { program, test1, test2 } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
-        emitterName: "@azure-tools/typespec-python",
+        emitterName: "@azure-tools/typespec-java",
       });
 
       strictEqual(shouldGenerateConvenient(context, test1), false);
       strictEqual(shouldGenerateConvenient(context, test2), false);
     }
 
-    // java should use default behavior
+    // python should use default behavior (since decorator is scoped to java, not python)
     {
       const { program, test1, test2 } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
-        emitterName: "@azure-tools/typespec-java",
+        emitterName: "@azure-tools/typespec-python",
       });
 
       // Should fall back to context default which is true
@@ -333,7 +354,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/conversations/{conversation_id}/items/{item_id}")
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         op getConversationItem(
           @path conversation_id: string,
           @path item_id: string,
@@ -341,7 +362,9 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): ItemResult;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
@@ -367,13 +390,15 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/data")
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         op getData(
           @header status: StatusEnum,
         ): Response;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
@@ -399,14 +424,16 @@ describe("@convenientAPI(false) with enum parameters", () => {
         }
 
         @route("/resources/{type}/{id}")
-        @convenientAPI(false, "python")
+        @convenientAPI(false, "java")
         op getResource(
           @path type: ResourceType,
           @path id: string,
         ): Resource;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
@@ -430,15 +457,14 @@ describe("@convenientAPI requires scope diagnostic", () => {
       }
     `)
     ).filter(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
     );
 
     expectDiagnostics(diagnostics, [
       {
-        code: "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
         severity: "warning",
-        message:
-          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+        message: `@convenientAPI should be applied with a language scope of "java" or "csharp".`,
       },
     ]);
   });
@@ -455,20 +481,41 @@ describe("@convenientAPI requires scope diagnostic", () => {
       }
     `)
     ).filter(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
     );
 
     expectDiagnostics(diagnostics, [
       {
-        code: "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
         severity: "warning",
-        message:
-          "@convenientAPI should be applied with a specific language scope since it is highly likely this is language-specific.",
+        message: `@convenientAPI should be applied with a language scope of "java" or "csharp".`,
       },
     ]);
   });
 
-  it("does not emit warning when @convenientAPI is scoped", async () => {
+  it("emits warning when @convenientAPI is scoped to a non-java/csharp language", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "python")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+        severity: "warning",
+        message: `@convenientAPI should be applied with a language scope of "java" or "csharp".`,
+      },
+    ]);
+  });
+
+  it("does not emit warning when @convenientAPI is scoped to java", async () => {
     const diagnostics = (
       await SimpleTester.diagnose(`
       @service
@@ -478,7 +525,39 @@ describe("@convenientAPI requires scope diagnostic", () => {
       }
     `)
     ).filter(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/convenient-api-requires-scope",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 0);
+  });
+
+  it("does not emit warning when @convenientAPI is scoped to csharp", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(false, "csharp")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 0);
+  });
+
+  it("does not emit warning when @convenientAPI is scoped to java and csharp", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "java, csharp")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
     );
 
     strictEqual(diagnostics.length, 0);
