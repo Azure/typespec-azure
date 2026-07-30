@@ -36,7 +36,7 @@
     "clean": "rimraf ./dist ./schema/dist",
     "build": "npm run regen-examples-yaml-schema && tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
-    "regen-examples-yaml-schema": "tsp compile ./schema/examples-yaml.tsp --warn-as-error && node ./.scripts/schema-json-to-js.js",
+    "regen-examples-yaml-schema": "tsp compile ./schema/examples-yaml.tsp --warn-as-error",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
@@ -44,7 +44,6 @@
     "lint:fix": "oxlint . --fix"
   },
   "files": [
-    "schema/dist/schema.js",
     "schema/dist/ExamplesYaml.json",
     "dist/**",
     "!dist/test/**"
