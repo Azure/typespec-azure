@@ -148,6 +148,9 @@ Edit `packages/<pkg>/src/rules/<rule-name>.md`:
 - Replace all placeholder text
 - Write a clear description of what the rule checks and why
 - Provide realistic ❌ Incorrect and ✅ Correct examples using actual TypeSpec patterns
+- Add a required **`## Impact`** section: a bulleted `**Area:**` line (e.g. `API`, `SDK`, `Emitters`) followed by a short paragraph describing what breaks or degrades when the rule is violated
+- Add a required **`## Suppression`** section: state whether suppression is acceptable and why, and point to the correct fix. Suppressions use the `#suppress "<rule-id>" "<justification-string>"` **directive** placed on the line above the target — NOT a `// suppress` comment
+- Add a **`## LintDiff Equivalent`** section when an equivalent LintDiff (azure-openapi-validator) rule exists, deep-linking to the specific rule id in the [OpenAPI authoring automated guidelines](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md). Omit only when no equivalent exists
 - This file holds only the extended documentation body — the page title, rule id, and
   short description are generated from the rule definition. `tspd` renders the page at
   `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`
@@ -196,7 +199,7 @@ New linter rules MUST NOT break existing Azure service specs. After pushing your
 If the check fails, your rule produces diagnostics on existing specs. To resolve:
 
 1. **Apply an API-neutral fix to the spec** (preferred): If the fix doesn't change API behavior, submit a PR to `Azure/azure-rest-api-specs` on the **main** branch.
-2. **Suppress the rule**: If the spec cannot be fixed without changing API behavior, add a suppress comment. Suppressions always go to the **main** branch.
+2. **Suppress the rule**: If the spec cannot be fixed without changing API behavior, add a `#suppress "<rule-id>" "<justification-string>"` directive on the line above the target (NOT a `// suppress` comment). Suppressions always go to the **main** branch.
 3. **Fix on typespec-next**: If the fix requires unreleased TypeSpec APIs or behavior, submit to the **typespec-next** branch (uses nightly builds).
 4. **Link your spec fix PR**: Always link the spec fix PR in your linter rule PR description.
 
