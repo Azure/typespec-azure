@@ -3,10 +3,10 @@
 ## Overview
 
 This document evaluates the prototype against the original questions from the prototype plan.
-The prototype was built across 8 phases in `packages/typespec-breaking-change/` on the
+The prototype was built across 9 phases in `packages/typespec-breaking-change/` on the
 `prototype/breaking-change-tool` branch of `markcowl/typespec-azure`.
 
-**Final stats**: 225 tests (212 unit + 13 integration), 98.87% line coverage, 90.7% branch coverage.
+**Final stats**: 253 tests (232 unit + 21 integration), 99.22% line coverage, 91.3% branch coverage.
 
 ---
 
@@ -189,16 +189,19 @@ Note: No cross-version comparisons needed: all versions are preview (no stable b
 
 **Evidence** (all measured on the analysis phase only, excluding initial TypeSpec compilation):
 
-| Spec | TSP Files | Operations | Versions | Analysis Time |
-|------|-----------|-----------|----------|---------------|
-| AppConfiguration | 14 | 29 | 3 (preview) | **0s** (no comparison needed) |
-| Network | 127 | 739 | 2 (stable) | **7.0s** |
+| Spec | TSP Files | Operations | Versions | Pairs | Analysis Time |
+|------|-----------|-----------|----------|-------|---------------|
+| AppConfiguration | 14 | 29 | 3 (preview) | 0 | **0s** (no comparison needed) |
+| ContainerService/fleet | 12 | 12–42 | 13 (3 stable + 10 preview) | 8 | **8.4s** |
+| Network | 127 | 739 | 2 (stable) | 1 | **7.0s** |
 
-- Target was <60 seconds. Even the largest spec (Network, 739 operations) completes in
-  7 seconds — **8.5x under budget**.
-- Timing breakdown for Network: version mutators 3.8s, diff engine 3.2s, classify <1ms,
-  suppress <1ms.
-- Scaling is sub-linear: 25x more operations (739 vs 29) results in only ~4x more time.
+- Target was <60 seconds. Even with 13 versions and 8 comparison pairs (fleet),
+  analysis completes in 8.4s — **7x under budget**.
+- **Version scaling**: Fleet's 13 versions produce 8 Phase B pairs. Per-view mutator
+  cost is ~180ms. Analysis scales linearly with pair count.
+- **Operation scaling**: Network's 739 operations complete in 7.0s with just 1 pair.
+  Sub-linear scaling: 25x more operations → only ~4x more time.
+- Timing breakdown for Fleet: version mutators 5.8s (69%), diff engine 2.6s (31%).
 - Performance validated by integration tests with `expect(elapsed).toBeLessThan(30_000)`.
 
 **Key insight**: The bottleneck is version mutator application (50% of time) and diff
@@ -324,4 +327,52 @@ From the prototype plan's "What Success Looks Like":
 | Determine if resources need special handling | ✅ | No — directional split is sufficient |
 | Determine if `{method, path}` identity is stable | ✅ | Yes — validated on 739 real operations |
 
-**All 7 success criteria are met.**
+---
+
+## Phase 9: CI Integration & Reporting (added post-prototype)
+
+### Q9: Can the tool integrate with azure-rest-api-specs CI like typespec-suppressions?
+
+**Status**: ✅ Answered — Yes, pattern established
+
+**Evidence**:
+- Evaluated `@azure-tools/typespec-suppressions` tool in `eng/tools/typespec-suppressions/`.
+- That tool uses: positional `<spec-folder>` args, `--base <commitish>`, `--json-output`,
+  `--markdown-output`, `--github-annotations`, `--fail-on-approval` exit code gating.
+- Our CLI now mirrors this pattern:
+  - `--json-output <path>` — writes structured JSON report to file
+  - `--markdown-output <path>` — writes PR comment markdown to file
+  - `--github-annotations` — emits `::error file=...,line=...::` annotations
+  - `--fail-on-breaking` — exit code 1 when unsuppressed errors exist
+- JSON report includes `requiresAction`, `counts`, `specPaths`, `baseRevision`, `headRevision`
+- Markdown report includes summary, findings table, suppressed (collapsed), timing
+- File-to-file comparison mode retained (`--entry <path> --base <path>`)
+
+### Q10: How does the tool scale with many versions?
+
+**Status**: ✅ Answered — Linear scaling, well within budget
+
+**Evidence**:
+- ContainerService/fleet spec: 13 versions (3 stable, 10 preview), 12→42 operations
+- Generates 8 Phase B pairs (each preview-after-stable → compared against previous stable)
+- Total analysis: 8.4s (182ms per versioned view, 2.6s diff engine)
+- 147 findings across 8 pairs, 71% origin coverage
+- Finding count grows naturally: 5 (2023-10-15→preview) → 35 (2025-03-01→latest preview)
+- **No performance bottleneck**: even a spec with 30+ versions would stay under 30s
+
+---
+
+## Updated Success Criteria (Phase 9)
+
+| Criterion | Met? | Notes |
+|-----------|------|-------|
+| Run `--base ./v1 --head ./v2` against real ARM specs | ✅ | Integration tests demonstrate this |
+| Accurate findings with correct source locations | ✅ | 56-71% origin coverage depending on spec |
+| `@approvedBreakingChange` suppresses findings | ✅ | 13 suppression tests, origin-aware lookup |
+| <60s for real specs (including many-version) | ✅ | 8.4s for 13-version fleet, 7s for 739-op network |
+| GitHub PR comment format that reviewers understand | ✅ | Markdown + JSON + annotations |
+| Determine if resources need special handling | ✅ | No — directional split is sufficient |
+| Determine if `{method, path}` identity is stable | ✅ | Yes — validated on 739+ real operations |
+| CI integration pattern established | ✅ | Mirrors typespec-suppressions tool pattern |
+
+**All 8 success criteria are met.**

@@ -1,6 +1,7 @@
 import type { SourceLocation } from "@typespec/compiler";
 import type { AnalysisResult, Finding } from "./types.js";
 import { isOperationIdentity } from "./types.js";
+import { formatSuppressionHint } from "./suppression-guidance.js";
 
 const SUMMARY_SEPARATOR = "─────────────────────────────";
 
@@ -101,10 +102,6 @@ function formatTiming(result: AnalysisResult): string {
 function formatVersionPair(finding: Finding): string {
   const { phase, baseVersion, headVersion } = finding.versionPair;
   return `${phase} (${baseVersion} → ${headVersion})`;
-}
-
-function formatSuppressionHint(finding: Finding): string {
-  return `@approvedBreakingChange("your reason here", "${finding.diff.kind}")`;
 }
 
 function countErrors(findings: Finding[]): number {

@@ -1,6 +1,7 @@
 import type { SourceLocation } from "@typespec/compiler";
 import type { AnalysisResult, AnalysisSummary, Finding, TimingInfo } from "./types.js";
 import { isOperationIdentity } from "./types.js";
+import { formatSuppressionGuidance } from "./suppression-guidance.js";
 
 /**
  * Full structured JSON report — aligned with typespec-suppressions report pattern.
@@ -45,6 +46,13 @@ export interface JsonFinding {
   statusCode?: string;
   versionPair: { baseVersion: string; headVersion: string };
   location?: { file: string; line: number };
+  /** How to suppress this finding if the breaking change is intentional. */
+  suppression?: {
+    decorator: string;
+    placement: string;
+    file?: string;
+    example: string;
+  };
 }
 
 export interface JsonReportOptions {
@@ -109,6 +117,17 @@ function mapFinding(finding: Finding): JsonFinding {
     };
     baseFinding.component = finding.diff.identity.component;
     baseFinding.statusCode = finding.diff.identity.statusCode;
+  }
+
+  // Include suppression guidance for unsuppressed errors
+  if (finding.severity === "error" && !finding.suppressed) {
+    const guidance = formatSuppressionGuidance(finding);
+    baseFinding.suppression = {
+      decorator: guidance.decorator,
+      placement: guidance.placement,
+      file: guidance.file,
+      example: guidance.example,
+    };
   }
 
   return baseFinding;

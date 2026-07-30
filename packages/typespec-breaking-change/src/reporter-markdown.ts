@@ -1,5 +1,6 @@
 import type { AnalysisResult, Finding } from "./types.js";
 import { isOperationIdentity } from "./types.js";
+import { formatSuppressionHint } from "./suppression-guidance.js";
 
 export interface MarkdownReportOptions {
   /** Base revision/path label. */
@@ -76,6 +77,28 @@ export function renderMarkdownSummary(
         `| ${esc(finding.diff.kind)} | ${esc(fmtOp(finding))} | \`${esc(finding.diff.identity.element)}\` | ${esc(fmtVer(finding))} |`,
       );
     }
+
+    // Suppression guidance
+    lines.push("");
+    lines.push("<details>");
+    lines.push("<summary>How to suppress these findings</summary>");
+    lines.push("");
+    lines.push("If a breaking change is intentional and approved, add the following decorator");
+    lines.push("to the affected type or property in your TypeSpec source:");
+    lines.push("");
+    lines.push("```typespec");
+    // Show unique decorator hints
+    const seenHints = new Set<string>();
+    for (const finding of errors) {
+      const hint = formatSuppressionHint(finding);
+      if (!seenHints.has(hint)) {
+        seenHints.add(hint);
+        lines.push(hint);
+      }
+    }
+    lines.push("```");
+    lines.push("");
+    lines.push("</details>");
   }
 
   // Suppressed (collapsed)

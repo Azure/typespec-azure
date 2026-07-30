@@ -180,7 +180,7 @@ describe("reporters", () => {
       comparisonsPerformed: 1,
     });
     expect(report.findings).toHaveLength(3);
-    expect(report.findings[0]).toEqual({
+    expect(report.findings[0]).toMatchObject({
       kind: "ResponsePropertyRemoved",
       severity: "error",
       rule: "response-widening",
@@ -197,6 +197,10 @@ describe("reporters", () => {
       },
       location: { file: "src/main.tsp", line: 45 },
     });
+    // Unsuppressed error findings include suppression guidance
+    expect(report.findings[0].suppression).toBeDefined();
+    expect(report.findings[0].suppression.decorator).toContain("@approvedBreakingChange");
+    expect(report.findings[0].suppression.decorator).toContain("ResponsePropertyRemoved");
     expect(report.timing).toEqual(createResult().timing);
   });
 
