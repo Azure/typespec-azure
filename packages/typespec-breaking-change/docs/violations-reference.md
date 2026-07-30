@@ -80,6 +80,38 @@ model Widget {
 
 Place the decorator on the most specific declaration you can: property > model > operation > namespace.
 
+### Suppression by operation identity
+
+You can place `@approvedBreakingChange` on the **operation** instead of on the property or type.
+
+This is useful when:
+
+- the breaking change comes from a template-expanded type and you cannot decorate the property directly, or
+- you want to suppress the finding only for one operation instead of everywhere that type is used.
+
+Operation-level suppression:
+
+```typespec
+@approvedBreakingChange("Migrating getWidget response shape", "ResponsePropertyRemoved")
+@route("/widgets/{id}")
+@get
+op getWidget(@path id: string): Widget;
+```
+
+Property-level suppression:
+
+```typespec
+model Widget {
+  @approvedBreakingChange("Field removed per API review", "ResponsePropertyRemoved")
+  @removed(Versions.v2)
+  legacy?: string;
+}
+```
+
+- **Property/type-level suppression is global**: it applies everywhere that declaration is used.
+- **Operation-level suppression is scoped**: it suppresses findings only for that specific operation identity.
+- Prefer **property/type-level** suppression for shared model changes, and **operation-level** suppression for operation-specific changes.
+
 ## Phase A: same-version findings are projection bugs, not breaking-change classifications
 
 Phase A compares the **same api-version** produced by two separate compilations (for example, base branch vs. PR branch). If the same operation or model compiles to different wire shapes for the same version, that indicates a version projection inconsistency or modeling bug.
@@ -145,6 +177,10 @@ The sections below are organized by the exact `DiffKind` values from `src/diff-k
 )
 @versioned(Versions)
 namespace Demo;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+}
 ```
 
 ### Authentication scheme lifecycle (`AuthSchemeRemoved`, `AuthSchemeAdded`)
@@ -167,6 +203,7 @@ namespace Demo;
 ```typespec
 @approvedBreakingChange("API key auth is retired in favor of OAuth", "AuthSchemeRemoved")
 @service(#{ title: "Demo" })
+@useAuth(BearerAuth)
 namespace Demo;
 ```
 
@@ -189,6 +226,7 @@ namespace Demo;
 
 ```typespec
 @approvedBreakingChange("Legacy manage scope is retired", "OAuthScopeRemoved")
+@useAuth(OAuth2Auth<["demo.read", "demo.write"]>)
 namespace Demo;
 ```
 
@@ -218,6 +256,7 @@ namespace Demo;
 ```typespec
 interface Widgets {
   @approvedBreakingChange("Delete was deprecated in the previous stable API", "OperationRemoved")
+  @removed(Versions.v2)
   @route("/widgets/{id}")
   @delete
   delete(@path id: string): void;
@@ -263,7 +302,16 @@ op getWidget(@path tenantId: string, @path id: string): Widget;
 
 ```typespec
 @approvedBreakingChange("Subscription is now part of the resource identity", "RequestPathParameterAdded")
+@route("/subscriptions/{subscriptionId}/widgets/{id}")
 op getWidget(@path subscriptionId: string, @path id: string): Widget;
+```
+
+Approve removed path parameter:
+
+```typespec
+@approvedBreakingChange("Subscription segment is removed after resource flattening", "RequestPathParameterRemoved")
+@route("/widgets/{id}")
+op getWidget(@path id: string): Widget;
 ```
 
 ### Query parameters (`RequestQueryParameterAdded`, `RequestQueryParameterRemoved`)
@@ -299,6 +347,13 @@ op listWidgets(
 ): Widget[];
 ```
 
+Approve removed query parameter:
+
+```typespec
+@approvedBreakingChange("Legacy filter parameter is removed", "RequestQueryParameterRemoved")
+op listWidgets(): Widget[];
+```
+
 ### Headers (`RequestHeaderAdded`, `RequestHeaderRemoved`)
 
 - `RequestHeaderAdded` → `error` when the new header is required; `ignore` when it is optional
@@ -331,6 +386,13 @@ op createWidget(
   @header("x-region") region: string,
   @body body: CreateWidgetRequest,
 ): Widget;
+```
+
+Approve removed header:
+
+```typespec
+@approvedBreakingChange("x-ms-client-request-id is no longer accepted", "RequestHeaderRemoved")
+op createWidget(@body body: CreateWidgetRequest): Widget;
 ```
 
 ### Parameter rename (`RequestParameterRenamed`)
@@ -439,6 +501,18 @@ model CreateWidgetRequest {
 }
 ```
 
+Approve removed request property:
+
+```typespec
+model CreateWidgetRequest {
+  name: string;
+
+  @approvedBreakingChange("tags is removed in v2", "RequestPropertyRemoved")
+  @removed(Versions.v2)
+  tags?: Record<string>;
+}
+```
+
 ### Request property rename (`RequestPropertyRenamed`)
 
 - `RequestPropertyRenamed` → `error`, rule `request-narrowing`
@@ -489,6 +563,15 @@ Widened:
 +  tier: string;
  }
 ```
+
+```typespec
+model CreateWidgetRequest {
+  @approvedBreakingChange("size now uses int32 on the wire", "RequestPropertyTypeChanged")
+  size: int32;
+}
+```
+
+Approve narrowed request property type:
 
 ```typespec
 model CreateWidgetRequest {
@@ -566,6 +649,13 @@ Widened:
 ```typespec
 @approvedBreakingChange("Request body is now structured", "RequestTypeChanged")
 op createWidget(@body body: CreateWidgetRequest): Widget;
+```
+
+Approve narrowed request body type:
+
+```typespec
+@approvedBreakingChange("Only named sizes are supported now", "RequestTypeNarrowed")
+op createWidget(@body body: "small" | "large"): Widget;
 ```
 
 ### Request type kind (`RequestTypeKindChanged`)
@@ -646,6 +736,7 @@ model CreateWidgetRequest {
 
 ```typespec
 @approvedBreakingChange("XML payloads are no longer accepted", "RequestContentTypeRemoved")
+@header contentType: "application/json"
 op updateWidget(@body body: UpdateWidgetRequest): Widget;
 ```
 
@@ -675,6 +766,7 @@ model Widget {
   id: string;
 
   @approvedBreakingChange("etag moved to a response header", "ResponsePropertyRemoved")
+  @removed(Versions.v2)
   etag?: string;
 }
 ```
@@ -732,6 +824,15 @@ Widened:
 
 ```typespec
 model Widget {
+  @approvedBreakingChange("size now returns int32 values", "ResponsePropertyTypeChanged")
+  size?: int32;
+}
+```
+
+Approve widened response property type:
+
+```typespec
+model Widget {
   @approvedBreakingChange("Clients are prepared for new provisioning states", "ResponsePropertyTypeWidened")
   provisioningState?: string;
 }
@@ -773,7 +874,7 @@ Changed:
 
 ```diff
 -op getWidget(): Widget;
-+op getWidget(): string;
++op getWidget(): WidgetEnvelope;
 ```
 
 Narrowed:
@@ -793,6 +894,13 @@ Widened:
 ```typespec
 @approvedBreakingChange("Response now returns a new envelope shape", "ResponseTypeChanged")
 op getWidget(): WidgetEnvelope;
+```
+
+Approve widened response type:
+
+```typespec
+@approvedBreakingChange("Clients can handle arbitrary state strings", "ResponseTypeWidened")
+op getState(): string;
 ```
 
 ### Response type kind (`ResponseTypeKindChanged`)
@@ -898,6 +1006,7 @@ op createWidget(...): Widget;
 ```
 
 ```typespec
+@produces("application/json")
 @approvedBreakingChange("XML responses are removed", "ResponseContentTypeRemoved")
 @get
 op getWidget(...): Widget;
@@ -923,6 +1032,7 @@ op getWidget(...): Widget;
 ```typespec
 model GetWidgetResponseHeaders {
   @approvedBreakingChange("etag moved into the body payload", "ResponseHeaderRemoved")
+  @removed(Versions.v2)
   etag?: string;
 }
 ```
