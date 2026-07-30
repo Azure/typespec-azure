@@ -38,6 +38,9 @@ extends:
       skipBuildTagsForGitHubPullRequests: true
       networkIsolationPolicy: Permissive, CFSClean
     sdl:
+      autobaseline:
+        enableForGitHub: true
+        isEnabledForAllTools: true
       git:
         longpaths: true
       codeql:
