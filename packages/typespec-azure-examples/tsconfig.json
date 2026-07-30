@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*.ts", "schema/dist/ExamplesYaml.json"],
+  "files": ["schema/dist/ExamplesYaml.json"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
