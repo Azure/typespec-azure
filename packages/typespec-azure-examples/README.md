@@ -1,7 +1,7 @@
 # @azure-tools/typespec-azure-examples
 
 Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema,
-the `examples-validate` CLI, and the `examples-migrate` CLI.
+the `examples-validate` CLI, the `examples-migrate` CLI, and the `examples-resolve` CLI.
 
 The unified examples format replaces the ~282K per-version `x-ms-examples` JSON files with a
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
@@ -97,6 +97,22 @@ What it does:
 Options: `--out <dir>` (default `.`), `--namespace <ns>`, `--split-by-interface`, `--dry-run`,
 `--warn-as-error`.
 
+## `examples-resolve`
+
+Resolve the applicable example for each operation at a target API version:
+
+```bash
+examples-resolve < service-dir > --api-version 2024-06-01
+```
+
+It reads the linear version order from the adjacent `service.yaml`, discovers `examples.yaml` /
+`examples/*.yaml`, and for each operation lineage selects the entry with the greatest `since` that
+is `<=` the target (the base entry applies from the earliest version). The `{api-version}`
+placeholder is substituted with the target version. Results are printed as JSON (or written with
+`--out <file>`); a lineage with no applicable entry at the target version is omitted.
+
+Options: `--api-version <v>` (required), `--out <file>`.
+
 ## API
 
 ```ts
@@ -105,9 +121,12 @@ import {
   validateExampleFiles,
   loadExampleFile,
   migrate,
+  resolveExamplesDir,
 } from "@azure-tools/typespec-azure-examples";
 
 const { diagnostics } = await validateExamplesDir("path/to/service");
 
 const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
+
+const { examples } = await resolveExamplesDir("path/to/service", "2024-06-01");
 ```
