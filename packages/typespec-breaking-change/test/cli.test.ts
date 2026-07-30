@@ -131,9 +131,10 @@ describe("CLI formatResult", () => {
     const opts: CliOptions = { entry: "main.tsp", format: "json" };
     const output = formatResult(mockResult, opts);
     const parsed = JSON.parse(output);
-    expect(parsed.summary.errors).toBe(1);
+    expect(parsed.counts.errors).toBe(1);
     expect(parsed.findings).toHaveLength(1);
     expect(parsed.findings[0].kind).toBe("ResponsePropertyRemoved");
+    expect(parsed.requiresAction).toBe(true);
   });
 
   it("formats as GitHub markdown", () => {
@@ -269,5 +270,203 @@ describe("CLI main", () => {
 
     expect(code).toBe(2);
     expect(errorSpy).toHaveBeenCalledWith("Analysis failed: boom");
+  });
+
+  it("parses --json-output flag", () => {
+    const opts = parseArgs(["main.tsp", "--json-output", "report.json"]);
+    expect(opts.jsonOutput).toBe("report.json");
+  });
+
+  it("parses --markdown-output flag", () => {
+    const opts = parseArgs(["main.tsp", "--markdown-output", "report.md"]);
+    expect(opts.markdownOutput).toBe("report.md");
+  });
+
+  it("parses --github-annotations flag", () => {
+    const opts = parseArgs(["main.tsp", "--github-annotations"]);
+    expect(opts.githubAnnotations).toBe(true);
+  });
+
+  it("parses --fail-on-breaking flag", () => {
+    const opts = parseArgs(["main.tsp", "--fail-on-breaking"]);
+    expect(opts.failOnBreaking).toBe(true);
+  });
+
+  it("writes JSON and Markdown output files", async () => {
+    // We can't spy on fs/promises in ESM, so we test via the CLI behavior:
+    // verify that the main function doesn't throw when output paths are specified.
+    // The actual file writing is implicitly tested by integration tests.
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [],
+      timing: {
+        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
+        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
+        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
+      },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    // Use temp directory for output
+    const { mkdtemp, readFile, rm } = await import("fs/promises");
+    const { tmpdir } = await import("os");
+    const { join } = await import("path");
+    const dir = await mkdtemp(join(tmpdir(), "bc-test-"));
+
+    try {
+      const code = await main([
+        "head.tsp",
+        "--json-output", join(dir, "report.json"),
+        "--markdown-output", join(dir, "report.md"),
+      ]);
+
+      expect(code).toBe(0);
+
+      const jsonContent = await readFile(join(dir, "report.json"), "utf8");
+      const parsed = JSON.parse(jsonContent);
+      expect(parsed.requiresAction).toBe(false);
+      expect(parsed.counts).toBeDefined();
+
+      const mdContent = await readFile(join(dir, "report.md"), "utf8");
+      expect(mdContent).toContain("## Breaking Change Analysis");
+      expect(mdContent).toContain("No breaking changes detected");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("emits GitHub annotations for errors", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "ResponsePropertyRemoved",
+            identity: { operation: { method: "GET", path: "/test" }, component: "response", element: "body.x" },
+            message: "Property removed",
+            headSourceLocation: {
+              file: { path: "src/test.tsp", text: "line1\nline2\nline3" },
+              pos: 12,
+              end: 15,
+            },
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
+        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
+        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
+      },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await main(["head.tsp", "--github-annotations"]);
+
+    const annotationCall = logSpy.mock.calls.find((c) => String(c[0]).startsWith("::error"));
+    expect(annotationCall).toBeDefined();
+    expect(annotationCall![0]).toContain("file=src/test.tsp");
+    expect(annotationCall![0]).toContain("line=3");
+    expect(annotationCall![0]).toContain("Breaking change: ResponsePropertyRemoved");
+  });
+
+  it("emits annotation without location when no source location", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "OperationRemoved",
+            identity: { element: "operations.GET /test" },
+            message: "Operation removed",
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
+        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
+        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
+      },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    await main(["head.tsp", "--github-annotations"]);
+
+    const annotationCall = logSpy.mock.calls.find((c) => String(c[0]).startsWith("::error"));
+    expect(annotationCall).toBeDefined();
+    expect(annotationCall![0]).not.toContain("file=");
+    expect(annotationCall![0]).toContain("Breaking change: OperationRemoved");
+  });
+
+  it("--fail-on-breaking returns 1 when errors exist", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "ResponsePropertyRemoved",
+            identity: { operation: { method: "GET", path: "/test" }, component: "response", element: "body.x" },
+            message: "Property removed",
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
+        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
+        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
+      },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const code = await main(["head.tsp", "--fail-on-breaking"]);
+    expect(code).toBe(1);
+  });
+
+  it("--fail-on-breaking returns 0 when no errors", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [],
+      timing: {
+        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
+        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
+        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
+      },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const code = await main(["head.tsp", "--fail-on-breaking"]);
+    expect(code).toBe(0);
+  });
+
+  it("catches non-Error throws and reports as string", async () => {
+    vi.spyOn(compileModule, "compileService").mockImplementation(async () => {
+      throw "string error";
+    });
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const code = await main(["head.tsp"]);
+    expect(code).toBe(2);
+    expect(errorSpy).toHaveBeenCalledWith("Analysis failed: string error");
   });
 });

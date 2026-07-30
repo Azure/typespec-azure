@@ -37,6 +37,7 @@ export * from "./policy.js";
 export * from "./reporter-console.js";
 export * from "./reporter-github.js";
 export * from "./reporter-json.js";
+export * from "./reporter-markdown.js";
 export * from "./suppression.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {

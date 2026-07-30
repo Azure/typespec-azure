@@ -4,6 +4,7 @@ import {
   formatGithubReport,
   formatJsonReport,
 } from "../src/index.js";
+import { renderMarkdownSummary } from "../src/reporter-markdown.js";
 import { describe, expect, it } from "vitest";
 
 function createLocation(path: string, line: number) {
@@ -161,65 +162,66 @@ describe("reporters", () => {
   });
 
   it("formats a JSON report without circular references", () => {
-    expect(JSON.parse(formatJsonReport(createResult()))).toEqual({
-      summary: {
-        errors: 1,
-        suppressed: 1,
-        ignored: 1,
-        totalFindings: 3,
-      },
-      findings: [
-        {
-          kind: "ResponsePropertyRemoved",
-          severity: "error",
-          rule: "response-widening",
-          phase: "cross-version",
-          suppressed: false,
-          message: "Response property 'legacyStatus' was removed",
-          operation: { method: "GET", path: "/widgets/{}" },
-          element: "body.properties.legacyStatus",
-          component: "response",
-          statusCode: "200",
-          versionPair: {
-            baseVersion: "2024-01-01",
-            headVersion: "2025-01-01",
-          },
-          location: { file: "src/main.tsp", line: 45 },
-        },
-        {
-          kind: "RequestPropertyRemoved",
-          severity: "error",
-          rule: "request-narrowing",
-          phase: "cross-version",
-          suppressed: true,
-          suppressionReason: "Legacy client migration approved.",
-          message: "Request property 'legacyField' was removed",
-          operation: { method: "POST", path: "/widgets" },
-          element: "body.properties.legacyField",
-          component: "request",
-          versionPair: {
-            baseVersion: "2024-01-01",
-            headVersion: "2025-01-01",
-          },
-          location: { file: "src/models.tsp", line: 12 },
-        },
-        {
-          kind: "OperationAdded",
-          severity: "ignore",
-          rule: "operation-lifecycle",
-          phase: "cross-version",
-          suppressed: false,
-          message: "Operation 'searchWidgets' was added",
-          element: "operations.POST /widgets/search",
-          versionPair: {
-            baseVersion: "2024-01-01",
-            headVersion: "2025-01-01",
-          },
-          location: { file: "src/service.tsp", line: 8 },
-        },
-      ],
-      timing: createResult().timing,
+    const report = JSON.parse(formatJsonReport(createResult(), {
+      specPaths: ["./spec"],
+      baseRevision: "origin/main",
+      headRevision: "HEAD",
+    }));
+    expect(report.specPaths).toEqual(["./spec"]);
+    expect(report.baseRevision).toBe("origin/main");
+    expect(report.headRevision).toBe("HEAD");
+    expect(report.requiresAction).toBe(true);
+    expect(report.counts).toEqual({
+      errors: 1,
+      suppressed: 1,
+      ignored: 1,
+      totalFindings: 3,
+      servicesAnalyzed: 1,
+      comparisonsPerformed: 1,
     });
+    expect(report.findings).toHaveLength(3);
+    expect(report.findings[0]).toEqual({
+      kind: "ResponsePropertyRemoved",
+      severity: "error",
+      rule: "response-widening",
+      phase: "cross-version",
+      suppressed: false,
+      message: "Response property 'legacyStatus' was removed",
+      operation: { method: "GET", path: "/widgets/{}" },
+      element: "body.properties.legacyStatus",
+      component: "response",
+      statusCode: "200",
+      versionPair: {
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+      },
+      location: { file: "src/main.tsp", line: 45 },
+    });
+    expect(report.timing).toEqual(createResult().timing);
+  });
+
+  it("formats a JSON report with requiresAction=false when no errors", () => {
+    const result = createResult();
+    result.findings = result.findings.filter((f) => f.severity !== "error" || f.suppressed);
+    const report = JSON.parse(formatJsonReport(result));
+    expect(report.requiresAction).toBe(false);
+    expect(report.counts.errors).toBe(0);
+  });
+
+  it("formats a JSON report with noComparisonReason when no comparisons", () => {
+    const result = createResult();
+    result.findings = [];
+    result.summary = { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview" };
+    const report = JSON.parse(formatJsonReport(result));
+    expect(report.noComparisonReason).toBe("All versions are preview");
+    expect(report.requiresAction).toBe(false);
+  });
+
+  it("formats a JSON report with default empty options", () => {
+    const report = JSON.parse(formatJsonReport(createResult()));
+    expect(report.specPaths).toEqual([]);
+    expect(report.baseRevision).toBeUndefined();
+    expect(report.headRevision).toBeUndefined();
   });
 
   it("formats a GitHub markdown report", () => {
@@ -279,5 +281,88 @@ describe("reporters", () => {
     ];
     const output = formatGithubReport(result);
     expect(output).toContain("—"); // dash for non-operation identity
+  });
+});
+
+describe("markdown reporter", () => {
+  it("renders a summary with breaking changes", () => {
+    const md = renderMarkdownSummary(createResult(), {
+      baseRevision: "origin/main",
+      headRevision: "HEAD",
+    });
+    expect(md).toContain("## Breaking Change Analysis");
+    expect(md).toContain("❌ **1 breaking change detected**");
+    expect(md).toContain("1 error");
+    expect(md).toContain("1 suppressed");
+    expect(md).toContain("1 ignored");
+    expect(md).toContain("Comparing `origin/main` → `HEAD`");
+    expect(md).toContain("### Breaking Changes");
+    expect(md).toContain("ResponsePropertyRemoved");
+    expect(md).toContain("Suppressed findings (1)");
+  });
+
+  it("renders a clean summary with no breaking changes", () => {
+    const result = createResult();
+    result.findings = result.findings.filter((f) => f.severity !== "error" || f.suppressed);
+    const md = renderMarkdownSummary(result);
+    expect(md).toContain("✅ **No breaking changes detected**");
+    expect(md).not.toContain("### Breaking Changes");
+  });
+
+  it("renders noComparisonReason when no comparisons performed", () => {
+    const result = createResult();
+    result.findings = [];
+    result.summary = { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview" };
+    const md = renderMarkdownSummary(result);
+    expect(md).toContain("ℹ️ **No comparisons performed**");
+    expect(md).toContain("All versions are preview");
+    expect(md).not.toContain("### Breaking Changes");
+  });
+
+  it("includes timing when showTiming is true", () => {
+    const md = renderMarkdownSummary(createResult(), { showTiming: true });
+    expect(md).toContain("<summary>Performance</summary>");
+    expect(md).toContain("Total:");
+  });
+
+  it("excludes timing when showTiming is false", () => {
+    const md = renderMarkdownSummary(createResult(), { showTiming: false });
+    expect(md).not.toContain("<summary>Performance</summary>");
+  });
+
+  it("handles service-level identity in findings table", () => {
+    const result = createResult();
+    result.findings = [
+      {
+        ...result.findings[0],
+        diff: {
+          ...result.findings[0].diff,
+          identity: { element: "service.endpoint" },
+        },
+      },
+    ];
+    const md = renderMarkdownSummary(result);
+    expect(md).toContain("—"); // dash for non-operation identity
+    expect(md).toContain("`service.endpoint`");
+  });
+
+  it("escapes pipe characters in table cells", () => {
+    const result = createResult();
+    result.findings = [
+      {
+        ...result.findings[0],
+        diff: {
+          ...result.findings[0].diff,
+          message: "value was a|b, now c|d",
+          identity: {
+            operation: { method: "GET", path: "/test" },
+            component: "request" as const,
+            element: "query.filter|sort",
+          },
+        },
+      },
+    ];
+    const md = renderMarkdownSummary(result);
+    expect(md).toContain("\\|"); // escaped pipes
   });
 });

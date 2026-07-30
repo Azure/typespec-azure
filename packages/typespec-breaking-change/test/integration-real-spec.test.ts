@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { compile, NodeHost } from "@typespec/compiler";
 import type { Program } from "@typespec/compiler";
 import { analyzeProgram, analyzeBaseAndHead } from "../src/orchestrator.js";
-import { enumerateVersions, createVersionedView } from "../src/versions.js";
+import { enumerateVersions, createVersionedView, buildPhaseBPairs } from "../src/versions.js";
 import { computeDiffs } from "../src/diff-engine.js";
 import { resolve } from "path";
 
@@ -192,4 +192,151 @@ describe("integration: large ARM spec (Network, 739 operations)", () => {
     // Without dedup, we'd see hundreds of duplicates for shared model changes
     expect(result.findings.length).toBeLessThan(200);
   }, 120_000);
+});
+
+/**
+ * Integration test against ContainerService/fleet — a spec with MANY versions (13).
+ * Tests version-count scaling: 3 stable + 10 preview → 8 Phase B pairs.
+ * Performance target: <30s for full analysis.
+ */
+const FLEET_ROOT = resolve(
+  "C:/Users/markcowl/session2/azure-rest-api-specs/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet",
+);
+
+describe("integration: many-version spec (ContainerService/fleet, 13 versions)", () => {
+  let program: Awaited<ReturnType<typeof compile>> | undefined;
+
+  async function getProgram() {
+    if (program) return program;
+    program = await compile(NodeHost, resolve(FLEET_ROOT, "main.tsp"), {
+      noEmit: true,
+    });
+    return program;
+  }
+
+  it("compiles the fleet spec without errors", async () => {
+    const prog = await getProgram();
+    const errors = prog.diagnostics.filter((d) => d.severity === "error");
+    expect(errors).toHaveLength(0);
+  }, 60_000);
+
+  it("discovers 13 versions across stable and preview", async () => {
+    const prog = await getProgram();
+    const services = enumerateVersions(prog);
+    expect(services.length).toBe(1);
+
+    const fleet = services[0];
+    expect(fleet.service.name).toBe("ContainerService");
+    expect(fleet.versions.length).toBe(13);
+
+    // Verify version ordering: 3 stable interspersed with preview
+    const stableVersions = fleet.versions.filter((v) => !v.endsWith("-preview"));
+    expect(stableVersions).toEqual(["2023-10-15", "2024-04-01", "2025-03-01"]);
+  }, 60_000);
+
+  it("generates correct Phase B pairs (each candidate vs previous stable)", async () => {
+    const prog = await getProgram();
+    const services = enumerateVersions(prog);
+    const fleet = services[0];
+
+    const pairs = buildPhaseBPairs(fleet.versions, fleet.versions);
+
+    // Preview versions before first stable have no stable baseline → skipped
+    // After 2023-10-15: 2024-02-02-preview compared to 2023-10-15
+    // After 2024-04-01: 2024-05-02-preview compared to 2024-04-01
+    // After 2025-03-01: 2025-04-01-preview, 2025-08-01-preview, etc. compared to 2025-03-01
+    expect(pairs.length).toBe(8);
+
+    // First four versions are preview with no prior stable → no pairs
+    // Verify specific pair structure
+    expect(pairs[0]).toMatchObject({
+      baseVersion: "2023-10-15",
+      headVersion: "2024-02-02-preview",
+    });
+    expect(pairs[1]).toMatchObject({
+      baseVersion: "2023-10-15",
+      headVersion: "2024-04-01",
+    });
+  }, 60_000);
+
+  it("operation count grows across versions (12 → 42)", async () => {
+    const prog = await getProgram();
+    const services = enumerateVersions(prog);
+    const fleet = services[0];
+
+    const firstView = createVersionedView(prog, fleet.service, fleet.versions[0]);
+    const lastView = createVersionedView(prog, fleet.service, fleet.versions[fleet.versions.length - 1]);
+
+    const firstOps = computeDiffs(firstView, firstView).baseCanonicalization.operations.size;
+    const lastOps = computeDiffs(lastView, lastView).baseCanonicalization.operations.size;
+
+    expect(firstOps).toBeGreaterThanOrEqual(10);
+    expect(lastOps).toBeGreaterThanOrEqual(35);
+    expect(lastOps).toBeGreaterThan(firstOps);
+
+    console.log(`  Fleet operations: ${firstOps} (first) → ${lastOps} (last)`);
+  }, 60_000);
+
+  it("full Phase B analysis completes in under 30 seconds", async () => {
+    const prog = await getProgram();
+    const start = Date.now();
+    const result = analyzeProgram(prog, { phase: "cross-version" });
+    const elapsed = Date.now() - start;
+
+    expect(elapsed).toBeLessThan(30_000);
+    expect(result.summary.comparisonsPerformed).toBe(8);
+    expect(result.findings.length).toBeGreaterThan(0);
+
+    console.log(`  Fleet analysis: ${elapsed}ms, ${result.findings.length} findings, ${result.summary.comparisonsPerformed} pairs`);
+    console.log(`  Timing:`, result.timing);
+  }, 60_000);
+
+  it("version mutator time scales linearly with pair count", async () => {
+    const prog = await getProgram();
+    const result = analyzeProgram(prog, { phase: "cross-version" });
+
+    // 8 pairs × 2 views each = 16 versioned views at ~170ms each ≈ ~2.7s
+    // Allow up to 1s per view (generous for CI variability)
+    const msPerView = result.timing.versionMutatorsMs / (result.summary.comparisonsPerformed * 2);
+    expect(msPerView).toBeLessThan(1000);
+
+    console.log(`  Per-view mutator time: ${Math.round(msPerView)}ms`);
+  }, 60_000);
+
+  it("findings have proper version pair references", async () => {
+    const prog = await getProgram();
+    const result = analyzeProgram(prog, { phase: "cross-version" });
+
+    const versionPairs = new Set(
+      result.findings.map((f) => `${f.versionPair.baseVersion}->${f.versionPair.headVersion}`),
+    );
+
+    // All findings should reference valid Phase B pairs (stable → candidate)
+    for (const finding of result.findings) {
+      expect(finding.versionPair.baseVersion).not.toContain("-preview");
+      expect(finding.phase).toBe("cross-version");
+    }
+
+    console.log(`  Active version pairs with findings: ${versionPairs.size}`);
+    for (const pair of versionPairs) {
+      const count = result.findings.filter(
+        (f) => `${f.versionPair.baseVersion}->${f.versionPair.headVersion}` === pair,
+      ).length;
+      console.log(`    ${pair}: ${count} findings`);
+    }
+  }, 60_000);
+
+  it("deduplication works across many version pairs", async () => {
+    const prog = await getProgram();
+    const result = analyzeProgram(prog, { phase: "cross-version" });
+
+    // With 8 pairs sharing many of the same model changes, dedup should help
+    const withOrigin = result.findings.filter((f) => f.diff.origin).length;
+    const total = result.findings.length;
+    const originPct = total > 0 ? (withOrigin / total) * 100 : 100;
+
+    console.log(`  Origin coverage: ${withOrigin}/${total} (${Math.round(originPct)}%)`);
+    // At least some findings should have origin (shared models)
+    expect(withOrigin).toBeGreaterThan(0);
+  }, 60_000);
 });

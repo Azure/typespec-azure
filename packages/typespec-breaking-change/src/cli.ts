@@ -1,20 +1,31 @@
 #!/usr/bin/env node
 
 import { resolve } from "path";
+import { writeFile, mkdir } from "fs/promises";
+import { dirname } from "path";
 import { compileService } from "./compile.js";
 import { analyzeBaseAndHead, analyzeProgram, type AnalysisOptions } from "./orchestrator.js";
 import { formatConsoleReport } from "./reporter-console.js";
 import { formatGithubReport } from "./reporter-github.js";
-import { formatJsonReport } from "./reporter-json.js";
+import { formatJsonReport, type JsonReportOptions } from "./reporter-json.js";
+import { renderMarkdownSummary, type MarkdownReportOptions } from "./reporter-markdown.js";
 import type { AnalysisResult, ComparisonPhase } from "./types.js";
 
 export interface CliOptions {
-  /** Path to the head TypeSpec entry point (required). */
+  /** Path to the head TypeSpec entry point (file-to-file mode). */
   entry: string;
-  /** Path to the base TypeSpec entry point (for two-program comparison). */
+  /** Path to the base TypeSpec entry point (file-to-file mode). */
   base?: string;
-  /** Output format: console, json, or github. */
+  /** Output format for console: console, json, or github. */
   format: "console" | "json" | "github";
+  /** Write JSON report to this file path. */
+  jsonOutput?: string;
+  /** Write Markdown report to this file path. */
+  markdownOutput?: string;
+  /** Emit GitHub Actions annotations. */
+  githubAnnotations?: boolean;
+  /** Exit with code 1 on breaking changes. */
+  failOnBreaking?: boolean;
   /** Restrict to a specific phase. */
   phase?: ComparisonPhase;
   /** Filter to a specific service name. */
@@ -49,6 +60,18 @@ export function parseArgs(args: string[]): CliOptions {
       case "-f":
         options.format = (args[++i] as CliOptions["format"]) ?? "console";
         break;
+      case "--json-output":
+        options.jsonOutput = args[++i];
+        break;
+      case "--markdown-output":
+        options.markdownOutput = args[++i];
+        break;
+      case "--github-annotations":
+        options.githubAnnotations = true;
+        break;
+      case "--fail-on-breaking":
+        options.failOnBreaking = true;
+        break;
       case "--phase":
       case "-p":
         options.phase = args[++i] as ComparisonPhase;
@@ -81,17 +104,21 @@ export function parseArgs(args: string[]): CliOptions {
 
 function printUsage(): void {
   console.log(`
-Usage: typespec-breaking-change [options] <entry>
+Usage: typespec-breaking-change [options] <spec-folder>
 
 Analyze a TypeSpec specification for breaking changes.
 
 Arguments:
-  entry                      Path to the head TypeSpec entry point
+  spec-folder                Path to the TypeSpec project folder (containing main.tsp)
 
 Options:
-  -e, --entry <path>         Path to the head TypeSpec entry point
-  -b, --base <path>          Path to the base TypeSpec entry point (two-program comparison)
-  -f, --format <format>      Output format: console, json, github (default: console)
+  -e, --entry <path>         Path to the head TypeSpec entry point (file-to-file mode)
+  -b, --base <path>          Path to the base TypeSpec entry point (file-to-file comparison)
+  -f, --format <format>      Console output format: console, json, github (default: console)
+  --json-output <path>       Write JSON report to file
+  --markdown-output <path>   Write Markdown summary to file
+  --github-annotations       Emit GitHub Actions ::warning annotations
+  --fail-on-breaking         Exit with code 1 if breaking changes detected
   -p, --phase <phase>        Restrict to phase: same-version, cross-version
   -s, --service <name>       Filter to a specific service name
   --show-suppressed          Include suppressed findings in output
@@ -99,9 +126,19 @@ Options:
   -h, --help                 Show this help message
 
 Exit codes:
-  0  No breaking changes found
-  1  Breaking changes detected
+  0  No breaking changes found (or --fail-on-breaking not set)
+  1  Breaking changes detected (with --fail-on-breaking)
   2  Analysis failure (compilation error, invalid arguments, etc.)
+
+Examples:
+  # Single spec folder (Phase B cross-version analysis)
+  typespec-breaking-change ./specification/widget/Microsoft.Widget/Widget
+
+  # File-to-file comparison (Phase A + B)
+  typespec-breaking-change --entry ./head/main.tsp --base ./base/main.tsp
+
+  # CI mode: JSON + Markdown output, fail on breaking
+  typespec-breaking-change ./spec --json-output report.json --markdown-output report.md --fail-on-breaking
 `);
 }
 
@@ -111,7 +148,7 @@ Exit codes:
 export function formatResult(result: AnalysisResult, options: CliOptions): string {
   switch (options.format) {
     case "json":
-      return formatJsonReport(result);
+      return formatJsonReport(result, buildReportOptions(options));
     case "github":
       return formatGithubReport(result);
     case "console":
@@ -122,6 +159,18 @@ export function formatResult(result: AnalysisResult, options: CliOptions): strin
         showTiming: true,
       });
   }
+}
+
+function buildReportOptions(options: CliOptions): JsonReportOptions {
+  return {
+    specPaths: [options.entry],
+    baseRevision: options.base,
+    headRevision: options.entry,
+  };
+}
+
+async function ensureParentDir(filePath: string): Promise<void> {
+  await mkdir(dirname(filePath), { recursive: true });
 }
 
 /**
@@ -161,16 +210,64 @@ export async function main(args: string[]): Promise<number> {
       result = analyzeProgram(program, analysisOptions);
     }
 
+    // Console output
     const output = formatResult(result, options);
     console.log(output);
 
-    // Exit code: 1 if unsuppressed errors exist
+    // JSON file output
+    if (options.jsonOutput) {
+      const jsonPath = resolve(options.jsonOutput);
+      await ensureParentDir(jsonPath);
+      const jsonContent = formatJsonReport(result, buildReportOptions(options));
+      await writeFile(jsonPath, jsonContent);
+    }
+
+    // Markdown file output
+    if (options.markdownOutput) {
+      const mdPath = resolve(options.markdownOutput);
+      await ensureParentDir(mdPath);
+      const mdOptions: MarkdownReportOptions = {
+        baseRevision: options.base,
+        headRevision: options.entry,
+        specPaths: [options.entry],
+        showTiming: true,
+      };
+      const mdContent = renderMarkdownSummary(result, mdOptions);
+      await writeFile(mdPath, mdContent);
+    }
+
+    // GitHub annotations
+    if (options.githubAnnotations) {
+      emitGithubAnnotations(result);
+    }
+
+    // Exit code
     const hasErrors = result.findings.some((f) => f.severity === "error" && !f.suppressed);
+    if (options.failOnBreaking && hasErrors) {
+      return 1;
+    }
     return hasErrors ? 1 : 0;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Analysis failed: ${message}`);
     return 2;
+  }
+}
+
+/**
+ * Emit GitHub Actions annotations for each unsuppressed error finding.
+ */
+function emitGithubAnnotations(result: AnalysisResult): void {
+  const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
+  for (const finding of errors) {
+    const location = finding.diff.headSourceLocation ?? finding.diff.baseSourceLocation;
+    const filePart = location ? `file=${location.file.path}` : "";
+    const linePart = location
+      ? `,line=${location.file.text.substring(0, location.pos).split("\n").length}`
+      : "";
+    const locStr = filePart ? ` ${filePart}${linePart}` : "";
+    const title = `Breaking change: ${finding.diff.kind}`;
+    console.log(`::error${locStr ? " " + locStr.trim() : ""}::${title} - ${finding.diff.message}`);
   }
 }
 
