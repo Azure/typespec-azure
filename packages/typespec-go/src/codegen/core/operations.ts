@@ -717,35 +717,6 @@ function getClientEndpointExpr(client: go.Client, azureARM: boolean): string | u
 }
 
 /**
- * emits code that resolves a relative next link against the client's service endpoint.
- * services are allowed to return a next link that's relative to the endpoint (e.g.
- * "/foo/page/2"), however runtime.FetcherForNextLink requires an absolute URL. absolute
- * next links are passed through unmodified.
- *
- * @param nextLinkVar the name of the local var containing the next link
- * @param endpointExpr the expression used to obtain the client's service endpoint
- * @param imports the import manager currently in scope
- * @param indent the indentation helper currently in scope
- * @returns the code to resolve a relative next link
- */
-function emitRelativeNextLinkResolution(
-  nextLinkVar: string,
-  endpointExpr: string,
-  imports: ImportManager,
-  indent: helpers.Indentation,
-): string {
-  imports.add("net/url");
-  let text = `${indent.get()}// the service can return a next link that's relative to the endpoint, however\n`;
-  text += `${indent.get()}// runtime.FetcherForNextLink requires an absolute URL, so resolve it here.\n`;
-  text += `${indent.get()}if ${nextLinkVar} != "" {\n`;
-  text += `${indent.push().get()}if u, err := url.Parse(${nextLinkVar}); err == nil && !u.IsAbs() {\n`;
-  text += `${indent.push().get()}${nextLinkVar} = runtime.JoinPaths(${endpointExpr}, ${nextLinkVar})\n`;
-  text += `${indent.pop().get()}}\n`;
-  text += `${indent.pop().get()}}\n`;
-  return text;
-}
-
-/**
  * emits code that calls runtime.NewPager
  *
  * @param method the pageable method
@@ -874,43 +845,44 @@ function emitPagerDefinition(
           text += `${indent.get()}if page != nil {\n`;
           text += `${indent.push().get()}nextLink = *page.${nextLinkPath}\n`;
           text += `${indent.pop().get()}}\n`;
-        } else if (endpointExpr) {
-          text += `${indent.get()}nextLink := *page.${nextLinkPath}\n`;
-          nextLinkVar = "nextLink";
         } else {
           nextLinkVar = `*page.${nextLinkPath}`;
-        }
-        if (endpointExpr) {
-          text += emitRelativeNextLinkResolution(nextLinkVar, endpointExpr, imports, indent);
         }
         text += `${indent.get()}resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), ${nextLinkVar}, func(ctx context.Context) (*policy.Request, error) {\n`;
         text += `${indent.push().get()}return client.${method.naming.requestMethod}(${reqParams})\n`;
         text += `${indent.pop().get()}}, `;
         // nextPageMethod might be absent in some cases, see https://github.com/Azure/autorest/issues/4393
-        if (method.strategy.method) {
-          const nextOpParams = helpers
-            .getCreateRequestParametersSig(method.strategy.method)
-            .split(",");
-          // keep the parameter names from the name/type tuples and find nextLink param
-          for (let i = 0; i < nextOpParams.length; ++i) {
-            const paramName = nextOpParams[i].trim().split(" ")[0];
-            const paramType = nextOpParams[i].trim().split(" ")[1];
-            if (paramName.startsWith("next") && paramType === "string") {
-              nextOpParams[i] = "encodedNextLink";
-            } else {
-              nextOpParams[i] = paramName;
-            }
-          }
-          // add a definition for the nextReq func that uses the nextLinkOperation
+        const nextReq = method.strategy.method;
+        const httpVerb =
+          !nextReq && method.nextLinkVerb !== "get"
+            ? `http.Method${naming.capitalize(method.nextLinkVerb)}`
+            : undefined;
+        if (nextReq || httpVerb || endpointExpr) {
+          text += `&runtime.FetcherForNextLinkOptions{\n`;
           indent.push();
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.get()}NextReq: func(ctx context.Context, encodedNextLink string) (*policy.Request, error) {\n`;
-          text += `${indent.push().get()}return client.${method.strategy.method.name}(${nextOpParams.join(", ")})\n`;
-          text += `${indent.pop().get()}},\n`;
-          text += `${indent.pop().get()}})\n`;
-        } else if (method.nextLinkVerb !== "get") {
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.push().get()}HTTPVerb: http.Method${naming.capitalize(method.nextLinkVerb)},\n`;
+          if (nextReq) {
+            const nextOpParams = helpers.getCreateRequestParametersSig(nextReq).split(",");
+            // keep the parameter names from the name/type tuples and find nextLink param
+            for (let i = 0; i < nextOpParams.length; ++i) {
+              const paramName = nextOpParams[i].trim().split(" ")[0];
+              const paramType = nextOpParams[i].trim().split(" ")[1];
+              if (paramName.startsWith("next") && paramType === "string") {
+                nextOpParams[i] = "encodedNextLink";
+              } else {
+                nextOpParams[i] = paramName;
+              }
+            }
+            // add a definition for the nextReq func that uses the nextLinkOperation
+            text += `${indent.get()}NextReq: func(ctx context.Context, encodedNextLink string) (*policy.Request, error) {\n`;
+            text += `${indent.push().get()}return client.${nextReq.name}(${nextOpParams.join(", ")})\n`;
+            text += `${indent.pop().get()}},\n`;
+          }
+          if (httpVerb) {
+            text += `${indent.get()}HTTPVerb: ${httpVerb},\n`;
+          }
+          if (endpointExpr) {
+            text += `${indent.get()}Endpoint: ${endpointExpr},\n`;
+          }
           text += `${indent.pop().get()}})\n`;
         } else {
           text += "nil)\n";
