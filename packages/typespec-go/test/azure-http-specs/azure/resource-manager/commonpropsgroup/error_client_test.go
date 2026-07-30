@@ -14,6 +14,7 @@ import (
 )
 
 func TestErrorClient_CreateForUserDefinedError(t *testing.T) {
+	t.Skip("https://github.com/Azure/typespec-azure/issues/4946")
 	resp, err := clientFactory.NewErrorClient().CreateForUserDefinedError(ctx, resourceGroupExpected, "confidential", commonpropsgroup.ConfidentialResource{
 		Location: to.Ptr("eastus"),
 		Properties: &commonpropsgroup.ConfidentialResourceProperties{
@@ -40,6 +41,7 @@ func TestErrorClient_GetForPredefinedError(t *testing.T) {
 	var respErr *azcore.ResponseError
 	require.ErrorAs(t, err, &respErr)
 	require.EqualValues(t, http.StatusNotFound, respErr.StatusCode)
+	require.EqualValues(t, "ResourceNotFound", respErr.ErrorCode)
 	require.Zero(t, resp)
 	bodyBytes := make([]byte, respErr.RawResponse.ContentLength)
 	_, readErr := respErr.RawResponse.Body.Read(bodyBytes)

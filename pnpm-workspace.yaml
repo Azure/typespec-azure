@@ -15,7 +15,10 @@ packages:
 verifyDepsBeforeRun: false
 
 overrides:
-  "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
+  "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5"
+  "diff@>=6.0.0 <8.0.3": ">=8.0.3"
+  dompurify: ^3.3.3
+  "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
 
 onlyBuiltDependencies:
   - tree-sitter
@@ -52,9 +55,9 @@ catalog:
   "@azure/storage-blob": ^12.31.0
   "@babel/code-frame": ^7.29.0
   "@babel/core": ^7.29.0
-  "@chronus/chronus": ^1.3.1
-  "@chronus/github": ^1.0.6
-  "@chronus/github-pr-commenter": ^1.0.6
+  "@chronus/chronus": ^1.4.0
+  "@chronus/github": ^1.1.0
+  "@chronus/github-pr-commenter": ^1.1.0
   "@docsearch/css": ^4.6.2
   "@docsearch/js": ^4.6.2
   "@expressive-code/core": ^0.44.0
