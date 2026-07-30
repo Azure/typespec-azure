@@ -13,6 +13,7 @@ export {
   type LoadedExampleFile,
   type Position,
 } from "./loader.js";
+export * from "./migrate/index.js";
 export { formatDiagnostics, formatSummary } from "./reporter.js";
 export { checkFilePlacement, checkSemantics, type SemanticContext } from "./rules.js";
 export { ExamplesYamlSchema } from "./schema.js";
