@@ -1,7 +1,8 @@
-import { Model, createRule, getDiscriminator, paramMessage } from "@typespec/compiler";
+import { Model, createRule, fileRef, getDiscriminator, paramMessage } from "@typespec/compiler";
 
 export const noStringDiscriminatorRule = createRule({
   name: "no-string-discriminator",
+  docs: fileRef.fromPackageRoot("src/rules/no-string-discriminator.md"),
   description:
     "Azure services discriminated models should define the discriminated property as an extensible union.",
   severity: "warning",

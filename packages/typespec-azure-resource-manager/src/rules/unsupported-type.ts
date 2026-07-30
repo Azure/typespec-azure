@@ -1,4 +1,11 @@
-import { DiagnosticTarget, Type, createRule, isType, paramMessage } from "@typespec/compiler";
+import {
+  DiagnosticTarget,
+  Type,
+  createRule,
+  fileRef,
+  isType,
+  paramMessage,
+} from "@typespec/compiler";
 
 const UnsupportedIntrinsicModel = new Set(["int8", "int16", "uint8", "uint16", "uint32", "uint64"]);
 /**
@@ -6,6 +13,7 @@ const UnsupportedIntrinsicModel = new Set(["int8", "int16", "uint8", "uint16", "
  */
 export const unsupportedTypeRule = createRule({
   name: "unsupported-type",
+  docs: fileRef.fromPackageRoot("src/rules/unsupported-type.md"),
   severity: "warning",
   description: "Check for unsupported ARM types.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type",

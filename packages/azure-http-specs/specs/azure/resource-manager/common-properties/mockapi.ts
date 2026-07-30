@@ -237,6 +237,7 @@ const SIMPLE_ARM_ID = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups
 const ARM_ID_WITH_TYPE = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
 const ARM_ID_WITH_TYPE_AND_SCOPE = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
 const ARM_ID_WITH_ALL_SCOPES = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Compute/virtualMachines/myVm`;
+const ARM_ID_WITH_GROUP_SCOPE = `/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/${SUBSCRIPTION_ID_EXPECTED}`;
 
 const validArmResourceIdentifierResource = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId`,
@@ -249,6 +250,7 @@ const validArmResourceIdentifierResource = {
     armIdWithType: ARM_ID_WITH_TYPE,
     armIdWithTypeAndScope: ARM_ID_WITH_TYPE_AND_SCOPE,
     armIdWithAllScopes: ARM_ID_WITH_ALL_SCOPES,
+    armIdWithGroupScope: ARM_ID_WITH_GROUP_SCOPE,
   },
 };
 
@@ -284,6 +286,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOr
           armIdWithType: ARM_ID_WITH_TYPE,
           armIdWithTypeAndScope: ARM_ID_WITH_TYPE_AND_SCOPE,
           armIdWithAllScopes: ARM_ID_WITH_ALL_SCOPES,
+          armIdWithGroupScope: ARM_ID_WITH_GROUP_SCOPE,
         },
       }),
       pathParams: {

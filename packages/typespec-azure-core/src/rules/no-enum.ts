@@ -2,6 +2,7 @@ import {
   CodeFix,
   Enum,
   createRule,
+  fileRef,
   getPositionBeforeTrivia,
   getSourceLocation,
   paramMessage,
@@ -17,6 +18,7 @@ import {
 import { getVersionsForEnum } from "@typespec/versioning";
 export const noEnumRule = createRule({
   name: "no-enum",
+  docs: fileRef.fromPackageRoot("src/rules/no-enum.md"),
   description: "Azure services should not use enums.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-enum",

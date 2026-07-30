@@ -1,6 +1,7 @@
 import {
   Operation,
   createRule,
+  fileRef,
   ignoreDiagnostics,
   isTemplateInstance,
   paramMessage,
@@ -10,6 +11,7 @@ import { getHttpOperation } from "@typespec/http";
 const binaryContentTypes = new Set(["application/octet-stream", "multipart/form-data"]);
 export const byosRule = createRule({
   name: "byos",
+  docs: fileRef.fromPackageRoot("src/rules/byos.md"),
   description: "Use the BYOS pattern recommended for Azure Services.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/byos",

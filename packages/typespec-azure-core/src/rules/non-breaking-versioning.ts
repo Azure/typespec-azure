@@ -1,4 +1,4 @@
-import { ModelProperty, Type, createRule, paramMessage } from "@typespec/compiler";
+import { ModelProperty, Type, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import {
   getAddedOnVersions,
   getMadeOptionalOn,
@@ -8,6 +8,7 @@ import {
 
 export const nonBreakingVersioningRule = createRule({
   name: "non-breaking-versioning",
+  docs: fileRef.fromPackageRoot("src/rules/non-breaking-versioning.md"),
   description: "Check that only backward compatible versioning change are done to a service.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/non-breaking-versioning",

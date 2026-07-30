@@ -1,7 +1,8 @@
-import { ModelProperty, createRule, isUnknownType } from "@typespec/compiler";
+import { ModelProperty, createRule, fileRef, isUnknownType } from "@typespec/compiler";
 
 export const preventUnknownType = createRule({
   name: "no-unknown",
+  docs: fileRef.fromPackageRoot("src/rules/no-unknown.md"),
   description: "Azure services must not have properties of type `unknown`.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unknown",

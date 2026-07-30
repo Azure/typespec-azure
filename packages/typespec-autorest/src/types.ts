@@ -24,8 +24,7 @@ import type {
  * a particular service definition.
  */
 export type AutorestServiceRecord =
-  | AutorestUnversionedServiceRecord
-  | AutorestVersionedServiceRecord;
+  AutorestUnversionedServiceRecord | AutorestVersionedServiceRecord;
 
 export interface AutorestUnversionedServiceRecord extends AutorestEmitterResult {
   /** The service that generated this OpenAPI document */

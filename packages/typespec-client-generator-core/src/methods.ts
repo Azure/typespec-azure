@@ -182,23 +182,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getOverriddenClientMethod(context, operation) ?? operation,
     );
 
-    if (responseType?.__raw?.kind !== "Model" || responseType.kind !== "model" || !pagingMetadata) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "unexpected-pageable-operation-return-type",
-          target: operation,
-          format: {
-            operationName: operation.name,
-          },
-        }),
-      );
-      // return as page method with no paging info
-      return diagnostics.wrap({
-        ...baseServiceMethod,
-        kind: "paging",
-        pagingMetadata: {},
-      });
-    }
+    compilerAssert(
+      responseType?.__raw?.kind === "Model" && responseType.kind === "model" && !!pagingMetadata,
+      "The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.",
+      operation,
+    );
 
     const resultSegments = mapFirstSegmentForResultSegments(
       pagingMetadata.output.pageItems.path,
@@ -213,8 +201,8 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       baseServiceMethod.response,
     );
 
-    baseServiceMethod.response.resultSegments = resultSegments?.map(
-      (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
+    baseServiceMethod.response.resultSegments = resultSegments?.map((resultSegment) =>
+      context.__modelPropertyCache.get(resultSegment)!,
     );
 
     context.__pagedResultSet.add(responseType);
@@ -255,14 +243,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
                   context.program,
                   pagingMetadata.output.nextLink.property.type,
                 ) ?? []
-              ).map(
-                (t: ModelProperty) =>
-                  getPropertySegmentsFromModelOrParameters(
-                    baseServiceMethod.parameters,
-                    (p) =>
-                      p.__raw?.kind === "ModelProperty" &&
-                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-                  )!,
+              ).map((t: ModelProperty) =>
+                getPropertySegmentsFromModelOrParameters(
+                  baseServiceMethod.parameters,
+                  (p) =>
+                    p.__raw?.kind === "ModelProperty" &&
+                    findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                )!,
               )
             : undefined,
       },

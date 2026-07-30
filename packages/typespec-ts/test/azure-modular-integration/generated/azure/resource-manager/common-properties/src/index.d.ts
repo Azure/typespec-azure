@@ -28,6 +28,7 @@ export declare interface ArmResourceIdentifierResourceProperties {
     armIdWithType: string;
     armIdWithTypeAndScope: string;
     armIdWithAllScopes: string;
+    armIdWithGroupScope: string;
 }
 
 export declare interface ArmResourceIdentifiersCreateOrReplaceOptionalParams extends OperationOptions {

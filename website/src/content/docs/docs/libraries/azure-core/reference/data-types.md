@@ -100,7 +100,7 @@ model Azure.Core.ClientRequestIdHeader
 
 ### `ConditionalRequestHeaders` {#Azure.Core.ConditionalRequestHeaders}
 
-Provides the 'If-\*' headers to enable conditional (cached) responses
+Provides the 'If-*' headers to enable conditional (cached) responses
 
 ```typespec
 model Azure.Core.ConditionalRequestHeaders
@@ -271,7 +271,7 @@ model Azure.Core.PollingOptions
 
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 
-Provides the 'Repeatability-\*' headers to enable repeatable requests.
+Provides the 'Repeatability-*' headers to enable repeatable requests.
 
 ```typespec
 model Azure.Core.RepeatabilityRequestHeaders
@@ -286,7 +286,7 @@ model Azure.Core.RepeatabilityRequestHeaders
 
 ### `RepeatabilityResponseHeaders` {#Azure.Core.RepeatabilityResponseHeaders}
 
-Provides the 'Repeatability-\*' headers to enable repeatable requests.
+Provides the 'Repeatability-*' headers to enable repeatable requests.
 
 ```typespec
 model Azure.Core.RepeatabilityResponseHeaders

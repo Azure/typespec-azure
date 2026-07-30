@@ -2,6 +2,7 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
 
 using Rest;
@@ -34,6 +35,25 @@ model ExportRequest {
 model ExportResult {
   @doc("Content of the exported order.")
   content: string;
+}
+
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/GenerateDetailedCostReportOperationResult.tsp#L33-L39
+model CostReport is ExtensionResource<CostReportProperties> {
+  ...ResourceNameParameter<
+    Resource = CostReport,
+    KeyName = "operationId",
+    SegmentName = "costReports",
+    NamePattern = ""
+  >;
+}
+
+model CostReportProperties {
+  @doc("The download URL for the cost report.")
+  downloadUrl?: url;
+
+  @doc("The provisioning state of the cost report.")
+  @visibility(Lifecycle.Read)
+  provisioningState?: string;
 }
 
 @armResourceOperations
@@ -321,5 +341,61 @@ interface Lro {
     {},
     LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportResult[]> &
       Azure.Core.Foundations.RetryAfterHeader
+  >;
+
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing markAsLro on GET"
+  #suppress "@azure-tools/typespec-azure-resource-manager/lro-location-header" "Testing markAsLro on GET"
+  @scenario
+  @scenarioDoc("""
+    Resource GET operation that returns a long-running operation.
+    Uses Extension.Read with @markAsLro, which returns 200 or 202.
+    The Location header points back to the same resource URL (matches real service behavior).
+    
+    Step 1: Initial GET Request (returns 202 Accepted)
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response status code: 202
+    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+    
+    Step 2: Polling Request (returns 202 Accepted)
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response status code: 202
+    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+    
+    Step 3: Final Polling Request (returns 200 OK with result)
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response status code: 200
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1",
+      "name": "report1",
+      "type": "Azure.ResourceManager.OperationTemplates/costReports",
+      "properties": {
+        "downloadUrl": "https://storage.blob.core.windows.net/reports/report1.csv",
+        "provisioningState": "Succeeded"
+      },
+      "systemData": {
+        "createdBy": "AzureSDK",
+        "createdByType": "User",
+        "createdAt": <any date>,
+        "lastModifiedBy": "AzureSDK",
+        "lastModifiedAt": <any date>,
+        "lastModifiedByType": "User"
+      }
+    }
+    ```
+    """)
+  @Azure.ClientGenerator.Core.Legacy.markAsLro
+  getLro is Extension.Read<
+    Extension.ScopeParameter,
+    CostReport,
+    Response = ArmResponse<CostReport> | ArmAcceptedResponse,
+    Error = ErrorResponse
   >;
 }
