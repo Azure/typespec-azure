@@ -27,7 +27,8 @@
     }
   },
   "bin": {
-    "examples-validate": "./dist/src/cli.js"
+    "examples-validate": "./dist/src/cli.js",
+    "examples-migrate": "./dist/src/migrate-cli.js"
   },
   "engines": {
     "node": ">=22.0.0"
