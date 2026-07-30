@@ -23,7 +23,6 @@ import {
   CreateRecorderHelpers,
   MultipartHelpers,
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   SimplePollerHelpers,
@@ -139,7 +138,6 @@ export async function $onEmit(context: EmitContext) {
       ...SimplePollerHelpers,
       ...UrlTemplateHelpers,
       ...MultipartHelpers,
-      ...PlatformTypeHelpers,
       ...CloudSettingHelpers,
       ...XmlHelpers,
       ...(resolvedEmitterOptions.generateTest ? CreateRecorderHelpers : {}),
@@ -165,7 +163,6 @@ export async function $onEmit(context: EmitContext) {
     dependencies: {
       ...extraDependencies,
     },
-    useSubpathImports: true,
   });
   provideSdkTypes(dpgContext);
 

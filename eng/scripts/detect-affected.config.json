@@ -1,6 +1,7 @@
 {
   "submodulePath": "core",
-  "ignore": ["**/test/**", "**/tests/**", "**/*.test.ts", "**/*.md"],
+  "ignore": ["**/*.md"],
+  "ignoreUpstream": ["**/test/**", "**/tests/**", "**/*.test.ts"],
   "sharedExtra": [".github/actions/setup/**", "pnpm-workspace.yaml"],
   "targets": {
     "python": {
