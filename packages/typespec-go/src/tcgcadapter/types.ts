@@ -808,9 +808,11 @@ export class TypeAdapter {
       serializedName = prop.serializedName;
     }
 
-    const fieldName = prop.isExactName
-      ? prop.name
-      : naming.capitalize(naming.ensureNameCase(prop.name));
+    const fieldName = helpers.getEffectiveName({
+      name: prop.name,
+      isExactName: prop.isExactName,
+      access: prop.access,
+    });
     const field = new go.ModelField(fieldName, type, fieldByValue, serializedName, annotations);
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
