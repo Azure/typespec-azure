@@ -1,10 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "schema/dist/ExamplesYaml.json"],
-  "exclude": ["**/*.test.*"],
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": ".",
-    "resolveJsonModule": true
-  }
+  "exclude": ["**/*.test.*"]
 }
