@@ -46,7 +46,7 @@ This creates:
 
 - `packages/<pkg>/src/rules/<rule-name>.ts` — rule skeleton
 - `packages/<pkg>/test/rules/<rule-name>.test.ts` — test skeleton
-- `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md` — docs skeleton
+- `packages/<pkg>/src/rules/<rule-name>.md` — docs skeleton (referenced from the rule via `docs: fileRef.fromPackageRoot(...)`)
 - Updates `packages/<pkg>/src/linter.ts` — registers the rule
 
 ## Step 3: WRITE FAILING TESTS FIRST (TDD)
@@ -143,12 +143,14 @@ pnpm --filter "@azure-tools/typespec-azure-rulesets..." test
 
 ## Step 7: WRITE DOCUMENTATION AND REGENERATE DOCS
 
-Edit `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`:
+Edit `packages/<pkg>/src/rules/<rule-name>.md`:
 
 - Replace all placeholder text
 - Write a clear description of what the rule checks and why
 - Provide realistic ❌ Incorrect and ✅ Correct examples using actual TypeSpec patterns
-- Ensure the `Full name` code block shows the correct fully-qualified rule name
+- This file holds only the extended documentation body — the page title, rule id, and
+  short description are generated from the rule definition. `tspd` renders the page at
+  `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`
 
 Then regenerate the library's reference docs (updates the rule listing):
 

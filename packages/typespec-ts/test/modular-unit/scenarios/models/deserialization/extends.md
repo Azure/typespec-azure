@@ -190,10 +190,7 @@ export function discountTypePropertiesDeserializer(item: any): DiscountTypePrope
 
 /** Alias for DiscountTypePropertiesUnion */
 export type DiscountTypePropertiesUnion =
-  | DiscountTypeProductFamily
-  | DiscountTypeProduct
-  | DiscountTypeProductSku
-  | DiscountTypeProperties;
+  DiscountTypeProductFamily | DiscountTypeProduct | DiscountTypeProductSku | DiscountTypeProperties;
 
 export function discountTypePropertiesUnionDeserializer(item: any): DiscountTypePropertiesUnion {
   switch (item["discountType"]) {
@@ -213,11 +210,7 @@ export function discountTypePropertiesUnionDeserializer(item: any): DiscountType
 
 /** Type of DiscountType */
 export type DiscountType =
-  | "ProductFamily"
-  | "Product"
-  | "Sku"
-  | "CustomPrice"
-  | "CustomPriceMultiCurrency";
+  "ProductFamily" | "Product" | "Sku" | "CustomPrice" | "CustomPriceMultiCurrency";
 
 /** model interface DiscountTypeProductFamily */
 export interface DiscountTypeProductFamily extends DiscountTypeProperties {
@@ -400,12 +393,7 @@ export function documentIngressUnionDeserializer(item: any): DocumentIngressUnio
 
 /** Document type */
 export type DocumentType =
-  | "Request"
-  | "RemoteDependency"
-  | "Exception"
-  | "Event"
-  | "Trace"
-  | "Unknown";
+  "Request" | "RemoteDependency" | "Exception" | "Event" | "Trace" | "Unknown";
 
 /** model interface Request */
 export interface Request extends DocumentIngress {

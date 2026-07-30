@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.55.2
+
+### Bug Fixes
+
+- [#5096](https://github.com/Azure/typespec-azure/pull/5096) Fix multi-client package build failures by syncing the generated `config/tsconfig.src.*.json` `include` lists with the `warp.config.yml` exports, so every client entry point is compiled and emitted to `dist` (previously warp failed with `DIST_MISSING`).
+
+
 ## 0.55.1
 
 ### Bug Fixes

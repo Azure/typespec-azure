@@ -1,5 +1,66 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.12
+
+### Bug Fixes
+
+- Sync core to microsoft/typespec commit `38de4f58`. Includes fixes: exclude hidden maxpagesize param from generated sample (core [#11436](https://github.com/microsoft/typespec/pull/11436)), avoid credential phrase in random mock map key (core [#11435](https://github.com/microsoft/typespec/pull/11435)), and remove legacy AutorestSettings plus write Package api-version to CHANGELOG.md for Fluent Premium (core [#11433](https://github.com/microsoft/typespec/pull/11433)).
+
+
+## 0.45.11
+
+### Features
+
+- Return response headers as a model from the convenience method when the operation has response headers (core [#11420](https://github.com/microsoft/typespec/pull/11420)).
+
+
+## 0.45.10
+
+### Features
+
+- [#5043](https://github.com/Azure/typespec-azure/pull/5043) Expose the `required-fields-as-ctor-args` emitter option in `tspconfig.yaml`. It controls whether required model properties are generated as constructor arguments. The default remains `true`.
+  
+  ```yaml
+  options:
+    "@azure-tools/typespec-java":
+      required-fields-as-ctor-args: false
+  ```
+
+
+## 0.45.9
+
+### Bug Fixes
+
+- Fix XML serialization to only apply for `azure-v1` data-plane clients, and to skip the XML `ObjectSerializer` for raw `byte[]`/`BinaryData` payloads that are not structured XML models. This avoids emitting a reference to a non-generated `XmlSerializerProviders` helper (which caused a build break) for operations that return raw XML bytes.
+
+
+## 0.45.8
+
+### Features
+
+- Support XML serialization for models: generate XmlSerializer helper classes and use the XML ObjectSerializer overload of toObject/fromObject in convenience methods for XML request/response bodies.
+
+
+## 0.45.7
+
+Compatible with compiler 1.14.0.
+
+### Features
+
+- Support `clientApiVersions`.
+
+### Bug Fixes
+
+- Fix per-client `ServiceVersion` regression after migrating from js-yaml and lodash.
+
+
+## 0.45.6 (2026-07-15)
+
+Compatible with compiler 1.14.0.
+
+- Updated package dependencies to the latest versions.
+- Replaced `js-yaml` with `yaml`, and `lodash` with builtin.
+
 ## 0.45.4 (2026-06-18)
 
 Compatible with compiler 1.13.0.

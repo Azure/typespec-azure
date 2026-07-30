@@ -11,12 +11,11 @@ import { getPackageName } from "./utils.js";
 interface PackageFileOptions {
   exports?: Record<string, any>;
   dependencies?: Record<string, string>;
-  clientContextPaths?: string[];
 }
 
 export function buildPackageFile(
   model: ClientModel,
-  { exports, dependencies, clientContextPaths }: PackageFileOptions = {},
+  { exports, dependencies }: PackageFileOptions = {},
 ) {
   const config: PackageCommonInfoConfig = {
     description: getDescription(model),
@@ -35,7 +34,6 @@ export function buildPackageFile(
     hasLro: hasPollingOperations(model),
     monorepoPackageDirectory: model.options?.azureOutputDirectory,
     dependencies,
-    clientContextPaths,
   };
 
   const packageInfo: Record<string, any> = buildAzureMonorepoPackage(extendedConfig);
@@ -63,17 +61,15 @@ export function buildPackageFile(
  * - Adds LRO dependencies (`@azure/core-lro`, `@azure/abort-controller`) when the package has
  *   polling operations (for non-monorepo Azure packages).
  * - Updates exports (tshy or warp) when `exports` is provided.
- * - Updates `//metadata.constantPaths` when `clientContextPaths` is provided.
  */
 export function updatePackageFile(
   model: ClientModel,
   existingFilePathOrContent: string | Record<string, any>,
-  { exports, clientContextPaths }: PackageFileOptions = {},
+  { exports }: PackageFileOptions = {},
 ) {
   const hasLro = hasPollingOperations(model);
   const needsLroUpdate = hasLro;
   const needsExportsUpdate = exports;
-  const needsConstantPathsUpdate = clientContextPaths && clientContextPaths.length > 0;
 
   let packageInfo;
   if (typeof existingFilePathOrContent === "string") {
@@ -99,30 +95,6 @@ export function updatePackageFile(
     needsCoreClientUpdate = true;
   }
 
-  // Ensure warp packages have #platform/* imports for polyfill resolution.
-  // The `react-native` condition is only added when explicitly opted in via
-  // `generateReactNativeTarget`, matching the fresh-generation path in
-  // `getEsmEntrypointInformation` (packageCommon.ts).
-  const platformImports: Record<string, string> = {
-    browser: "./src/*-browser.mts",
-    default: "./src/*.ts",
-  };
-  if (model.options?.generateReactNativeTarget) {
-    // Insert `react-native` before `default` so Node's conditional
-    // resolution order matches the fresh-generation output.
-    packageInfo.imports = {
-      "#platform/*": {
-        browser: platformImports["browser"],
-        "react-native": "./src/*-react-native.mts",
-        default: platformImports["default"],
-      },
-    };
-  } else {
-    packageInfo.imports = {
-      "#platform/*": platformImports,
-    };
-  }
-
   // Update exports (warp: resolved exports in package.json)
   if (needsExportsUpdate) {
     packageInfo.exports = resolveWarpExports(exports, model.options?.generateReactNativeTarget);
@@ -131,9 +103,6 @@ export function updatePackageFile(
   // Update Core Client dependency
   if (needsCoreClientUpdate) {
     delete deps["@azure/core-client"];
-    if (!("@azure-rest/core-client" in deps)) {
-      deps["@azure-rest/core-client"] = "^2.3.1";
-    }
     packageInfo.dependencies = deps;
   }
 
@@ -146,20 +115,13 @@ export function updatePackageFile(
     };
   }
 
-  // Update constantPaths metadata for Azure packages
-  if (needsConstantPathsUpdate && packageInfo["//metadata"]) {
-    const metadata = packageInfo["//metadata"];
-    // Filter out existing userAgentInfo entries
-    const nonUserAgentPaths = (metadata.constantPaths || []).filter(
-      (item: any) => item.prefix !== "userAgentInfo",
-    );
-    // Add new userAgentInfo entries from clientContextPaths
-    const newUserAgentPaths = clientContextPaths!.map((path) => ({
-      path: path,
-      prefix: "userAgentInfo",
-    }));
-    metadata.constantPaths = [...nonUserAgentPaths, ...newUserAgentPaths];
-  }
+  // Always update @azure/core-rest-pipeline and @azure-rest/core-client to the latest
+  // versions because our imports rely on APIs from those latest package versions.
+  packageInfo.dependencies = {
+    ...packageInfo.dependencies,
+    "@azure/core-rest-pipeline": "^1.24.0",
+    "@azure-rest/core-client": "^2.7.0",
+  };
 
   return {
     path: "package.json",

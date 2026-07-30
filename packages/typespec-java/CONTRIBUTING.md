@@ -21,17 +21,18 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
 the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
 at build time by `Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
-built from `core/packages/http-client-java/generator` by `Build-Generator.ps1` and staged into
-`generator/http-client-generator/target/`.
+built by `Build-Generator.ps1` from a patched copy of `core/packages/http-client-java/generator`
+(see below) and staged into `generator/http-client-generator/target/`.
 
 ### Azure customization patch
 
-Before building the jar, `Build-Generator.ps1` applies `core.patch` to the `core/` submodule.
-This swaps the unbranded customization engine in `http-client-generator-core` for Azure's
+`Copy-Sources.ps1` copies the Java generator sources out of the `core/` submodule into this
+package's `./generator` folder and applies `core.patch` to that **copy** — never to `core/` itself.
+The patch swaps the unbranded customization engine in `http-client-generator-core` for Azure's
 `com.azure.tools:azure-autorest-customization` (resolved from Maven Central), so the
-`customization-class` emitter option runs against the Azure customization base. The patch is applied
-transiently at build time (the script runs `git checkout .` in `core/` to apply and again to revert
-it), so commit/stage any local `core/` changes before building. When the `core/` submodule is bumped,
+`customization-class` emitter option runs against the Azure customization base. `Build-Generator.ps1`
+then builds `emitter.jar` from the patched `./generator`. Because the patch is only ever applied to
+the copy, the `core/` submodule working tree stays clean. When the `core/` submodule is bumped,
 refresh `core.patch` if its context no longer applies.
 
 ## Build
@@ -40,30 +41,26 @@ refresh `core.patch` if its context no longer applies.
 # From the repo root, install workspace dependencies.
 pnpm install
 
-# From the repo root, build the dependencies first. The ^... filter builds
-# @azure-tools/typespec-java dependencies without building typespec-java itself.
-pnpm turbo run --filter "@azure-tools/typespec-java^..." build
-
-# Then build and pack @azure-tools/typespec-java. This builds the generator
-# (emitter.jar via Maven + core.patch, requires JDK 11+ and Maven), builds the
-# emitter TypeScript, and packs the .tgz consumed by emitter-tests.
-cd packages/typespec-java
-pwsh ./Build-TypeSpec.ps1
+# From the repo root, build typespec-java along with all its dependencies.
+# Use run-all so pnpm does not auto-install concurrently during the Turbo build.
+pnpm run-all --filter "@azure-tools/typespec-java..." build
 ```
 
 ### Pinning the core commit (`core-commit.json`)
 
-`Copy-Sources.ps1` copies the emitter sources from the `core/` submodule's current checkout. The
-optional `core-commit.json` pins a specific upstream `core` commit to copy from instead:
+`Copy-Sources.ps1` reads the emitter/generator sources from the `core/` submodule's current checkout.
+The optional `core-commit.json` pins a specific upstream `core` commit to read from instead:
 
 ```json
 { "sha": "3cb616e4e8c3d5b6954bac9832b97445450a71af" }
 ```
 
 The pinned SHA is fetched if needed and used only when it is **newer** than the current checkout (the
-submodule never moves backwards). The submodule is checked out transiently for the copy, then always
-restored to its original SHA, keeping `pnpm build` and CI git-status checks clean. To advance the pin,
-update the `sha`.
+submodule never moves backwards). When the pin is newer, those sources are extracted from that commit
+into a temporary directory via `git archive` — the `core/` submodule is **never** checked out or
+otherwise modified. This keeps `pnpm build` safe to run alongside the parallel monorepo build (which
+reads `core/` concurrently) and keeps CI git-status checks clean. To advance the pin, update the
+`sha`.
 
 ### Troubleshooting
 
@@ -73,11 +70,46 @@ force pnpm to refresh the local install state and rerun the command:
 
 ```powershell
 pnpm install --force
-pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+pnpm run-all --filter "@azure-tools/typespec-java..." build
 ```
 
 Changing the npm registry has been observed to clear this symptom, possibly because
 pnpm re-resolves packages or relinks local binaries after the registry setting changes.
+
+## Debugging
+
+### Debugging TypeScript code
+
+Build the package first, then run the TypeSpec compiler under the Node.js debugger from
+`packages/typespec-java`:
+
+```shell
+node --inspect-brk node_modules/@typespec/compiler/dist/src/core/cli/cli.js compile emitter-tests/<tsp-file>
+```
+
+Attach a debugger to port 9229 and set breakpoints in `src/emitter.ts`,
+`src/code-model-builder.ts`, or their compiled counterparts under `dist/src`.
+
+### Debugging Java code
+
+TypeScript passes the code model and emitter options to Java through the generated
+`emitter-tests/tsp-output/code-model.yaml` file. To debug the Java generator directly:
+
+1. Build the package so `Copy-Sources.ps1` creates the patched generator copy under `generator/`.
+2. Update `DEFAULT_OUTPUT_DIR` in
+   `generator/http-client-generator/src/main/java/com/microsoft/typespec/http/client/generator/Main.java`
+   to the directory containing the `code-model.yaml` to debug.
+3. Run `com.microsoft.typespec.http.client.generator.Main.main()` from an IDE with these VM options:
+
+   ```text
+   --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+   ```
+
+The copied generator is recreated on each build, so do not commit changes under `generator/`.
+Emitter options used by `Main` are defined in
+`generator/http-client-generator/src/main/java/com/microsoft/typespec/http/client/generator/model/EmitterOptions.java`.
+When debugging this way, temporarily align them with the options in the relevant `tspconfig.yaml`;
+for example, set `flavor` to `azure`.
 
 ## Before making a Pull request
 
@@ -87,7 +119,49 @@ Make sure to run the following commands:
 
 ## Release Process
 
-TODO: The post-release process for `@azure-tools/typespec-java` has not been finalized yet.
+Shipping a `@azure-tools/typespec-java` patch is done as **two separate PRs**, both targeting the
+`release/<sprint>` branch. The overall publishing flow is the repo's general one — see the root
+[`CONTRIBUTING.md` "Publishing" section](../../CONTRIBUTING.md#publishing) and the
+[`hotfix-release` skill](../../.github/skills/hotfix-release/SKILL.md); only the
+`typespec-java`-specific parts are called out here.
+
+### Part A — Sync core PR
+
+Pulls the fix in from core; **no version bump**. Example:
+[#5012](https://github.com/Azure/typespec-azure/pull/5012). On a branch off `release/<sprint>`:
+
+1. **Pin the core commit.** Release branches don't carry `core/` submodule updates, so update the
+   `sha` in [`core-commit.json`](./core-commit.json) to the target microsoft/typespec commit
+   (e.g. the HEAD of core `main`). Build and sync scripts transiently check this commit out without
+   moving the submodule pointer.
+2. **Sync tests from core.** Run `pwsh ./SyncTests.ps1` in [`emitter-tests`](./emitter-tests): it
+   copies the tests/specs from the pinned core commit and aligns `emitter-tests/package.json`.
+3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
+
+Open the PR against `release/<sprint>` (not `main`) and merge it. _(Optional)_ Before merging,
+validate SDK regeneration from the PR's emitter with the
+[`typespec-java - sync sdk`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=8274)
+pipeline: leave **Emitter Version** as `none` and set **PR Id or Branch** to this PR.
+
+### Part B — Release PR
+
+Bumps the version and publishes, after Part A merges. Example:
+[#4990](https://github.com/Azure/typespec-azure/pull/4990). Prepare the version bump per the
+`hotfix-release` skill (creates the `publish/hotfix/<name>-<sprint>` branch off `release/<sprint>`
+and runs `pnpm chronus version --ignore-policies`, consuming the changeset from Part A). The `core`
+submodule stays unchanged. The bump must also be reflected in `emitter-tests/package.json` (its
+`version` and the `*.tgz` dependency) — rerun `pwsh ./SyncTests.ps1` or update it manually.
+
+Open the PR against `release/<sprint>`. After it merges:
+
+- The emitter is auto-released by the
+  [`typespec-azure - Publish`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+  pipeline.
+- Backmerge the generated branch to `main`. If the backmerge branch isn't created automatically
+  (e.g. the workflow failed on a name collision), create it manually from the release branch and
+  open the PR to `main` yourself.
+- _(Optional)_ Regenerate the downstream SDKs by rerunning `typespec-java - sync sdk` with
+  **Emitter Version** set to the released version, and merge the resulting SDK PR.
 
 ## Trademarks
 

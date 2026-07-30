@@ -12,15 +12,18 @@ import {
   Namespace,
   NumericLiteral,
   Operation,
+  Program,
   Scalar,
   StringLiteral,
   Tuple,
   Type,
   Union,
+  compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -30,6 +33,8 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   Authentication,
   HttpOperationFileBody,
@@ -218,8 +223,8 @@ export function addEncodeInfo(
       innerType.encode = "bytes";
     }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
+    // integer and boolean types are allowed to be encoded as string
     if (encodeData) {
       if (encodeData?.encoding) {
         (innerType as any).encode = encodeData.encoding;
@@ -755,42 +760,31 @@ function addDiscriminatorToModelType(
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
-            if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-constant",
-                  target: childModel,
-                  format: { discriminator: property.name },
-                }),
-              );
-            } else if (typeof property.type.value !== "string") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-string",
-                  target: type,
-                  format: {
-                    discriminator: property.name,
-                    discriminatorValue: String(property.type.value),
-                  },
-                }),
-              );
-            } else {
-              // map string value type to enum value type
-              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
-                for (const value of discriminatorType.values) {
-                  if (value.value === property.type.value) {
-                    property.type = value;
-                  }
+            compilerAssert(
+              property.type.kind === "constant" || property.type.kind === "enumvalue",
+              `Discriminator "${property.name}" has to be constant`,
+              childModel,
+            );
+            compilerAssert(
+              typeof property.type.value === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            // map string value type to enum value type
+            if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+              for (const value of discriminatorType.values) {
+                if (value.value === property.type.value) {
+                  property.type = value;
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
-              property.discriminator = true;
-              if (model.discriminatedSubtypes === undefined) {
-                model.discriminatedSubtypes = {};
-              }
-              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
-              discriminatorProperty = property;
             }
+            childModelSdkType.discriminatorValue = property.type.value as string;
+            property.discriminator = true;
+            if (model.discriminatedSubtypes === undefined) {
+              model.discriminatedSubtypes = {};
+            }
+            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            discriminatorProperty = property;
           }
         }
       }
@@ -819,6 +813,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -832,6 +827,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -935,8 +931,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -1537,6 +1532,66 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
+/**
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
+    }
+    if (effectivePayloadContentType) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
+    }
+  }
+}
+
 export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
@@ -1822,6 +1877,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1953,6 +2010,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
@@ -2469,6 +2528,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions

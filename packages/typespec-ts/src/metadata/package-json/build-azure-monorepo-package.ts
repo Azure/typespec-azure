@@ -6,7 +6,6 @@ import { getCommonPackageScripts, getPackageCommonInfo } from "./package-common.
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {
   monorepoPackageDirectory?: string;
-  clientContextPaths?: string[];
 }
 
 /**
@@ -32,7 +31,7 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
   // revert this change after sdk repo update.
   const runtimeDeps = {
     ...dependencies,
-    "@azure-rest/core-client": "^2.3.1",
+    "@azure-rest/core-client": "^2.7.0",
     ...(hasLro && {
       "@azure/abort-controller": "^2.1.2",
     }),
@@ -40,7 +39,7 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
     ...(hasLro && {
       "@azure/core-lro": "^3.1.0",
     }),
-    "@azure/core-rest-pipeline": "^1.20.0",
+    "@azure/core-rest-pipeline": "^1.24.0",
     "@azure/core-util": "^1.12.0",
     "@azure/logger": "^1.2.0",
     tslib: "catalog:",
@@ -101,7 +100,6 @@ export function getAzureMonorepoPackageInfo(config: AzureMonorepoInfoConfig): Re
       homepage: `https://github.com/Azure/azure-sdk-for-js/tree/main/${config.monorepoPackageDirectory}/README.md`,
     }),
     prettier: "@azure/eslint-plugin-azure-sdk/prettier.json",
-    "//metadata": getMetadataInfo(config),
   };
 }
 
@@ -161,19 +159,4 @@ function getEsmScripts() {
     "test:node": "dev-tool run test:vitest",
     test: "tsc -b --noEmit && npm run test:node && npm run test:browser",
   };
-}
-
-function getMetadataInfo(config: AzureMonorepoInfoConfig) {
-  const metadata: Record<string, any> = {
-    constantPaths: [],
-  };
-  const paths = config.clientContextPaths;
-  for (const path of paths ?? []) {
-    metadata["constantPaths"].push({
-      path: path,
-      prefix: "userAgentInfo",
-    });
-  }
-
-  return metadata;
 }

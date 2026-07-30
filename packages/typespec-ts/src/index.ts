@@ -23,7 +23,6 @@ import {
   CreateRecorderHelpers,
   MultipartHelpers,
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   SimplePollerHelpers,
@@ -76,7 +75,7 @@ import { buildSampleTest } from "./metadata/test/build-sample-test.js";
 import { buildSnippets } from "./metadata/test/build-snippets.js";
 import { buildClassicalClient } from "./modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "./modular/build-classical-operation-groups.js";
-import { buildClientContext, getClientContextPath } from "./modular/build-client-context.js";
+import { buildClientContext } from "./modular/build-client-context.js";
 import { transformModularEmitterOptions } from "./modular/build-modular-options.js";
 import { buildOperationFiles } from "./modular/build-operations.js";
 import { getModuleExports } from "./modular/build-project-files.js";
@@ -139,7 +138,6 @@ export async function $onEmit(context: EmitContext) {
       ...SimplePollerHelpers,
       ...UrlTemplateHelpers,
       ...MultipartHelpers,
-      ...PlatformTypeHelpers,
       ...CloudSettingHelpers,
       ...XmlHelpers,
       ...(resolvedEmitterOptions.generateTest ? CreateRecorderHelpers : {}),
@@ -165,7 +163,6 @@ export async function $onEmit(context: EmitContext) {
     dependencies: {
       ...extraDependencies,
     },
-    useSubpathImports: true,
   });
   provideSdkTypes(dpgContext);
 
@@ -455,19 +452,18 @@ export async function $onEmit(context: EmitContext) {
         modularPackageInfo = {
           ...modularPackageInfo,
           dependencies,
-          clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
         };
       }
       commonBuilders.push((model) => buildPackageFile(model, modularPackageInfo));
       // Generate warp.config.yml for Azure monorepo ESM packages
       commonBuilders.push((model) => buildWarpConfig(model, modularPackageInfo));
       commonBuilders.push(buildTsConfig);
-      commonBuilders.push(buildTsSrcEsmConfig);
-      commonBuilders.push(buildTsSrcBrowserConfig);
+      commonBuilders.push(() => buildTsSrcEsmConfig(modularPackageInfo["exports"]));
+      commonBuilders.push(() => buildTsSrcBrowserConfig(modularPackageInfo["exports"]));
       if (option.generateReactNativeTarget) {
-        commonBuilders.push(buildTsSrcReactNativeConfig);
+        commonBuilders.push(() => buildTsSrcReactNativeConfig(modularPackageInfo["exports"]));
       }
-      commonBuilders.push(buildTsSrcCjsConfig);
+      commonBuilders.push(() => buildTsSrcCjsConfig(modularPackageInfo["exports"]));
       if (option.generateSample) {
         commonBuilders.push(buildTsSampleConfig);
       }
@@ -508,14 +504,13 @@ export async function $onEmit(context: EmitContext) {
       }
       const modularPackageInfo = {
         exports: getModuleExports(context, modularEmitterOptions),
-        clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
         ...(Object.keys(additionalDependencies).length > 0 && {
           dependencies: additionalDependencies,
         }),
       };
 
       // Always update package.json (adds #platform/* imports) along with
-      // exports, clientContextPaths and LRO deps.
+      // exports and LRO deps.
       {
         // Read package.json content via host and pass parsed object
         const pkgSourceFile = await host.readFile(existingPackageFilePath);
@@ -532,6 +527,14 @@ export async function $onEmit(context: EmitContext) {
 
       // Update warp.config.yml for Azure monorepo packages
       updateBuilders.push((model: ClientModel) => buildWarpConfig(model, modularPackageInfo));
+
+      // Re-sync tsconfig.src.*.json `include` with the warp exports
+      updateBuilders.push(() => buildTsSrcEsmConfig(modularPackageInfo["exports"]));
+      updateBuilders.push(() => buildTsSrcBrowserConfig(modularPackageInfo["exports"]));
+      if (option.generateReactNativeTarget) {
+        updateBuilders.push(() => buildTsSrcReactNativeConfig(modularPackageInfo["exports"]));
+      }
+      updateBuilders.push(() => buildTsSrcCjsConfig(modularPackageInfo["exports"]));
 
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
@@ -579,13 +582,6 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.metadataDir,
       );
     }
-  }
-
-  function getRelativeContextPaths(context: SdkContext, options: ModularEmitterOptions) {
-    const clientMap = getClientHierarchyMap(context);
-    return Array.from(clientMap)
-      .map((subClient) => getClientContextPath(subClient, options))
-      .map((path) => path.substring(path.indexOf("src")));
   }
 }
 

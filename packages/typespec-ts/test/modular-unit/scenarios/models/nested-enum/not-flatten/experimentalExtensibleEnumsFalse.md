@@ -81,12 +81,7 @@ export function _fooRequestBodySerializer(item: _FooRequestBody): any {
 
 /** The resource provisioning state. */
 export type ProvisioningState =
-  | ResourceProvisioningState
-  | "Provisioning"
-  | "Updating"
-  | "Deleting"
-  | "Accepted"
-  | string;
+  ResourceProvisioningState | "Provisioning" | "Updating" | "Deleting" | "Accepted" | string;
 
 export function provisioningStateSerializer(item: ProvisioningState): any {
   return item;

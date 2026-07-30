@@ -4,9 +4,9 @@ A self contained website for the TypeSpec Azure Playground.
 
 ## Use
 
-- `npm start` to start in dev mode
-- `npm run preview` to build and preview prod mode
-- `npm run build` to build for production
+- `pnpm start` to start in dev mode
+- `pnpm preview` to build and preview prod mode
+- `pnpm build` to build for production
 
 ## Configuration
 
