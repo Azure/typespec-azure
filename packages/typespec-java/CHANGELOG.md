@@ -31,14 +31,14 @@
 
 ### Bug Fixes
 
-- [#5012](https://github.com/Azure/typespec-azure/pull/5012) Fix XML serialization to only apply for `azure-v1` data-plane clients, and to skip the XML `ObjectSerializer` for raw `byte[]`/`BinaryData` payloads that are not structured XML models. This avoids emitting a reference to a non-generated `XmlSerializerProviders` helper (which caused a build break) for operations that return raw XML bytes.
+- Fix XML serialization to only apply for `azure-v1` data-plane clients, and to skip the XML `ObjectSerializer` for raw `byte[]`/`BinaryData` payloads that are not structured XML models. This avoids emitting a reference to a non-generated `XmlSerializerProviders` helper (which caused a build break) for operations that return raw XML bytes.
 
 
 ## 0.45.8
 
 ### Features
 
-- [#4987](https://github.com/Azure/typespec-azure/pull/4987) Support XML serialization for models: generate XmlSerializer helper classes and use the XML ObjectSerializer overload of toObject/fromObject in convenience methods for XML request/response bodies.
+- Support XML serialization for models: generate XmlSerializer helper classes and use the XML ObjectSerializer overload of toObject/fromObject in convenience methods for XML request/response bodies.
 
 
 ## 0.45.7
@@ -47,11 +47,11 @@ Compatible with compiler 1.14.0.
 
 ### Features
 
-- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Support `clientApiVersions`.
+- Support `clientApiVersions`.
 
 ### Bug Fixes
 
-- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Fix per-client `ServiceVersion` regression after migrating from js-yaml and lodash.
+- Fix per-client `ServiceVersion` regression after migrating from js-yaml and lodash.
 
 
 ## 0.45.6 (2026-07-15)
