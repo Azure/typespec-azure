@@ -2,7 +2,7 @@ This diagnostic is issued when the type of the value passed to `@clientDefaultVa
 
 ## Impact
 
-- **Area:** Client default values. Catches mismatches where a string default is applied to a numeric property (or vice versa). When a type mismatch is detected, the client default value is **discarded** and will not appear in generated SDKs.
+- **Area:** Client default values. Catches mismatches where a string default is applied to a numeric property (or vice versa), which could produce incorrect defaults in generated SDKs.
 - **Not affected:** Properties without `@clientDefaultValue`, properties where the value type matches, or properties where `@alternateType` makes the value type valid.
 
 ## ❌ Incorrect Usage
@@ -49,10 +49,10 @@ Or use `@alternateType` to change the client-facing type so it matches the defau
 
 ## Suppression
 
-If you suppress this diagnostic, be aware that the mismatched client default value is still **discarded** — suppression only silences the warning, it does not cause the value to be applied.
+If the mismatch is intentional, you can suppress this diagnostic. Note that the mismatched default value will still be applied to generated SDKs when suppressed.
 
 ```typespec
 #suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch" "intentional mismatch"
 @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
-@query pageSize?: int32; // warning suppressed, but default value is still ignored
+@query pageSize?: int32;
 ```

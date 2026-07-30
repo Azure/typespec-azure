@@ -1,6 +1,7 @@
 import { Program } from "@typespec/compiler";
 import { createTCGCContext } from "./context.js";
 import { validateClients } from "./validations/clients.js";
+import { validateDecorators } from "./validations/decorators.js";
 import { validateHttp } from "./validations/http.js";
 import { validateMethods } from "./validations/methods.js";
 import { validatePackage } from "./validations/package.js";
@@ -16,4 +17,5 @@ export function $onValidate(program: Program) {
   validateMethods(tcgcContext);
   validateHttp(tcgcContext);
   validateTypes(tcgcContext);
+  validateDecorators(tcgcContext);
 }

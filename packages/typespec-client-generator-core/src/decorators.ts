@@ -13,8 +13,6 @@ import {
   isErrorModel,
   isList,
   isNumeric,
-  isNumericType,
-  isStringType,
   Model,
   ModelProperty,
   Namespace,
@@ -1784,17 +1782,7 @@ export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" 
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
-const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
-
-function isBooleanScalar(program: Program, type: Type): boolean {
-  if (type.kind !== "Scalar") return false;
-  let current: Scalar | undefined = type;
-  while (current) {
-    if (current.name === "boolean") return true;
-    current = current.baseScalar;
-  }
-  return false;
-}
+export const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
 
 export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
@@ -1803,32 +1791,6 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   scope?: LanguageScopes,
 ) => {
   const actualValue = isNumeric(value) ? value.asNumber() : value;
-
-  // Validate that the value type matches the property type (or the alternate type if present)
-  const alternateTypeDecorator = target.decorators.find(
-    (d) => d.definition?.name === "@alternateType",
-  );
-  const typeToCheck = alternateTypeDecorator
-    ? (alternateTypeDecorator.args[0]?.value as Type)
-    : target.type;
-
-  if (typeToCheck.kind === "Scalar") {
-    const valueType = isNumeric(value) ? "numeric" : typeof value;
-    const isMatch =
-      (typeof value === "string" && isStringType(context.program, typeToCheck)) ||
-      (isNumeric(value) && isNumericType(context.program, typeToCheck)) ||
-      (typeof value === "boolean" && isBooleanScalar(context.program, typeToCheck));
-
-    if (!isMatch) {
-      reportDiagnostic(context.program, {
-        code: "client-default-value-type-mismatch",
-        format: { valueType, propertyType: typeToCheck.name },
-        target,
-      });
-      return; // Don't store mismatched default value
-    }
-  }
-
   setScopedDecoratorData(
     context,
     $clientDefaultValue,
