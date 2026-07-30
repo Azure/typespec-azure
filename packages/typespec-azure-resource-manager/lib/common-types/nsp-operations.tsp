@@ -96,8 +96,6 @@ interface NspConfigurationOperations<
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Resource Optional. The NspConfiguration resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
@@ -127,12 +125,10 @@ interface NspConfigurationOperations<
   >;
 
   /**
-   * List the network security parameter configuration for a resource without pagination - this should only be used for legacy operations
+   * List the network security perimeter configuration for a resource without pagination - this should only be used for legacy operations
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Resource Optional. The NspConfiguration resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.

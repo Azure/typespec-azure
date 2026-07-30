@@ -116,7 +116,7 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 | StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
 | FinalResult     | The type of the logical result when following the location header                 |
 | PollingUrlValue | The value type of the link to the status monitor                                  |
-| FinalUrlValue   | The value type fo the link to the final result                                    |
+| FinalUrlValue   | The value type of the link to the final result                                    |
 
 #### Examples
 
@@ -426,7 +426,7 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 | Name       | Description                                                |
 | ---------- | ---------------------------------------------------------- |
-| Resource   | The resource being updated                                 |
+| Resource   | The resource being created                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
 #### Examples
@@ -463,7 +463,7 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 | Name     | Description                |
 | -------- | -------------------------- |
-| Resource | The resource being updated |
+| Resource | The resource being created |
 
 #### Examples
 
