@@ -13,6 +13,7 @@ export {
   type LoadedExampleFile,
   type Position,
 } from "./loader.js";
+export * from "./migrate/index.js";
 export { defaultLegacyExampleFilename, slugify, stripJsonExtension } from "./naming.js";
 export { formatDiagnostics, formatSummary } from "./reporter.js";
 export { checkFilePlacement, checkSemantics, type SemanticContext } from "./rules.js";
