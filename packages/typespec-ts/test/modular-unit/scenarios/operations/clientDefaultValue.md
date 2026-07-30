@@ -30,6 +30,7 @@ interface Operations {
     limit?: int32,
 
     @query
+    #suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch" "testing mismatch behavior"
     @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("mismatch")
     typeMismatch?: int32,
 
