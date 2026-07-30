@@ -52,8 +52,12 @@ interface ModelProjection {
  *     are not part of the payload and recursing into nested models (and, for
  *     discriminated bases, their whole subtype hierarchy). The original graph is
  *     never mutated, so response types keep the full (read) model.
- *  3. Repoints the operation's `bodyParam.type` and the corresponding client
- *     method parameters to the projected model.
+ *  3. Walks `bodyParam.methodParameterSegments` (which map each client-method
+ *     parameter to the HTTP payload) and, for every model-typed parameter,
+ *     repoints it to the projected model. The payload side is repointed too:
+ *     the whole `bodyParam.type` for a non-spread body, or the matching wrapper
+ *     property for a *spread* body (whose `bodyParam.type` is a synthesized
+ *     wrapper serialized property-by-property).
  *  4. Registers every produced split model in `sdkPackage.models` so the
  *     subsequent `visitPackageTypes` graph walk emits them.
  *
@@ -302,12 +306,8 @@ function repointMethodBody(
   method: SdkServiceMethod<SdkHttpOperation>,
 ): void {
   const operation = method.operation;
-  if (!operation?.bodyParam) {
-    return;
-  }
-
-  const originalBodyType = operation.bodyParam.type;
-  if (originalBodyType.kind !== "model") {
+  const bodyParam = operation?.bodyParam;
+  if (!bodyParam || bodyParam.type.kind !== "model") {
     return;
   }
 
@@ -316,25 +316,48 @@ function repointMethodBody(
     operation.__raw.operation,
     operation.verb,
   );
-  const projectedBodyType = projectModelToVisibility(state, originalBodyType, visibility).model;
-  if (projectedBodyType === originalBodyType) {
-    // The write view is identical to the read model (collapse).
-    return;
-  }
 
-  // Repoint the client-method parameters that reference the body model. If none
-  // do (e.g. a spread body), leave the operation untouched in this PoC.
-  let didRepointParam = false;
-  for (const parameter of method.parameters) {
-    if (parameter.type === originalBodyType) {
-      parameter.type = projectedBodyType;
-      didRepointParam = true;
+  // TCGC exposes how each client-method parameter maps to the HTTP payload via
+  // `bodyParam.methodParameterSegments`. Each segment is a path whose root
+  // (`segment[0]`) is a method parameter; that object is the very same instance
+  // held by `method.parameters`, so mutating its `.type` in place updates the
+  // client signature (and every other reference to it) at once.
+  //
+  // The projection of each parameter is identical for spread and non-spread
+  // bodies. Only the *payload* side differs:
+  //   - Non-spread: the payload IS the body model (`segment[0].type === bodyParam.type`),
+  //     so we repoint `bodyParam.type`, which drives the whole-model serializer.
+  //   - Spread: `bodyParam.type` is a synthesized wrapper (never emitted) whose
+  //     properties map to the individual parameters; `buildBodyParameter`
+  //     serializes it by walking those properties, so we repoint the matching
+  //     wrapper property instead of the wrapper itself.
+  for (const segment of bodyParam.methodParameterSegments) {
+    const methodParam = segment[0];
+    if (!methodParam || methodParam.type.kind !== "model") {
+      continue;
+    }
+
+    const projection = projectModelToVisibility(state, methodParam.type, visibility);
+    if (!projection.changed) {
+      // The write view is identical to the read model (collapse).
+      continue;
+    }
+
+    const originalType = methodParam.type;
+    methodParam.type = projection.model;
+
+    if (originalType === bodyParam.type) {
+      // Non-spread: the method parameter *is* the whole body, so repoint the
+      // payload model directly (drives the whole-model serializer).
+      bodyParam.type = projection.model;
+    } else {
+      // Spread: the payload is a synthesized wrapper serialized property by
+      // property, so repoint the wrapper property this parameter maps to.
+      for (const bodyProperty of bodyParam.type.properties) {
+        if (bodyProperty.type === originalType) {
+          bodyProperty.type = projection.model;
+        }
+      }
     }
   }
-
-  if (!didRepointParam) {
-    return;
-  }
-
-  operation.bodyParam.type = projectedBodyType;
 }

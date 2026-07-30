@@ -1,0 +1,13 @@
+emit:
+  - "@azure-tools/typespec-ts"
+options:
+  "@azure-tools/typespec-ts":
+    title: Spread Service
+    generate-metadata: false
+    azure-sdk-for-js: false
+    experimental-split-models-by-visibility: true
+    emitter-output-dir: "{project-root}/generated/typespec-ts"
+    package-details:
+      name: "@azure-rest/spread"
+      description: "Spread Service"
+      version: "1.0.0-beta.1"
