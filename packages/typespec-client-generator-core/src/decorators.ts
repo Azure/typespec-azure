@@ -1819,6 +1819,7 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
         format: { valueType, propertyType: propertyType.name },
         target,
       });
+      return; // Don't store mismatched default value
     }
   }
 
