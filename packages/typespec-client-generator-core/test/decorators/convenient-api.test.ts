@@ -469,7 +469,7 @@ describe("@convenientAPI requires scope diagnostic", () => {
     ]);
   });
 
-  it("emits warning when @convenientAPI is used without scope on interface", async () => {
+  it("does not emit warning when @convenientAPI(false) is used without scope on interface", async () => {
     const diagnostics = (
       await SimpleTester.diagnose(`
       @service
@@ -484,13 +484,7 @@ describe("@convenientAPI requires scope diagnostic", () => {
       (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
     );
 
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
-        severity: "warning",
-        message: `@convenientAPI should be applied with a language scope of "java" or "csharp".`,
-      },
-    ]);
+    strictEqual(diagnostics.length, 0);
   });
 
   it("emits warning when @convenientAPI is scoped to a non-java/csharp language", async () => {

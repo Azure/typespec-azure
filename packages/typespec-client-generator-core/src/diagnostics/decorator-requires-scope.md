@@ -4,13 +4,13 @@ This diagnostic is issued when a TCGC decorator that requires a language scope i
 
 - **Area:** Language-scoped decorator behavior. The decorator may apply globally or to unintended emitters without a proper scope.
 - **Decorators checked:**
-  - `@convenientAPI` — must be scoped to `"java"` and/or `"csharp"`
+  - `@convenientAPI(true)` — must be scoped to `"java"` and/or `"csharp"`. `@convenientAPI(false)` is always allowed without scope since opting out of convenience methods is safe for any language.
   - `@clientOption` — must be scoped to any specific language
 
 ## ❌ Incorrect Usage
 
 ```typespec
-// @convenientAPI without scope or with wrong scope
+// @convenientAPI(true) without scope or with wrong scope
 @convenientAPI(true)
 op myOperation(): void;
 
@@ -40,8 +40,12 @@ Provide the correct language scope:
 @convenientAPI(true, "java")
 op myOperation(): void;
 
-@convenientAPI(false, "csharp")
+@convenientAPI(true, "csharp")
 op anotherOperation(): void;
+
+// @convenientAPI(false) is fine without scope
+@convenientAPI(false)
+op yetAnotherOperation(): void;
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
 @clientOption("enableFeatureFoo", true, "python")

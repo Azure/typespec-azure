@@ -8,12 +8,15 @@ interface DecoratorScopeRequirement {
   decoratorName: string;
   /** If provided, the scope must include at least one of these languages. If undefined, any scope is accepted. */
   allowedScopes?: string[];
+  /** If true, only check when the first boolean argument is true. */
+  onlyWhenTrue?: boolean;
 }
 
 const DECORATOR_SCOPE_REQUIREMENTS: DecoratorScopeRequirement[] = [
   {
     decoratorName: "@convenientAPI",
     allowedScopes: ["java", "csharp"],
+    onlyWhenTrue: true,
   },
   {
     decoratorName: "@clientOption",
@@ -35,6 +38,15 @@ function checkDecoratorScopes(
     );
 
     for (const decorator of matchingDecorators) {
+      // For decorators with onlyWhenTrue, skip validation when the first arg is false.
+      // e.g., @convenientAPI(false) is always allowed — opting out is safe for any language.
+      if (requirement.onlyWhenTrue) {
+        const firstArgValue = (decorator.args[0]?.value as any)?.value;
+        if (firstArgValue === false) {
+          continue;
+        }
+      }
+
       // Find the scope argument - it's the last string argument.
       // decorator.args[i].value is a Value object with entityKind and a nested .value for the primitive.
       const scopeArg = decorator.args.find((arg, idx) => {
