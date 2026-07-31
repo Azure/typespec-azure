@@ -1,4 +1,9 @@
-import { MockRequest, ScenarioMockApi, ValidationError, passOnSuccess } from "@typespec/spec-api";
+import {
+  MockRequest,
+  type ScenarioMockApi,
+  ValidationError,
+  passOnSuccess,
+} from "@typespec/spec-api";
 
 export const commonBase = "/resiliency/service-driven";
 
