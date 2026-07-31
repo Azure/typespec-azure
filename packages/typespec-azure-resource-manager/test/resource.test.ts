@@ -1437,10 +1437,9 @@ describe("decorator re-application", () => {
       }
     `);
 
-    const reportedBefore = program.diagnostics.length;
     const tk = $(program);
     tk.type.finishType(tk.type.clone(FooResource));
 
-    expectDiagnosticEmpty(program.diagnostics.slice(reportedBefore));
+    expectDiagnosticEmpty(program.diagnostics);
   });
 });
