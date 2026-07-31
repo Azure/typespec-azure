@@ -1,30 +1,30 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
-  DecoratorContext,
-  DecoratorFunction,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
+  type DecoratorContext,
+  type DecoratorFunction,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
-  Interface,
+  type Interface,
   isErrorModel,
   isList,
   isNumeric,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   Numeric,
-  Operation,
-  Program,
-  RekeyableMap,
-  Scalar,
-  Type,
-  Union,
+  type Operation,
+  type Program,
+  type RekeyableMap,
+  type Scalar,
+  type Type,
+  type Union,
 } from "@typespec/compiler";
-import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAuthentication,
@@ -35,7 +35,7 @@ import {
   isPathParam,
 } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
-import {
+import type {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
@@ -55,7 +55,7 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import {
+import type {
   ClientDefaultValueDecorator,
   DisablePageableDecorator,
   FlattenPropertyDecorator,
@@ -65,12 +65,12 @@ import {
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
-  AccessFlags,
-  ClientInitializationOptions,
-  ExternalTypeInfo,
-  LanguageScopes,
-  SdkClient,
-  TCGCContext,
+  type AccessFlags,
+  type ClientInitializationOptions,
+  type ExternalTypeInfo,
+  type LanguageScopes,
+  type SdkClient,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {

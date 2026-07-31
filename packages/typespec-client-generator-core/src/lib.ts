@@ -1,5 +1,10 @@
-import { createTypeSpecLibrary, fileRef, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import {
+  createTypeSpecLibrary,
+  fileRef,
+  type JSONSchemaType,
+  paramMessage,
+} from "@typespec/compiler";
+import type {
   BrandedSdkEmitterOptionsInterface,
   TCGCEmitterOptions,
   UnbrandedSdkEmitterOptionsInterface,
