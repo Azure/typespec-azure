@@ -41,7 +41,7 @@ import (
 // MarshalJSON implements the json.Marshaller interface for type Widget.
 func (w Widget) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]any)
-	populateTime[datetime.RFC3339](objectMap, "createdAt", w.CreatedAt)
+	populateTime[datetime.RFC3339](objectMap, "createdAt", w.CreatedAt, true)
 	populate(objectMap, "name", w.Name)
 	return json.Marshal(objectMap)
 }
@@ -79,13 +79,17 @@ func populate(m map[string]any, k string, v any) {
 	}
 }
 
-func populateTime[T dateTimeConstraints](m map[string]any, k string, t *time.Time) {
+func populateTime[T dateTimeConstraints](m map[string]any, k string, t *time.Time, utc bool) {
 	if t == nil {
 		return
 	} else if azcore.IsNullValue(t) {
 		m[k] = nil
 	} else if !reflect.ValueOf(t).IsNil() {
-		newTime := T(*t)
+		tt := *t
+		if utc {
+			tt = tt.UTC()
+		}
+		newTime := T(tt)
 		m[k] = (*T)(&newTime)
 	}
 }

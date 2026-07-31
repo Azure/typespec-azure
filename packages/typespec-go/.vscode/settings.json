@@ -1,0 +1,20 @@
+{
+  // The pnpm node_modules under this package are symlinks into the repo-root
+  // `.pnpm` store and sibling packages. With symlink-following enabled, the
+  // VS Code file crawler (ripgrep, run with --follow) re-walks the entire
+  // monorepo dependency graph and can peg the CPU. Disable following here.
+  "search.followSymlinks": false,
+
+  // Keep pure build/test artifacts out of search and file watching. `temp`
+  // (the synced azure-rest-api-specs) is fully generated. (`node_modules` is
+  // already excluded by the top-level settings.json.) The test/ trees are NOT
+  // excluded: they hold hand-written committed fixtures, and the generated Go
+  // inside them is already .gitignore'd (which search honors).
+  "search.exclude": {
+    "temp": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "temp/**": true
+  }
+}

@@ -342,13 +342,17 @@ export function formatParamValue(
         case "string":
           imports.add("strings");
           return `strings.Join(${paramName}, "${separator}")`;
-        case "time":
+        case "time": {
           imports.add("strings");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+          const elemVal = param.type.elementType.utc
+            ? `${param.name}[i].UTC()`
+            : `${param.name}[i]`;
           return emitConvertOver(
             param.name,
-            `datetime.${param.type.elementType.format}(${param.name}[i]).String()`,
+            `datetime.${param.type.elementType.format}(${elemVal}).String()`,
           );
+        }
         default:
           imports.add("fmt");
           imports.add("strings");
@@ -430,9 +434,11 @@ export function formatValue(
         default:
           throw new CodegenError("InternalError", `unhandled scalar type ${type.type}`);
       }
-    case "time":
+    case "time": {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      return `datetime.${type.format}(${star}${paramName}).String()`;
+      const timeVal = type.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
+      return `datetime.${type.format}(${timeVal}).String()`;
+    }
     default:
       return `${star}${paramName}`;
   }
