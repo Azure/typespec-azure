@@ -1,11 +1,11 @@
-import { Model, Operation } from "@typespec/compiler";
+import type { Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
 import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { ArmLifecycleOperationKind } from "../src/operations.js";
+import type { ArmLifecycleOperationKind } from "../src/operations.js";
 import {
-  ArmResourceDetails,
+  type ArmResourceDetails,
   getArmResources,
   getFeature,
   getResourceFeature,

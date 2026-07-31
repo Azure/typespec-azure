@@ -1,5 +1,5 @@
 import {
-  TypeSpecTestLibrary,
+  type TypeSpecTestLibrary,
   createTestLibrary,
   findTestPackageRoot,
 } from "@typespec/compiler/testing";

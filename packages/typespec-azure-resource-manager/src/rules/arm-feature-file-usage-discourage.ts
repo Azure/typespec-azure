@@ -1,4 +1,4 @@
-import { createRule, fileRef, Namespace } from "@typespec/compiler";
+import { createRule, fileRef, type Namespace } from "@typespec/compiler";
 import { getFeatureFileSet } from "../resource.js";
 
 export const armFeatureFileUsageDiscourage = createRule({

@@ -1,5 +1,9 @@
-import { createRule, fileRef, isTemplateInstance, Operation } from "@typespec/compiler";
-import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
+import { createRule, fileRef, isTemplateInstance, type Operation } from "@typespec/compiler";
+import {
+  getHttpOperation,
+  getResponsesForOperation,
+  type HttpOperationResponse,
+} from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
  * verify that 202 or 204 responses do not contain a response body.

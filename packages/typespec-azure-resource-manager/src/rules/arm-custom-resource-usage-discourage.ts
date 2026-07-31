@@ -1,4 +1,10 @@
-import { createRule, fileRef, isTemplateInstance, Model, Program } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  isTemplateInstance,
+  type Model,
+  type Program,
+} from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { isCustomAzureResource } from "../resource.js";
 
