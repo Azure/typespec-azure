@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { useStandardNames } from "../../src/rules/use-standard-names.js";
 

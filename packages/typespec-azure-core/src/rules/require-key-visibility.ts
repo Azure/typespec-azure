@@ -1,5 +1,5 @@
 import {
-  Model,
+  type Model,
   createRule,
   fileRef,
   getLifecycleVisibilityEnum,

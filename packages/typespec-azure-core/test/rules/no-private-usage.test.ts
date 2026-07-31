@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { noPrivateUsage } from "../../src/rules/no-private-usage.js";
 

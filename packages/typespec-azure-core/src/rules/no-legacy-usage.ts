@@ -1,10 +1,10 @@
 import {
   createRule,
-  DecoratedType,
-  DiagnosticTarget,
+  type DecoratedType,
+  type DiagnosticTarget,
   fileRef,
   paramMessage,
-  Type,
+  type Type,
 } from "@typespec/compiler";
 import {
   checkDecoratorsInDisallowedNamespace,
