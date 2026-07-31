@@ -1,16 +1,16 @@
 import { getFeature } from "@azure-tools/typespec-azure-resource-manager";
 import {
   compilerAssert,
-  Program,
   type ModelProperty,
   type Operation,
+  type Program,
   type Service,
   type SourceFile,
   type Type,
 } from "@typespec/compiler";
-import { HttpOperation, Visibility } from "@typespec/http";
-import { AdditionalInfo } from "@typespec/openapi";
-import { AutorestEmitterContext } from "./index.js";
+import { type HttpOperation, Visibility } from "@typespec/http";
+import type { AdditionalInfo } from "@typespec/openapi";
+import type { AutorestEmitterContext } from "./index.js";
 import type {
   OpenAPI2Document,
   OpenAPI2Operation,
