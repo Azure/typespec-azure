@@ -1816,20 +1816,19 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
           ? alternateType
           : target.type;
 
-      if (!tk.scalar.is(effectiveType)) return [];
-
-      const valueType = typeof actualValue;
-      const isMatch =
-        (valueType === "string" && tk.scalar.extendsString(effectiveType)) ||
-        (valueType === "number" && tk.scalar.extendsNumeric(effectiveType)) ||
-        (valueType === "boolean" && tk.scalar.extendsBoolean(effectiveType));
-
-      if (!isMatch) {
+      // Create a Value from the actual JS value and check assignability to the property type
+      const defaultValue = tk.value.create(actualValue as string | number | boolean);
+      const [isValid] = tk.value.isOfType.withDiagnostics(defaultValue, effectiveType, target);
+      if (!isValid) {
+        const valueType = typeof actualValue;
         const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
         return [
           createDiagnostic({
             code: "client-default-value-type-mismatch",
-            format: { valueType: valueTypeLabel, propertyType: effectiveType.name },
+            format: {
+              valueType: valueTypeLabel,
+              propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
+            },
             target: target,
           }),
         ];
