@@ -263,7 +263,10 @@ export class TypeAdapter {
       case "offsetDateTime":
         return this.getTimeType(type.encode, false);
       case "utcDateTime":
-        return this.getTimeType(type.encode, true);
+        // the utc flag drives emission of a .UTC() coercion before marshalling.
+        // that only matters for RFC3339, the sole offset-preserving format (RFC7231
+        // forces GMT and Unix is absolute), so restrict it to that encoding.
+        return this.getTimeType(type.encode, getDateTimeEncoding(type.encode) === "RFC3339");
       case "dict": {
         const valueTypeByValue = helpers.isTypePassedByValue(type.valueType);
         const keyName = recursiveKeyName(
@@ -322,12 +325,15 @@ export class TypeAdapter {
 
   private getTimeType(encode: string, utc: boolean): go.Time {
     const encoding = getDateTimeEncoding(encode);
-    let datetime = this.types.get(encoding);
+    // the cache key must include utc since RFC3339 is shared by utcDateTime
+    // (utc=true, needs a .UTC() coercion) and offsetDateTime (utc=false).
+    const keyName = `${encoding}-${utc}`;
+    let datetime = this.types.get(keyName);
     if (datetime) {
       return <go.Time>datetime;
     }
     datetime = new go.Time(encoding, utc);
-    this.types.set(encoding, datetime);
+    this.types.set(keyName, datetime);
     return datetime;
   }
 
@@ -736,11 +742,11 @@ export class TypeAdapter {
     modelType.docs.description = model.doc;
     if (modelType.docs.summary) {
       if (!modelType.docs.summary.startsWith(modelName)) {
-        modelType.docs.summary = `${modelName} - ${modelType.docs.summary}`;
+        modelType.docs.summary = go.prefixDocWithName(modelName, modelType.docs.summary);
       }
     } else if (modelType.docs.description) {
       if (!modelType.docs.description.startsWith(modelName)) {
-        modelType.docs.description = `${modelName} - ${modelType.docs.description}`;
+        modelType.docs.description = go.prefixDocWithName(modelName, modelType.docs.description);
       }
     }
 

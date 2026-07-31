@@ -93,6 +93,7 @@ words:
   - Onco
   - oncophenotype
   - PAYG
+  - pipx
   - popd
   - prismjs
   - psscriptanalyzer
@@ -102,6 +103,7 @@ words:
   - qnas
   - regionality
   - responseasbool
+  - retarget
   - reinjected
   - Reranker
   - rpaasoneboxacr

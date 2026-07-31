@@ -113,7 +113,7 @@ export class ClientAdapter {
     if (docs.summary) {
       docs.summary = `${clientName} - ${docs.summary}`;
     } else if (docs.description) {
-      docs.description = `${clientName} - ${docs.description}`;
+      docs.description = go.prefixDocWithName(clientName, docs.description);
     } else if (clientName.length > 6) {
       // strip clientName's "Client" suffix
       const groupName = clientName.substring(0, clientName.length - 6);
