@@ -96,6 +96,16 @@ describe("computeAffected", () => {
     expect(computeAffected(NONE, ["core"], CONFIG)).toEqual(ALL_AFFECTED);
   });
 
+  // Azure/typespec-azure#5010: catalog upstreams such as
+  // `@typespec/http-client-python` are not workspace packages, so pnpm reports no
+  // affected package when one is bumped. The root workspace file must trigger
+  // every target on its own.
+  it("pnpm-workspace.yaml change triggers all targets", () => {
+    expect(computeAffected(NONE, ["pnpm-workspace.yaml", "pnpm-lock.yaml"], CONFIG)).toEqual(
+      ALL_AFFECTED,
+    );
+  });
+
   it("unrelated root file change triggers nothing", () => {
     expect(computeAffected(NONE, ["README.md", "package.json"], CONFIG)).toEqual(NONE_AFFECTED);
   });

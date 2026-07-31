@@ -116,14 +116,18 @@ export function generateModels(
     serdeImports.add("reflect");
     serdeImports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
     serdeTextBody +=
-      "func populateTime[T dateTimeConstraints](m map[string]any, k string, t *time.Time) {\n";
+      "func populateTime[T dateTimeConstraints](m map[string]any, k string, t *time.Time, utc bool) {\n";
     serdeTextBody += `${indent.get()}if t == nil {\n`;
     serdeTextBody += `${indent.push().get()}return\n`;
     serdeTextBody += `${indent.pop().get()}} else if azcore.IsNullValue(t) {\n`;
     serdeTextBody += `${indent.push().get()}m[k] = nil\n`;
     serdeTextBody += `${indent.pop().get()}} else if !reflect.ValueOf(t).IsNil() {\n`;
     indent.push();
-    serdeTextBody += `${indent.get()}newTime := T(*t)\n`;
+    serdeTextBody += `${indent.get()}tt := *t\n`;
+    serdeTextBody += `${indent.get()}if utc {\n`;
+    serdeTextBody += `${indent.push().get()}tt = tt.UTC()\n`;
+    serdeTextBody += `${indent.pop().get()}}\n`;
+    serdeTextBody += `${indent.get()}newTime := T(tt)\n`;
     serdeTextBody += `${indent.get()}m[k] = (*T)(&newTime)\n`;
     indent.pop();
     serdeTextBody += `${indent.get()}}\n`;
@@ -276,7 +280,17 @@ function generateModelDefs(
         // add a basic description if one isn't available
         descriptionMods.push("The contents of this field are raw JSON.");
       }
-      field.docs.description = descriptionMods.join("; ");
+      if (
+        descriptionMods.length > 1 &&
+        go.startsWithDocListItem(descriptionMods[descriptionMods.length - 1]!)
+      ) {
+        // a leading list item can't share a line with the modifiers; joining
+        // them would demote it to prose.
+        const description = descriptionMods.pop()!;
+        field.docs.description = `${descriptionMods.join("; ")}\n${description}`;
+      } else {
+        field.docs.description = descriptionMods.join("; ");
+      }
     }
 
     const serDeFormat = helpers.getSerDeFormat(model, pkg);
@@ -511,15 +525,27 @@ function generateJSONMarshallerBody(
       modelDef.SerDe.needsJSONPopulateByteArray = true;
     } else if (field.type.kind === "slice" && field.type.elementType.kind === "time") {
       const source = `${receiver}.${field.name}`;
+      const elementType = field.type.elementType;
       let elementPtr = "*";
       if (field.type.elementTypeByValue) {
         elementPtr = "";
       }
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      marshaller += `${indent.get()}aux := make([]${elementPtr}datetime.${field.type.elementType.format}, len(${source}), len(${source}))\n`;
+      marshaller += `${indent.get()}aux := make([]${elementPtr}datetime.${elementType.format}, len(${source}), len(${source}))\n`;
       marshaller += `${indent.get()}for i := 0; i < len(${source}); i++ {\n`;
-      marshaller += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${field.type.elementType.format})(${source}[i])\n`;
-      marshaller += `${indent.pop().get()}}\n`;
+      if (elementType.utc && elementPtr === "*") {
+        // pointer elements must be nil-checked before normalizing to UTC
+        marshaller += `${indent.push().get()}if ${source}[i] != nil {\n`;
+        marshaller += `${indent.push().get()}utcTime := ${source}[i].UTC()\n`;
+        marshaller += `${indent.get()}aux[i] = (*datetime.${elementType.format})(&utcTime)\n`;
+        marshaller += `${indent.pop().get()}}\n`;
+        indent.pop();
+      } else {
+        const utcCall = elementType.utc ? ".UTC()" : "";
+        marshaller += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${elementType.format})(${source}[i]${utcCall})\n`;
+        indent.pop();
+      }
+      marshaller += `${indent.get()}}\n`;
       marshaller += `${indent.get()}populate(objectMap, "${field.serializedName}", aux)\n`;
       modelDef.SerDe.needsJSONPopulate = true;
     } else if (field.type.kind === "literal") {
@@ -542,9 +568,12 @@ function generateJSONMarshallerBody(
         marshaller += `${indent.pop().get()}}\n`;
       }
       let populate: string;
+      // populateTime takes an extra utc argument; the other populate funcs don't.
+      let populateArgs = "";
       if (field.type.kind === "time") {
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         populate = `populateTime[datetime.${field.type.format}]`;
+        populateArgs = `, ${field.type.utc}`;
         modelDef.SerDe.needsJSONPopulateTime = true;
       } else if (field.type.kind === "any") {
         populate = "populateAny";
@@ -570,18 +599,29 @@ function generateJSONMarshallerBody(
           marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", to.Ptr(strconv.${field.type.type.startsWith("int") ? "FormatInt" : "FormatUint"}(*${receiver}.${field.name}, 10)))\n`;
         }
       } else {
-        marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name})\n`;
+        marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name}${populateArgs})\n`;
       }
     }
   }
   if (addlProps) {
     marshaller += `${indent.get()}if ${receiver}.AdditionalProperties != nil {\n`;
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
-    let assignment = "val";
-    if (addlProps.valueType.kind === "time") {
-      assignment = `(*${addlProps.valueType.format})(val)`;
+    if (addlProps.valueType.kind === "time" && addlProps.valueType.utc) {
+      // normalize utc datetimes before casting the (pointer) map value
+      imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+      marshaller += `${indent.push().get()}if val != nil {\n`;
+      marshaller += `${indent.push().get()}utcTime := val.UTC()\n`;
+      marshaller += `${indent.get()}objectMap[key] = (*datetime.${addlProps.valueType.format})(&utcTime)\n`;
+      marshaller += `${indent.pop().get()}} else {\n`;
+      marshaller += `${indent.push().get()}objectMap[key] = nil\n`;
+      marshaller += `${indent.pop().get()}}\n`;
+    } else {
+      let assignment = "val";
+      if (addlProps.valueType.kind === "time") {
+        assignment = `(*${addlProps.valueType.format})(val)`;
+      }
+      marshaller += `${indent.push().get()}objectMap[key] = ${assignment}\n`;
     }
-    marshaller += `${indent.push().get()}objectMap[key] = ${assignment}\n`;
     marshaller += `${indent.pop().get()}}\n`;
     marshaller += `${indent.pop().get()}}\n`;
   }

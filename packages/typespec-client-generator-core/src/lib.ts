@@ -596,6 +596,13 @@ export const $lib = createTypeSpecLibrary({
         default: "Auto-merging service client must be empty.",
       },
     },
+    "client-default-value-type-mismatch": {
+      ...doc("client-default-value-type-mismatch"),
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client default value type "${"valueType"}" does not match property type "${"propertyType"}". The default value type should match the property type.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

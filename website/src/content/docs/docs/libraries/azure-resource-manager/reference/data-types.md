@@ -116,7 +116,7 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 | StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
 | FinalResult     | The type of the logical result when following the location header                 |
 | PollingUrlValue | The value type of the link to the status monitor                                  |
-| FinalUrlValue   | The value type fo the link to the final result                                    |
+| FinalUrlValue   | The value type of the link to the final result                                    |
 
 #### Examples
 
@@ -426,7 +426,7 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 | Name       | Description                                                |
 | ---------- | ---------------------------------------------------------- |
-| Resource   | The resource being updated                                 |
+| Resource   | The resource being created                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
 #### Examples
@@ -463,7 +463,7 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 | Name     | Description                |
 | -------- | -------------------------- |
-| Resource | The resource being updated |
+| Resource | The resource being created |
 
 #### Examples
 
@@ -1965,6 +1965,54 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 | Incomplete | `"Incomplete"` | The response is incomplete.           |
 | Queued     | `"Queued"`     | The response is queued for execution. |
 | InProgress | `"InProgress"` | The response is in progress.          |
+
+## Azure.ResourceManager.BaseTypes.Relationships
+
+### `Relationship` {#Azure.ResourceManager.BaseTypes.Relationships.Relationship}
+
+Model template for a Relationship extension resource.
+Applies the Relationship base type decorator automatically.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                      |
+| ---------- | -------------------------------------------------------------------------------- |
+| Properties | RP-specific properties for the relationship (must extend RelationshipProperties) |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `RelationshipProperties` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties}
+
+Required properties for a relationship resource.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<ProvisioningState>
+```
+
+#### Template Parameters
+
+| Name              | Description                                 |
+| ----------------- | ------------------------------------------- |
+| ProvisioningState | The relationship provisioning state values. |
+
+#### Properties
+
+| Name               | Type                                             | Description                                                           |
+| ------------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | ARM-managed. Must include the base type descriptor for this resource. |
+| sourceId           | `string`                                         | The relationship source identifier.                                   |
+| sourceTenant       | `string`                                         | The tenant identifier of the relationship source.                     |
+| targetId           | `string`                                         | The relationship target identifier.                                   |
+| targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
+| provisioningState? | `ProvisioningState`                              | The provisioning state of the relationship.                           |
 
 ## Azure.ResourceManager.CommonTypes
 
