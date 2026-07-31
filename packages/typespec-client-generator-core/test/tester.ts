@@ -1,8 +1,8 @@
-import { Program, resolvePath } from "@typespec/compiler";
+import { type Program, resolvePath } from "@typespec/compiler";
 import { createTester, resolveVirtualPath, t } from "@typespec/compiler/testing";
 import { TemplateWithMarkers } from "../../../core/packages/compiler/src/testing/marked-template.js";
-import { createSdkContext, CreateSdkContextOptions } from "../src/context.js";
-import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
+import { createSdkContext, type CreateSdkContextOptions } from "../src/context.js";
+import type { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 
 /** Create a multiline test string without its shared source indentation. */
 export function d(strings: TemplateStringsArray, ...values: unknown[]): string {

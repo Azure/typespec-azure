@@ -1,6 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkBuiltInType, SdkContext } from "../../src/interfaces.js";
+import type { SdkBuiltInType, SdkContext } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import {
   AzureCoreTesterWithService,

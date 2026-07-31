@@ -1,4 +1,4 @@
-import { ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import { type ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";

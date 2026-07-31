@@ -1,9 +1,9 @@
-import { Namespace } from "@typespec/compiler";
+import type { Namespace } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { listClients, listOperationsInClient, listSubClients } from "../../src/decorators.js";
-import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
+import { type SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import {
   AzureCoreTester,
   createClientCustomizationInput,
