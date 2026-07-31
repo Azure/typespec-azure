@@ -13,6 +13,7 @@ import { ModularEmitterOptions } from "../modular/interfaces.js";
 import { resolveProjectRoot } from "../utils/resolve-project-root.js";
 import { refkey } from "./refkey.js";
 export const SourceFileSymbol = Symbol("SourceFile");
+
 export interface StaticHelperMetadata {
   name: string;
   kind: "function" | "interface" | "typeAlias" | "class" | "enum";
@@ -94,22 +95,6 @@ export async function loadStaticHelpers(
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
-      addedFile.getImportDeclarations().map((i) => {
-        // Rewrite relative platform-types imports to #platform/ specifiers
-        // so that browser/react-native variants are resolved via subpath imports.
-        // Only rewrite imports to the default variant (not -browser/-react-native variants
-        // which are already platform-specific direct imports).
-        const specifier = i.getModuleSpecifierValue();
-        if (
-          specifier.startsWith(".") &&
-          specifier.includes("platform-types") &&
-          !specifier.includes("-browser") &&
-          !specifier.includes("-react-native")
-        ) {
-          i.setModuleSpecifier("#platform/static-helpers/platform-types");
-        }
-      });
-
       for (const entry of Object.values(helpers)) {
         if (!addedFile.getFilePath().endsWith(entry.location)) {
           continue;

@@ -94,7 +94,7 @@ import {
   scopeKey,
   usageKey,
 } from "./internal-utils.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -1799,6 +1799,41 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
     actualValue,
     scope,
   );
+
+  return {
+    onTargetFinish: () => {
+      const tk = $(context.program);
+
+      // Check if there's an alternate type set on this property (respecting scope)
+      const alternateType = getScopedDecoratorData(
+        { program: context.program } as TCGCContext,
+        alternateTypeKey,
+        target,
+        scope ?? AllScopes,
+      );
+      const effectiveType =
+        alternateType !== undefined && alternateType.kind !== "externalTypeInfo"
+          ? alternateType
+          : target.type;
+
+      // Create a literal type from the value and check assignability to the property type
+      const literal = tk.literal.create(actualValue as string | number | boolean);
+      if (tk.type.isAssignableTo(literal, effectiveType)) return [];
+
+      const valueType = typeof actualValue;
+      const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
+      return [
+        createDiagnostic({
+          code: "client-default-value-type-mismatch",
+          format: {
+            valueType: valueTypeLabel,
+            propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
+          },
+          target: target,
+        }),
+      ];
+    },
+  };
 };
 
 /**
@@ -1884,8 +1919,7 @@ export function getClientOptionValue(
 ): unknown | undefined {
   // Check operation directly
   const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
-    | { name: string; value: unknown }
-    | undefined;
+    { name: string; value: unknown } | undefined;
   if (opOption?.name === optionName) {
     return opOption.value;
   }
@@ -1893,8 +1927,7 @@ export function getClientOptionValue(
   // Check interface if operation is in one
   if (target.interface) {
     const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (ifaceOption?.name === optionName) {
       return ifaceOption.value;
     }
@@ -1904,8 +1937,7 @@ export function getClientOptionValue(
   let ns = target.namespace;
   while (ns) {
     const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (nsOption?.name === optionName) {
       return nsOption.value;
     }

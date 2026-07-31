@@ -1,4 +1,11 @@
-import { Model, Program, createRule, getNamespaceFullName, paramMessage } from "@typespec/compiler";
+import {
+  Model,
+  Program,
+  createRule,
+  fileRef,
+  getNamespaceFullName,
+  paramMessage,
+} from "@typespec/compiler";
 import { getParentResource } from "@typespec/rest";
 
 import { AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
@@ -6,6 +13,7 @@ import { getArmResources } from "../resource.js";
 
 export const armAgentBaseTypeChildResourcesRule = createRule({
   name: "arm-agent-base-type-child-resources",
+  docs: fileRef.fromPackageRoot("src/rules/arm-agent-base-type-child-resources.md"),
   severity: "warning",
   description:
     "Resources decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource.",

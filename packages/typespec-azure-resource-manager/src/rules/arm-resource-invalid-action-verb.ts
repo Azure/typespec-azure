@@ -1,4 +1,4 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { Operation, createRule, fileRef } from "@typespec/compiler";
 import { getOperationVerb } from "@typespec/http";
 
 import { getActionDetails } from "@typespec/rest";
@@ -6,6 +6,7 @@ import { isSourceOperationResourceManagerInternal } from "./utils.js";
 
 export const armResourceInvalidActionVerbRule = createRule({
   name: "arm-resource-invalid-action-verb",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-invalid-action-verb.md"),
   severity: "warning",
   description: "Actions must be HTTP Post or Get operations.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb",

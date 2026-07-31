@@ -3,6 +3,7 @@ import {
   UsageFlags,
   createAddDecoratorCodeFix,
   createRule,
+  fileRef,
   isSecret,
   paramMessage,
   resolveUsages,
@@ -18,6 +19,7 @@ function isKeyValuePairKeyProp(property: ModelProperty): boolean {
 }
 export const secretProprule = createRule({
   name: "secret-prop",
+  docs: fileRef.fromPackageRoot("src/rules/secret-prop.md"),
   description: `RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.`,
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop",

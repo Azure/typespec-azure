@@ -35,7 +35,7 @@ A complete rule usually touches **7+ files across 3+ packages**:
 2. Linter registration in `packages/<pkg>/src/linter.ts`
 3. Tests in `packages/<pkg>/test/rules/<rule-name>.test.ts`
 4. Ruleset registration in `packages/typespec-azure-rulesets`
-5. Rule documentation in `website/src/content/docs/docs/libraries/<pkg>/rules/`
+5. Rule documentation in `packages/<pkg>/src/rules/<rule-name>.md` (referenced from the rule via `docs`)
 6. Regenerated reference docs
 7. A changeset in `.chronus/changes/`
 
@@ -123,7 +123,7 @@ Concretely, expect changes like:
 
 - `packages/<pkg>/src/rules/<rule-name>.ts`
 - `packages/<pkg>/test/rules/<rule-name>.test.ts`
-- `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`
+- `packages/<pkg>/src/rules/<rule-name>.md`
 - `packages/<pkg>/src/linter.ts`
 
 ### Step 3: Write Tests First (TDD)
@@ -238,6 +238,7 @@ import {
   Namespace,
   createRule,
   defineCodeFix,
+  fileRef,
   getService,
   getSourceLocation,
   paramMessage,
@@ -262,6 +263,7 @@ export const myNewRule = createRule({
   description: "Require a specific Azure shape.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/my-new-rule",
+  docs: fileRef.fromPackageRoot("src/rules/my-new-rule.md"),
   messages: {
     default: "This type violates the rule.",
     withName: paramMessage`Property '${"propertyName"}' must meet the Azure guideline.`,
@@ -392,30 +394,58 @@ pnpm --filter "@azure-tools/typespec-azure-rulesets..." test
 
 ### Step 7: Write Documentation
 
-Each rule needs its own rule page:
+Each rule's extended documentation lives in a markdown file next to the rule
+implementation and is referenced from the rule via the `docs` field
+(`docs: fileRef.fromPackageRoot("src/rules/<rule-name>.md")`):
 
-- `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`
+- `packages/<pkg>/src/rules/<rule-name>.md`
 
-That page should include:
+`tspd` renders one reference page per rule at
+`website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`.
+The generated page starts with the rule id and its `description`, followed by
+the content of the `docs` markdown file. The `docs` file therefore contains only
+the **extended** documentation (no frontmatter and no `Full name` code block —
+those are generated):
 
-- Frontmatter with a `title`
-- A `Full name` code block
-- A plain-language description
+- A plain-language explanation
+- An **`## Impact`** section (required) — see below
 - `#### ❌ Incorrect` examples
 - `#### ✅ Correct` examples
+- A **`## Suppression`** section (required) — see below
+- A **`## LintDiff Equivalent`** section (when applicable) — see below
 
-Example rule doc shape:
+#### Required sections
+
+Every rule's `docs` file must include an **Impact** statement and a
+**Suppression** statement, and must include a **LintDiff Equivalent** section
+whenever an equivalent LintDiff (azure-openapi-validator) rule exists.
+
+- **`## Impact`** — Describe the practical consequence of a violation. Start with
+  a bulleted `**Area:**` line listing the affected areas (for example `API`,
+  `SDK`, `Emitters`), followed by a short paragraph explaining what breaks or
+  degrades when the rule is violated.
+- **`## Suppression`** — State whether suppression is acceptable and why. If the
+  rule should never be suppressed, say so and point to the correct fix. If
+  suppression is acceptable in narrow cases, describe exactly when. Suppressions
+  use the `#suppress "<rule-id>" "<justification>"` directive (see
+  [Step 10](#step-10-external-integration-check)).
+- **`## LintDiff Equivalent`** — If this rule corresponds to one or more LintDiff
+  rules from
+  [azure-openapi-validator](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md),
+  link them here (deep-link to the specific rule id, e.g. `#r2007`). This tells
+  spec authors which Swagger-era check the TypeSpec rule replaces. Omit the
+  section only when no LintDiff equivalent exists.
+
+Example `docs` markdown (`packages/<pkg>/src/rules/my-new-rule.md`):
 
 ````markdown
----
-title: "my-new-rule"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-core/my-new-rule
-```
-
 Brief description of the rule.
+
+## Impact
+
+- **Area:** API, SDK
+
+Explain what breaks or degrades when this rule is violated.
 
 #### ❌ Incorrect
 
@@ -432,6 +462,15 @@ model GoodThing {
   goodName: string;
 }
 ```
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule
+[RuleName](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2007).
+
+## Suppression
+
+Do not suppress. Use `goodName` instead of `badName`.
 ````
 
 After editing the rule docs, regenerate package docs:
@@ -509,8 +548,19 @@ existing specs in `Azure/azure-rest-api-specs`. To resolve this:
    follow conventions), submit a PR to `Azure/azure-rest-api-specs` on the
    **main** branch.
 2. **Suppress the rule** — If the spec cannot be fixed without changing API
-   behavior, add a `// suppress` comment. Suppressions can always go to the
+   behavior, add a `#suppress` directive. Suppressions can always go to the
    **main** branch.
+
+   Suppressions use the `#suppress` **directive**, not a `// suppress` comment.
+   Place it on the line directly above the target, passing the fully-qualified
+   rule id and a justification string:
+
+   ```tsp
+   #suppress "@azure-tools/typespec-azure-core/no-openapi-client-extensions" "Emitter-only annotation with no TypeSpec construct."
+   @OpenAPI.extension("x-ms-example-annotation", true)
+   op example(): void;
+   ```
+
 3. **Fix on typespec-next branch** — If the fix requires unreleased TypeSpec
    APIs, types, or behavior that aren't yet available in the published
    packages, submit the fix to the **typespec-next** branch, which uses nightly
@@ -555,7 +605,8 @@ packages/
 │   ├── src/
 │   │   ├── linter.ts
 │   │   └── rules/
-│   │       └── <rule-name>.ts
+│   │       ├── <rule-name>.ts
+│   │       └── <rule-name>.md
 │   └── test/
 │       ├── tester.ts
 │       └── rules/
@@ -564,7 +615,8 @@ packages/
 │   ├── src/
 │   │   ├── linter.ts
 │   │   └── rules/
-│   │       └── <rule-name>.ts
+│   │       ├── <rule-name>.ts
+│   │       └── <rule-name>.md
 │   └── test/
 │       ├── test-host.ts
 │       └── rules/
@@ -573,7 +625,8 @@ packages/
 │   ├── src/
 │   │   ├── linter.ts
 │   │   └── rules/
-│   │       └── <rule-name>.ts
+│   │       ├── <rule-name>.ts
+│   │       └── <rule-name>.md
 │   └── test/
 │       ├── tester.ts
 │       └── rules/
@@ -583,9 +636,7 @@ packages/
 │   └── src/rulesets/resource-manager.ts
 website/
 └── src/content/docs/docs/libraries/
-    ├── azure-core/rules/<rule-name>.md
-    ├── azure-resource-manager/rules/<rule-name>.md
-    └── typespec-client-generator-core/rules/<rule-name>.md
+    └── <pkg>/rules/<rule-name>.md   # generated by `regen-docs`
 ```
 
 ### Test Hosts
@@ -634,6 +685,9 @@ website/
 - [ ] Rule registered in `linter.ts`
 - [ ] Rule listed in appropriate ruleset(s)
 - [ ] Documentation has realistic examples
+- [ ] Documentation has an `## Impact` section
+- [ ] Documentation has a `## Suppression` section
+- [ ] Documentation has a `## LintDiff Equivalent` section (if a LintDiff equivalent exists)
 - [ ] Reference docs regenerated
 - [ ] Changeset created
 - [ ] `pnpm validate:pr` passes

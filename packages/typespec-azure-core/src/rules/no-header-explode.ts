@@ -1,8 +1,9 @@
-import { createRule, ignoreDiagnostics, Operation } from "@typespec/compiler";
+import { createRule, fileRef, ignoreDiagnostics, Operation } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 export const noHeaderExplodeRule = createRule({
   name: "no-header-explode",
+  docs: fileRef.fromPackageRoot("src/rules/no-header-explode.md"),
   description: "It is recommended to serialize header parameter without explode: true",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode",

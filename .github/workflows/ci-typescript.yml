@@ -1,16 +1,7 @@
 name: "typespec-ts / CI"
 
 on:
-  pull_request:
-    branches:
-      - main
-      - release/*
-    paths:
-      - "packages/typespec-ts/**"
-      - "packages/typespec-client-generator-core/**"
-      - "packages/typespec-azure-resource-manager/**"
-      - ".github/workflows/ci-typescript.yml"
-  merge_group:
+  workflow_call:
 
 permissions:
   contents: read

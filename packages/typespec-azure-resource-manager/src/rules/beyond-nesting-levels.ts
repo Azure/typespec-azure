@@ -1,4 +1,4 @@
-import { Model, createRule } from "@typespec/compiler";
+import { Model, createRule, fileRef } from "@typespec/compiler";
 
 import { getParentResource } from "@typespec/rest";
 import { isTrackedResource } from "./utils.js";
@@ -9,6 +9,7 @@ import { isTrackedResource } from "./utils.js";
 
 export const beyondNestingRule = createRule({
   name: "beyond-nesting-levels",
+  docs: fileRef.fromPackageRoot("src/rules/beyond-nesting-levels.md"),
   severity: "warning",
   description: "Tracked Resources must use 3 or fewer levels of nesting.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/beyond-nesting-levels",

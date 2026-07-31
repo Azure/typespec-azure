@@ -1,5 +1,11 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.43
+
+### Bump dependencies
+
+- Republish aligned with the TypeSpec `1.14.0` / TypeSpec Azure `0.70.0` release. Peer dependencies now resolve to `@azure-tools/typespec-azure-core@^0.70.0`, `@typespec/compiler@^1.14.0`, `@typespec/http@^1.14.0`, `@typespec/rest@^0.84.0`, `@typespec/versioning@^0.84.0`, and `@typespec/xml@^0.84.0`, so downstream emitters (e.g. `@typespec/http-client-python`) can install against the `0.70.0` line.
+
 ## 0.1.0-alpha.42
 
 ### Features

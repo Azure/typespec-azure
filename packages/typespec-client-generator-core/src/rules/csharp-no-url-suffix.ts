@@ -1,10 +1,11 @@
-import { ModelProperty, createRule, paramMessage } from "@typespec/compiler";
+import { ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";
 
 export const csharpNoUrlSuffixRule = createRule({
   name: "csharp-no-url-suffix",
+  docs: fileRef.fromPackageRoot("src/rules/csharp-no-url-suffix.md"),
   description:
     "Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.",
   severity: "warning",
