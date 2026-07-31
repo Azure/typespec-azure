@@ -151,7 +151,15 @@ function compareProperties(base: ModelProperty, head: ModelProperty, ctx: DiffCo
     );
   }
 
-  diffs.push(...compareTypes(base.type, head.type, ctx));
+  // Type-change findings from compareTypes store inner types (e.g., Scalars) as
+  // baseType/headType, but the violation is about this property changing — the
+  // ModelProperty should be the target for suppression lookup.
+  const typeDiffs = compareTypes(base.type, head.type, ctx);
+  for (const diff of typeDiffs) {
+    diff.baseType = base;
+    diff.headType = head;
+  }
+  diffs.push(...typeDiffs);
 
   return diffs;
 }

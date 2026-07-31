@@ -538,11 +538,7 @@ describe("suppression with versioning decorators", () => {
     }
   });
 
-  it("@typeChangedFrom — suppression on type-changed property (known gap)", async () => {
-    // Known gap: type-change findings store Scalar types as baseType/headType,
-    // not the containing ModelProperty. Suppression on the property is NOT found
-    // because findSuppressions walks from the Scalar, which has no path to the property.
-    // This will be addressed when we add containingProperty to findings.
+  it("@typeChangedFrom — suppression on type-changed property", async () => {
     const findings = await analyze(`
       ${baseSpec}
       model Widget {
@@ -557,8 +553,7 @@ describe("suppression with versioning decorators", () => {
       (f) => f.diff.kind === "ResponsePropertyTypeChanged" && f.severity === "error",
     );
     if (typeChanged.length > 0) {
-      // Gap: suppression on property is NOT found for type-change findings
-      expect(typeChanged.every((f) => f.suppressed)).toBe(false);
+      expect(typeChanged.every((f) => f.suppressed)).toBe(true);
     }
   });
 
