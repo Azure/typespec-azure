@@ -68,6 +68,13 @@ function collectSuppressions(
     suppressions.push(...finder(program, originType));
   }
 
+  // Also check the operation type — critical for inline models where there is
+  // no named type to decorate, so the operation is the only suppression target
+  const operationType = finding.diff.operationType;
+  if (operationType && operationType !== targetType && operationType !== originType) {
+    suppressions.push(...finder(program, operationType));
+  }
+
   return suppressions;
 }
 

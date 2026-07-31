@@ -82,35 +82,65 @@ Place the decorator on the most specific declaration you can: property > model >
 
 ### Suppression by operation identity
 
-You can place `@approvedBreakingChange` on the **operation** instead of on the property or type.
-
-This is useful when:
-
-- the breaking change comes from a template-expanded type and you cannot decorate the property directly, or
-- you want to suppress the finding only for one operation instead of everywhere that type is used.
-
-Operation-level suppression:
+When a response or request body uses an **inline model** (an anonymous type defined directly in the operation signature), there is no named type to decorate. The only way to suppress findings is to place `@approvedBreakingChange` on the **operation** itself:
 
 ```typespec
-@approvedBreakingChange("Migrating getWidget response shape", "ResponsePropertyRemoved")
+// Inline response — no named model exists, so decorate the operation
+@approvedBreakingChange("removing legacy field from inline response")
+@route("/widgets/{id}")
+@get
+op getWidget(@path id: string): {
+  name: string;
+  @removed(Versions.v2)
+  legacy?: string;
+};
+```
+
+```typespec
+// Inline request body — same pattern
+@approvedBreakingChange("removing legacy field from inline body")
+@route("/widgets")
+@post
+op createWidget(@body body: {
+  name: string;
+  @removed(Versions.v2)
+  legacy?: string;
+}): void;
+```
+
+This also works when the type is a **named model** — operation-level suppression is scoped to that operation only, while property-level suppression applies everywhere the type is used:
+
+```typespec
+// Suppresses ResponsePropertyRemoved only for getWidget, not listWidgets
+@approvedBreakingChange("approved for getWidget only", "ResponsePropertyRemoved")
 @route("/widgets/{id}")
 @get
 op getWidget(@path id: string): Widget;
+
+// listWidgets still reports the finding — no suppression here
+@route("/widgets")
+@get
+op listWidgets(): Widget[];
 ```
 
-Property-level suppression:
+Compare with property-level suppression, which is global:
 
 ```typespec
 model Widget {
+  // This suppresses the finding for ALL operations returning Widget
   @approvedBreakingChange("Field removed per API review", "ResponsePropertyRemoved")
   @removed(Versions.v2)
   legacy?: string;
 }
 ```
 
-- **Property/type-level suppression is global**: it applies everywhere that declaration is used.
-- **Operation-level suppression is scoped**: it suppresses findings only for that specific operation identity.
-- Prefer **property/type-level** suppression for shared model changes, and **operation-level** suppression for operation-specific changes.
+**When to use each:**
+
+| Scenario | Target |
+|---|---|
+| Inline model (anonymous type) | Operation (only option) |
+| Suppress for one operation only | Operation |
+| Suppress everywhere a type is used | Property or model |
 
 ## Phase A: same-version findings are projection bugs, not breaking-change classifications
 

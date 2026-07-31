@@ -205,6 +205,62 @@ describe("orchestrator", () => {
     expect(remainingErrors).toHaveLength(0);
   });
 
+  it("operation-level suppression works on inline response model", async () => {
+    const { program } = await TesterWithSuppressions.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      @route("/widgets")
+      @get
+      @approvedBreakingChange("approved")
+      op getWidget(): { name: string; @removed(Versions.v2) legacy?: string; };
+    `);
+
+    const result = analyzeProgram(program);
+    const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("operation-level suppression works on inline request body", async () => {
+    const { program } = await TesterWithSuppressions.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      @route("/widgets")
+      @post
+      @approvedBreakingChange("approved")
+      op createWidget(@body body: { name: string; @removed(Versions.v2) legacy?: string; }): void;
+    `);
+
+    const result = analyzeProgram(program);
+    const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("without operation-level suppression, inline model findings are errors", async () => {
+    const { program } = await TesterWithSuppressions.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      @route("/widgets")
+      @get
+      op getWidget(): { name: string; @removed(Versions.v2) legacy?: string; };
+    `);
+
+    const result = analyzeProgram(program);
+    const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
   it("filters two-program analysis by service name", async () => {
     const { program: baseProgram } = await Tester.compile(`
       @versioned(Versions)

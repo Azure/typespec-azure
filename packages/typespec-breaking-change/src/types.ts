@@ -129,6 +129,14 @@ export interface ApiDiff {
    * Always populated for operation-relative diffs.
    */
   operationSourceLocation?: SourceLocation;
+
+  /**
+   * Reference to the TypeSpec Operation node in the head compilation.
+   * Used for operation-scoped suppression: when a finding targets an inline model
+   * (no named type to decorate), putting @approvedBreakingChange on the operation
+   * suppresses findings for that operation only.
+   */
+  operationType?: Type;
 }
 
 /**

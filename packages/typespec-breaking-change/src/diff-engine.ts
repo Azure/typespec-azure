@@ -73,11 +73,15 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
     const headOp = headOps.get(key);
     if (headOp) {
       const opDiffs = diffOperations(baseOp.canonical, headOp.canonical, baseOp.identity);
-      // Attach operation source location to all operation-relative diffs
-      const opLoc = getOperationSourceLocation(headOp.httpOperation.operation);
+      // Attach operation source location and operation Type to all diffs
+      const headOperation = headOp.httpOperation.operation;
+      const opLoc = getOperationSourceLocation(headOperation);
       for (const diff of opDiffs) {
         if (!diff.operationSourceLocation && opLoc) {
           diff.operationSourceLocation = opLoc;
+        }
+        if (!diff.operationType && headOperation) {
+          diff.operationType = headOperation;
         }
       }
       diffs.push(...opDiffs);
