@@ -742,11 +742,11 @@ export class TypeAdapter {
     modelType.docs.description = model.doc;
     if (modelType.docs.summary) {
       if (!modelType.docs.summary.startsWith(modelName)) {
-        modelType.docs.summary = `${modelName} - ${modelType.docs.summary}`;
+        modelType.docs.summary = go.prefixDocWithName(modelName, modelType.docs.summary);
       }
     } else if (modelType.docs.description) {
       if (!modelType.docs.description.startsWith(modelName)) {
-        modelType.docs.description = `${modelName} - ${modelType.docs.description}`;
+        modelType.docs.description = go.prefixDocWithName(modelName, modelType.docs.description);
       }
     }
 
