@@ -94,7 +94,7 @@ import {
   scopeKey,
   usageKey,
 } from "./internal-utils.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -1782,7 +1782,7 @@ export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" 
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
-export const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
+const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
 
 export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
@@ -1799,6 +1799,41 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
     actualValue,
     scope,
   );
+
+  return {
+    onTargetFinish: () => {
+      const tk = $(context.program);
+
+      // Check if there's an alternate type set on this property
+      const alternateData = context.program.stateMap(alternateTypeKey).get(target);
+      const alternateType =
+        alternateData?.[AllScopes] !== undefined &&
+        alternateData[AllScopes].kind !== "externalTypeInfo"
+          ? alternateData[AllScopes]
+          : undefined;
+      const effectiveType = alternateType ?? target.type;
+
+      if (!tk.scalar.is(effectiveType)) return [];
+
+      const valueType = typeof actualValue;
+      const isMatch =
+        (valueType === "string" && tk.scalar.extendsString(effectiveType)) ||
+        (valueType === "number" && tk.scalar.extendsNumeric(effectiveType)) ||
+        (valueType === "boolean" && tk.scalar.extendsBoolean(effectiveType));
+
+      if (!isMatch) {
+        const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
+        return [
+          createDiagnostic({
+            code: "client-default-value-type-mismatch",
+            format: { valueType: valueTypeLabel, propertyType: effectiveType.name },
+            target: target,
+          }),
+        ];
+      }
+      return [];
+    },
+  };
 };
 
 /**
