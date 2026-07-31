@@ -1816,9 +1816,9 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
           ? alternateType
           : target.type;
 
-      // Create a Value from the actual JS value and check assignability to the property type
-      const defaultValue = tk.value.create(actualValue as string | number | boolean);
-      const [isValid] = tk.value.isOfType.withDiagnostics(defaultValue, effectiveType, target);
+      // Create a literal type from the value and check assignability to the property type
+      const literal = tk.literal.create(actualValue as string | number | boolean);
+      const [isValid] = tk.type.isAssignableTo.withDiagnostics(literal, effectiveType, target);
       if (!isValid) {
         const valueType = typeof actualValue;
         const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
