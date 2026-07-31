@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { isPathParam } from "@typespec/http";
 import { isExcludedCoreType } from "./utils.js";
 

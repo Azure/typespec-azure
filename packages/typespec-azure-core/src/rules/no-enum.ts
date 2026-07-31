@@ -1,6 +1,6 @@
 import {
-  CodeFix,
-  Enum,
+  type CodeFix,
+  type Enum,
   createRule,
   fileRef,
   getPositionBeforeTrivia,
@@ -10,7 +10,7 @@ import {
 import {
   type EnumMemberNode,
   type EnumSpreadMemberNode,
-  EnumStatementNode,
+  type EnumStatementNode,
   type Node,
   SyntaxKind,
   type TypeSpecScriptNode,

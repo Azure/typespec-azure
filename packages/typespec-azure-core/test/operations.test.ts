@@ -1,8 +1,8 @@
 import type { Model, Scalar, StringLiteral } from "@typespec/compiler";
 import {
+  type TesterInstance,
   expectDiagnosticEmpty,
   expectDiagnostics,
-  TesterInstance,
 } from "@typespec/compiler/testing";
 import type { HttpOperation } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
