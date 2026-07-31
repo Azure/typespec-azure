@@ -5,13 +5,12 @@
   // monorepo dependency graph and can peg the CPU. Disable following here.
   "search.followSymlinks": false,
 
-  // Keep pure build/test artifacts out of search and file watching. Only
-  // `node_modules` and `temp` (the synced azure-rest-api-specs) are fully
-  // generated. The test/ trees are NOT excluded: they hold hand-written
-  // committed fixtures, and the generated Go inside them is already
-  // .gitignore'd (which search honors).
+  // Keep pure build/test artifacts out of search and file watching. `temp`
+  // (the synced azure-rest-api-specs) is fully generated. (`node_modules` is
+  // already excluded by the top-level settings.json.) The test/ trees are NOT
+  // excluded: they hold hand-written committed fixtures, and the generated Go
+  // inside them is already .gitignore'd (which search honors).
   "search.exclude": {
-    "**/node_modules": true,
     "temp": true
   },
   "files.watcherExclude": {
