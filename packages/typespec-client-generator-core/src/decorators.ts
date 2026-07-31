@@ -1804,14 +1804,17 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
     onTargetFinish: () => {
       const tk = $(context.program);
 
-      // Check if there's an alternate type set on this property
-      const alternateData = context.program.stateMap(alternateTypeKey).get(target);
-      const alternateType =
-        alternateData?.[AllScopes] !== undefined &&
-        alternateData[AllScopes].kind !== "externalTypeInfo"
-          ? alternateData[AllScopes]
-          : undefined;
-      const effectiveType = alternateType ?? target.type;
+      // Check if there's an alternate type set on this property (respecting scope)
+      const alternateType = getScopedDecoratorData(
+        { program: context.program } as TCGCContext,
+        alternateTypeKey,
+        target,
+        scope ?? AllScopes,
+      );
+      const effectiveType =
+        alternateType !== undefined && alternateType.kind !== "externalTypeInfo"
+          ? alternateType
+          : target.type;
 
       if (!tk.scalar.is(effectiveType)) return [];
 
