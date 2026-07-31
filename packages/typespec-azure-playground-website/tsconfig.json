@@ -15,6 +15,7 @@
     "allowJs": true,
     "lib": ["DOM", "ES2022"],
     "skipLibCheck": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true
   }
 }
