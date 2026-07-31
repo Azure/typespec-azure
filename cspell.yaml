@@ -117,6 +117,7 @@ words:
   - tsmv
   - userrp
   - vnet
+  - VMSS
   - WINDOWSVMIMAGE
   - azcore
   - azkeys

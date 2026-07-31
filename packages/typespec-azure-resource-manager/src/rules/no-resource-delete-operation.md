@@ -8,7 +8,7 @@ A tracked resource without a delete operation violates the RPC contract.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [AllTrackedResourcesMustHaveDelete](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [AllTrackedResourcesMustHaveDelete](https://github.com/Azure/azure-openapi-validator/blob/main/docs/all-tracked-resources-must-have-delete.md).
 
 ## ❌ Incorrect
 
