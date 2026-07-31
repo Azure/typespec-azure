@@ -4,7 +4,8 @@
     "outDir": "dist",
     "rootDir": ".",
     "rewriteRelativeImportExtensions": true,
-    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.ts", "eng/**/*.ts"]
 }
