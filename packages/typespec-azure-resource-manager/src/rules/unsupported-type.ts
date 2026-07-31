@@ -1,6 +1,6 @@
 import {
-  DiagnosticTarget,
-  Type,
+  type DiagnosticTarget,
+  type Type,
   createRule,
   fileRef,
   isType,

@@ -1,6 +1,12 @@
-import { Model, Program, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type Program,
+  createRule,
+  getProperty,
+  paramMessage,
+} from "@typespec/compiler";
 
-import { AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
+import { type AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
 import { getArmResources } from "../resource.js";
 
 export const useRelationshipRequiredPropertiesRule = createRule({

@@ -2,26 +2,26 @@ import {
   $key,
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
-  DecoratorContext,
-  Enum,
+  type DecoratorContext,
+  type Enum,
   getKeyName,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getTypeName,
-  Interface,
+  type Interface,
   isKey,
   isSealed,
   isTemplateDeclarationOrInstance,
   isTemplateInstance,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
-  Scalar,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Scalar,
   sealVisibilityModifiers,
-  Tuple,
-  Type,
+  type Tuple,
+  type Type,
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
@@ -40,13 +40,13 @@ import {
 } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
-import {
+import type {
   AzureResourceManagerExtensionPrivateDecorators,
   BuiltInResourceDecorator,
   BuiltInResourceGroupResourceDecorator,
   BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
-import {
+import type {
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
@@ -84,15 +84,15 @@ import {
   $armResourceRead,
   $armResourceUpdate,
   addArmResourceOperation,
-  ArmOperationIdentifier,
+  type ArmOperationIdentifier,
   armRenameListByOperationInternal,
-  ArmResourceOperation,
+  type ArmResourceOperation,
   getArmResourceOperations,
   setArmOperationIdentifier,
 } from "./operations.js";
 import {
-  ArmResourceDetails,
-  ArmResourceKind,
+  type ArmResourceDetails,
+  type ArmResourceKind,
   getArmResourceKind,
   getArmVirtualResourceDetails,
   getResourceBaseType,
