@@ -332,7 +332,7 @@ it("protocol response usage", async () => {
       prop: string;
     }
 
-    @convenientAPI(false, "java")
+    @convenientAPI(false)
     op get(): Test;
     `,
   );

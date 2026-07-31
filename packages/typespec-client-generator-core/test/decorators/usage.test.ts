@@ -153,7 +153,7 @@ it("usage and convenience", async () => {
       op putModel(@body body: Fish): void;
 
       @get
-      @convenientAPI(false, "java")
+      @convenientAPI(false)
       op getModel(): Fish;
     }
   `);
@@ -171,7 +171,7 @@ it("usage and convenience", async () => {
       }
 
       @put
-      @convenientAPI(false, "java")
+      @convenientAPI(false)
       op putModel(@body body: Dog): void;
 
       @get
