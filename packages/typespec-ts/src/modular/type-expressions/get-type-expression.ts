@@ -1,10 +1,10 @@
-import {
+import type {
   SdkHttpParameter,
   SdkModelPropertyType,
   SdkServiceResponseHeader,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getCredentialExpression } from "./get-credential-expression.js";
 import { getEnumExpression } from "./get-enum-expression.js";

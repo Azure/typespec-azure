@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 import { getPackageName } from "./utils.js";
 
 function shouldGenerateTestConfig(model: ClientModel): boolean {
