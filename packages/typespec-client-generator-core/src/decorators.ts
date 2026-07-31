@@ -1818,22 +1818,20 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
 
       // Create a literal type from the value and check assignability to the property type
       const literal = tk.literal.create(actualValue as string | number | boolean);
-      const [isValid] = tk.type.isAssignableTo.withDiagnostics(literal, effectiveType, target);
-      if (!isValid) {
-        const valueType = typeof actualValue;
-        const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
-        return [
-          createDiagnostic({
-            code: "client-default-value-type-mismatch",
-            format: {
-              valueType: valueTypeLabel,
-              propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
-            },
-            target: target,
-          }),
-        ];
-      }
-      return [];
+      if (tk.type.isAssignableTo(literal, effectiveType)) return [];
+
+      const valueType = typeof actualValue;
+      const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
+      return [
+        createDiagnostic({
+          code: "client-default-value-type-mismatch",
+          format: {
+            valueType: valueTypeLabel,
+            propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
+          },
+          target: target,
+        }),
+      ];
     },
   };
 };
