@@ -1,0 +1,49 @@
+name: "go / emitter diff commenter"
+
+# Posts the sticky PR comment for the "go / emitter diff" workflow.
+# Runs in the privileged repo context (not the fork) so it can write PR comments.
+# See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+
+on:
+  workflow_run:
+    workflows: ["go / emitter diff"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  # DO NOT BUILD ANYTHING FROM A PR HERE https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  commenter:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download comment artifact
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: emitter-diff-go-comment
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/emitter-diff-comment
+
+      - name: Post PR comment
+        if: steps.download.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const commentDir = path.join(process.env.RUNNER_TEMP, 'emitter-diff-comment');
+            const payload = JSON.parse(fs.readFileSync(path.join(commentDir, 'comment.json'), 'utf8'));
+            const { prNumber, marker, body } = payload;
+            const { owner, repo } = context.repo;
+            const { data } = await github.rest.issues.listComments({ owner, repo, issue_number: prNumber });
+            const hit = data.find((c) => c.body && c.body.includes(marker));
+            if (hit) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: hit.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+            }
