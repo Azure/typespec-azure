@@ -1,13 +1,13 @@
-import { Diagnostic, resolvePath } from "@typespec/compiler";
+import { type Diagnostic, resolvePath } from "@typespec/compiler";
 import {
   createTester,
-  EmitterTesterInstance,
+  type EmitterTesterInstance,
   expectDiagnosticEmpty,
   resolveVirtualPath,
 } from "@typespec/compiler/testing";
 import { ok } from "assert";
-import { AutorestEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document, OpenAPI2Schema } from "../src/openapi2-document.js";
+import type { AutorestEmitterOptions } from "../src/lib.js";
+import type { OpenAPI2Document, OpenAPI2Schema } from "../src/openapi2-document.js";
 
 export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
