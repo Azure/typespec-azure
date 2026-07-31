@@ -1,5 +1,6 @@
 import { Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
+import { $ } from "@typespec/compiler/typekit";
 import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
@@ -1416,5 +1417,29 @@ describe("multiple services", () => {
     expect(ResA.armProviderNamespace).toEqual("Provider.A");
     expect(ResB.name).toEqual("ResB");
     expect(ResB.armProviderNamespace).toEqual("Provider.B");
+  });
+});
+
+describe("decorator re-application", () => {
+  // Emitters (and versioning) create copies of the resource types through the mutator
+  // framework, which re-runs the decorators on the copy. Those decorators must be
+  // idempotent, otherwise sealing the visibility of `name` a second time reports
+  // `visibility-sealed`.
+  it("does not report diagnostics when the resource decorators are applied again", async () => {
+    const { program, FooResource } = await Tester.compile(t.code`
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      model FooResourceProperties {}
+
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+        ...ResourceNameParameter<FooResource>;
+      }
+    `);
+
+    const tk = $(program);
+    tk.type.finishType(tk.type.clone(FooResource));
+
+    expectDiagnosticEmpty(program.diagnostics);
   });
 });
