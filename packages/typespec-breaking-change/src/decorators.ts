@@ -85,6 +85,8 @@ export interface SuppressionMetadata {
   reason: string;
   /** Optional version scope — only applies to this version pair. */
   version?: string;
+  /** Optional identity path from suppression site to violation target. */
+  path?: string;
 }
 
 export interface ResolvedSuppression {
@@ -96,12 +98,12 @@ export function $approvedBreakingChange(
   context: DecoratorContext,
   target: Type,
   reason: string,
-  kind?: string,
-  since?: string,
+  options?: { kind?: string; since?: string; path?: string },
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
-  const normalizedKind = getDecoratorStringValue(kind);
-  const normalizedSince = getDecoratorStringValue(since);
+  const normalizedKind = options?.kind ? getDecoratorStringValue(options.kind) ?? options.kind : undefined;
+  const normalizedSince = options?.since ? getDecoratorStringValue(options.since) ?? options.since : undefined;
+  const normalizedPath = options?.path ? getDecoratorStringValue(options.path) ?? options.path : undefined;
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -114,6 +116,7 @@ export function $approvedBreakingChange(
     resolvedKind,
     normalizedReason,
     normalizedSince,
+    normalizedPath,
   );
 }
 
@@ -121,10 +124,10 @@ export function $approvedUnversionedChange(
   context: DecoratorContext,
   target: Type,
   reason: string,
-  kind?: string,
+  options?: { kind?: string },
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
-  const normalizedKind = getDecoratorStringValue(kind);
+  const normalizedKind = options?.kind ? getDecoratorStringValue(options.kind) ?? options.kind : undefined;
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -182,10 +185,11 @@ function addSuppression(
   kind: DiffKind | undefined,
   reason: string,
   version?: string,
+  path?: string,
 ): void {
   const stateMap = program.stateMap(stateKey);
   const existing: SuppressionMetadata[] = stateMap.get(target) ?? [];
-  stateMap.set(target, [...existing, { kind, reason, version }]);
+  stateMap.set(target, [...existing, { kind, reason, version, path }]);
 }
 
 function findSuppressionsWith(

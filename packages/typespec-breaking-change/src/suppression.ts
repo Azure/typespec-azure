@@ -97,7 +97,7 @@ function matchesVersion(suppression: ResolvedSuppression, finding: Finding): boo
  * the end of the finding's element path.
  */
 function matchesPath(suppression: ResolvedSuppression, finding: Finding): boolean {
-  const suppressionPath = (suppression.suppression as any).path as string | undefined;
+  const suppressionPath = suppression.suppression.path;
   if (!suppressionPath) return true;
 
   // Get the element path from the finding's identity

@@ -3,17 +3,30 @@ using TypeSpec.Reflection;
 namespace Azure.BreakingChange;
 
 /**
+ * Options for the approvedBreakingChange decorator.
+ */
+model ApprovedBreakingChangeOptions {
+  /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
+  kind?: string;
+  /** Optional version lower bound — suppression applies when head version >= since. */
+  since?: string;
+  /**
+   * Identity path from the suppression site to the violation target.
+   * Required when the suppression is not on the target node itself.
+   * Uses dot-separated segments matching the finding's element path
+   * (e.g., "body.properties.legacy", "query.filter", "properties.name").
+   */
+  path?: string;
+}
+
+/**
  * Marks a breaking change as intentionally approved for cross-version (Phase B) comparison.
  *
  * When placed on a type, property, operation, or namespace, it suppresses
  * the matching breaking-change finding in the tool output.
  *
  * @param reason A required explanation of why the breaking change is approved.
- * @param kind Optional DiffKind filter. If specified, only suppresses this specific kind
- *   of breaking change (e.g., "ResponsePropertyRemoved", "RequestPropertyMadeRequired").
- *   If omitted, suppresses all breaking-change kinds on this target.
- * @param since Optional version lower bound. If specified, the suppression only applies
- *   when the head api-version is >= this value (e.g., "2026-01-01").
+ * @param options Optional suppression options: kind, since, and path filters.
  */
 extern dec approvedBreakingChange(
   target:
@@ -28,9 +41,16 @@ extern dec approvedBreakingChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  kind?: valueof string,
-  since?: valueof string
+  options?: valueof ApprovedBreakingChangeOptions,
 );
+
+/**
+ * Options for the approvedUnversionedChange decorator.
+ */
+model ApprovedUnversionedChangeOptions {
+  /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
+  kind?: string;
+}
 
 /**
  * Marks a same-version (Phase A) structural difference as intentionally approved.
@@ -40,7 +60,7 @@ extern dec approvedBreakingChange(
  * is known and accepted (e.g., during a refactoring migration).
  *
  * @param reason A required explanation of why the unversioned change is approved.
- * @param kind Optional DiffKind filter. If specified, only suppresses this specific kind.
+ * @param options Optional suppression options: kind filter.
  */
 extern dec approvedUnversionedChange(
   target:
@@ -55,5 +75,5 @@ extern dec approvedUnversionedChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  kind?: valueof string
+  options?: valueof ApprovedUnversionedChangeOptions,
 );
