@@ -189,7 +189,10 @@ function addSuppression(
 ): void {
   const stateMap = program.stateMap(stateKey);
   const existing: SuppressionMetadata[] = stateMap.get(target) ?? [];
-  stateMap.set(target, [...existing, { kind, reason, version, path }]);
+  const metadata: SuppressionMetadata = { kind, reason };
+  if (version !== undefined) metadata.version = version;
+  if (path !== undefined) metadata.path = path;
+  stateMap.set(target, [...existing, metadata]);
 }
 
 function findSuppressionsWith(

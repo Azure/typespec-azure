@@ -6,7 +6,7 @@ import { isOperationIdentity } from "./types.js";
  * a detected breaking change if it is intentional.
  */
 export interface SuppressionGuidance {
-  /** The decorator to add (e.g., `@approvedBreakingChange("reason", "kind")`). */
+  /** The decorator to add (e.g., `@approvedBreakingChange("reason", #{ kind: "SomeKind" })`). */
   decorator: string;
   /** Where to place it: description of the target location. */
   placement: string;
@@ -25,7 +25,7 @@ export function formatSuppressionGuidance(finding: Finding): SuppressionGuidance
   const decoratorName =
     finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
 
-  const decorator = `${decoratorName}("your reason here", "${kind}")`;
+  const decorator = `${decoratorName}("your reason here", #{ kind: "${kind}" })`;
   const placement = getPlacementDescription(finding);
   const file = getTargetFile(finding);
   const example = buildExample(finding, decorator);
@@ -39,7 +39,7 @@ export function formatSuppressionGuidance(finding: Finding): SuppressionGuidance
 export function formatSuppressionHint(finding: Finding): string {
   const decoratorName =
     finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
-  return `${decoratorName}("your reason here", "${finding.diff.kind}")`;
+  return `${decoratorName}("your reason here", #{ kind: "${finding.diff.kind}" })`;
 }
 
 /**

@@ -31,7 +31,7 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widget,
       "Reviewed and approved.",
-      "RequestPropertyRemoved",
+      { kind: "RequestPropertyRemoved" },
     );
 
     expect(getSuppressions(program, widget)).toEqual([
@@ -52,7 +52,7 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widget,
       "Second approval.",
-      "ResponsePropertyRemoved",
+      { kind: "ResponsePropertyRemoved" },
     );
 
     expect(getSuppressions(program, widget)).toEqual([
@@ -73,13 +73,13 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widget,
       "Versioned approval.",
-      "RequestPropertyRemoved",
+      { kind: "RequestPropertyRemoved" },
     );
     $approvedUnversionedChange(
       { program } as DecoratorContext,
       widget,
       "Phase A approval.",
-      "RequestPropertyRemoved",
+      { kind: "RequestPropertyRemoved" },
     );
 
     expect(getSuppressions(program, widget)).toEqual([
@@ -106,14 +106,14 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       namespace,
       "Namespace-level approval.",
-      "RequestPropertyRemoved",
+      { kind: "RequestPropertyRemoved" },
     );
     $approvedBreakingChange({ program } as DecoratorContext, widget, "Model-level approval.");
     $approvedBreakingChange(
       { program } as DecoratorContext,
       name,
       "Property-level approval.",
-      "ResponsePropertyRemoved",
+      { kind: "ResponsePropertyRemoved" },
     );
 
     expect(findSuppressions(program, name)).toEqual([
@@ -154,13 +154,13 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widgets,
       "Interface-level approval.",
-      "OperationRemoved",
+      { kind: "OperationRemoved" },
     );
     $approvedBreakingChange(
       { program } as DecoratorContext,
       operation,
       "Operation-level approval.",
-      "OperationRouteChanged",
+      { kind: "OperationRouteChanged" },
     );
 
     expect(findSuppressions(program, operation)).toEqual([
@@ -214,7 +214,7 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widget,
       "Reviewed and approved.",
-      "NotAKind",
+      { kind: "NotAKind" },
     );
 
     expect(getSuppressions(program, widget)).toEqual([]);
@@ -240,7 +240,7 @@ describe("suppression decorators", () => {
       { program } as DecoratorContext,
       widget,
       "Approved.",
-      "NotAValidKind",
+      { kind: "NotAValidKind" },
     );
 
     expect(getUnversionedSuppressions(program, widget)).toEqual([]);

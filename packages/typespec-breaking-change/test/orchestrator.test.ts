@@ -106,7 +106,7 @@ describe("orchestrator", () => {
       enum Versions { v1: "2024-01-01", v2: "2025-01-01", v3: "2026-01-01" }
 
       model Widget {
-        @approvedBreakingChange("property removed starting v3", "RequestPropertyRemoved", "2026-01-01")
+        @approvedBreakingChange("property removed starting v3", #{ kind: "RequestPropertyRemoved", since: "2026-01-01" })
         @removed(Versions.v2)
         legacy?: string;
 
@@ -205,7 +205,7 @@ describe("orchestrator", () => {
     expect(remainingErrors).toHaveLength(0);
   });
 
-  it("operation-level suppression works on inline response model", async () => {
+  it("operation-level suppression requires a path for inline response model findings", async () => {
     const { program } = await TesterWithSuppressions.compile(`
       @versioned(Versions)
       @service
@@ -215,7 +215,7 @@ describe("orchestrator", () => {
 
       @route("/widgets")
       @get
-      @approvedBreakingChange("approved")
+      @approvedBreakingChange("approved", #{ path: "responses.200.body.properties.legacy" })
       op getWidget(): { name: string; @removed(Versions.v2) legacy?: string; };
     `);
 
@@ -224,7 +224,7 @@ describe("orchestrator", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("operation-level suppression works on inline request body", async () => {
+  it("operation-level suppression requires a path for inline request body findings", async () => {
     const { program } = await TesterWithSuppressions.compile(`
       @versioned(Versions)
       @service
@@ -234,7 +234,7 @@ describe("orchestrator", () => {
 
       @route("/widgets")
       @post
-      @approvedBreakingChange("approved")
+      @approvedBreakingChange("approved", #{ path: "request.body.properties.legacy" })
       op createWidget(@body body: { name: string; @removed(Versions.v2) legacy?: string; }): void;
     `);
 

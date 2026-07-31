@@ -5,7 +5,7 @@ import {
   type ResolvedSuppression,
 } from "./decorators.js";
 import { isOperationIdentity } from "./types.js";
-import type { Finding } from "./types.js";
+import type { Finding, OperationDiffIdentity } from "./types.js";
 
 /**
  * Apply suppression metadata to classified findings.
@@ -13,7 +13,9 @@ import type { Finding } from "./types.js";
  * A suppression matches if:
  * 1. Its `kind` is undefined (wildcard) OR matches the finding's diff kind
  * 2. Its `version` is undefined (no scope) OR the finding's head version is >= the since version
- * 3. Its `path` is undefined OR matches the finding's identity element suffix
+ * 3. Path matching:
+ *    - Direct suppression (target === finding type): no path needed, wildcard OK
+ *    - Ancestor suppression (target !== finding type): path MUST be specified and match
  */
 export function applySuppressions(findings: Finding[], program: Program): Finding[] {
   return findings.map((finding) => {
@@ -26,14 +28,19 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
       return finding;
     }
 
-    // Collect suppressions from the wire type AND the origin type (if different)
+    // Collect all types where a direct (pathless) suppression is valid
+    const directTargets = new Set<Type>();
+    directTargets.add(targetType);
+    const originType = finding.diff.origin?.type;
+    if (originType) directTargets.add(originType);
+
     const allSuppressions = collectSuppressions(finding, program, targetType);
 
     const match = allSuppressions.find(
       (suppression) =>
         matchesKind(suppression, finding) &&
         matchesVersion(suppression, finding) &&
-        matchesPath(suppression, finding),
+        matchesPathOrDirect(suppression, finding, directTargets),
     );
 
     if (!match) {
@@ -49,8 +56,7 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
 }
 
 /**
- * Collect suppressions from both the wire type and the origin declaration type.
- * The origin type may have suppressions that apply to all uses of that declaration.
+ * Collect suppressions from the wire type, origin type, and operation type.
  */
 function collectSuppressions(
   finding: Finding,
@@ -62,14 +68,11 @@ function collectSuppressions(
 
   const suppressions = [...finder(program, targetType)];
 
-  // Also check the origin type if it's different from the target
   const originType = finding.diff.origin?.type;
   if (originType && originType !== targetType) {
     suppressions.push(...finder(program, originType));
   }
 
-  // Also check the operation type — critical for inline models where there is
-  // no named type to decorate, so the operation is the only suppression target
   const operationType = finding.diff.operationType;
   if (operationType && operationType !== targetType && operationType !== originType) {
     suppressions.push(...finder(program, operationType));
@@ -92,20 +95,69 @@ function matchesVersion(suppression: ResolvedSuppression, finding: Finding): boo
 }
 
 /**
- * Check if a suppression's path constraint matches the finding's element path.
- * Path matching uses suffix comparison — the suppression path should match
- * the end of the finding's element path.
+ * Check if a suppression matches via direct placement or identity path.
+ *
+ * - Direct: suppression target IS the finding's type → matches without path
+ * - Ancestor: suppression target is NOT the finding's type → requires path to match
  */
-function matchesPath(suppression: ResolvedSuppression, finding: Finding): boolean {
+function matchesPathOrDirect(
+  suppression: ResolvedSuppression,
+  finding: Finding,
+  directTargets: Set<Type>,
+): boolean {
+  const isDirect = directTargets.has(suppression.target);
   const suppressionPath = suppression.suppression.path;
-  if (!suppressionPath) return true;
 
-  // Get the element path from the finding's identity
-  const element = isOperationIdentity(finding.diff.identity)
-    ? finding.diff.identity.element
-    : undefined;
+  if (isDirect && !suppressionPath) {
+    // Direct suppression without path — always matches (wildcard on target)
+    return true;
+  }
 
-  if (!element) return false;
+  if (!isDirect && !suppressionPath) {
+    // Ancestor suppression without path — does NOT match
+    return false;
+  }
 
-  return element === suppressionPath || element.endsWith(`.${suppressionPath}`);
+  // Path specified — match against the finding's full identity path
+  return matchesPath(suppressionPath!, finding);
+}
+
+/**
+ * Compose the full identity path from an OperationDiffIdentity.
+ *
+ * Per design doc §3.1:
+ * - Request elements: request.{element} (e.g., request.body.properties.tags, request.query.filter)
+ * - Response elements: responses.{statusCode}.{element} (e.g., responses.200.body.properties.name)
+ */
+export function composeFullIdentityPath(identity: OperationDiffIdentity): string {
+  if (identity.component === "request") {
+    return `request.${identity.element}`;
+  }
+  const statusCode = identity.statusCode ?? "*";
+  return `responses.${statusCode}.${identity.element}`;
+}
+
+/**
+ * Match a suppression path against the finding's identity.
+ *
+ * The suppression path can be:
+ * - Absolute from operation root: "responses.200.body.properties.legacy"
+ * - Relative from anchor: "properties.legacy" (matches as a suffix)
+ *
+ * Per design §6.5: both relative and absolute paths are supported.
+ * Relative paths match at dot boundaries.
+ */
+function matchesPath(suppressionPath: string, finding: Finding): boolean {
+  const identity = finding.diff.identity;
+  if (!isOperationIdentity(identity)) return false;
+
+  const fullPath = composeFullIdentityPath(identity);
+
+  // Exact match (absolute path from operation root)
+  if (fullPath === suppressionPath) return true;
+
+  // Suffix match at dot boundary (relative path from anchor)
+  if (fullPath.endsWith(`.${suppressionPath}`)) return true;
+
+  return false;
 }

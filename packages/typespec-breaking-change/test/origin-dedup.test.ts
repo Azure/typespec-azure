@@ -630,7 +630,7 @@ describe("deduplication (single-spec versioning)", () => {
 // ────────────────────────────────────────────────────────────────────────────
 
 describe("suppression with origin", () => {
-  it("suppression on declaring model applies via origin lookup", async () => {
+  it("suppression on declaring model does not suppress property findings without a path", async () => {
     const spec = `
       @versioned(Versions)
       @service
@@ -665,11 +665,11 @@ describe("suppression with origin", () => {
     const unsuppressedRemovals = errorFindings.filter(
       (f) => f.diff.kind === "ResponsePropertyRemoved" && !f.suppressed,
     );
-    expect(unsuppressedRemovals).toHaveLength(0);
+    expect(unsuppressedRemovals.length).toBeGreaterThanOrEqual(1);
 
     const suppressedRemovals = errorFindings.filter(
       (f) => f.diff.kind === "ResponsePropertyRemoved" && f.suppressed,
     );
-    expect(suppressedRemovals.length).toBeGreaterThanOrEqual(1);
+    expect(suppressedRemovals).toHaveLength(0);
   });
 });

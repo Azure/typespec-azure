@@ -129,7 +129,7 @@ describe("applySuppressions", () => {
       enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
 
       model Widget {
-        @approvedBreakingChange("reason", "RequestPropertyRemoved")
+        @approvedBreakingChange("reason", #{ kind: "RequestPropertyRemoved" })
         @typeChangedFrom(Versions.v2, string)
         count: int32;
       }
@@ -195,7 +195,7 @@ describe("applySuppressions", () => {
     expect(finding.suppressionReason).toBeUndefined();
   });
 
-  it("applies parent model suppressions to child property diffs", async () => {
+  it("does not apply parent model suppressions to child property diffs without a path", async () => {
     const { program, diffs } = await compileDiffsWithSuppressions(`
       @versioned(Versions)
       @service
@@ -222,8 +222,7 @@ describe("applySuppressions", () => {
     );
     const finding = getFinding(findings, "RequestPropertyRemoved");
 
-    expect(finding.suppressed).toBe(true);
-    expect(finding.suppressionReason).toBe("refactoring model");
+    expect(finding.suppressed).toBe(false);
   });
 
   it("uses unversioned suppressions for same-version findings", async () => {
@@ -330,7 +329,7 @@ describe("applySuppressions", () => {
     const widget = getModel(program, "Widget");
     program
       .stateMap(BreakingChangeStateKeys.approvedBreakingChange)
-      .set(widget, [{ reason: "property path approval", path: "properties.name" } as any]);
+      .set(widget, [{ reason: "property path approval", path: "properties.name" }]);
 
     const [finding] = applySuppressions(
       [createFinding("ResponsePropertyRemoved", widget, "body.properties.name")],
@@ -353,7 +352,7 @@ describe("applySuppressions", () => {
     const widget = getModel(program, "Widget");
     program
       .stateMap(BreakingChangeStateKeys.approvedBreakingChange)
-      .set(widget, [{ reason: "other path approval", path: "properties.id" } as any]);
+      .set(widget, [{ reason: "other path approval", path: "properties.id" }]);
 
     const [finding] = applySuppressions(
       [createFinding("ResponsePropertyRemoved", widget, "body.properties.name")],
@@ -374,7 +373,7 @@ describe("applySuppressions", () => {
     const widget = getModel(program, "Widget");
     program
       .stateMap(BreakingChangeStateKeys.approvedBreakingChange)
-      .set(widget, [{ reason: "path constrained", path: "properties.name" } as any]);
+      .set(widget, [{ reason: "path constrained", path: "properties.name" }]);
 
     const [finding] = applySuppressions(
       [

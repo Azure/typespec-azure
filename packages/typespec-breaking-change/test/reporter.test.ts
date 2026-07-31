@@ -118,7 +118,7 @@ describe("reporters", () => {
         Element: body.properties.legacyStatus
         Phase: cross-version (2024-01-01 → 2025-01-01)
         Location: src/main.tsp:45
-        Suppress: @approvedBreakingChange("your reason here", "ResponsePropertyRemoved")
+        Suppress: @approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })
 
       ─────────────────────────────
       Results: 1 errors, 1 suppressed, 1 ignored
@@ -140,7 +140,7 @@ describe("reporters", () => {
         Element: body.properties.legacyStatus
         Phase: cross-version (2024-01-01 → 2025-01-01)
         Location: src/main.tsp:45
-        Suppress: @approvedBreakingChange("your reason here", "ResponsePropertyRemoved")
+        Suppress: @approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })
 
       SUPPRESSED  RequestPropertyRemoved
         Request property 'legacyField' was removed

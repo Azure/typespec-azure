@@ -16,7 +16,7 @@ export function createApproveBreakingChangeCodeFix(finding: Finding): CodeFix | 
 
   return createAddDecoratorCodeFix(target as DiagnosticTarget, "approvedBreakingChange", [
     `"Approved: ${escapeString(finding.diff.message)}"`,
-    `"${finding.diff.kind}"`,
+    `#{ kind: "${escapeString(finding.diff.kind)}" }`,
   ]);
 }
 

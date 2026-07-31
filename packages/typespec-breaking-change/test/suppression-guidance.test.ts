@@ -39,7 +39,7 @@ describe("suppression guidance", () => {
       const finding = makeFinding();
       const hint = formatSuppressionHint(finding);
       expect(hint).toBe(
-        '@approvedBreakingChange("your reason here", "ResponsePropertyRemoved")',
+        '@approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })',
       );
     });
 
@@ -47,7 +47,7 @@ describe("suppression guidance", () => {
       const finding = makeFinding({ phase: "same-version" });
       const hint = formatSuppressionHint(finding);
       expect(hint).toBe(
-        '@approvedUnversionedChange("your reason here", "ResponsePropertyRemoved")',
+        '@approvedUnversionedChange("your reason here", #{ kind: "ResponsePropertyRemoved" })',
       );
     });
 
@@ -82,7 +82,7 @@ describe("suppression guidance", () => {
 
       const guidance = formatSuppressionGuidance(finding);
       expect(guidance.decorator).toBe(
-        '@approvedBreakingChange("your reason here", "ResponsePropertyRemoved")',
+        '@approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })',
       );
       expect(guidance.placement).toContain("Microsoft.Widget.Models.WidgetProperties.legacyStatus");
       expect(guidance.file).toBe("src/models.tsp");
@@ -237,7 +237,9 @@ describe("suppression guidance in reporters", () => {
     const result = makeResult();
     const output = formatConsoleReport(result);
     expect(output).toContain("Suppress:");
-    expect(output).toContain('@approvedBreakingChange("your reason here", "ResponsePropertyRemoved")');
+    expect(output).toContain(
+      '@approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })',
+    );
   });
 
   it("Console report shows reason instead of hint for suppressed findings", () => {
