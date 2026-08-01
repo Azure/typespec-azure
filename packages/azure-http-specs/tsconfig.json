@@ -4,6 +4,7 @@
     "outDir": "dist",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/.tsbuildinfo",
-    "allowJs": true
+    "allowJs": true,
+    "verbatimModuleSyntax": true
   }
 }
