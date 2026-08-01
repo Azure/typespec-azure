@@ -169,7 +169,8 @@ describe("origin resolution (two-spec comparison)", () => {
 
     expect(typeChange).toBeDefined();
     expect(typeChange!.origin).toBeDefined();
-    expect(typeChange!.origin!.declarationPath).toBe("TestService.Widget");
+    // Origin resolves to the property where the type change occurred
+    expect(typeChange!.origin!.declarationPath).toBe("TestService.Envelope.value");
   });
 
   it("anonymous inline model type change has no origin", async () => {
@@ -195,7 +196,9 @@ describe("origin resolution (two-spec comparison)", () => {
     );
 
     expect(typeChange).toBeDefined();
-    expect(typeChange!.origin).toBeUndefined();
+    // Origin resolves to the property even when the new type is anonymous
+    expect(typeChange!.origin).toBeDefined();
+    expect(typeChange!.origin!.declarationPath).toBe("TestService.Envelope.value");
   });
 
   it("resolves origin for named model property removal", async () => {
@@ -377,7 +380,8 @@ describe("origin resolution (two-spec comparison)", () => {
 
     expect(scalarChange).toBeDefined();
     expect(scalarChange!.origin).toBeDefined();
-    expect(scalarChange!.origin!.declarationPath).toContain("WidgetId");
+    // Origin resolves to the property where the type change occurred
+    expect(scalarChange!.origin!.declarationPath).toContain("Widget.id");
   });
 
   it("literal union variant removal resolves to parent union origin", async () => {

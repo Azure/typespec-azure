@@ -58,8 +58,12 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     }
   }
 
+  const dedupStart = Date.now();
+  const dedupedFindings = deduplicateBySourceType(allFindings);
+  timing.classifyMs += Date.now() - dedupStart;
+
   const suppressStart = Date.now();
-  const findings = applySuppressions(allFindings, program);
+  const findings = applySuppressions(dedupedFindings, program);
   timing.suppressMs += Date.now() - suppressStart;
   timing.totalMs = Date.now() - totalStart;
 
@@ -135,8 +139,12 @@ export function analyzeBaseAndHead(
     }
   }
 
+  const dedupStart = Date.now();
+  const dedupedFindings = deduplicateBySourceType(allFindings);
+  timing.classifyMs += Date.now() - dedupStart;
+
   const suppressStart = Date.now();
-  const findings = applySuppressions(allFindings, headProgram);
+  const findings = applySuppressions(dedupedFindings, headProgram);
   timing.suppressMs += Date.now() - suppressStart;
   timing.totalMs = Date.now() - totalStart;
 
@@ -215,4 +223,54 @@ function buildSummary(
   }
 
   return summary;
+}
+
+/**
+ * Deduplicate findings that trace back to the same source type declaration.
+ *
+ * Source type tracing is fundamental to the design: headType/baseType on each
+ * finding points to the original TypeSpec declaration (ModelProperty, Scalar, etc.).
+ * When the same model property (e.g., `Employee.city`) appears in multiple
+ * operations (GET, PUT, PATCH), the diff engine produces separate findings
+ * for each. Since version projection reuses type objects, these findings share
+ * the same source type reference — enabling identity-based deduplication.
+ *
+ * Dedup key: source type reference identity + diff kind + version pair.
+ * Falls back to string key (kind + element + versions) only when no source
+ * type is available (e.g., service-level diffs like ApiVersionRemoved).
+ */
+function deduplicateBySourceType(findings: Finding[]): Finding[] {
+  const seenByNode = new Map<object, Set<string>>();
+  const seenByString = new Set<string>();
+  const result: Finding[] = [];
+
+  for (const f of findings) {
+    const versionKey = `${f.versionPair.baseVersion}|${f.versionPair.headVersion}`;
+    const kindVersionKey = `${f.diff.kind}|${versionKey}`;
+
+    const sourceType = f.diff.headType ?? f.diff.baseType;
+    // Use AST node identity for dedup — visibility-filtered model copies
+    // (e.g., EmployeePropertiesCreateOrUpdate.city) share the same node as
+    // the original declaration (EmployeeProperties.city).
+    const dedupKey = sourceType && (sourceType as any).node ? (sourceType as any).node : sourceType;
+
+    if (dedupKey) {
+      let kindSet = seenByNode.get(dedupKey);
+      if (!kindSet) {
+        kindSet = new Set();
+        seenByNode.set(dedupKey, kindSet);
+      }
+      if (kindSet.has(kindVersionKey)) continue;
+      kindSet.add(kindVersionKey);
+    } else {
+      // String fallback for findings without source type
+      const stringKey = `${f.diff.kind}|${f.diff.identity.element}|${versionKey}`;
+      if (seenByString.has(stringKey)) continue;
+      seenByString.add(stringKey);
+    }
+
+    result.push(f);
+  }
+
+  return result;
 }

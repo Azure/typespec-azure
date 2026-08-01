@@ -83,6 +83,8 @@ function compareModels(base: Model, head: Model, ctx: DiffContext): ApiDiff[] {
       if (diff.headType === head.indexer.value || diff.baseType === base.indexer.value) {
         diff.baseType = base;
         diff.headType = head;
+        diff.baseSourceLocation = getTypeSourceLocation(base);
+        diff.headSourceLocation = getTypeSourceLocation(head);
       }
     }
     return diffs;
@@ -169,6 +171,9 @@ function compareProperties(base: ModelProperty, head: ModelProperty, ctx: DiffCo
     if (diff.headType === head.type || diff.baseType === base.type) {
       diff.baseType = base;
       diff.headType = head;
+      diff.baseSourceLocation = getTypeSourceLocation(base);
+      diff.headSourceLocation = getTypeSourceLocation(head);
+      diff.origin = resolveOrigin(head);
     }
   }
   diffs.push(...typeDiffs);
@@ -276,6 +281,8 @@ function compareUnions(base: Union, head: Union, ctx: DiffContext): ApiDiff[] {
       if (diff.headType === headVariant.type || diff.baseType === baseVariant.type) {
         diff.baseType = baseVariant;
         diff.headType = headVariant;
+        diff.baseSourceLocation = getTypeSourceLocation(baseVariant);
+        diff.headSourceLocation = getTypeSourceLocation(headVariant);
       }
     }
     diffs.push(...variantDiffs);
@@ -322,6 +329,8 @@ function compareUnions(base: Union, head: Union, ctx: DiffContext): ApiDiff[] {
       if (diff.headType === headVariant.type || diff.baseType === baseVariant.type) {
         diff.baseType = baseVariant;
         diff.headType = headVariant;
+        diff.baseSourceLocation = getTypeSourceLocation(baseVariant);
+        diff.headSourceLocation = getTypeSourceLocation(headVariant);
       }
     }
     diffs.push(...anonDiffs);

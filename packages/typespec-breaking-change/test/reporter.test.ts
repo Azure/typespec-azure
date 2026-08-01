@@ -295,22 +295,21 @@ describe("markdown reporter", () => {
       headRevision: "HEAD",
     });
     expect(md).toContain("## Breaking Change Analysis");
-    expect(md).toContain("❌ **1 breaking change detected**");
-    expect(md).toContain("1 error");
+    expect(md).toContain("❌ **1 unsuppressed breaking change detected**");
+    expect(md).toContain("1 unsuppressed");
     expect(md).toContain("1 suppressed");
-    expect(md).toContain("1 ignored");
-    expect(md).toContain("Comparing `origin/main` → `HEAD`");
-    expect(md).toContain("### Breaking Changes");
+    expect(md).toContain("### Unsuppressed Breaking Changes");
     expect(md).toContain("ResponsePropertyRemoved");
-    expect(md).toContain("Suppressed findings (1)");
+    expect(md).toContain("### New Suppressed Breaking Changes");
   });
 
   it("renders a clean summary with no breaking changes", () => {
     const result = createResult();
     result.findings = result.findings.filter((f) => f.severity !== "error" || f.suppressed);
     const md = renderMarkdownSummary(result);
-    expect(md).toContain("✅ **No breaking changes detected**");
-    expect(md).not.toContain("### Breaking Changes");
+    expect(md).toContain("⚠️");
+    expect(md).toContain("suppressed");
+    expect(md).not.toContain("### Unsuppressed Breaking Changes");
   });
 
   it("renders noComparisonReason when no comparisons performed", () => {
@@ -318,9 +317,8 @@ describe("markdown reporter", () => {
     result.findings = [];
     result.summary = { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview" };
     const md = renderMarkdownSummary(result);
-    expect(md).toContain("ℹ️ **No comparisons performed**");
-    expect(md).toContain("All versions are preview");
-    expect(md).not.toContain("### Breaking Changes");
+    expect(md).toContain("ℹ️ All versions are preview");
+    expect(md).not.toContain("### Unsuppressed Breaking Changes");
   });
 
   it("includes timing when showTiming is true", () => {
@@ -346,7 +344,6 @@ describe("markdown reporter", () => {
       },
     ];
     const md = renderMarkdownSummary(result);
-    expect(md).toContain("—"); // dash for non-operation identity
     expect(md).toContain("`service.endpoint`");
   });
 

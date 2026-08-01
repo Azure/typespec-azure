@@ -227,10 +227,13 @@ export async function main(args: string[]): Promise<number> {
       const mdPath = resolve(options.markdownOutput);
       await ensureParentDir(mdPath);
       const mdOptions: MarkdownReportOptions = {
-        baseRevision: options.base,
-        headRevision: options.entry,
         specPaths: [options.entry],
         showTiming: true,
+        githubServerUrl: process.env.GITHUB_SERVER_URL,
+        githubRepository: process.env.GITHUB_REPOSITORY,
+        githubSha: process.env.GITHUB_SHA,
+        workspacePath: process.env.GITHUB_WORKSPACE,
+        violationsReferenceUrl: process.env.VIOLATIONS_REFERENCE_URL,
       };
       const mdContent = renderMarkdownSummary(result, mdOptions);
       await writeFile(mdPath, mdContent);
