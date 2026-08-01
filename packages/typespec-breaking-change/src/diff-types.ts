@@ -77,7 +77,13 @@ export function compareTypes(baseType: Type, headType: Type, ctx: DiffContext): 
 
 function compareModels(base: Model, head: Model, ctx: DiffContext): ApiDiff[] {
   if (isArrayModelType(base) && isArrayModelType(head)) {
-    return compareTypes(base.indexer.value, head.indexer.value, ctx);
+    // Array item type changes — the violation is about the array model, not the inner item type
+    const diffs = compareTypes(base.indexer.value, head.indexer.value, ctx);
+    for (const diff of diffs) {
+      diff.baseType = base;
+      diff.headType = head;
+    }
+    return diffs;
   }
 
   const diffs: ApiDiff[] = [];
@@ -258,7 +264,13 @@ function compareUnions(base: Union, head: Union, ctx: DiffContext): ApiDiff[] {
       continue;
     }
 
-    diffs.push(...compareTypes(baseVariant.type, headVariant.type, { ...ctx, elementPath }));
+    // Union variant type changes — the violation is about the variant, not the inner type
+    const variantDiffs = compareTypes(baseVariant.type, headVariant.type, { ...ctx, elementPath });
+    for (const diff of variantDiffs) {
+      diff.baseType = baseVariant;
+      diff.headType = headVariant;
+    }
+    diffs.push(...variantDiffs);
   }
 
   for (const [name, headVariant] of headNamed) {
@@ -296,7 +308,13 @@ function compareUnions(base: Union, head: Union, ctx: DiffContext): ApiDiff[] {
       continue;
     }
 
-    diffs.push(...compareTypes(baseVariant.type, headVariant.type, { ...ctx, elementPath }));
+    // Anonymous variant type changes — target the variant, not inner type
+    const anonDiffs = compareTypes(baseVariant.type, headVariant.type, { ...ctx, elementPath });
+    for (const diff of anonDiffs) {
+      diff.baseType = baseVariant;
+      diff.headType = headVariant;
+    }
+    diffs.push(...anonDiffs);
   }
 
   for (const [key, headVariant] of headAnonymous) {
