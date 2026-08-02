@@ -193,6 +193,7 @@ export async function main(args: string[]): Promise<number> {
   const analysisOptions: AnalysisOptions = {
     serviceName: options.service,
     phase: options.phase,
+    log: (message: string) => console.log(message),
   };
 
   try {

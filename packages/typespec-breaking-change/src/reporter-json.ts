@@ -25,6 +25,8 @@ export interface JsonReport {
     servicesAnalyzed: number;
     comparisonsPerformed: number;
   };
+  /** Analysis summary metadata. */
+  summary: AnalysisSummary;
   /** Explanation if no comparisons were performed. */
   noComparisonReason?: string;
   /** All classified findings. */
@@ -79,6 +81,13 @@ export function formatJsonReport(result: AnalysisResult, options?: JsonReportOpt
       totalFindings: result.findings.length,
       servicesAnalyzed: result.summary.servicesAnalyzed,
       comparisonsPerformed: result.summary.comparisonsPerformed,
+    },
+    summary: {
+      servicesAnalyzed: result.summary.servicesAnalyzed,
+      comparisonsPerformed: result.summary.comparisonsPerformed,
+      phase: result.summary.phase,
+      versionComparisons: result.summary.versionComparisons ?? [],
+      noComparisonReason: result.summary.noComparisonReason,
     },
     noComparisonReason: result.summary.noComparisonReason,
     findings: result.findings.map(mapFinding),

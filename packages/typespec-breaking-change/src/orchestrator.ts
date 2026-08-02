@@ -8,6 +8,7 @@ import type {
   ComparisonPhase,
   Finding,
   TimingInfo,
+  VersionComparisonSummary,
   VersionPair,
 } from "./types.js";
 import {
@@ -22,6 +23,8 @@ export interface AnalysisOptions {
   serviceName?: string;
   /** If provided, only run this phase. */
   phase?: ComparisonPhase;
+  /** Optional callback for progress logging (appears in CI logs). */
+  log?: (message: string) => void;
 }
 
 /**
@@ -32,6 +35,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   const totalStart = Date.now();
   const timing = createEmptyTiming();
   const allFindings: Finding[] = [];
+  const versionComparisons: VersionComparisonSummary[] = [];
   let servicesAnalyzed = 0;
   let comparisonsPerformed = 0;
 
@@ -41,6 +45,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     }
 
     servicesAnalyzed++;
+    options?.log?.(`Analyzing service: ${service.service.name} (${service.versions.length} versions)`);
 
     if (options?.phase === "same-version") {
       continue;
@@ -54,7 +59,18 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     for (const pair of pairs) {
       const baseView = timeVersionedView(program, service.service, pair.baseVersion, timing);
       const headView = timeVersionedView(program, service.service, pair.headVersion, timing);
-      allFindings.push(...analyzePair(baseView, headView, pair, timing));
+      const findings = analyzePair(baseView, headView, pair, timing);
+      allFindings.push(...findings);
+      versionComparisons.push({
+        serviceName: service.service.name,
+        baseVersion: pair.baseVersion,
+        headVersion: pair.headVersion,
+        phase: pair.phase,
+        findingCount: findings.length,
+      });
+      options?.log?.(
+        `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(findings.length)}`,
+      );
     }
   }
 
@@ -63,11 +79,14 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   timing.classifyMs += Date.now() - dedupStart;
 
   const suppressStart = Date.now();
-  const findings = applySuppressions(dedupedFindings, program);
+  const suppressedFindings = applySuppressions(dedupedFindings, program);
   timing.suppressMs += Date.now() - suppressStart;
+
+  const merged = mergeRequestResponseToResource(suppressedFindings);
+  const findings = collapsePhaseADuplicates(merged);
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, options);
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options);
   return { findings, timing, summary };
 }
 
@@ -82,6 +101,7 @@ export function analyzeBaseAndHead(
   const totalStart = Date.now();
   const timing = createEmptyTiming();
   const allFindings: Finding[] = [];
+  const versionComparisons: VersionComparisonSummary[] = [];
   let servicesAnalyzed = 0;
   let comparisonsPerformed = 0;
 
@@ -93,6 +113,7 @@ export function analyzeBaseAndHead(
     }
 
     servicesAnalyzed++;
+    options?.log?.(`Analyzing service: ${headService.service.name} (${headService.versions.length} versions)`);
     const baseService = baseServices.find((candidate) => candidate.service.name === headService.service.name);
     const changedVersions: string[] = [];
 
@@ -110,6 +131,16 @@ export function analyzeBaseAndHead(
         const baseView = timeVersionedView(baseProgram, baseService.service, pair.baseVersion, timing);
         const headView = timeVersionedView(headProgram, headService.service, pair.headVersion, timing);
         const findings = analyzePair(baseView, headView, pair, timing);
+        versionComparisons.push({
+          serviceName: headService.service.name,
+          baseVersion: pair.baseVersion,
+          headVersion: pair.headVersion,
+          phase: pair.phase,
+          findingCount: findings.length,
+        });
+        options?.log?.(
+          `  Phase A: ${pair.headVersion} (base \u2192 head) \u2014 ${formatComparisonResult(findings.length)}`,
+        );
 
         if (findings.length > 0) {
           changedVersions.push(pair.headVersion);
@@ -133,7 +164,18 @@ export function analyzeBaseAndHead(
         for (const pair of phaseBPairs) {
           const baseView = timeVersionedView(headProgram, headService.service, pair.baseVersion, timing);
           const headView = timeVersionedView(headProgram, headService.service, pair.headVersion, timing);
-          allFindings.push(...analyzePair(baseView, headView, pair, timing));
+          const findings = analyzePair(baseView, headView, pair, timing);
+          allFindings.push(...findings);
+          versionComparisons.push({
+            serviceName: headService.service.name,
+            baseVersion: pair.baseVersion,
+            headVersion: pair.headVersion,
+            phase: pair.phase,
+            findingCount: findings.length,
+          });
+          options?.log?.(
+            `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(findings.length)}`,
+          );
         }
       }
     }
@@ -144,11 +186,14 @@ export function analyzeBaseAndHead(
   timing.classifyMs += Date.now() - dedupStart;
 
   const suppressStart = Date.now();
-  const findings = applySuppressions(dedupedFindings, headProgram);
+  const suppressedFindings = applySuppressions(dedupedFindings, headProgram);
   timing.suppressMs += Date.now() - suppressStart;
+
+  const merged = mergeRequestResponseToResource(suppressedFindings);
+  const findings = collapsePhaseADuplicates(merged);
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, options);
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options);
   return { findings, timing, summary };
 }
 
@@ -203,11 +248,14 @@ function createEmptyTiming(): TimingInfo {
 function buildSummary(
   servicesAnalyzed: number,
   comparisonsPerformed: number,
+  versionComparisons: VersionComparisonSummary[] = [],
   options?: AnalysisOptions,
 ): AnalysisSummary {
   const summary: AnalysisSummary = {
     servicesAnalyzed,
     comparisonsPerformed,
+    phase: options?.phase,
+    versionComparisons,
   };
 
   if (comparisonsPerformed === 0) {
@@ -223,6 +271,10 @@ function buildSummary(
   }
 
   return summary;
+}
+
+function formatComparisonResult(findingCount: number): string {
+  return findingCount === 0 ? "no changes" : `${findingCount} finding${findingCount === 1 ? "" : "s"}`;
 }
 
 /**
@@ -269,6 +321,120 @@ function deduplicateBySourceType(findings: Finding[]): Finding[] {
       seenByString.add(stringKey);
     }
 
+    result.push(f);
+  }
+
+  return result;
+}
+
+/**
+ * Mapping from Request/Response property kind suffixes to their Resource equivalent.
+ */
+const REQUEST_RESPONSE_PAIRS: Record<string, string> = {
+  PropertyAdded: "ResourcePropertyAdded",
+  PropertyRemoved: "ResourcePropertyRemoved",
+  PropertyRenamed: "ResourcePropertyRenamed",
+  PropertyTypeChanged: "ResourcePropertyTypeChanged",
+  PropertyTypeNarrowed: "ResourcePropertyTypeNarrowed",
+  PropertyTypeWidened: "ResourcePropertyTypeWidened",
+  PropertyMadeRequired: "ResourcePropertyMadeRequired",
+  PropertyMadeOptional: "ResourcePropertyMadeOptional",
+};
+
+/**
+ * Merge matching Request + Response findings into single Resource findings.
+ *
+ * When the same model property appears in both request and response bodies
+ * (common in ARM resources using TrackedResource<T>), the diff engine produces
+ * separate Request* and Response* findings. This merges them into a single
+ * Resource* finding to reduce noise.
+ *
+ * Match criteria: same AST node (or element path), same version pair,
+ * and kinds are the Request/Response pair (e.g., RequestPropertyRemoved +
+ * ResponsePropertyRemoved → ResourcePropertyRemoved).
+ */
+function mergeRequestResponseToResource(findings: Finding[]): Finding[] {
+  const result: Finding[] = [];
+  const consumed = new Set<Finding>();
+
+  // Index Response findings by (element + version + suffix + suppressed)
+  const responseIndex = new Map<string, Finding>();
+  for (const f of findings) {
+    if (!f.diff.kind.startsWith("Response")) continue;
+    const suffix = getPropertySuffix(f.diff.kind, "Response");
+    if (!suffix || !REQUEST_RESPONSE_PAIRS[suffix]) continue;
+
+    const key = buildMergeKey(f, suffix);
+    if (key) responseIndex.set(key, f);
+  }
+
+  // First pass: find all Request findings that have a Response match
+  for (const f of findings) {
+    if (!f.diff.kind.startsWith("Request")) continue;
+    const suffix = getPropertySuffix(f.diff.kind, "Request");
+    if (!suffix || !REQUEST_RESPONSE_PAIRS[suffix]) continue;
+
+    const key = buildMergeKey(f, suffix);
+    if (key) {
+      const match = responseIndex.get(key);
+      if (match && match.suppressed === f.suppressed) {
+        // Mark both as consumed, emit a Resource finding
+        consumed.add(f);
+        consumed.add(match);
+        const merged: Finding = {
+          ...f,
+          diff: { ...f.diff, kind: REQUEST_RESPONSE_PAIRS[suffix] as any },
+        };
+        result.push(merged);
+      }
+    }
+  }
+
+  // Second pass: emit all non-consumed findings in original order
+  for (const f of findings) {
+    if (!consumed.has(f)) {
+      result.push(f);
+    }
+  }
+
+  return result;
+}
+
+function getPropertySuffix(kind: string, prefix: string): string | undefined {
+  if (!kind.startsWith(prefix)) return undefined;
+  return kind.substring(prefix.length);
+}
+
+function buildMergeKey(f: Finding, suffix: string): string | undefined {
+  const versionKey = `${f.versionPair.baseVersion}|${f.versionPair.headVersion}`;
+  const suppressedKey = f.suppressed ? "s" : "u";
+  return `${f.diff.identity.element}|${versionKey}|${suffix}|${suppressedKey}`;
+}
+
+/**
+ * Collapse Phase A findings that repeat across version pairs.
+ *
+ * In Phase A (same-version), an unversioned change like removing a property
+ * appears identically in every API version (e.g., once for 2021-10-01-preview
+ * and once for 2021-11-01). Since it's the same logical change, report it once.
+ *
+ * Only collapses findings with phase === "same-version". Phase B findings
+ * across different version pairs represent genuinely different comparisons.
+ */
+function collapsePhaseADuplicates(findings: Finding[]): Finding[] {
+  const seen = new Set<string>();
+  const result: Finding[] = [];
+
+  for (const f of findings) {
+    if (f.phase !== "same-version") {
+      result.push(f);
+      continue;
+    }
+
+    // For Phase A, dedup key excludes version pair — same element+kind = same change
+    const key = `${f.diff.kind}|${f.diff.identity.element}|${f.suppressed}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     result.push(f);
   }
 

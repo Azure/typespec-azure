@@ -197,6 +197,17 @@ export interface VersionPair {
 }
 
 /**
+ * Summary of a single version comparison.
+ */
+export interface VersionComparisonSummary {
+  serviceName: string;
+  baseVersion: string;
+  headVersion: string;
+  phase: ComparisonPhase;
+  findingCount: number;
+}
+
+/**
  * A compiled and versioned view of a TypeSpec service, ready for comparison.
  */
 export interface VersionedView {
@@ -242,6 +253,10 @@ export interface AnalysisSummary {
   servicesAnalyzed: number;
   /** Number of version pairs compared. */
   comparisonsPerformed: number;
+  /** Which phase filter was applied, if any. */
+  phase?: ComparisonPhase;
+  /** Per-version-pair breakdown. */
+  versionComparisons: VersionComparisonSummary[];
   /** If no comparisons were performed, explains why. */
   noComparisonReason?: string;
 }

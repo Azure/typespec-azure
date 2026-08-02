@@ -124,10 +124,11 @@ export function $approvedUnversionedChange(
   context: DecoratorContext,
   target: Type,
   reason: string,
-  options?: { kind?: string },
+  options?: { kind?: string; path?: string },
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
   const normalizedKind = options?.kind ? getDecoratorStringValue(options.kind) ?? options.kind : undefined;
+  const normalizedPath = options?.path ? getDecoratorStringValue(options.path) ?? options.path : undefined;
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -139,6 +140,8 @@ export function $approvedUnversionedChange(
     target,
     resolvedKind,
     normalizedReason,
+    undefined, // since
+    normalizedPath,
   );
 }
 

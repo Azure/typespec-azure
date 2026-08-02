@@ -185,7 +185,7 @@ describe("suppression guidance in reporters", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 100,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1, versionComparisons: [] },
     };
   }
 

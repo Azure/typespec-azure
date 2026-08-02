@@ -105,7 +105,20 @@ function createResult(): AnalysisResult {
       reportMs: 0,
       totalMs: 1200,
     },
-    summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    summary: {
+      servicesAnalyzed: 1,
+      comparisonsPerformed: 1,
+      phase: "cross-version",
+      versionComparisons: [
+        {
+          serviceName: "Contoso.WidgetManager",
+          baseVersion: "2024-01-01",
+          headVersion: "2025-01-01",
+          phase: "cross-version",
+          findingCount: 2,
+        },
+      ],
+    },
   };
 }
 
@@ -121,7 +134,7 @@ describe("reporters", () => {
         Suppress: @approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved" })
 
       ─────────────────────────────
-      Results: 1 errors, 1 suppressed, 1 ignored
+      Results: 1 errors, 1 suppressed, 1 ignored (cross-version)
       Timing: 1.2s total (compile: 0.4s, diff: 0.6s, classify: 0.1s)"
     `);
   });
@@ -157,8 +170,33 @@ describe("reporters", () => {
         Location: src/service.tsp:8
 
       ─────────────────────────────
-      Results: 1 errors, 1 suppressed, 1 ignored"
+      Results: 1 errors, 1 suppressed, 1 ignored (cross-version)"
     `);
+  });
+
+  it("formats a phase-aware clean console report", () => {
+    const result = createResult();
+    result.findings = result.findings.filter((f) => f.severity === "ignore");
+    result.summary.phase = "same-version";
+    result.summary.comparisonsPerformed = 2;
+    result.summary.versionComparisons = [
+      {
+        serviceName: "Contoso.WidgetManager",
+        baseVersion: "2024-01-01",
+        headVersion: "2024-01-01",
+        phase: "same-version",
+        findingCount: 0,
+      },
+      {
+        serviceName: "Contoso.WidgetManager",
+        baseVersion: "2025-01-01",
+        headVersion: "2025-01-01",
+        phase: "same-version",
+        findingCount: 0,
+      },
+    ];
+
+    expect(formatConsoleReport(result)).toContain("✅ No unversioned changes found (2 version pairs compared)");
   });
 
   it("formats a JSON report without circular references", () => {
@@ -178,6 +216,20 @@ describe("reporters", () => {
       totalFindings: 3,
       servicesAnalyzed: 1,
       comparisonsPerformed: 1,
+    });
+    expect(report.summary).toEqual({
+      servicesAnalyzed: 1,
+      comparisonsPerformed: 1,
+      phase: "cross-version",
+      versionComparisons: [
+        {
+          serviceName: "Contoso.WidgetManager",
+          baseVersion: "2024-01-01",
+          headVersion: "2025-01-01",
+          phase: "cross-version",
+          findingCount: 2,
+        },
+      ],
     });
     expect(report.findings).toHaveLength(3);
     expect(report.findings[0]).toMatchObject({
@@ -215,10 +267,16 @@ describe("reporters", () => {
   it("formats a JSON report with noComparisonReason when no comparisons", () => {
     const result = createResult();
     result.findings = [];
-    result.summary = { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview" };
+    result.summary = {
+      servicesAnalyzed: 1,
+      comparisonsPerformed: 0,
+      versionComparisons: [],
+      noComparisonReason: "All versions are preview",
+    };
     const report = JSON.parse(formatJsonReport(result));
     expect(report.noComparisonReason).toBe("All versions are preview");
     expect(report.requiresAction).toBe(false);
+    expect(report.summary.versionComparisons).toEqual([]);
   });
 
   it("formats a JSON report with default empty options", () => {
@@ -305,20 +363,52 @@ describe("markdown reporter", () => {
 
   it("renders a clean summary with no breaking changes", () => {
     const result = createResult();
-    result.findings = result.findings.filter((f) => f.severity !== "error" || f.suppressed);
+    result.findings = result.findings.filter((f) => f.severity === "ignore");
+    result.summary.phase = "cross-version";
+    result.summary.comparisonsPerformed = 2;
+    result.summary.versionComparisons = [
+      {
+        serviceName: "Contoso.WidgetManager",
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+        phase: "cross-version",
+        findingCount: 0,
+      },
+      {
+        serviceName: "Contoso.WidgetManager",
+        baseVersion: "2025-01-01",
+        headVersion: "2026-01-01",
+        phase: "cross-version",
+        findingCount: 0,
+      },
+    ];
     const md = renderMarkdownSummary(result);
-    expect(md).toContain("⚠️");
-    expect(md).toContain("suppressed");
+    expect(md).toContain("✅ **No cross-version breaking changes found (2 version pairs compared)**");
     expect(md).not.toContain("### Unsuppressed Breaking Changes");
+    expect(md).toContain("<summary>Version Comparisons</summary>");
   });
 
   it("renders noComparisonReason when no comparisons performed", () => {
     const result = createResult();
     result.findings = [];
-    result.summary = { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview" };
+    result.summary = {
+      servicesAnalyzed: 1,
+      comparisonsPerformed: 0,
+      versionComparisons: [],
+      noComparisonReason: "All versions are preview",
+    };
     const md = renderMarkdownSummary(result);
     expect(md).toContain("ℹ️ All versions are preview");
     expect(md).not.toContain("### Unsuppressed Breaking Changes");
+  });
+
+  it("renders a version comparisons section", () => {
+    const md = renderMarkdownSummary(createResult());
+    expect(md).toContain("<summary>Version Comparisons</summary>");
+    expect(md).toContain("| Service | Version Pair | Phase | Result |");
+    expect(md).toContain("Contoso.WidgetManager");
+    expect(md).toContain("2024-01-01 → 2025-01-01");
+    expect(md).toContain("❌ 2 findings");
   });
 
   it("includes timing when showTiming is true", () => {

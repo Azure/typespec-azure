@@ -83,7 +83,13 @@ function formatSummary(result: AnalysisResult): string {
   const errors = countErrors(result.findings);
   const suppressed = countSuppressed(result.findings);
   const ignored = countIgnored(result.findings);
-  return `Results: ${errors} errors, ${suppressed} suppressed, ${ignored} ignored`;
+
+  if (errors === 0) {
+    return formatNoFindingsSummary(result);
+  }
+
+  const phaseSuffix = result.summary.phase ? ` (${result.summary.phase})` : "";
+  return `Results: ${errors} errors, ${suppressed} suppressed, ${ignored} ignored${phaseSuffix}`;
 }
 
 function formatTiming(result: AnalysisResult): string {
@@ -130,4 +136,18 @@ function formatLocation(location?: SourceLocation): string {
 
 function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function formatNoFindingsSummary(result: AnalysisResult): string {
+  const pairCount = result.summary.comparisonsPerformed;
+  const pairLabel = `${pairCount} version pair${pairCount === 1 ? "" : "s"} compared`;
+
+  switch (result.summary.phase) {
+    case "same-version":
+      return `✅ No unversioned changes found (${pairLabel})`;
+    case "cross-version":
+      return `✅ No cross-version breaking changes found (${pairLabel})`;
+    default:
+      return `✅ No breaking changes found (${pairLabel})`;
+  }
 }

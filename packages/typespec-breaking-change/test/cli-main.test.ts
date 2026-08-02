@@ -66,7 +66,12 @@ describe("CLI main module", () => {
           reportMs: 0,
           totalMs: 0,
         },
-        summary: { servicesAnalyzed: 1, comparisonsPerformed: 0, noComparisonReason: "All versions are preview." },
+        summary: {
+          servicesAnalyzed: 1,
+          comparisonsPerformed: 0,
+          versionComparisons: [],
+          noComparisonReason: "All versions are preview.",
+        },
       })),
     }));
 

@@ -85,4 +85,13 @@ export type DiffKind =
   // Default values (generic, applies to params and properties)
   | "DefaultValueAdded"
   | "DefaultValueRemoved"
-  | "DefaultValueChanged";
+  | "DefaultValueChanged"
+  // Resource-level (merged from matching Request + Response findings)
+  | "ResourcePropertyAdded"
+  | "ResourcePropertyRemoved"
+  | "ResourcePropertyRenamed"
+  | "ResourcePropertyTypeChanged"
+  | "ResourcePropertyTypeNarrowed"
+  | "ResourcePropertyTypeWidened"
+  | "ResourcePropertyMadeRequired"
+  | "ResourcePropertyMadeOptional";

@@ -1,7 +1,7 @@
 import type { SourceLocation } from "@typespec/compiler";
 import type { AnalysisResult, Finding } from "./types.js";
 import { isOperationIdentity } from "./types.js";
-import { formatSuppressionHint } from "./suppression-guidance.js";
+import { formatSuppressionDiff, formatSuppressionHint } from "./suppression-guidance.js";
 import { resolveFindingLocation } from "./resolve-location.js";
 
 export interface MarkdownReportOptions {
@@ -65,7 +65,7 @@ export function renderMarkdownSummary(
 
   // Status badge
   if (errors.length === 0 && suppressed.length === 0) {
-    lines.push("✅ **No breaking changes detected**");
+    lines.push(`✅ **${formatNoFindingsMessage(result.summary.phase, result.summary.comparisonsPerformed)}**`);
   } else if (errors.length === 0) {
     lines.push(
       `⚠️ **${suppressed.length} new suppressed breaking change${suppressed.length === 1 ? "" : "s"}** — review required`,
@@ -96,11 +96,12 @@ export function renderMarkdownSummary(
     lines.push("| Kind | Identity | Versions | Suppression |");
     lines.push("|------|----------|----------|-------------|");
     for (const finding of errors) {
-      const kind = fmtKindLink(finding.diff.kind, options);
+      const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
       const identity = fmtIdentityLink(finding, options);
       const versions = esc(fmtVer(finding));
-      const hint = esc(formatSuppressionHint(finding));
-      lines.push(`| ${kind} | ${identity} | ${versions} | \`${hint}\` |`);
+      const diffSnippet = formatSuppressionDiff(finding);
+      const suppressionCell = `<pre lang="diff">${escHtml(diffSnippet).replace(/\n/g, "&#10;")}</pre>`;
+      lines.push(`| ${kind} | ${identity} | ${versions} | ${suppressionCell} |`);
     }
   }
 
@@ -117,11 +118,27 @@ export function renderMarkdownSummary(
     lines.push("| Kind | Identity | Reason |");
     lines.push("|------|----------|--------|");
     for (const finding of suppressed) {
-      const kind = fmtKindLink(finding.diff.kind, options);
+      const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
       const identity = fmtIdentityLink(finding, options);
       const reason = esc(finding.suppressionReason ?? "—");
       lines.push(`| ${kind} | ${identity} | ${reason} |`);
     }
+  }
+
+  if (result.summary.versionComparisons.length > 0) {
+    lines.push("");
+    lines.push("<details>");
+    lines.push("<summary>Version Comparisons</summary>");
+    lines.push("");
+    lines.push("| Service | Version Pair | Phase | Result |");
+    lines.push("|---------|-------------|-------|--------|");
+    for (const comparison of result.summary.versionComparisons) {
+      lines.push(
+        `| ${esc(comparison.serviceName)} | ${esc(formatComparisonPair(comparison.phase, comparison.baseVersion, comparison.headVersion))} | ${esc(comparison.phase)} | ${formatComparisonResult(comparison.findingCount)} |`,
+      );
+    }
+    lines.push("");
+    lines.push("</details>");
   }
 
   // Timing (collapsed)
@@ -142,10 +159,12 @@ export function renderMarkdownSummary(
 }
 
 /** Format a DiffKind as a link to the violations reference docs. */
-function fmtKindLink(kind: string, options?: MarkdownReportOptions): string {
+function fmtKindLink(kind: string, phase: string | undefined, options?: MarkdownReportOptions): string {
   const baseUrl = options?.violationsReferenceUrl ?? DEFAULT_VIOLATIONS_REF_URL;
-  // Link to the Phase B summary table which lists all kinds
-  return `[\`${esc(kind)}\`](${baseUrl}#phase-b-detailed-reference)`;
+  const anchor = phase === "same-version"
+    ? "#phase-a-same-version-findings-are-projection-bugs-not-breaking-change-classifications"
+    : "#phase-b-detailed-reference";
+  return `[\`${esc(kind)}\`](${baseUrl}${anchor})`;
 }
 
 /** Format the identity as a link to the source file, or plain text if no link available. */
@@ -187,6 +206,9 @@ function buildSourceUrl(
     return undefined;
   }
 
+  // Strip ".base" suffix from directory names (artifact of Phase A in-place compilation)
+  filePath = filePath.replace(/\.base([/\\])/g, "$1");
+
   const line = getLineNumber(location);
   const lineAnchor = line > 0 ? `#L${line}` : "";
   return `${server}/${options.githubRepository}/blob/${sha}/${filePath}${lineAnchor}`;
@@ -208,4 +230,38 @@ function fmtMs(ms: number): string {
 
 function esc(value: string): string {
   return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
+}
+
+function escHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatNoFindingsMessage(phase: string | undefined, comparisonsPerformed: number): string {
+  const pairLabel = `${comparisonsPerformed} version pair${comparisonsPerformed === 1 ? "" : "s"} compared`;
+  switch (phase) {
+    case "same-version":
+      return `No unversioned changes found (${pairLabel})`;
+    case "cross-version":
+      return `No cross-version breaking changes found (${pairLabel})`;
+    default:
+      return `No breaking changes found (${pairLabel})`;
+  }
+}
+
+function formatComparisonPair(phase: string, baseVersion: string, headVersion: string): string {
+  if (phase === "same-version") {
+    return `${headVersion} (base → head)`;
+  }
+
+  return `${baseVersion} → ${headVersion}`;
+}
+
+function formatComparisonResult(findingCount: number): string {
+  return findingCount === 0
+    ? "✅ No changes"
+    : `❌ ${findingCount} finding${findingCount === 1 ? "" : "s"}`;
 }

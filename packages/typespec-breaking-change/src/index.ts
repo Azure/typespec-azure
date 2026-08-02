@@ -56,6 +56,7 @@ export type {
   OriginDeclaration,
   ServiceDiffIdentity,
   TimingInfo,
+  VersionComparisonSummary,
   VersionPair,
   VersionedView,
 } from "./types.js";

@@ -4,6 +4,15 @@ import * as compileModule from "../src/compile.js";
 import * as orchestratorModule from "../src/orchestrator.js";
 import type { AnalysisResult, Finding } from "../src/types.js";
 
+function createSummary(overrides: Partial<AnalysisResult["summary"]> = {}): AnalysisResult["summary"] {
+  return {
+    servicesAnalyzed: 1,
+    comparisonsPerformed: 1,
+    versionComparisons: [],
+    ...overrides,
+  };
+}
+
 describe("CLI argument parsing", () => {
   it("parses positional entry argument", () => {
     const opts = parseArgs(["main.tsp"]);
@@ -124,7 +133,7 @@ describe("CLI formatResult", () => {
       reportMs: 0,
       totalMs: 700,
     },
-    summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+    summary: createSummary({ phase: "cross-version" }),
   };
 
   it("formats as JSON", () => {
@@ -186,7 +195,7 @@ describe("CLI main", () => {
         reportMs: 0,
         totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "same-version" }),
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -199,9 +208,9 @@ describe("CLI main", () => {
     expect(analyzeSpy).toHaveBeenCalledWith(
       { path: expect.stringMatching(/base\.tsp$/) },
       { path: expect.stringMatching(/head\.tsp$/) },
-      { serviceName: "Test", phase: "same-version" },
+      { serviceName: "Test", phase: "same-version", log: expect.any(Function) },
     );
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("Results: 0 errors"));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("No unversioned changes found"));
   });
 
   it("returns exit code 1 when single-program analysis finds an unsuppressed error", async () => {
@@ -243,7 +252,7 @@ describe("CLI main", () => {
         reportMs: 0,
         totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -254,7 +263,7 @@ describe("CLI main", () => {
     expect(compileSpy).toHaveBeenCalledWith(expect.stringMatching(/head\.tsp$/));
     expect(analyzeSpy).toHaveBeenCalledWith(
       { path: expect.stringMatching(/head\.tsp$/) },
-      { serviceName: undefined, phase: undefined },
+      { serviceName: undefined, phase: undefined, log: expect.any(Function) },
     );
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("ResponsePropertyRemoved"));
   });
@@ -304,7 +313,7 @@ describe("CLI main", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -331,7 +340,7 @@ describe("CLI main", () => {
 
       const mdContent = await readFile(join(dir, "report.md"), "utf8");
       expect(mdContent).toContain("## Breaking Change Analysis");
-      expect(mdContent).toContain("No breaking changes detected");
+      expect(mdContent).toContain("No cross-version breaking changes found");
     } finally {
       await rm(dir, { recursive: true });
     }
@@ -364,7 +373,7 @@ describe("CLI main", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -400,7 +409,7 @@ describe("CLI main", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -434,7 +443,7 @@ describe("CLI main", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -451,7 +460,7 @@ describe("CLI main", () => {
         canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
         classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 0,
       },
-      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
+      summary: createSummary({ phase: "cross-version" }),
     });
 
     vi.spyOn(console, "log").mockImplementation(() => undefined);

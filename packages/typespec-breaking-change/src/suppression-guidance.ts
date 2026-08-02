@@ -1,4 +1,5 @@
-import type { Finding } from "./types.js";
+import type { SourceLocation } from "@typespec/compiler";
+import type { Finding, OriginDeclaration } from "./types.js";
 import { isOperationIdentity } from "./types.js";
 
 /**
@@ -117,4 +118,119 @@ function buildExample(finding: Finding, decorator: string): string {
 
   // Fallback
   return decorator;
+}
+
+/**
+ * Format a diff-style suppression snippet showing the decorator (as added line)
+ * above the target declaration line it would decorate, with optional line numbers.
+ *
+ * For removed elements where no head source exists (unversioned removal in Phase A),
+ * targets the parent model declaration since the property no longer exists.
+ */
+export function formatSuppressionDiff(finding: Finding): string {
+  const decoratorName =
+    finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
+
+  // Case 1: Property still exists in head (versioned changes, or non-removal diffs)
+  // Decorator goes directly on the element.
+  if (finding.diff.headSourceLocation) {
+    const decorator = `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+    return buildDiffFromLocation(finding.diff.headSourceLocation, decorator);
+  }
+
+  // Case 2: Unversioned removal (Phase A) — property no longer exists in head.
+  // Decorator must go on the parent model with path option targeting the property.
+  if (finding.phase === "same-version" && finding.diff.origin) {
+    const propertyPath = getPropertyPath(finding.diff.origin);
+    const decorator = propertyPath
+      ? `${decoratorName}("reason", #{ kind: "${finding.diff.kind}", path: "${propertyPath}" })`
+      : `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+    return buildRemovedPropertyDiff(finding.diff.origin, decorator);
+  }
+
+  // Case 3: Origin exists (e.g., cross-version with origin from base)
+  const decorator = `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+  if (finding.diff.origin?.sourceLocation) {
+    return buildDiffFromLocation(finding.diff.origin.sourceLocation, decorator);
+  }
+
+  // Case 4: Operation-level fallback
+  if (finding.diff.operationSourceLocation) {
+    return buildDiffFromLocation(finding.diff.operationSourceLocation, decorator);
+  }
+
+  // Final fallback: just show the decorator
+  return `+ ${decorator}`;
+}
+
+/**
+ * Extract the property name from an origin declaration path.
+ * e.g., "Contoso.Management.EmployeeProperties.city" → "city"
+ */
+function getPropertyPath(origin: OriginDeclaration): string | undefined {
+  const parts = origin.declarationPath.split(".");
+  return parts.length > 1 ? parts[parts.length - 1] : undefined;
+}
+
+/**
+ * Build a diff snippet from a source location: decorator as added line, target line as context.
+ */
+function buildDiffFromLocation(loc: SourceLocation, decorator: string): string {
+  const { text } = loc.file;
+  const targetLine = getLineAtPos(text, loc.pos);
+  const targetLineNum = getLineNumber(text, loc.pos);
+  const targetText = targetLine.trim();
+
+  const numWidth = String(targetLineNum).length;
+  const decorLineNum = targetLineNum > 1 ? targetLineNum - 1 : targetLineNum;
+  const pad = (n: number) => String(n).padStart(numWidth, " ");
+
+  return `${pad(decorLineNum)} + ${decorator}\n${pad(targetLineNum)}   ${targetText}`;
+}
+
+/**
+ * Build a diff snippet for a removed property (Phase A unversioned).
+ * The decorator goes on the parent model since the property no longer exists.
+ */
+function buildRemovedPropertyDiff(origin: OriginDeclaration, decorator: string): string {
+  const parts = origin.declarationPath.split(".");
+  const parentName = parts.length > 1 ? parts[parts.length - 2] : "Model";
+
+  // Try to find the parent model declaration line from the origin source
+  const loc = origin.sourceLocation;
+  if (loc) {
+    const { text } = loc.file;
+    // Search backwards from the property pos to find the model declaration
+    const modelPattern = new RegExp(`model\\s+${parentName}\\s*`);
+    const textBefore = text.substring(0, loc.pos);
+    const match = textBefore.match(modelPattern);
+    if (match && match.index !== undefined) {
+      const modelLineNum = getLineNumber(text, match.index);
+      const modelLine = getLineAtPos(text, match.index).trim();
+      const numWidth = String(modelLineNum).length;
+      const pad = (n: number) => String(n).padStart(numWidth, " ");
+      const decorLineNum = modelLineNum > 1 ? modelLineNum - 1 : modelLineNum;
+      return `${pad(decorLineNum)} + ${decorator}\n${pad(modelLineNum)}   ${modelLine}`;
+    }
+  }
+
+  // Fallback: synthetic model line
+  return `+ ${decorator}\n  model ${parentName} {`;
+}
+
+/** Get the full text of the line containing the given character offset. */
+function getLineAtPos(text: string, pos: number): string {
+  const lineStart = text.lastIndexOf("\n", pos - 1) + 1;
+  let lineEnd = text.indexOf("\n", pos);
+  if (lineEnd === -1) lineEnd = text.length;
+  return text.substring(lineStart, lineEnd);
+}
+
+/** Get the 1-based line number for a character offset. */
+function getLineNumber(text: string, pos: number): number {
+  let line = 1;
+  for (let i = 0; i < pos; i++) {
+    if (text[i] === "\n") line++;
+  }
+  return line;
 }
