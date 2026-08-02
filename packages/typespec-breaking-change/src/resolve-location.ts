@@ -16,6 +16,18 @@ import type { Finding } from "./types.js";
 export function resolveFindingLocation(finding: Finding): SourceLocation | undefined {
   const diff = finding.diff;
 
+  // Special case: removed property — link to parent model instead of the
+  // removed property itself, since the property no longer exists in head.
+  if (!diff.headType && !diff.headSourceLocation && diff.baseType?.kind === "ModelProperty") {
+    const parentModel = (diff.baseType as ModelProperty).model;
+    if (parentModel) {
+      const modelLoc = safeGetSourceLocation(parentModel);
+      if (modelLoc && isValidSourceLocation(modelLoc)) {
+        return modelLoc;
+      }
+    }
+  }
+
   // 1. Origin source location (property/type declaration in user code)
   if (diff.origin?.sourceLocation && isValidSourceLocation(diff.origin.sourceLocation)) {
     return diff.origin.sourceLocation;

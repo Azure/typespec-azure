@@ -88,40 +88,78 @@ export function renderMarkdownSummary(
   lines.push("");
   lines.push(parts.join(" · "));
 
-  // Unsuppressed breaking changes
+  // Unsuppressed breaking changes — grouped by version pair
   if (errors.length > 0) {
     lines.push("");
     lines.push("### Unsuppressed Breaking Changes");
-    lines.push("");
-    lines.push("| Kind | Identity | Versions | Suppression |");
-    lines.push("|------|----------|----------|-------------|");
-    for (const finding of errors) {
-      const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
-      const identity = fmtIdentityLink(finding, options);
-      const versions = esc(fmtVer(finding));
-      const diffSnippet = formatSuppressionDiff(finding);
-      const suppressionCell = `<pre lang="diff">${escHtml(diffSnippet).replace(/\n/g, "&#10;")}</pre>`;
-      lines.push(`| ${kind} | ${identity} | ${versions} | ${suppressionCell} |`);
+
+    const grouped = groupByVersionPair(errors);
+    let suppressionIndex = 0;
+    const suppressionBlocks: { index: number; diff: string; label: string }[] = [];
+
+    for (const [versionLabel, findings] of grouped) {
+      lines.push("");
+      lines.push(`#### ${versionLabel}`);
+      lines.push("");
+      lines.push("| Kind | Identity | Suppression |");
+      lines.push("|------|----------|-------------|");
+      for (const finding of findings) {
+        suppressionIndex++;
+        const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
+        const identity = fmtIdentityLink(finding, options);
+        const hint = formatSuppressionHint(finding);
+        lines.push(`| ${kind} | ${identity} | \`${esc(hint)}\` |`);
+        const diffSnippet = formatSuppressionDiff(finding);
+        const element = finding.diff.identity.element;
+        const shortElement = element.split(".").pop() ?? element;
+        suppressionBlocks.push({
+          index: suppressionIndex,
+          diff: diffSnippet,
+          label: `${finding.diff.kind} (${shortElement})`,
+        });
+      }
+    }
+
+    // Render diff blocks below the tables
+    if (suppressionBlocks.length > 0) {
+      lines.push("");
+      lines.push("<details>");
+      lines.push("<summary>Suppression examples</summary>");
+      lines.push("");
+      for (const block of suppressionBlocks) {
+        lines.push(`**${block.label}:**`);
+        lines.push("```diff");
+        lines.push(block.diff);
+        lines.push("```");
+        lines.push("");
+      }
+      lines.push("</details>");
     }
   }
 
-  // New suppressed breaking changes
+  // New suppressed breaking changes — grouped by version pair
   if (suppressed.length > 0) {
     lines.push("");
     lines.push("### New Suppressed Breaking Changes");
     lines.push("");
     lines.push(
-      "The following breaking changes have `@approvedBreakingChange` decorators.",
+      "The following breaking changes have suppression decorators.",
     );
     lines.push("Reviewers should verify these changes are intentional and properly justified.");
-    lines.push("");
-    lines.push("| Kind | Identity | Reason |");
-    lines.push("|------|----------|--------|");
-    for (const finding of suppressed) {
-      const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
-      const identity = fmtIdentityLink(finding, options);
-      const reason = esc(finding.suppressionReason ?? "—");
-      lines.push(`| ${kind} | ${identity} | ${reason} |`);
+
+    const grouped = groupByVersionPair(suppressed);
+    for (const [versionLabel, findings] of grouped) {
+      lines.push("");
+      lines.push(`#### ${versionLabel}`);
+      lines.push("");
+      lines.push("| Kind | Identity | Reason |");
+      lines.push("|------|----------|--------|");
+      for (const finding of findings) {
+        const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
+        const identity = fmtIdentityLink(finding, options);
+        const reason = esc(finding.suppressionReason ?? "—");
+        lines.push(`| ${kind} | ${identity} | ${reason} |`);
+      }
     }
   }
 
@@ -238,6 +276,23 @@ function escHtml(value: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+/** Group findings by version pair, returning label → findings entries. */
+function groupByVersionPair(findings: Finding[]): [string, Finding[]][] {
+  const groups = new Map<string, Finding[]>();
+  for (const f of findings) {
+    const label = f.phase === "same-version"
+      ? `${f.versionPair.headVersion} (base → head)`
+      : `${f.versionPair.baseVersion} → ${f.versionPair.headVersion}`;
+    let list = groups.get(label);
+    if (!list) {
+      list = [];
+      groups.set(label, list);
+    }
+    list.push(f);
+  }
+  return [...groups.entries()];
 }
 
 function formatNoFindingsMessage(phase: string | undefined, comparisonsPerformed: number): string {
