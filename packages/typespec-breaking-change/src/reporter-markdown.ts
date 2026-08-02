@@ -23,6 +23,8 @@ export interface MarkdownReportOptions {
   workspacePath?: string;
   /** URL to the violations reference documentation. */
   violationsReferenceUrl?: string;
+  /** Custom report title (defaults to "Breaking Change Analysis"). */
+  reportTitle?: string;
 }
 
 /** Default URL for the violations reference docs in the typespec-azure repo. */
@@ -40,8 +42,10 @@ export function renderMarkdownSummary(
   const suppressed = result.findings.filter((f) => f.suppressed);
   const lines: string[] = [];
 
+  const title = options?.reportTitle ?? "Breaking Change Analysis";
+
   // Header
-  lines.push("## Breaking Change Analysis");
+  lines.push(`## ${title}`);
   lines.push("");
 
   // Spec path context

@@ -34,6 +34,8 @@ export interface CliOptions {
   showSuppressed?: boolean;
   /** Show ignored findings in output. */
   showIgnored?: boolean;
+  /** Custom report title for markdown output. */
+  reportTitle?: string;
 }
 
 /**
@@ -85,6 +87,9 @@ export function parseArgs(args: string[]): CliOptions {
         break;
       case "--show-ignored":
         options.showIgnored = true;
+        break;
+      case "--report-title":
+        options.reportTitle = args[++i];
         break;
       case "--help":
       case "-h":
@@ -234,6 +239,7 @@ export async function main(args: string[]): Promise<number> {
         githubSha: process.env.GITHUB_SHA,
         workspacePath: process.env.GITHUB_WORKSPACE,
         violationsReferenceUrl: process.env.VIOLATIONS_REFERENCE_URL,
+        reportTitle: options.reportTitle,
       };
       const mdContent = renderMarkdownSummary(result, mdOptions);
       await writeFile(mdPath, mdContent);

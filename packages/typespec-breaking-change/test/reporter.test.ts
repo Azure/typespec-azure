@@ -366,4 +366,12 @@ describe("markdown reporter", () => {
     const md = renderMarkdownSummary(result);
     expect(md).toContain("\\|"); // escaped pipes
   });
+
+  it("uses custom reportTitle when provided", () => {
+    const md = renderMarkdownSummary(createResult(), {
+      reportTitle: "TypeSpec Versioning Change Analysis",
+    });
+    expect(md).toContain("## TypeSpec Versioning Change Analysis");
+    expect(md).not.toContain("## Breaking Change Analysis");
+  });
 });
