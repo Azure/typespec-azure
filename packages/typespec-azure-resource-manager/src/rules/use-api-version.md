@@ -78,3 +78,7 @@ interface FooResources {
     | ErrorResponse;
 }
 ```
+
+## Suppression
+
+Do not suppress unless it is a false positive. Use the common-types `ApiVersionParameter`.

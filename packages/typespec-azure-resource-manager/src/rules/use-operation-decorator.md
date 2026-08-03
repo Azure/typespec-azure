@@ -85,3 +85,7 @@ interface FooResources {
   myAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use the correct ARM decorator for the operation's HTTP verb.
