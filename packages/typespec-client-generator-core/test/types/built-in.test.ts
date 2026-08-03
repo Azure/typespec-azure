@@ -387,6 +387,7 @@ it("integer model property encoded as string", async function () {
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "safeint");
   strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.wireType?.kind, "string");
   strictEqual(sdkType.baseType, undefined);
   assertModelsAndEnumsHaveNames(context);
 });
@@ -407,6 +408,7 @@ it("integer scalar encoded as string", async function () {
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "int32");
   strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.wireType?.kind, "string");
   strictEqual(sdkType.baseType?.kind, "int32");
   assertModelsAndEnumsHaveNames(context);
 });
@@ -425,6 +427,7 @@ it("boolean model property encoded as string", async function () {
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "boolean");
   strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.wireType?.kind, "string");
   strictEqual(sdkType.baseType, undefined);
 });
 
@@ -444,5 +447,6 @@ it("boolean scalar encoded as string", async function () {
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "boolean");
   strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.wireType?.kind, "string");
   strictEqual(sdkType.baseType?.kind, "boolean");
 });
