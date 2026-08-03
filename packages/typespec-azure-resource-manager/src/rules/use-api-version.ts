@@ -1,11 +1,5 @@
-import {
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  createRule,
-  isTemplateInstance,
-} from "@typespec/compiler";
+import { createRule, isTemplateInstance } from "@typespec/compiler";
+import type { Model, ModelProperty, Operation, Program } from "@typespec/compiler";
 import { getNamespaceName, getSourceModel, isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useApiVersionRule = createRule({
