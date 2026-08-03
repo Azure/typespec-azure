@@ -8,21 +8,10 @@ gist https://gist.github.com/catalinaperalta/b2e7d29a33b4b451bcfcc87e8314565a.
 
 ### Prove parity by real-service equivalence, not co-occurrence (High)
 
-Each migrated TypeSpec lint must be equivalent to its Swagger LintDiff rule.
+I understand aach migrated TypeSpec lint shall be equivalent to its Swagger LintDiff rule as much as possible.
 Project-level co-occurrence does not prove that both rules detect the same
 violations. Run both tools on generated Swagger and TypeSpec from a set of real
 services, then compare rule counts and diagnostic locations.
-
-The first trial used the fully TypeSpec-authored Microsoft.Fabric service
-(`package-2023-11-01`). Production LintDiff reported **53 violations across 3
-rules, including 5 errors**, while `tsp compile --no-emit` with the service's own
-ruleset reported **0 diagnostics**. One of those rules,
-`RequiredPropertiesMissingInResourceModel`, is classified as
-`Template-enforced` in `catalog.json` with no mapped TypeSpec lint, yet it still
-fires on real TypeSpec-generated Swagger.
-
-The reusable procedure and complete results are recorded in
-[real-service-equivalence-check.md](./real-service-equivalence-check.md).
 
 ## Questions
 
@@ -33,8 +22,6 @@ The DoD says only "Reviewer approval obtained" and prices zero days.
 - Which parties are required sign-off — TypeSpec/compiler owners, the ARM
   reviewer board, specs-repo tooling owners? Two or three groups per rule makes
   review a first-class cost line.
-- Rule IDs and messages become public API once a rule lands in the official
-  libraries, and naming/wording is where review round-trips accumulate.
 - ARM reviewer capacity is shared with spec reviews: 147 rules × 2–3 rounds may
   dominate wall-clock even if dev-days hold.
 - How many rounds are assumed, at what latency? Can rules be reviewed in batches?
@@ -46,13 +33,9 @@ The report stops at "added to ruleset" and never covers getting rules enforced.
 - **Public specs repo**: 467 ARM projects today (450 at gist time) to triage,
   suppress-or-fix and sequence.
 - **Private specs repo**: the same again.
-- Severity asymmetry: LintDiff fails only on **new error/fatal**, while a
-  TypeSpec lint landing as `error` blocks compilation outright. A like-for-like
-  mapping can be far more disruptive than the Swagger original
-  (`EnumInsteadOfBoolean` is `warn` today and blocks nothing).
 - Is adoption in scope for this programme, or a separate budgeted workstream?
 
-### Other questions
+### Other questions about some details in report and migration plan
 
 3. **Severity mapping and suppression policy** — LintDiff `error` maps to which
    TypeSpec severity, and should the rollout preserve existing suppressions?
