@@ -1,4 +1,4 @@
-import { Operation, Program, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, type Program, createRule, fileRef } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
 // import { getExtensions } from "@typespec/openapi";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";

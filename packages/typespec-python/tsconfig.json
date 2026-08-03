@@ -3,7 +3,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
-    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
+    "rewriteRelativeImportExtensions": true,
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.ts", "eng/**/*.ts"]
 }

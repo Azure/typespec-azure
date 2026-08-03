@@ -4,6 +4,12 @@ Operations defined using `RpcOperation` or `LongRunningRpcOperation` should not 
 This rule also applies to custom operations that extend `RpcOperation` through the `is` keyword.
 :::
 
+## Impact
+
+- **Area:** API
+
+`RpcOperation` and `LongRunningRpcOperation` model non-resource actions. Path parameters make them ambiguous with resource operations and produce an inconsistent API surface.
+
 #### ❌ Incorrect
 
 `@path` parameter in an `RpcOperation`:
@@ -62,3 +68,7 @@ Use `ResourceAction` or `ResourceCollectionAction` when path parameters are need
 ```tsp
 op analyze is ResourceAction<MyResource, AnalysisRequest, AnalysisResult>;
 ```
+
+## Suppression
+
+Do not suppress. Use `ResourceAction` or `ResourceCollectionAction` when path parameters are required.

@@ -1621,7 +1621,7 @@ op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foun
 
 Adds check global name availability operation, normally used if
 a resource name must be globally unique (for example, if the resource
-exposes and endpoint that uses the resource name in the url)
+exposes an endpoint that uses the resource name in the url)
 
 ```typespec
 op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1639,7 +1639,7 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 
 Adds check location-specific name availability operation, normally used if
 a resource name must be globally unique (for example, if the resource
-exposes and endpoint that uses the resource name in the url)
+exposes an endpoint that uses the resource name in the url)
 
 ```typespec
 op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: Azure.Core.azureLocation, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1717,7 +1717,7 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 
 #### `NspConfigurationOperations.ListSinglePageByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent}
 
-List the network security parameter configuration for a resource without pagination - this should only be used for legacy operations
+List the network security perimeter configuration for a resource without pagination - this should only be used for legacy operations
 
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -2307,7 +2307,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionP
 
 | Name                 | Description                                                             |
 | -------------------- | ----------------------------------------------------------------------- |
-| Resource             | the resource being created or updated                                   |
+| Resource             | the resource being updated                                              |
 | PatchModel           | the PATCH request model                                                 |
 | LroHeaders           | Optional. Allows overriding the lro headers returned on resource create |
 | Parameters           | Optional. Additional parameters after the path parameters               |
@@ -2329,7 +2329,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionP
 
 | Name                 | Description                                                       |
 | -------------------- | ----------------------------------------------------------------- |
-| Resource             | the resource being created or updated                             |
+| Resource             | the resource being updated                                        |
 | PatchModel           | the PATCH request model                                           |
 | Parameters           | Optional. Additional parameters after the path parameters         |
 | Response             | Optional. The success response(s) for the PATCH operation         |
@@ -2512,7 +2512,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceName          | Optional. The name of the resource type described in this template               |
 
 #### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateAsync}
@@ -2652,7 +2652,7 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
 | RoutedResourceName    | Optional. The name of the resource type described in this template               |
 
@@ -2913,7 +2913,7 @@ op Azure.ResourceManager.Legacy.ArmListSinglePageByParent(provider: "Microsoft.T
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
@@ -2933,7 +2933,7 @@ op Azure.ResourceManager.Legacy.ArmListSinglePageBySubscription(apiVersion: stri
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |

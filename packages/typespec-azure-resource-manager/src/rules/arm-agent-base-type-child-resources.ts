@@ -1,6 +1,6 @@
 import {
-  Model,
-  Program,
+  type Model,
+  type Program,
   createRule,
   fileRef,
   getNamespaceFullName,
@@ -8,7 +8,7 @@ import {
 } from "@typespec/compiler";
 import { getParentResource } from "@typespec/rest";
 
-import { AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
+import { type AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
 import { getArmResources } from "../resource.js";
 
 export const armAgentBaseTypeChildResourcesRule = createRule({

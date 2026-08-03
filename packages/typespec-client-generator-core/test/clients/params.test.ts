@@ -1,7 +1,7 @@
-import { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
+import type { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
+import type {
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,

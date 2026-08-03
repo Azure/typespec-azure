@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
 import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
 

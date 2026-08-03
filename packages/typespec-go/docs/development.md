@@ -35,6 +35,28 @@ This guide outlines the steps to contributing to the emitter.
 
 The repo pins its tool versions in `mise.toml` at the repo root. If you use [mise](https://mise.jdx.dev/), running `mise install` will provision the expected versions of Node, Go, and the other tools.
 
+`mise install` only downloads the tools — it does not put them on your `PATH`. To make the provisioned versions available in your shell, we recommend using [shims](https://mise.jdx.dev/dev-tools/shims.html): mise creates a small launcher executable per tool binary, and you simply add the shims directory to your `PATH`. Shims are preferred over `mise activate` because activation installs a hook that shells out to `mise` on **every directory change** — which adds noticeable `cd` latency and, on Windows, fails on deep paths near the `MAX_PATH` limit (the child process's working directory is capped at 260 characters regardless of long-path settings). Shims have no per-directory hook.
+
+For PowerShell, add the shims directory to `PATH` in your profile:
+
+```terminal
+if (!(Test-Path $PROFILE)) { New-Item -Type File -Path $PROFILE -Force }
+Add-Content $PROFILE '$miseShims = "$HOME\AppData\Local\mise\shims"; if ((Test-Path $miseShims) -and ($env:PATH -notlike "*$miseShims*")) { $env:PATH = "$miseShims;$env:PATH" }'
+. $PROFILE
+```
+
+For bash or zsh, add the equivalent line to `~/.bashrc` or `~/.zshrc`:
+
+```terminal
+echo 'export PATH="$HOME/.local/share/mise/shims:$PATH"' >> ~/.bashrc   # or ~/.zshrc
+```
+
+Then restart your shell and confirm the tools resolve with `mise doctor` (or, for example, `go version` and `node --version`).
+
+> **Re-shim when the inventory of executables changes.** A shim is a version-agnostic launcher, so bumping the version of an already-shimmed tool needs no action — the existing shim resolves the new version automatically. But whenever `mise install` **adds a new tool or a new binary** (a brand-new entry in `mise.toml`, a tool update that ships an additional executable, or a global npm/pipx package), you must run `mise reshim` to create the missing shims. Forgetting to do so shows up as a _"command not found"_ — or, worse, the command silently resolving to a different copy elsewhere on your `PATH`. Removing a tool likewise leaves a stale shim until you reshim.
+
+If you'd rather not put shims on your `PATH`, you can [activate mise](https://mise.jdx.dev/getting-started.html) instead (adds a shell hook that manages `PATH` per directory) or run individual commands through `mise exec -- <command>`.
+
 ## Step 1: Clone the repo
 
 We recommend [forking then cloning](https://github.com/Azure/azure-sdk/blob/main/docs/policies/repobranching.md) the repo.
@@ -152,6 +174,8 @@ pnpm diff-regen-code -- --baseline gh:<sha>
 
 This is the same tool the `go / emitter diff` PR check runs to post an informational diff of your emitter change; it never fails on a diff, only on a build/tool error.
 
+> **Windows path length.** After emitting, the emitter runs `go generate`, `gofmt`, and `go mod tidy` in the output directory. Windows caps a process's working directory at `MAX_PATH` (260 characters), so if the output path is too long these tools fail to launch and the emitter reports an error telling you to emit to a shorter directory. This is most likely to bite `pnpm diff-regen-code`, whose worktree cache lives under a deep `%TEMP%\emitter-diff-cache\...` path. Work around it by pointing `TMP`/`TEMP` at a short directory before running, for example `$env:TMP = 'C:\t'; $env:TEMP = 'C:\t'` (or run under WSL2, which has no such limit).
+
 ### Run the Go tests
 
 The Spector-backed specs under `test/http-specs/` and `test/azure-http-specs/` exercise the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector) mock server, while the local Go tests under `test/local/` (for example `fakeserver` and `gogenerate`) run standalone. All of them run against the fixtures produced by [Regenerate the Go fixtures](#regenerate-the-go-fixtures), so regenerate first. Start the mock server, run the tests, then stop it:
@@ -187,10 +211,19 @@ Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverabl
 
 ### Debug
 
-To debug the emitter:
+This repo manages Node with [mise](https://mise.jdx.dev/), so `node` resolves to a mise shim (`…/mise/shims/node.exe`). VS Code's JavaScript Debug Terminal implements auto-attach by wrapping the `node` it launches, and the mise shim bypasses that wrapper — so breakpoints set in the emitter never bind (you'll notice the terminal never prints "Debugger attached."). Pass `--debugger` to sidestep this: it launches the compiler child with `--inspect-brk=9229`, so the child opens its own inspector on a fixed port and waits for you to attach explicitly, independent of the mise shim.
 
-1. Set a breakpoint in the TypeScript source.
-2. In the VS Code JavaScript Debug Terminal, run `pnpm tspcompile` (optionally with `--filter`) from the [Regenerate the Go fixtures](#regenerate-the-go-fixtures) section.
+1. Build the emitter (`pnpm build:deps`) so the compiled `dist/` matches your source — breakpoints bind through source maps against `dist/`, so a stale build makes them drift.
+2. Set a breakpoint in the TypeScript source.
+3. In a terminal, run `pnpm tspcompile` with `--debugger` and a `--filter` for the test you're debugging:
+
+   ```terminal
+   pnpm tspcompile --filter=TestName --debugger
+   ```
+
+   The command hangs while the compiler child waits for a debugger. (The "Debugger listening…" banner is buffered by `exec` and won't print until the child exits — this is expected.)
+
+4. In VS Code, press F5 and select the **Attach to Default Port** launch configuration. Execution stops at the compiler's entry point; press Continue (F5) once and it runs to your breakpoint after the emitter loads. With `--debugger` the specs run one at a time, so omit `--filter` only if you intend to step through every spec in turn.
 
 ## Step 4: Update emitter documentation
 

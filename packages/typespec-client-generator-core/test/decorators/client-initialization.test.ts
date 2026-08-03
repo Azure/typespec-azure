@@ -1,7 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { InitializedByFlags, SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
+import {
+  InitializedByFlags,
+  type SdkClientType,
+  type SdkHttpOperation,
+} from "../../src/interfaces.js";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,

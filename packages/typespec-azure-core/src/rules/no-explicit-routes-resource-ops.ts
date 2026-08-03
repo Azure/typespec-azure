@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getRoutePath } from "@typespec/http";
 import { isResourceOperation } from "../decorators/private/ensure-resource-type.js";
 import { isExcludedCoreType } from "./utils.js";

@@ -1,4 +1,4 @@
-import { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { EXACT_NAME_PREFIX } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";

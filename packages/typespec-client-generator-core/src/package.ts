@@ -1,6 +1,6 @@
 import {
   createDiagnosticCollector,
-  Diagnostic,
+  type Diagnostic,
   getNamespaceFullName,
   ignoreDiagnostics,
 } from "@typespec/compiler";
@@ -8,7 +8,7 @@ import {
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
-import {
+import type {
   SdkClientType,
   SdkEnumType,
   SdkModelType,

@@ -1,14 +1,14 @@
 import { resolvePath } from "@typespec/compiler";
 import {
-  EmitterTesterInstance,
+  type EmitterTesterInstance,
   expectDiagnosticEmpty,
   expectDiagnostics,
   resolveVirtualPath,
-  TestEmitterCompileResult,
+  type TestEmitterCompileResult,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { AutorestEmitterOptions } from "../src/lib.js";
+import type { AutorestEmitterOptions } from "../src/lib.js";
 import { ApiTester, compileOpenAPI, ignoreDiagnostics, Tester } from "./test-host.js";
 
 let runner: EmitterTesterInstance<TestEmitterCompileResult>;

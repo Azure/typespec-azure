@@ -1,6 +1,6 @@
 import {
-  Discriminator,
-  Model,
+  type Discriminator,
+  type Model,
   createRule,
   fileRef,
   getDiscriminator,

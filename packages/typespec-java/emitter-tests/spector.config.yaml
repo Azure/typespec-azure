@@ -85,6 +85,7 @@ specs:
   payload/json-merge-patch: true
   payload/media-type: true
   payload/multipart: true
+  payload/pageable: true
   payload/xml: true
   resiliency/srv-driven/main.tsp: { options: { advanced-versioning: true } }
   resiliency/srv-driven/old.tsp: { options: { namespace: resiliency.servicedriven.v1, advanced-versioning: true } }
@@ -129,6 +130,3 @@ specs:
   versioning/renamedFrom: true
   versioning/returnTypeChangedFrom: true
   versioning/typeChangedFrom: true
-
-  # Disabled: nested pageItems/nextLink/continuationToken not supported
-  payload/pageable: false

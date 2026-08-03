@@ -1,16 +1,16 @@
 import {
-  Enum,
-  Interface,
+  type Enum,
+  type Interface,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  Namespace,
-  Operation,
+  type Namespace,
+  type Operation,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
-import { SdkClient, TCGCContext } from "./interfaces.js";
+import type { SdkClient, TCGCContext } from "./interfaces.js";
 import {
   clientKey,
   clientLocationKey,
