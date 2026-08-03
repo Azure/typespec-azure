@@ -22,6 +22,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
     // no go.mod file (e.g. the first time an SDK is generated) we
     // fall back to the provided value.
     let moduleIdentity: string | undefined;
+    let moduleRoot: string | undefined;
     let currentDir = context.emitterOutputDir;
     while (true) {
       const goModFile = path.join(currentDir, "go.mod");
@@ -40,6 +41,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
           return;
         }
         moduleIdentity = match[1];
+        moduleRoot = currentDir;
         break;
       }
 
@@ -83,7 +85,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
       }
     }
 
-    const adapter = await Adapter.create(context);
+    const adapter = await Adapter.create(context, moduleRoot);
     const codeModel = adapter.tcgcToGoCodeModel();
 
     await mkdir(context.emitterOutputDir, { recursive: true });

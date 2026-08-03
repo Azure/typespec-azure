@@ -141,8 +141,7 @@ export async function emitGoFor(
 
   // `emitter-output-dir` is a standard emitter option that the compiler normally
   // resolves into EmitContext.emitterOutputDir; resolve it here (including the
-  // `{output-dir}` template) since this helper drives the emitter directly. The
-  // last path segment becomes the package name when a containing-module is used.
+  // `{output-dir}` template) since this helper drives the emitter directly.
   const baseOutputDir = "tsp-output";
   let outputDir = baseOutputDir;
   if (emitterOptions["emitter-output-dir"]) {
@@ -171,7 +170,10 @@ export async function emitGoFor(
     options: emitterOptions,
   } as unknown as EmitContext<GoEmitterOptions>;
 
-  const adapter = await Adapter.create(context);
+  const containingModuleRoot = emitterOptions["containing-module"]
+    ? resolveVirtualPath(baseOutputDir)
+    : undefined;
+  const adapter = await Adapter.create(context, containingModuleRoot);
   const codeModel = adapter.tcgcToGoCodeModel();
 
   let filePrefix = (emitterOptions["file-prefix"] as string | undefined) ?? "zz_";

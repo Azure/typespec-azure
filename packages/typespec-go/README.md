@@ -52,7 +52,7 @@ Semantic version of azcore without the leading 'v' to use if different from the 
 
 **Type:** `string`
 
-The module into which the package is being emitted. Mutually exclusive with module.
+The existing Go module into which the package is being emitted. `emitter-output-dir` must be within the module directory containing `go.mod`. Mutually exclusive with module.
 
 ### `disallow-unknown-fields`
 

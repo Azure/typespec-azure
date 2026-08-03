@@ -43,7 +43,7 @@ const EmitterOptionsSchema: JSONSchemaType<GoEmitterOptions> = {
       type: "string",
       nullable: true,
       description:
-        "The module into which the package is being emitted. Mutually exclusive with module.",
+        "The existing Go module into which the package is being emitted. `emitter-output-dir` must be within the module directory containing `go.mod`. Mutually exclusive with module.",
     },
     "disallow-unknown-fields": {
       type: "boolean",

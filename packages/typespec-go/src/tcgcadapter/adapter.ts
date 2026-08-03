@@ -7,6 +7,7 @@
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
+import * as path from "path";
 import * as go from "../codemodel/index.js";
 import { GoEmitterOptions } from "../lib.js";
 import * as naming from "../naming/index.js";
@@ -27,9 +28,13 @@ export class Adapter {
    * Creates an Adapter for the specified EmitContext.
    *
    * @param context the compiler context from which to create the Adapter
+   * @param containingModuleRoot the directory containing go.mod when emitting into an existing module
    * @returns a new Adapter for the provided context
    */
-  static async create(context: tsp.EmitContext<GoEmitterOptions>): Promise<Adapter> {
+  static async create(
+    context: tsp.EmitContext<GoEmitterOptions>,
+    containingModuleRoot?: string,
+  ): Promise<Adapter> {
     // @encodedName can be used in XML scenarios, it
     // is effectively the same as TypeSpec.Xml.@name.
     // however, it's filtered out by default so we need
@@ -54,14 +59,19 @@ export class Adapter {
       }
     }
 
-    return new Adapter(ctx, context.options, context.emitterOutputDir);
+    return new Adapter(ctx, context.options, context.emitterOutputDir, containingModuleRoot);
   }
 
   private readonly ctx: tcgc.SdkContext;
   private readonly options: GoEmitterOptions;
   private readonly codeModel: go.CodeModel;
 
-  private constructor(ctx: tcgc.SdkContext, options: GoEmitterOptions, emitterOutputDir: string) {
+  private constructor(
+    ctx: tcgc.SdkContext,
+    options: GoEmitterOptions,
+    emitterOutputDir: string,
+    containingModuleRoot?: string,
+  ) {
     this.ctx = ctx;
     this.options = options;
 
@@ -88,7 +98,27 @@ export class Adapter {
     if (this.options.module) {
       root = new go.Module(this.options.module);
     } else if (this.options["containing-module"]) {
-      root = new go.ContainingModule(this.options["containing-module"]);
+      if (!containingModuleRoot) {
+        throw new AdapterError(
+          "InvalidArgument",
+          "containing-module requires emitter-output-dir to be within an existing Go module",
+        );
+      }
+      const relativePackagePath = path.relative(containingModuleRoot, emitterOutputDir);
+      if (
+        relativePackagePath === ".." ||
+        relativePackagePath.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relativePackagePath)
+      ) {
+        throw new AdapterError(
+          "InvalidArgument",
+          `emitter-output-dir '${emitterOutputDir}' is outside containing module root '${containingModuleRoot}'`,
+        );
+      }
+      root = new go.ContainingModule(
+        this.options["containing-module"],
+        relativePackagePath.split(path.sep).join("/"),
+      );
       root.package = new go.Package(naming.packageNameFromOutputFolder(emitterOutputDir), root);
     } else {
       throw new AdapterError("InvalidArgument", "missing argument module or containing-module");

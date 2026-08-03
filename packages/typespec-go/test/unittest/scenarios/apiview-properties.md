@@ -70,17 +70,52 @@ interface WidgetOps {
 
 ```yaml
 containing-module: github.com/contoso/widget/v2
-emitter-output-dir: {output-dir}/subpkg
+emitter-output-dir: {output-dir}/generated/subpkg
 ```
 
 ```json apiview-properties
 {
   "CrossLanguagePackageId": "Widgets",
   "CrossLanguageDefinitionId": {
-    "widget/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
-    "widget/subpkg.Widget": "Widgets.Widget",
-    "widget/subpkg.WidgetsClient": "Widgets",
-    "widget/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+    "widget/generated/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget/generated/subpkg.Widget": "Widgets.Widget",
+    "widget/generated/subpkg.WidgetsClient": "Widgets",
+    "widget/generated/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
+```
+
+# The APIView cross-language definition ID file uses the module name at its root
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+model Widget {
+  id: string;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+}
+```
+
+```yaml
+containing-module: github.com/contoso/widget/v2
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget.Widget": "Widgets.Widget",
+    "widget.WidgetsClient": "Widgets",
+    "widget.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
   },
   "CrossLanguageVersion": "d80dc19078a8"
 }

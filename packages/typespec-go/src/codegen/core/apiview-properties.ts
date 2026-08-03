@@ -56,10 +56,13 @@ function relPackageName(pkg: go.PackageContent): string {
     return go.getPackageName(pkg);
   }
   const parent = pkg.parent;
-  const parentName =
-    parent.kind === "containingModule"
-      ? path.basename(parent.identity.replace(/\/v\d+$/, ""))
-      : relPackageName(parent);
+  if (parent.kind === "containingModule") {
+    const moduleName = path.basename(parent.identity.replace(/\/v\d+$/, ""));
+    return parent.relativePackagePath
+      ? `${moduleName}/${parent.relativePackagePath}`
+      : moduleName;
+  }
+  const parentName = relPackageName(parent);
   return `${parentName}/${pkg.name}`;
 }
 
