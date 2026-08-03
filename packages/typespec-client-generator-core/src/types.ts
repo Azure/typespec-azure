@@ -228,16 +228,17 @@ export function addEncodeInfo(
   }
   if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
     // integer and boolean types are allowed to be encoded as string
+    const builtInType = innerType as SdkBuiltInType;
     if (encodeData) {
       if (encodeData?.encoding) {
-        (innerType as any).encode = encodeData.encoding;
+        builtInType.encode = encodeData.encoding;
       }
       if (encodeData?.type) {
         const wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
         // if we specify the encoding type in the decorator, we set the `.encode` string
         // to the kind of the encoding type
-        (innerType as any).encode = wireType.kind;
-        (innerType as any).wireType = wireType;
+        builtInType.encode = wireType.kind;
+        builtInType.wireType = wireType;
       }
     }
   }
