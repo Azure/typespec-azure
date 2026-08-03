@@ -129,6 +129,7 @@ words:
   - Tsps
   # Go emitter
   - addl
+  - azblob
   - azfake
   - azidentity
   - errorf

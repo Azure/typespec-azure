@@ -10,6 +10,7 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import * as codegen from "./codegen/index.js";
 import { CodeModelError } from "./codemodel/errors.js";
+import { setContainingModuleRelativePackagePath } from "./containing-module.js";
 import { GoEmitterOptions, reportDiagnostic } from "./lib.js";
 import { Adapter, ExternalError } from "./tcgcadapter/adapter.js";
 import { AdapterError } from "./tcgcadapter/errors.js";
@@ -22,6 +23,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
     // no go.mod file (e.g. the first time an SDK is generated) we
     // fall back to the provided value.
     let moduleIdentity: string | undefined;
+    let moduleRoot: string | undefined;
     let currentDir = context.emitterOutputDir;
     while (true) {
       const goModFile = path.join(currentDir, "go.mod");
@@ -40,6 +42,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
           return;
         }
         moduleIdentity = match[1];
+        moduleRoot = currentDir;
         break;
       }
 
@@ -85,6 +88,9 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
 
     const adapter = await Adapter.create(context);
     const codeModel = adapter.tcgcToGoCodeModel();
+    if (codeModel.root.kind === "containingModule") {
+      setContainingModuleRelativePackagePath(codeModel.root, moduleRoot, context.emitterOutputDir);
+    }
 
     await mkdir(context.emitterOutputDir, { recursive: true });
 
@@ -119,6 +125,7 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
     await emitter.emitExamples();
     await emitter.emitLicenseFile();
     await emitter.emitMetadataFile();
+    await emitter.emitApiViewPropertiesFile();
 
     const goGenerateFile = context.options["go-generate"];
     const goGenerateFileExists = goGenerateFile

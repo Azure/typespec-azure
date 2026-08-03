@@ -125,6 +125,7 @@ export class ClientAdapter {
 
     const goClient = new go.Client(this.ta.getPkg(), clientName, docs);
     goClient.parent = parent;
+    goClient.crossLanguageDefinitionId = sdkClient.crossLanguageDefinitionId;
 
     // NOTE: per tcgc convention, if there is no param of kind credential
     // it means that the client doesn't require any kind of authentication.
@@ -684,6 +685,7 @@ export class ClientAdapter {
 
     method.docs.summary = sdkMethod.summary;
     method.docs.description = sdkMethod.doc;
+    method.crossLanguageDefinitionId = sdkMethod.crossLanguageDefinitionId;
     goClient.methods.push(method);
     const pageableInfo = this.populateMethod(sdkMethod, method);
 

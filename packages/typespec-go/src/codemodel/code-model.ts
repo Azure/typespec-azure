@@ -31,6 +31,9 @@ export type CodeModelType = "azure-arm" | "data-plane";
 /** contains top-level info about the input source */
 export interface Info {
   title: string;
+
+  /** the TCGC cross-language version of the service definition */
+  crossLanguageVersion?: string;
 }
 
 /**
