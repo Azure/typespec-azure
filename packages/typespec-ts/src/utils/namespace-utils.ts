@@ -1,7 +1,13 @@
 import { getAllModels, UsageFlags } from "@azure-tools/typespec-client-generator-core";
-import { isGlobalNamespace, isService, Namespace, NoTarget, Operation } from "@typespec/compiler";
+import {
+  isGlobalNamespace,
+  isService,
+  type Namespace,
+  NoTarget,
+  type Operation,
+} from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
-import { SdkContext } from "./interfaces.js";
+import type { SdkContext } from "./interfaces.js";
 
 export function getModelNamespaceName(dpgContext: SdkContext, namespace: Namespace): string[] {
   const result: string[] = [];

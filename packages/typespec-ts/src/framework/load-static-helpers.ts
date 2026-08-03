@@ -1,4 +1,4 @@
-import { type CompilerHost, joinPaths, NoTarget, Program } from "@typespec/compiler";
+import { type CompilerHost, joinPaths, NoTarget, type Program } from "@typespec/compiler";
 import {
   ClassDeclaration,
   EnumDeclaration,
@@ -9,7 +9,7 @@ import {
   TypeAliasDeclaration,
 } from "ts-morph";
 import { reportDiagnostic } from "../lib.js";
-import { ModularEmitterOptions } from "../modular/interfaces.js";
+import type { ModularEmitterOptions } from "../modular/interfaces.js";
 import { resolveProjectRoot } from "../utils/resolve-project-root.js";
 import { refkey } from "./refkey.js";
 export const SourceFileSymbol = Symbol("SourceFile");

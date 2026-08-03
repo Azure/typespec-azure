@@ -1,5 +1,5 @@
 import { SourceFile } from "ts-morph";
-import { ImportType, Imports } from "../interfaces.js";
+import type { ImportType, Imports } from "../interfaces.js";
 
 /**
  * Build the common imports for generated SDK. Azure Core packages are always used.

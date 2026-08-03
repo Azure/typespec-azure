@@ -1,4 +1,4 @@
-import { InterfaceDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
+import { type InterfaceDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import {
   getDeserializeExceptionHeadersPrivateFunction,
   getDeserializeHeadersPrivateFunction,
@@ -10,9 +10,9 @@ import {
   isLroAndPagingOperation,
   isLroOnlyOperation,
 } from "./helpers/operation-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import {
+import type {
   SdkClientType,
   SdkMethodParameter,
   SdkServiceOperation,
@@ -23,16 +23,16 @@ import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
-  ServiceOperation,
+  type ServiceOperation,
 } from "../utils/operation-util.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
-import { OperationPathAndDeserDetails } from "./interfaces.js";
+import type { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
 /**
