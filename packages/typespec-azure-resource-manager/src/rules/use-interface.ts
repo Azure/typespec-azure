@@ -1,5 +1,5 @@
-import { createRule, isTemplateInstance } from "@typespec/compiler";
 import type { Operation } from "@typespec/compiler";
+import { createRule, isTemplateInstance } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import {
   isSourceOperationResourceManagerInternal,

@@ -1,12 +1,12 @@
-import { createRule, isTemplateInstance, paramMessage } from "@typespec/compiler";
 import type {
   DecoratorApplication,
   DecoratorArgument,
   Operation,
   Program,
 } from "@typespec/compiler";
-import { getOperationVerb } from "@typespec/http";
+import { createRule, isTemplateInstance, paramMessage } from "@typespec/compiler";
 import type { HttpVerb } from "@typespec/http";
+import { getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
 import {
   isSourceOperationResourceManagerInternal,
