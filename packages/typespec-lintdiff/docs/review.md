@@ -1,4 +1,4 @@
-# LintDiff → TypeSpec migration: review notes
+# LintDiff → TypeSpec migration review
 
 Review of the "Migrate Swagger LintDiff to TypeSpec lints" plan, based on the
 `feature/lintdiff-migration` branch of `Azure/typespec-azure` and the ARM coverage
