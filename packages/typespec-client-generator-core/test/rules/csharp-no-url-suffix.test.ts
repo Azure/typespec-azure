@@ -1,8 +1,8 @@
 import {
   createLinterRuleTester,
-  LinterRuleTester,
+  type LinterRuleTester,
   t,
-  TesterInstance,
+  type TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { csharpNoUrlSuffixRule } from "../../src/rules/csharp-no-url-suffix.js";

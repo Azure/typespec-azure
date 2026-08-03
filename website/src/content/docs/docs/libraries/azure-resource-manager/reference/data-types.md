@@ -116,7 +116,7 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 | StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
 | FinalResult     | The type of the logical result when following the location header                 |
 | PollingUrlValue | The value type of the link to the status monitor                                  |
-| FinalUrlValue   | The value type fo the link to the final result                                    |
+| FinalUrlValue   | The value type of the link to the final result                                    |
 
 #### Examples
 
@@ -426,7 +426,7 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 | Name       | Description                                                |
 | ---------- | ---------------------------------------------------------- |
-| Resource   | The resource being updated                                 |
+| Resource   | The resource being created                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
 #### Examples
@@ -463,7 +463,7 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 | Name     | Description                |
 | -------- | -------------------------- |
-| Resource | The resource being updated |
+| Resource | The resource being created |
 
 #### Examples
 
@@ -1560,10 +1560,27 @@ model Azure.ResourceManager.BaseTypes.BaseTypeInfo
 
 #### Properties
 
-| Name     | Type     | Description                                      |
-| -------- | -------- | ------------------------------------------------ |
-| baseType | `string` | The base type identifier (for example, "Agent"). |
-| version  | `string` | The schema version of the base type.             |
+| Name     | Type                                                                   | Description                          |
+| -------- | ---------------------------------------------------------------------- | ------------------------------------ |
+| baseType | [`BaseType`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseType) | The base type identifier.            |
+| version  | `string`                                                               | The schema version of the base type. |
+
+### `BaseType` {#Azure.ResourceManager.BaseTypes.BaseType}
+
+The set of Azure base types a resource may declare conformance to via the
+`@azureBaseType` decorator. Modeled as an extensible (open) enum so additional
+base types can be introduced without a breaking change.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.BaseType
+```
+
+#### Variants
+
+| Name         | Type             | Description                 |
+| ------------ | ---------------- | --------------------------- |
+| Agent        | `"Agent"`        | The Agent base type.        |
+| Relationship | `"Relationship"` | The Relationship base type. |
 
 ## Azure.ResourceManager.BaseTypes.Agents
 
@@ -1763,7 +1780,23 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform
 | type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
 | name | `string` | Tool name/identifier.                                                                        |
 
-### `ConversationItem` {#Azure.ResourceManager.BaseTypes.Agents.ConversationItem}
+### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
+
+Properties for a conversation resource holding the items and metadata
+exchanged between a client and an agent.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
+```
+
+#### Properties
+
+| Name       | Type                                                                            | Description                                                |
+| ---------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| createdAt? | `utcDateTime`                                                                   | Timestamp of when the conversation was created. Read-only. |
+| input      | [`InputItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputItem) | Content input to the conversation. Required on create.     |
+
+### `InputItem` {#Azure.ResourceManager.BaseTypes.Agents.InputItem}
 
 A single item exchanged within a conversation.
 
@@ -1776,7 +1809,7 @@ that variant are populated, so all variant-specific fields are optional:
 - `Compaction`: `summary`
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
+model Azure.ResourceManager.BaseTypes.Agents.InputItem
 ```
 
 #### Properties
@@ -1785,29 +1818,14 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
 | ---------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | id?        | `string`                                                                                  | Unique identifier of the item. Read-only (assigned by the service).                                               |
 | type       | [`ItemType`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ItemType)             | The item type discriminator. Determines which variant this item represents.                                       |
-| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items.                                                       |
-| content?   | `string`                                                                                  | The text content of the message. Applies to `Message` items.                                                      |
+| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items. Read-only.                                            |
+| content?   | `Record<unknown>`                                                                         | The content of the message. Applies to `Message` items.                                                           |
 | callId?    | `string`                                                                                  | Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. |
 | name?      | `string`                                                                                  | The name of the function (tool) to invoke. Applies to `FunctionCall` items.                                       |
 | arguments? | `Record<unknown>`                                                                         | Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items.          |
 | output?    | `string`                                                                                  | The output produced by the function (tool) call. Applies to `FunctionCallOutput` items.                           |
 | summary?   | `string`                                                                                  | Summary of the compacted conversation history. Applies to `Compaction` items.                                     |
 | status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the item. Read-only.                                                                                |
-
-### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
-
-Properties for a conversation resource holding the items and metadata
-exchanged between a client and an agent.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
-```
-
-#### Properties
-
-| Name       | Type          | Description                                                |
-| ---------- | ------------- | ---------------------------------------------------------- |
-| createdAt? | `utcDateTime` | Timestamp of when the conversation was created. Read-only. |
 
 ### `PreviousResponseProperty` {#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty}
 
@@ -1860,7 +1878,7 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseItem
 | id?        | `string`                                                                                  | Unique identifier of the output item. Read-only.                                                                             |
 | type?      | [`ItemType`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ItemType)             | The item type discriminator. Read-only.                                                                                      |
 | role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items. Read-only.                                                       |
-| content?   | `string`                                                                                  | The text content of the message. Applies to `Message` items. Read-only.                                                      |
+| content?   | `Record<unknown>`                                                                         | The content of the message. Applies to `Message` items. Read-only.                                                           |
 | callId?    | `string`                                                                                  | Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. Read-only. |
 | name?      | `string`                                                                                  | The name of the function (tool) invoked. Applies to `FunctionCall` items. Read-only.                                         |
 | arguments? | `Record<unknown>`                                                                         | Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items. Read-only.          |
@@ -1893,12 +1911,12 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 
 #### Properties
 
-| Name       | Type                                                                                          | Description                                                                                                          |
-| ---------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| createdAt? | `utcDateTime`                                                                                 | Timestamp of when the response was created. Read-only.                                                               |
-| model?     | `string`                                                                                      | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
-| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus)     | The status of the response. Read-only.                                                                               |
-| input      | [`ConversationItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ConversationItem) | Content input to the model. Required on create.                                                                      |
+| Name       | Type                                                                                      | Description                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| createdAt? | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
+| model?     | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
+| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
+| input      | [`InputItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputItem)           | Content input to the model. Required on create.                                                                      |
 
 ### `ItemType` {#Azure.ResourceManager.BaseTypes.Agents.ItemType}
 
@@ -1948,6 +1966,54 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 | Incomplete | `"Incomplete"` | The response is incomplete.           |
 | Queued     | `"Queued"`     | The response is queued for execution. |
 | InProgress | `"InProgress"` | The response is in progress.          |
+
+## Azure.ResourceManager.BaseTypes.Relationships
+
+### `Relationship` {#Azure.ResourceManager.BaseTypes.Relationships.Relationship}
+
+Model template for a Relationship extension resource.
+Applies the Relationship base type decorator automatically.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                      |
+| ---------- | -------------------------------------------------------------------------------- |
+| Properties | RP-specific properties for the relationship (must extend RelationshipProperties) |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `RelationshipProperties` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties}
+
+Required properties for a relationship resource.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<ProvisioningState>
+```
+
+#### Template Parameters
+
+| Name              | Description                                 |
+| ----------------- | ------------------------------------------- |
+| ProvisioningState | The relationship provisioning state values. |
+
+#### Properties
+
+| Name               | Type                                             | Description                                                           |
+| ------------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | ARM-managed. Must include the base type descriptor for this resource. |
+| sourceId           | `string`                                         | The relationship source identifier.                                   |
+| sourceTenant       | `string`                                         | The tenant identifier of the relationship source.                     |
+| targetId           | `string`                                         | The relationship target identifier.                                   |
+| targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
+| provisioningState? | `ProvisioningState`                              | The provisioning state of the relationship.                           |
 
 ## Azure.ResourceManager.CommonTypes
 
@@ -2499,12 +2565,12 @@ model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName, R
 
 #### Template Parameters
 
-| Name                | Description                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| KeyName             | The name of the network security perimeter configuration resource name parameter.                                    |
-| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                     |
-| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                   |
+| Name                | Description                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the network security perimeter configuration resource name parameter.                                   |
+| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                    |
+| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                  |
 
 #### Properties
 
@@ -2759,7 +2825,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter<K
 | Name                | Description                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------------- |
 | KeyName             | The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName") |
-| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]\*$")          |
+| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]*$")           |
 | MinLength           | The minimum length for the private endpoint connection name (default is 3)                              |
 | MaxLength           | The maximum length for the private endpoint connection name (default is 63                              |
 
@@ -2883,12 +2949,12 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment
 
 #### Template Parameters
 
-| Name                | Description                                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------- |
-| Segment             | The resource type name for private links (default is privateLinkResources)               |
-| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the private link resource name (default is 3)                     |
-| MaxLength           | The maximum length for the private link resource name (default is 63                     |
+| Name                | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| Segment             | The resource type name for private links (default is privateLinkResources)              |
+| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the private link resource name (default is 3)                    |
+| MaxLength           | The maximum length for the private link resource name (default is 63                    |
 
 #### Properties
 
@@ -3556,10 +3622,10 @@ model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource
 
 #### Template Parameters
 
-| Name           | Description                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| Resource       | The extension resource.                                                                                                                                                   |
+| Name           | Description                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| Resource       | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3581,10 +3647,10 @@ model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, 
 
 #### Template Parameters
 
-| Name              | Description                                                                                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| ExtensionResource | The extension resource.                                                                                                                                                   |
+| Name              | Description                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| ExtensionResource | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3761,6 +3827,26 @@ model Employee {
 | ----- | ------ | ----------- |
 | scope | `Type` |             |
 
+### `ServiceGroup` {#Azure.ResourceManager.Extension.ServiceGroup}
+
+A service group
+
+```typespec
+model Azure.ResourceManager.Extension.ServiceGroup<ParameterName>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| ParameterName | The name of the 'name' parameter of the service group (usually serviceGroupName or serviceGroupId). |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
 
 A subscription target for an extension resource
@@ -3783,9 +3869,9 @@ model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3806,9 +3892,9 @@ model Azure.ResourceManager.Extension.TargetParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3829,9 +3915,9 @@ model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource) |
+| Name     | Description                                                                                                                                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource) |
 
 #### Properties
 

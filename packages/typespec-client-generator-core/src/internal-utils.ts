@@ -2,14 +2,14 @@ import {
   FinalStateValue,
   getLroMetadata,
   isPreviewVersion,
-  LroMetadata,
+  type LroMetadata,
 } from "@azure-tools/typespec-azure-core";
 import {
-  BooleanLiteral,
+  type BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
-  Diagnostic,
-  Enum,
+  type Diagnostic,
+  type Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -17,39 +17,39 @@ import {
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
-  Interface,
+  type Interface,
   isNeverType,
   isNullType,
   isTemplateDeclaration,
   isVoidType,
   listServices,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   Numeric,
-  NumericLiteral,
-  Operation,
-  Program,
-  StringLiteral,
-  Type,
-  Union,
-  Value,
+  type NumericLiteral,
+  type Operation,
+  type Program,
+  type StringLiteral,
+  type Type,
+  type Union,
+  type Value,
 } from "@typespec/compiler";
 import {
   unsafe_mutateSubgraphWithNamespace,
-  unsafe_MutatorWithNamespace,
+  type unsafe_MutatorWithNamespace,
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  Authentication,
+  type Authentication,
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
-  HttpOperation,
-  HttpOperationResponseContent,
-  HttpPayloadBody,
-  HttpServer,
+  type HttpOperation,
+  type HttpOperationResponseContent,
+  type HttpPayloadBody,
+  type HttpServer,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -69,7 +69,7 @@ import {
   getOverriddenClientMethod,
   getParamAlias,
 } from "./decorators.js";
-import {
+import type {
   DecoratorInfo,
   ExternalTypeInfo,
   SdkBuiltInType,
@@ -544,15 +544,7 @@ export function getTypeDecorators(
 function getDecoratorArgValue(
   context: TCGCContext,
   arg:
-    | Type
-    | Record<string, unknown>
-    | Value
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | Numeric
-    | null,
+    Type | Record<string, unknown> | Value | unknown[] | string | number | boolean | Numeric | null,
   type: Type,
   decoratorName: string,
 ): [any, readonly Diagnostic[]] {

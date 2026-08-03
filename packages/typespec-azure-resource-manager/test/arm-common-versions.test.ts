@@ -1,4 +1,4 @@
-import { getService, Namespace } from "@typespec/compiler";
+import { getService, type Namespace } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { expect, it } from "vitest";

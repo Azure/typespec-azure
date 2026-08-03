@@ -1,5 +1,9 @@
-import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
+  FinalStateValue,
+  type LroMetadata,
+  type ParameterSource,
+} from "@azure-tools/typespec-azure-core";
+import type {
   DateTimeKnownEncoding,
   Diagnostic,
   DurationKnownEncoding,
@@ -18,11 +22,11 @@ import {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
-  HttpAuth,
-  HttpOperation,
-  HttpOperationResponse,
-  HttpStatusCodeRange,
-  HttpVerb,
+  type HttpAuth,
+  type HttpOperation,
+  type HttpOperationResponse,
+  type HttpStatusCodeRange,
+  type HttpVerb,
   Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
@@ -74,6 +78,7 @@ export interface TCGCContext {
   __pagedResultSet: Set<SdkType>;
   __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
+  __serviceToVersionsSdkEnum?: Map<Namespace, SdkEnumType>; // the SDK enum type for the versions enum (for each service).
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
@@ -85,6 +90,7 @@ export interface TCGCContext {
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
+  getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType>;
   getClients(): SdkClient[];
   getRootClients(): SdkClient[];
   getClient(type: Namespace | Interface): SdkClient | undefined;
@@ -222,6 +228,8 @@ export interface SdkClientType<
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
   apiVersions: string[];
+  /** The SDK versions enum for this client's service. Undefined for unversioned services or multi-service clients. */
+  versionsEnum?: SdkEnumType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
@@ -647,10 +655,7 @@ export interface SdkModelPropertyTypeBase<
 }
 
 export type ArrayKnownEncoding =
-  | "pipeDelimited"
-  | "spaceDelimited"
-  | "commaDelimited"
-  | "newlineDelimited";
+  "pipeDelimited" | "spaceDelimited" | "commaDelimited" | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -972,11 +977,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
 }
 
 export type SdkHttpParameter =
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  SdkQueryParameter | SdkPathParameter | SdkBodyParameter | SdkHeaderParameter | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";

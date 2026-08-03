@@ -1,11 +1,12 @@
-import { Model, Operation } from "@typespec/compiler";
+import type { Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
+import { $ } from "@typespec/compiler/typekit";
 import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { ArmLifecycleOperationKind } from "../src/operations.js";
+import type { ArmLifecycleOperationKind } from "../src/operations.js";
 import {
-  ArmResourceDetails,
+  type ArmResourceDetails,
   getArmResources,
   getFeature,
   getResourceFeature,
@@ -930,7 +931,8 @@ interface RestorePointOperations {
 });
 
 it("allows extension of foreign resources", async () => {
-  const { program, Employees, ManagementGroups, VirtualMachines } = await Tester.compile(t.code`
+  const { program, Employees, ManagementGroups, ServiceGroups, VirtualMachines } =
+    await Tester.compile(t.code`
 using Azure.Core;
 
 @armProviderNamespace
@@ -984,6 +986,8 @@ interface ${t.interface("Employees")} extends EmplOps<Extension.ScopeParameter> 
 @armResourceOperations
 interface ${t.interface("ManagementGroups")} extends EmplOps<Extension.ManagementGroup> {}
 @armResourceOperations
+interface ${t.interface("ServiceGroups")} extends EmplOps<Extension.ServiceGroup> {}
+@armResourceOperations
 interface ${t.interface("VirtualMachines")} extends EmplOps<VirtualMachine> {}
 
 model MoveRequest {
@@ -1008,6 +1012,12 @@ model MoveResponse {
   const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
   expect(managementGetHttp.path).toBe(
     "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const serviceGroupGet: Operation | undefined = ServiceGroups?.operations?.get("get");
+  ok(serviceGroupGet);
+  const [serviceGroupGetHttp, _sg] = getHttpOperation(program, serviceGroupGet);
+  expect(serviceGroupGetHttp.path).toBe(
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
   );
   const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
   ok(virtualMachinesGet);
@@ -1407,5 +1417,29 @@ describe("multiple services", () => {
     expect(ResA.armProviderNamespace).toEqual("Provider.A");
     expect(ResB.name).toEqual("ResB");
     expect(ResB.armProviderNamespace).toEqual("Provider.B");
+  });
+});
+
+describe("decorator re-application", () => {
+  // Emitters (and versioning) create copies of the resource types through the mutator
+  // framework, which re-runs the decorators on the copy. Those decorators must be
+  // idempotent, otherwise sealing the visibility of `name` a second time reports
+  // `visibility-sealed`.
+  it("does not report diagnostics when the resource decorators are applied again", async () => {
+    const { program, FooResource } = await Tester.compile(t.code`
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      model FooResourceProperties {}
+
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+        ...ResourceNameParameter<FooResource>;
+      }
+    `);
+
+    const tk = $(program);
+    tk.type.finishType(tk.type.clone(FooResource));
+
+    expectDiagnosticEmpty(program.diagnostics);
   });
 });

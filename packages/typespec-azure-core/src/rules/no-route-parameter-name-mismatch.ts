@@ -1,11 +1,12 @@
 import {
   createRule,
+  fileRef,
   getNamespaceFullName,
   ignoreDiagnostics,
-  Operation,
+  type Operation,
   paramMessage,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperationPathParameter } from "@typespec/http";
+import { getHttpOperation, type HttpOperationPathParameter } from "@typespec/http";
 import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
 interface PathParamInfo {
@@ -33,6 +34,7 @@ function getFullyQualifiedOperationName(operation: Operation): string {
 
 export const noRouteParameterNameMismatchRule = createRule({
   name: "no-route-parameter-name-mismatch",
+  docs: fileRef.fromPackageRoot("src/rules/no-route-parameter-name-mismatch.md"),
   description: "Ensure that operations with the same path use consistent path parameter names.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch",

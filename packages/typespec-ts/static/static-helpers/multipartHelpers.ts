@@ -1,14 +1,10 @@
-import { NodeReadableStream } from "./platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 /**
  * Valid values for the contents of a binary file.
  */
 export type FileContents =
-  | string
-  | NodeReadableStream
-  | ReadableStream<Uint8Array>
-  | Uint8Array
-  | Blob;
+  string | NodeReadableStream | ReadableStream<Uint8Array> | Uint8Array | Blob;
 
 export function createFilePartDescriptor(
   partName: string,

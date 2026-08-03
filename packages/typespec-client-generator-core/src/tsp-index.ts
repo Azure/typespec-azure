@@ -1,8 +1,8 @@
-import {
+import type {
   AzureClientGeneratorCoreDecorators,
   AzureClientGeneratorCoreFunctions,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import type { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   $access,
   $alternateType,

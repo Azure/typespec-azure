@@ -1,10 +1,11 @@
 import {
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
   createRule,
+  fileRef,
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
@@ -13,6 +14,7 @@ import { isCamelCaseNoAcronyms, isPascalCaseWithAcceptedAcronyms } from "./utils
 const acceptedAzureAcronyms = ["AI", "VM", "OS", "IP", "CPU", "GPU", "LRO"];
 export const casingRule = createRule({
   name: "casing-style",
+  docs: fileRef.fromPackageRoot("src/rules/casing-style.md"),
   description: "Ensure proper casing style.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style",

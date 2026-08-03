@@ -2,25 +2,26 @@ import {
   $key,
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
-  DecoratorContext,
-  Enum,
+  type DecoratorContext,
+  type Enum,
   getKeyName,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getTypeName,
-  Interface,
+  type Interface,
   isKey,
+  isSealed,
   isTemplateDeclarationOrInstance,
   isTemplateInstance,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
-  Scalar,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Scalar,
   sealVisibilityModifiers,
-  Tuple,
-  Type,
+  type Tuple,
+  type Type,
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
@@ -39,13 +40,13 @@ import {
 } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
-import {
+import type {
   AzureResourceManagerExtensionPrivateDecorators,
   BuiltInResourceDecorator,
   BuiltInResourceGroupResourceDecorator,
   BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
-import {
+import type {
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
@@ -83,15 +84,15 @@ import {
   $armResourceRead,
   $armResourceUpdate,
   addArmResourceOperation,
-  ArmOperationIdentifier,
+  type ArmOperationIdentifier,
   armRenameListByOperationInternal,
-  ArmResourceOperation,
+  type ArmResourceOperation,
   getArmResourceOperations,
   setArmOperationIdentifier,
 } from "./operations.js";
 import {
-  ArmResourceDetails,
-  ArmResourceKind,
+  type ArmResourceDetails,
+  type ArmResourceKind,
   getArmResourceKind,
   getArmVirtualResourceDetails,
   getResourceBaseType,
@@ -584,14 +585,20 @@ export function registerArmResource(
     // Set the name property to be read only
     if (primaryKeyProperty.name === "name") {
       const Lifecycle = getLifecycleVisibilityEnum(program);
-      clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
-      addVisibilityModifiers(
-        program,
-        primaryKeyProperty,
-        [Lifecycle.members.get("Read")!],
-        context,
-      );
-      sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+      // Decorators may be re-applied to copies of the resource (e.g. by versioning
+      // projections or emitters using the mutator framework), and such copies share the
+      // original property instances. Sealing is only done here, so an already sealed
+      // property means this decorator already ran and the visibility is already correct.
+      if (!isSealed(program, primaryKeyProperty, Lifecycle)) {
+        clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+        addVisibilityModifiers(
+          program,
+          primaryKeyProperty,
+          [Lifecycle.members.get("Read")!],
+          context,
+        );
+        sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+      }
     }
 
     keyName = getKeyName(program, primaryKeyProperty);
@@ -729,8 +736,13 @@ const $baseTypeOptional: BaseTypeOptionalDecorator = (
   const { program } = context;
   if (!isPresent) {
     const lifecycle = getLifecycleVisibilityEnum(program);
-    clearVisibilityModifiersForClass(program, target, lifecycle);
-    sealVisibilityModifiers(program, target, lifecycle);
+    // Guard against this decorator being re-applied to a copy of the containing model
+    // (e.g. by versioning projections or the mutator framework), which shares the same
+    // property instance and would otherwise report `visibility-sealed`.
+    if (!isSealed(program, target, lifecycle)) {
+      clearVisibilityModifiersForClass(program, target, lifecycle);
+      sealVisibilityModifiers(program, target, lifecycle);
+    }
   } else if (isAppliance) {
     const lifecycle = getLifecycleVisibilityEnum(program);
     const readMember = lifecycle.members.get("Read");
@@ -768,13 +780,7 @@ function callOperationDecorator(
   resourceType: Model,
   resourceName: string,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -806,13 +812,7 @@ function callLifecycleDecorator(
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -842,13 +842,7 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   targetResourceType: Model,
   extensionResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -879,13 +873,7 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   parentResourceType: Model,
   builtInResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -907,13 +895,7 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -979,13 +961,7 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (

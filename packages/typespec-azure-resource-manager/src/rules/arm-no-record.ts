@@ -1,13 +1,15 @@
 import {
-  DiagnosticTarget,
-  Model,
-  SemanticNodeListener,
-  Type,
+  type DiagnosticTarget,
+  type Model,
+  type SemanticNodeListener,
+  type Type,
   createRule,
+  fileRef,
 } from "@typespec/compiler";
 
 export const armNoRecordRule = createRule({
   name: "arm-no-record",
+  docs: fileRef.fromPackageRoot("src/rules/arm-no-record.md"),
   severity: "warning",
   description: "Don't use Record types for ARM resources.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record",

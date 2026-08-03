@@ -144,6 +144,10 @@ interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 /** Management group-level operations */
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+
+/** Service group-level operations */
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
 ```
 
 | Scope                       | Description                               |
@@ -153,6 +157,50 @@ interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
 | `Extension.Subscription`    | Subscription-level scope                  |
 | `Extension.ResourceGroup`   | Resource group-level scope                |
 | `Extension.ManagementGroup` | Management group-level scope              |
+| `Extension.ServiceGroup`    | Service group-level scope                 |
+
+##### Note: Service Group Scope
+
+Service groups are a grouping mechanism allowing you to create flexible, custom groupings of Azure resources. For more information on service groups, including when to use service groups instead of management groups, please see the official Azure documentation: [https://aka.ms/servicegroups](https://aka.ms/servicegroups).
+
+If you previously modeled service group scope manually with `Extension.ExternalResource`, replace the custom alias with `Extension.ServiceGroup`:
+
+```typespec
+// Before
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+alias ServiceGroup = Extension.ExternalResource<
+  "Microsoft.Management",
+  "serviceGroups",
+  "serviceGroupName",
+  ParentType = "Tenant"
+>;
+
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<ServiceGroup> {}
+```
+
+```typespec
+// After
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
+```
+
+Use `Extension.ServiceGroup<"serviceGroupId">` if your API already uses a different path parameter name.
+
+```typespec
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup<"serviceGroupId">> {}
+```
 
 #### Targeting External Resources
 

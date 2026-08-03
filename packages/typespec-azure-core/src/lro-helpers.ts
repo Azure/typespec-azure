@@ -19,8 +19,8 @@ import {
   type Program,
   type Scalar,
   type Type,
-  UnknownType,
-  VoidType,
+  type UnknownType,
+  type VoidType,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
@@ -46,13 +46,13 @@ import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
   findLroStatusProperty,
-  LongRunningStates,
+  type LongRunningStates,
 } from "./decorators/lro-status.js";
 import {
   getOperationLink,
   getOperationLinks,
   type OperationLink,
-  OperationLinkMetadata,
+  type OperationLinkMetadata,
 } from "./decorators/operation-link.js";
 import {
   getPollingLocationInfo,
@@ -185,10 +185,7 @@ export interface NextOperationReference extends LogicalOperationStep {
  * getting to a success result
  */
 export type FinalOperationStep =
-  | FinalOperationLink
-  | FinalOperationReference
-  | PollingSuccessProperty
-  | NoPollingSuccessProperty;
+  FinalOperationLink | FinalOperationReference | PollingSuccessProperty | NoPollingSuccessProperty;
 
 /**
  * For long-running operations, the resource link to the final result
@@ -296,9 +293,8 @@ export function getLroMetadata(program: Program, operation: Operation): LroMetad
   processFinalReference(program, operation, context);
   processFinalLink(program, operation, context);
   const nextReference:
-    | NextOperationReference
-    | (NextOperationLink & { operation: Operation })
-    | undefined = processStatusMonitorReference(program, operation, context);
+    NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined =
+    processStatusMonitorReference(program, operation, context);
   if (nextReference !== undefined && nextReference.responseModel.kind === "Model") {
     context.statusMonitorStep = nextReference;
     const linkedOperation =
