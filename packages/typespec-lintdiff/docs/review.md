@@ -6,7 +6,7 @@ gist https://gist.github.com/catalinaperalta/b2e7d29a33b4b451bcfcc87e8314565a.
 
 ## Proposals
 
-### Prove parity by real-service equivalence, not co-occurrence
+### Prove parity by real-service equivalence, not co-occurrence (High)
 
 Each migrated TypeSpec lint must be equivalent to its Swagger LintDiff rule.
 Project-level co-occurrence does not prove that both rules detect the same
@@ -26,7 +26,7 @@ The reusable procedure and complete results are recorded in
 
 ## Questions
 
-### 1 Who reviews a migrated rule, and what does it cost?
+### 1 Who reviews a migrated rule, and what does it cost?  (High)
 
 The DoD says only "Reviewer approval obtained" and prices zero days.
 
@@ -39,7 +39,7 @@ The DoD says only "Reviewer approval obtained" and prices zero days.
   dominate wall-clock even if dev-days hold.
 - How many rounds are assumed, at what latency? Can rules be reviewed in batches?
 
-### 2 Rollout cost in the spec repos is unpriced
+### 2 Rollout cost in the spec repos is unpriced  (High)
 
 The report stops at "added to ruleset" and never covers getting rules enforced.
 
