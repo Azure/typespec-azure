@@ -180,25 +180,49 @@ model Widget is TrackedResource<WidgetProperties> {
 interface Widgets {
   get is ArmResourceRead<Widget>;
 }
+
+model GadgetProperties {
+  description?: string;
+}
+
+model Gadget is TrackedResource<GadgetProperties> {
+  @path
+  @key("gadgetName")
+  @segment("gadgets")
+  name: string;
+}
+
+@armResourceOperations
+interface Gadgets {
+  get is ArmResourceRead<Gadget>;
+}
 ```
 
 ```json apiview-properties
 {
   "CrossLanguagePackageId": "Microsoft.Test",
   "CrossLanguageDefinitionId": {
+    "testmodule-(c *ClientFactory) NewGadgetsClient": "Microsoft.Test.Gadgets",
     "testmodule-(c *ClientFactory) NewWidgetsClient": "Microsoft.Test.Widgets",
+    "testmodule-(client *GadgetsClient) Get": "Microsoft.Test.Gadgets.get",
     "testmodule-(client *WidgetsClient) Get": "Microsoft.Test.Widgets.get",
+    "testmodule-NewClientFactory": "Microsoft.Test",
+    "testmodule-NewGadgetsClient": "Microsoft.Test.Gadgets",
     "testmodule-NewWidgetsClient": "Microsoft.Test.Widgets",
+    "testmodule.ClientFactory": "Microsoft.Test",
     "testmodule.CreatedByType": "Azure.ResourceManager.CommonTypes.createdByType",
     "testmodule.CreatedByTypeApplication": "Azure.ResourceManager.CommonTypes.createdByType.Application",
     "testmodule.CreatedByTypeKey": "Azure.ResourceManager.CommonTypes.createdByType.Key",
     "testmodule.CreatedByTypeManagedIdentity": "Azure.ResourceManager.CommonTypes.createdByType.ManagedIdentity",
     "testmodule.CreatedByTypeUser": "Azure.ResourceManager.CommonTypes.createdByType.User",
+    "testmodule.Gadget": "Microsoft.Test.Gadget",
+    "testmodule.GadgetProperties": "Microsoft.Test.GadgetProperties",
+    "testmodule.GadgetsClient": "Microsoft.Test.Gadgets",
     "testmodule.SystemData": "Azure.ResourceManager.CommonTypes.SystemData",
     "testmodule.Widget": "Microsoft.Test.Widget",
     "testmodule.WidgetProperties": "Microsoft.Test.WidgetProperties",
     "testmodule.WidgetsClient": "Microsoft.Test.Widgets"
   },
-  "CrossLanguageVersion": "db730e704043"
+  "CrossLanguageVersion": "21ca920b5054"
 }
 ```

@@ -27,7 +27,13 @@ export function generateApiViewProperties(codeModel: go.CodeModel): string {
     codeModel.root.kind === "module" ? codeModel.root : codeModel.root.package;
 
   const definitionIDs = new Map<string, string>();
-  collectPackage(rootPkg, relPackageName(rootPkg), codeModel.type, definitionIDs);
+  collectPackage(
+    rootPkg,
+    relPackageName(rootPkg),
+    codeModel.type,
+    codeModel.info.title,
+    definitionIDs,
+  );
 
   if (definitionIDs.size === 0) {
     return "";
@@ -71,12 +77,14 @@ function relPackageName(pkg: go.PackageContent): string {
  * @param pkg the package to collect
  * @param relName the package name relative to the module root (e.g. azblob/blob)
  * @param target the codegen target for the package
+ * @param crossLanguagePackageId the package's cross-language definition ID
  * @param definitionIDs receives the collected mappings
  */
 function collectPackage(
   pkg: go.PackageContent,
   relName: string,
   target: go.CodeModelType,
+  crossLanguagePackageId: string,
   definitionIDs: Map<string, string>,
 ): void {
   // APIView only reviews the exported API surface
@@ -100,6 +108,11 @@ function collectPackage(
     for (const value of constant.values) {
       addType(value.name, value.crossLanguageDefinitionId);
     }
+  }
+
+  if (target === "azure-arm" && pkg.clients.length > 0) {
+    addType("ClientFactory", crossLanguagePackageId);
+    addFunc("NewClientFactory", "NewClientFactory", crossLanguagePackageId);
   }
 
   for (const client of pkg.clients) {
@@ -129,7 +142,13 @@ function collectPackage(
   }
 
   for (const subPkg of pkg.packages) {
-    collectPackage(subPkg, `${relName}/${subPkg.name}`, target, definitionIDs);
+    collectPackage(
+      subPkg,
+      `${relName}/${subPkg.name}`,
+      target,
+      crossLanguagePackageId,
+      definitionIDs,
+    );
   }
 }
 
