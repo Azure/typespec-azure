@@ -98,27 +98,18 @@ export class Adapter {
     if (this.options.module) {
       root = new go.Module(this.options.module);
     } else if (this.options["containing-module"]) {
-      if (!containingModuleRoot) {
-        throw new AdapterError(
-          "InvalidArgument",
-          "containing-module requires emitter-output-dir to be within an existing Go module",
-        );
+      let relativePackagePath = naming.packageNameFromOutputFolder(emitterOutputDir);
+      if (containingModuleRoot) {
+        const relativePath = path.relative(containingModuleRoot, emitterOutputDir);
+        if (
+          relativePath !== ".." &&
+          !relativePath.startsWith(`..${path.sep}`) &&
+          !path.isAbsolute(relativePath)
+        ) {
+          relativePackagePath = relativePath.split(path.sep).join("/");
+        }
       }
-      const relativePackagePath = path.relative(containingModuleRoot, emitterOutputDir);
-      if (
-        relativePackagePath === ".." ||
-        relativePackagePath.startsWith(`..${path.sep}`) ||
-        path.isAbsolute(relativePackagePath)
-      ) {
-        throw new AdapterError(
-          "InvalidArgument",
-          `emitter-output-dir '${emitterOutputDir}' is outside containing module root '${containingModuleRoot}'`,
-        );
-      }
-      root = new go.ContainingModule(
-        this.options["containing-module"],
-        relativePackagePath.split(path.sep).join("/"),
-      );
+      root = new go.ContainingModule(this.options["containing-module"], relativePackagePath);
       root.package = new go.Package(naming.packageNameFromOutputFolder(emitterOutputDir), root);
     } else {
       throw new AdapterError("InvalidArgument", "missing argument module or containing-module");

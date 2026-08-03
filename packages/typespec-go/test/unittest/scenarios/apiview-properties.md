@@ -121,6 +121,42 @@ containing-module: github.com/contoso/widget/v2
 }
 ```
 
+# The APIView package path falls back when the module root isn't known
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+model Widget {
+  id: string;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+}
+```
+
+```yaml
+containing-module: github.com/contoso/widget/v2
+emitter-output-dir: unrelated-output/generated/subpkg
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget/subpkg.Widget": "Widgets.Widget",
+    "widget/subpkg.WidgetsClient": "Widgets",
+    "widget/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
+```
+
 # The APIView cross-language definition ID file includes the ARM ClientFactory accessors
 
 ## TypeSpec
