@@ -25,7 +25,8 @@ export function generateGoModFile(
 
   // here we specify the minimum version of azcore as required by the code generator.
   // the version can be overwritten by passing the --azcore-version switch during generation.
-  let version = "1.22.0";
+  // TODO: replace this pseudo-version with 1.22.1 after it's released.
+  let version = "1.22.1-0.20260731225345-5811a2e9dc69";
   if (options.azcoreVersion) {
     // when matching versions, we need to handle beta, non-beta, and pseudo versions
     // 1.2.3-beta.1, 1.2.3, 0.22.1-0.20220315231014-ed309e73db6b
