@@ -69,8 +69,6 @@ Two libraries can source the projection logic:
 - `MetadataInfo.isPayloadProperty(prop, visibility)` → the per-property keep/drop decision, matching the wire contract so write models align with Swagger.
 - `getVisibilitySuffix(visibility, Visibility.Read)` → the name suffix (`Create`/`Update`/`CreateOrUpdate`/`Query`), returning `""` when the view equals Read — the signal to **collapse** instead of rename.
 
-(See §5 for the projection's known gaps — cycles, discriminators, coincident views.)
-
 #### 3.2.2 Location — how deeply the split integrates
 
 The projection is trivial and inherits usage/access everywhere it runs; **what actually differs is integration** — whether the rest of the pipeline knows the split model exists, and who moves the reference edges. Three sub-proposals sit on an integration-depth axis:
@@ -101,25 +99,98 @@ The whole feature is a single emitter pre-pass in `src/modular/helpers/visibilit
 
 - `applyVisibilityModelSplit(context: SdkContext): void`
 
-It runs in `provideSdkTypes` **immediately before** `visitPackageTypes(context)` — the graph walk that builds the `emitQueue` — so the repointed graph is what gets emitted. Walking every operation, it does two things.
+It runs in `provideSdkTypes` **immediately before** `visitPackageTypes(context)` — the graph walk that builds the `emitQueue` — so the repointed graph is what gets emitted. It is a single graph rewrite in four phases, gated by the feature flag (see below).
 
-**Part 1 — Create the split model.** A recursive, collapse-aware clone builds the write view:
+The phases operate on a graph of `(model, visibility)` nodes. Each node carries the two flags the phases below revolve around:
 
-- `projectModelToVisibility(state, model, visibility): { result, changed }` — clones via shallow spread (`{ ...model, name, properties }`), drops non-payload properties (`MetadataInfo.isPayloadProperty`), recurses into nested models, and renames with `getVisibilitySuffix` only when something changed (otherwise returns the original — collapse). It memoizes (seeding before recursion so cycles terminate) and collects each produced clone.
+```ts
+interface ModelNode {
+  model: SdkModelType;
+  visibility: Visibility;
+  refKeys: Set<string>;      // keys of nodes this node references (props + discriminated base/subtypes)
+  ownPropertyDropped: boolean; // does THIS model omit ≥1 of its own props under `visibility`? (a local fact)
+  needsClone: boolean;         // can this node REACH any dropped property? ⇒ needs a write clone (derived)
+}
 
-**Part 2 — Link the model to the operation.**
+interface SplitState {
+  context: SdkContext;
+  metadata: MetadataInfo;              // @typespec/http oracle; decides isPayloadProperty
+  nodes: Map<string, ModelNode>;       // the collected graph, keyed by `${defId}|${visibility}`
+  cloneByKey: Map<string, SdkModelType>; // the write clone built for each node that needsClone
+}
+```
 
-- `repointMethodBody(state, method): void` — resolves the write visibility from the verb (`resolveRequestVisibility`), projects the body, and if it changed points `operation.bodyParam.type` **and** the matching `method.parameters[i].type` at the projected model, leaving `responses[].type` on the original read model. Spread bodies are skipped.
+We follow one worked example through all four phases: a `POST createWidget(body: Widget)` (write visibility = `Create`, suffix `Create`) over these source models:
 
-Finally, the produced clones are pushed into `context.sdkPackage.models` so they are emitted and visible to consumers that read that list directly.
+```
+Widget                      Detail                    Meta
+├─ name                     ├─ label                  └─ tag
+├─ id      @Read  ✗DROP     ├─ secret   @Read ✗DROP
+├─ detail ──► Detail        └─ next ──► Detail (cycle)
+└─ meta   ──► Meta
+```
+
+**Phase 1 — Collect** (`collectMethodRoots` → `collectNode`). Resolve the write visibility from the verb (`resolveRequestVisibility`), then DFS from each model-typed body root building one node per `(model, visibility)`. Each node records its `refKeys` edges and `ownPropertyDropped` (does it omit an own property under this visibility — `MetadataInfo.isPayloadProperty`). Nodes are seeded *before* recursing, so the `Detail → Detail` back-edge terminates; the source graph is never mutated.
+
+```
+        detail          next
+ ┌────────┐      ┌────────┐──┐
+ │ Widget │ ───► │ Detail │  │  (self-cycle: next ──► Detail)
+ │dropped │      │dropped │◄─┘
+ └───┬────┘      └────────┘
+     │ meta
+     ▼
+ ┌────────┐
+ │  Meta  │   (no drop)
+ └────────┘
+```
+
+**Phase 2 — Mark** (`markNodesNeedingClones`). Reverse-propagate `needsClone` outward from every `ownPropertyDropped` node: a node needs a clone iff it can *reach* a drop. As a transitive closure it needs no special-casing for cycles, mutual recursion, or discriminated trees.
+
+```
+ Widget  ✔ needsClone   (own drop: id)
+ Detail  ✔ needsClone   (own drop: secret; Widget reaches it too)
+ Meta    ·  collapses   (reaches no drop → no clone, reused as-is)
+```
+
+**Phase 3 — Build clones** (`buildClones`). Pass 1 allocates an empty shell (`getVisibilitySuffix` name) for every node that needs a clone; pass 2 wires them once *all* shells exist — dropping non-payload props, repointing model-typed props (and, for discriminated nodes, `baseModel`/`discriminatedSubtypes`) at their clones. Shells-before-wiring is what lets the `Detail` self-cycle repoint to the clone rather than the read model.
+
+```
+ WidgetCreate {                 DetailCreate {              Meta  (reused, no clone)
+   name                           label
+   detail ──► DetailCreate        next ──► DetailCreate     // self-cycle → clone
+   meta   ──► Meta              }
+ }
+ // dropped (both @Read): Widget.id, Detail.secret
+```
+
+**Phase 4 — Link** (`repointMethodBody`). Point each model-typed method parameter — and the payload side (`bodyParam.type` for a non-spread body, or the matching wrapper property for a *spread* body) — at its clone. Responses are left alone, so the read graph survives.
+
+```
+ POST createWidget(body: WidgetCreate)     // request  → write view
+ response.type ──► Widget                  // response → read view (unchanged)
+```
+
+Finally, the clones (`state.cloneByKey.values()`) are pushed into `context.sdkPackage.models` so `visitPackageTypes` emits them.
+
+**Discriminated hierarchies** are the one case the linear example above can't show. `collectNode` links a discriminated base and its subtypes with *bidirectional* edges, so a drop *anywhere* marks the **whole tree** as needing clones in Phase 2, and Phase 3 clones every node — each subtype re-parenting onto the projected base. A `POST createPet(body: Pet)` where only `Pet.petId` and `Cat.livesLeft` are `@Read`:
+
+```
+ source tree                     write clones (any drop ⇒ whole tree clones)
+ (base↔subtype edges             ────────────────────────────────────────────
+  are bidirectional)             PetCreate                 // sheds petId
+                                 ├─ CatCreate ──► PetCreate // sheds petId + livesLeft
+ Pet  ✗DROP (petId)              └─ DogCreate ──► PetCreate // no own drop, but must
+ ├─ Cat  ✗DROP (livesLeft)                                  //   re-parent to shed petId
+ └─ Dog  (no own drop)           + PetCreateUnion           // alias over Cat/DogCreate
+```
 
 **Feature flag.** Everything above is gated by `experimentalSplitModelsByVisibility` (emit option `experimental-split-models-by-visibility`), **default OFF**. When a model already carries an `@@alternateType` JS workaround, defer to it — do not double-split.
 
 ## 5. Open questions
 
 - **Collision-aware naming:** when a synthesized `FooCreate` clashes with a user-declared model of the same name, the binder renames the synthesized one positionally to `FooCreate_1` (verified in `visibility-scenarios/03-name-collision`). Decide: is `FooCreate_1` acceptable, or do we add a semantic rename (e.g. a deterministic `FooCreate2`)?
-- **Discriminated unions / polymorphism:** view splitting must propagate through discriminator hierarchies (`buildModelPolymorphicType`) — currently unhandled (see scenario 04).
-- **Cyclic models:** the memo seeds the original before recursing, so a cyclic back-edge resolves to the read view (see scenario 07); needs a fix-up pass for full fidelity.
+- **Deserializer for write-only models:** `addSerializationFunctions` (`emit-models.ts`) emits **both** a serializer and a deserializer for every model, with no `usage & Output` gate. A projected `FooCreate` is write-only (request body only), so its deserializer is dead code. This is pre-existing baseline-emitter behavior (any input-only model gets an unused deserializer too), not introduced by the split. Decide: should we gate deserializer emission on `UsageFlags.Output`? Note the fix would be a general emitter change affecting all input-only models, not just projected ones.
 
 ## 6. Scenarios
 
@@ -129,3 +200,5 @@ Runnable projects under `packages/typespec-ts/visibility-scenarios/` (spec + `ts
 - **`02-nested-createorupdate`** — `A` nests `B`, both with a required read-only prop; a `PUT` body resolves to `ACreateOrUpdate` + recursively `BCreateOrUpdate`. A second pair shows propagation: `C` has only writable props but nests `D` (read-only prop), yet `CCreate` is **still** synthesized because the nested change propagates up (`C.child` → `DCreate`).
 - **`03-name-collision`** — the spec already declares a user model `WidgetCreate` while `Widget`'s `POST` body also projects to `WidgetCreate`. Output is valid TypeScript, but the synthesized model is renamed positionally by the binder to `WidgetCreate_1` — non-semantic and order-dependent (see the collision-naming open question).
 - **`04-discriminated-polymorphic`** — a `@discriminator("kind")` base `Pet` (read-only `petId`) with `Cat` (own read-only `livesLeft`) and `Dog` subtypes. The whole hierarchy is projected together: `PetCreate` drops `petId`, `CatCreate extends PetCreate` drops `livesLeft`, and `DogCreate` is still cloned so it can re-parent to `PetCreate` even though it adds no read-only prop of its own, and `PetCreateUnion = CatCreate | DogCreate | PetCreate` is emitted (no unresolved polymorphic placeholder). Because any model routes through the discriminated root, a `createCat` operation whose body is the `Cat` **subtype** — declared *before* the `createPet` base operation — reuses the same single `CatCreate` clone rather than producing a duplicate.
+- **`05-spread-body`** — an operation that **spreads** a model into its request body (the body is a synthesized wrapper serialized property-by-property, not a single body model). A spread parameter of type `Detail` (with a read-only prop) is repointed to `DetailCreate`, exercising the spread branch of `repointMethodBody` (repoint the matching wrapper property, not `bodyParam.type`). Also covers deep propagation: a spread member with no read-only prop of its own is still cloned when it nests a model that drops one.
+- **`06-cyclic-model`** — a self-referential `Node` (`next?: Node`) with a required read-only `nodeId`. The `POST` body splits into `NodeCreate` while the read view stays `Node`, and crucially the cyclic back-edge is repointed to the write clone: `NodeCreate.next?: NodeCreate` (not `Node`). Verifies the materialize-then-wire design resolves self-cycles without a separate back-patch pass.

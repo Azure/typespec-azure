@@ -16,24 +16,45 @@ import { getAllOperationsFromClient } from "../../framework/hooks/sdk-types.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { getDirectSubtypes } from "./type-helpers.js";
 
-interface ProjectionState {
+interface SplitState {
   context: SdkContext;
   /** Shared `@typespec/http` metadata oracle (canonical baseline = Read). */
   metadata: MetadataInfo;
-  /** Memoized projections keyed by `${crossLanguageDefinitionId}|${visibility}`. */
-  cache: Map<string, ModelProjection>;
-  /** Every distinct split model produced, for registration / emission. */
-  produced: Set<SdkModelType>;
+  /**
+   * Every reachable `(model, visibility)` pair in the write-body graph, keyed by
+   * `${crossLanguageDefinitionId}|${visibility}`. Built in the collect phase;
+   * carries the reference edges and per-node analysis flags.
+   */
+  nodes: Map<string, ModelNode>;
+  /**
+   * The write clone materialized for each node that `needsClone`, keyed the same
+   * way as `nodes`. A node absent here collapsed (its write view equals the read
+   * model).
+   */
+  cloneByKey: Map<string, SdkModelType>;
 }
 
 /**
- * Result of projecting a model to a write visibility: the model to use for that
- * visibility (a split clone when `changed`, otherwise the original) and whether
- * the projection actually dropped anything.
+ * A `(model, visibility)` vertex in the write-body reference graph.
  */
-interface ModelProjection {
+interface ModelNode {
   model: SdkModelType;
-  changed: boolean;
+  visibility: Visibility;
+  /**
+   * Keys of the nodes this node references: its model-typed properties plus, for
+   * a discriminated hierarchy, its base and direct subtypes. Edges are what the
+   * needs-clone propagation walks; the discriminated links are bidirectional so
+   * a whole hierarchy needs cloning together.
+   */
+  refKeys: Set<string>;
+  /** True if the model drops at least one of its own properties under `visibility`. */
+  ownPropertyDropped: boolean;
+  /**
+   * True if the node can reach any property-dropping node (itself included) — i.e.
+   * its write view differs from the read model, so it needs a clone. Derived from
+   * `ownPropertyDropped` by `markNodesNeedingClones`.
+   */
+  needsClone: boolean;
 }
 
 /**
@@ -44,22 +65,29 @@ interface ModelProjection {
  *
  * This is implemented entirely in the emitter (no TCGC dependency beyond the
  * public `SdkModelType` shape and the stable `@typespec/http` visibility
- * helpers). For every HTTP operation with a model request body it:
+ * helpers). It runs as a single graph rewrite in four phases:
  *
- *  1. Resolves the write visibility from the verb (`POST` -> Create,
- *     `PUT` -> Create|Update, ...).
- *  2. Clone-projects the body model to that visibility, dropping properties that
- *     are not part of the payload and recursing into nested models (and, for
- *     discriminated bases, their whole subtype hierarchy). The original graph is
- *     never mutated, so response types keep the full (read) model.
- *  3. Walks `bodyParam.methodParameterSegments` (which map each client-method
- *     parameter to the HTTP payload) and, for every model-typed parameter,
- *     repoints it to the projected model. The payload side is repointed too:
- *     the whole `bodyParam.type` for a non-spread body, or the matching wrapper
- *     property for a *spread* body (whose `bodyParam.type` is a synthesized
- *     wrapper serialized property-by-property).
- *  4. Registers every produced split model in `sdkPackage.models` so the
- *     subsequent `visitPackageTypes` graph walk emits them.
+ *  1. **Collect** — from every HTTP operation's model request body (resolving
+ *     the write visibility from the verb: `POST` -> Create, `PUT` -> Create|Update,
+ *     ...), walk the reachable `(model, visibility)` graph, recording reference
+ *     edges (model-typed properties plus, for discriminated bases, their whole
+ *     subtype hierarchy) and which nodes drop a property under that visibility.
+ *  2. **Mark** — a node *needs a clone* iff it can reach any drop (transitive
+ *     closure). Computed by reverse-propagating from the drop nodes, so cycles
+ *     and mutual recursion fall out naturally with no special-casing.
+ *  3. **Materialize + wire** — clone every node that needs one (suffixed, dropped
+ *     properties removed) and, in a uniform sweep, repoint every clone's
+ *     model-typed properties, `baseModel`, and `discriminatedSubtypes` at the
+ *     matching clones. Because all clones exist before any wiring, self-cycles
+ *     (`NodeCreate.next` -> `NodeCreate`), mutual recursion, and discriminated
+ *     hierarchies are all handled by the same code. The original graph is never
+ *     mutated, so response types keep the full (read) model.
+ *  4. **Repoint operations** — walk `bodyParam.methodParameterSegments` (which
+ *     map each client-method parameter to the HTTP payload) and point every
+ *     model-typed parameter (plus the payload side — the whole `bodyParam.type`
+ *     for a non-spread body, or the matching wrapper property for a *spread*
+ *     body) at its clone, then register every clone in `sdkPackage.models` so the
+ *     subsequent `visitPackageTypes` graph walk emits it.
  *
  * Projected models are simply named `${sourceName}${suffix}` (e.g. `FooCreate`,
  * `FooCreateOrUpdate`). Deduplication against a same-named user model is left to
@@ -78,82 +106,157 @@ export function applyVisibilityModelSplit(context: SdkContext): void {
     return;
   }
 
-  const state = createProjectionState(context);
+  const state = createSplitState(context);
+  const methods = context.sdkPackage.clients.flatMap((client) =>
+    getAllOperationsFromClient(client),
+  );
 
-  for (const client of context.sdkPackage.clients) {
-    for (const method of getAllOperationsFromClient(client)) {
-      repointMethodBody(state, method);
-    }
+  // Phase 1 — collect the reachable write-body graph.
+  for (const method of methods) {
+    collectMethodRoots(state, method);
   }
 
-  // Register every produced split model (including nested ones) so the later
-  // `visitPackageTypes` graph walk emits them. Each produced model is a freshly
-  // created clone, so there is nothing to dedup against the existing list.
-  for (const producedModel of state.produced) {
-    context.sdkPackage.models.push(producedModel);
+  // Phase 2 — mark every node whose write view differs from the read model.
+  markNodesNeedingClones(state);
+
+  // Phase 3 — materialize the clones, then wire all reference edges uniformly.
+  buildClones(state);
+
+  // Phase 4 — repoint each operation body/parameters at the clones.
+  for (const method of methods) {
+    repointMethodBody(state, method);
+  }
+
+  // Register every produced clone so the later `visitPackageTypes` graph walk
+  // emits it. Each is a freshly created model, so there is nothing to dedup.
+  for (const clone of state.cloneByKey.values()) {
+    context.sdkPackage.models.push(clone);
   }
 }
 
-function createProjectionState(context: SdkContext): ProjectionState {
+function createSplitState(context: SdkContext): SplitState {
   return {
     context,
     metadata: createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read }),
-    cache: new Map<string, ModelProjection>(),
-    produced: new Set<SdkModelType>(),
+    nodes: new Map<string, ModelNode>(),
+    cloneByKey: new Map<string, SdkModelType>(),
   };
 }
 
-/** Cache key for a `(model, visibility)` projection. */
-function cacheKeyFor(model: SdkModelType, visibility: Visibility): string {
+/** Stable key identifying a `(model, visibility)` node (and its clone). */
+function nodeKeyFor(model: SdkModelType, visibility: Visibility): string {
   return `${model.crossLanguageDefinitionId}|${visibility}`;
 }
 
-function projectModelToVisibility(
-  state: ProjectionState,
+// ---------------------------------------------------------------------------
+// Phase 1 — collect: build the reachable `(model, visibility)` reference graph.
+// ---------------------------------------------------------------------------
+
+/**
+ * Collects the write-body roots of a single operation. Resolves the write
+ * visibility from the verb, then walks `bodyParam.methodParameterSegments` (each
+ * segment's root is a client-method parameter) and collects every model-typed
+ * parameter as a graph root.
+ */
+function collectMethodRoots(
+  state: SplitState,
+  method: SdkServiceMethod<SdkHttpOperation>,
+): void {
+  const operation = method.operation;
+  const bodyParam = operation?.bodyParam;
+  if (!bodyParam || bodyParam.type.kind !== "model") {
+    return;
+  }
+
+  const visibility = resolveRequestVisibility(
+    state.context.program,
+    operation.__raw.operation,
+    operation.verb,
+  );
+
+  for (const segment of bodyParam.methodParameterSegments) {
+    const methodParam = segment[0];
+    if (!methodParam || methodParam.type.kind !== "model") {
+      continue;
+    }
+    collectNode(state, methodParam.type, visibility);
+  }
+}
+
+/**
+ * Cycle-safe DFS that records a `(model, visibility)` node and its outgoing
+ * reference edges, returning the node's key. The node is seeded in `state.nodes`
+ * *before* recursing, so cyclic and mutually-recursive graphs terminate.
+ *
+ * Edges recorded:
+ *  - one per model-typed own property whose target is (transitively) collected;
+ *  - for a model in a discriminated hierarchy, *bidirectional* edges to its base
+ *    and direct subtypes, and recursion into the whole tree. The bidirectional
+ *    links make the needs-clone propagation treat the hierarchy as one unit (a
+ *    subtype must re-parent to the projected base to shed inherited read-only
+ *    props even when it drops nothing itself).
+ *
+ * `ownPropertyDropped` is set when the model omits at least one own property under this
+ * visibility (a dropped payload property or metadata).
+ */
+function collectNode(
+  state: SplitState,
   model: SdkModelType,
   visibility: Visibility,
-): ModelProjection {
-  const cacheKey = cacheKeyFor(model, visibility);
-  const cachedProjection = state.cache.get(cacheKey);
-  if (cachedProjection) {
-    return cachedProjection;
+): string {
+  const key = nodeKeyFor(model, visibility);
+  if (state.nodes.has(key)) {
+    return key;
   }
 
-  // Any model that participates in a discriminated hierarchy — as the base *or*
-  // as a subtype reached directly (e.g. an operation whose body is `Cat`, not
-  // `Pet`) — is projected through the whole tree. This keeps a single set of
-  // clones per hierarchy, so a subtype referenced directly reuses the same
-  // re-parented clone instead of getting a duplicate `CatCreate`.
-  const discriminatedRoot = findDiscriminatedRoot(model);
-  if (discriminatedRoot) {
-    projectDiscriminatedHierarchy(state, discriminatedRoot, visibility);
-    // The hierarchy pass caches every node it changed (base + subtypes). If this
-    // model wasn't cached, the whole tree collapsed → use the original.
-    return state.cache.get(cacheKey) ?? { model, changed: false };
-  }
-
-  // Seed with the original before recursing so cyclic graphs terminate. A cyclic
-  // back-reference to the same (model, visibility) resolves to the original
-  // (unprojected) model; full cyclic write-model fidelity is a follow-up.
-  const projection: ModelProjection = { model, changed: false };
-  state.cache.set(cacheKey, projection);
-
-  const { properties, changed } = projectOwnProperties(state, model, visibility);
-
-  if (!changed) {
-    // Collapse: the write view equals the full (read) model, keep the original.
-    return projection;
-  }
-
-  const projectedModel: SdkModelType = {
-    ...model,
-    name: `${model.name}${getVisibilitySuffix(visibility, Visibility.Read)}`,
-    properties,
+  const node: ModelNode = {
+    model,
+    visibility,
+    refKeys: new Set<string>(),
+    ownPropertyDropped: false,
+    needsClone: false,
   };
-  projection.model = projectedModel;
-  projection.changed = true;
-  state.produced.add(projectedModel);
-  return projection;
+  // Seed before recursing so cycles terminate at the already-seeded node.
+  state.nodes.set(key, node);
+
+  for (const property of model.properties) {
+    // A property not part of the payload for this visibility (e.g. required
+    // read-only `id`/`name`, or `@header`/`@path` metadata) is a drop. If
+    // `__raw` is missing we cannot decide and conservatively keep it.
+    if (
+      property.kind === "property" &&
+      property.__raw &&
+      !state.metadata.isPayloadProperty(property.__raw, visibility)
+    ) {
+      node.ownPropertyDropped = true;
+      continue;
+    }
+    if (property.kind === "property" && property.type.kind === "model") {
+      node.refKeys.add(collectNode(state, property.type, visibility));
+    }
+  }
+
+  // Discriminated hierarchy: link base <-> subtypes bidirectionally and follow
+  // the whole tree. Non-discriminated inheritance is intentionally not rewired.
+  if (findDiscriminatedRoot(model)) {
+    for (const neighbor of discriminatedNeighbors(model)) {
+      const neighborKey = collectNode(state, neighbor, visibility);
+      node.refKeys.add(neighborKey);
+      state.nodes.get(neighborKey)!.refKeys.add(key);
+    }
+  }
+
+  return key;
+}
+
+/** The base model and direct subtypes that share a node's discriminated tree. */
+function discriminatedNeighbors(model: SdkModelType): SdkModelType[] {
+  const neighbors: SdkModelType[] = [];
+  if (model.baseModel) {
+    neighbors.push(model.baseModel);
+  }
+  neighbors.push(...getDirectSubtypes(model));
+  return neighbors;
 }
 
 /**
@@ -174,135 +277,139 @@ function findDiscriminatedRoot(model: SdkModelType): SdkModelType | undefined {
   return root;
 }
 
+// ---------------------------------------------------------------------------
+// Phase 2 — mark: a node changes iff it can reach any dropped property.
+// ---------------------------------------------------------------------------
+
 /**
- * Projects a model's own properties to the given visibility: drops properties
- * that are not part of the payload for this visibility and recurses into nested
- * model-typed properties. Inherited (base) properties are not included here —
- * `SdkModelType.properties` holds own properties only, so read-only props on a
- * base are stripped when that base is itself projected.
+ * Marks every node whose write view differs from the read model, so it needs a
+ * clone. A node needs a clone iff it can reach (via reference edges) some node
+ * that drops an own property — itself included. Computed by reverse-propagating
+ * `needsClone` from the drop nodes, so self-cycles, mutual recursion, and
+ * discriminated hierarchies (whose edges are bidirectional) all fall out with no
+ * special-casing.
  */
-function projectOwnProperties(
-  state: ProjectionState,
-  model: SdkModelType,
-  visibility: Visibility,
-): { properties: SdkModelPropertyType[]; changed: boolean } {
-  let changed = false;
-  const properties: SdkModelPropertyType[] = [];
-  for (const property of model.properties) {
-    // Drop properties not part of the payload for this visibility (e.g. required
-    // read-only `id`/`name`). Metadata (`@header`/`@path`/...) is dropped too. If
-    // `__raw` is missing we cannot decide and conservatively keep the property.
-    if (
-      property.kind === "property" &&
-      property.__raw &&
-      !state.metadata.isPayloadProperty(property.__raw, visibility)
-    ) {
-      changed = true;
-      continue;
+function markNodesNeedingClones(state: SplitState): void {
+  // Reverse adjacency: predecessors that reference each node.
+  const predecessors = new Map<string, string[]>();
+  for (const [key, node] of state.nodes) {
+    for (const referencedKey of node.refKeys) {
+      let referrers = predecessors.get(referencedKey);
+      if (!referrers) {
+        referrers = [];
+        predecessors.set(referencedKey, referrers);
+      }
+      referrers.push(key);
     }
-    let projectedProperty = property;
-    if (property.type.kind === "model") {
-      const nestedProjection = projectModelToVisibility(state, property.type, visibility);
-      if (nestedProjection.changed) {
-        changed = true;
-        projectedProperty = { ...property, type: nestedProjection.model };
+  }
+
+  // Seed the queue with every own-drop node, then walk reverse edges.
+  const queue: string[] = [];
+  for (const [key, node] of state.nodes) {
+    if (node.ownPropertyDropped) {
+      node.needsClone = true;
+      queue.push(key);
+    }
+  }
+  while (queue.length > 0) {
+    const key = queue.shift()!;
+    for (const predecessorKey of predecessors.get(key) ?? []) {
+      const predecessor = state.nodes.get(predecessorKey)!;
+      if (!predecessor.needsClone) {
+        predecessor.needsClone = true;
+        queue.push(predecessorKey);
       }
     }
-    properties.push(projectedProperty);
   }
-  return { properties, changed };
 }
 
+// ---------------------------------------------------------------------------
+// Phase 3 — build clones: materialize the nodes that need clones, then wire them.
+// ---------------------------------------------------------------------------
+
 /**
- * Projects a discriminated base together with its full subtype hierarchy.
+ * Builds the write clone for every node that `needsClone`, in two passes over the
+ * graph. The two passes are the crux of the design, so they live together:
  *
- * The whole tree collapses (returns the original base, no clones) only when
- * neither the base nor any subtype loses a property to the write visibility.
- * Otherwise every node is cloned with the visibility suffix and re-wired:
- *  - each clone's `baseModel` points at its parent's clone (so a subtype that
- *    adds no read-only props of its own is *still* cloned — it must re-parent to
- *    the projected base to shed the base's read-only props it would inherit);
- *  - each clone's `discriminatedSubtypes` map points at the projected subtypes,
- *    so `getDirectSubtypes` finds them and the `${Base}Union` alias is emitted.
+ *  1. **Materialize** — allocate an *empty-bodied* clone (suffixed name, no
+ *     properties yet) for every node that needs one. Nodes that need no clone
+ *     collapse to the read model.
+ *  2. **Wire** — now that *all* clones exist, fill each clone's edges by
+ *     repointing at the other clones. Materializing every shell first is what
+ *     lets a forward reference, a self-cycle (`NodeCreate.next` -> `NodeCreate`),
+ *     or mutual recursion resolve to a clone instead of falling back to the read
+ *     model — wiring can never observe a not-yet-created target.
  *
- * Every node (base + subtypes) is cached, so a subtype reached directly by an
- * operation body resolves to the same clone as one reached through the base.
+ * Wiring covers both:
+ *  - own properties: dropped payload/metadata properties are removed, and each
+ *    surviving model-typed property is repointed at its target's clone (if the
+ *    target needs one);
+ *  - discriminated hierarchy: `baseModel` and `discriminatedSubtypes` are
+ *    repointed at the clones so a subtype re-parents to the projected base and
+ *    `getDirectSubtypes` still finds the projected subtypes (driving the
+ *    `${Base}Union` alias). Non-discriminated inheritance is left untouched.
  */
-function projectDiscriminatedHierarchy(
-  state: ProjectionState,
-  root: SdkModelType,
-  visibility: Visibility,
-): ModelProjection {
-  const rootCacheKey = cacheKeyFor(root, visibility);
-  const cachedRootProjection = state.cache.get(rootCacheKey);
-  if (cachedRootProjection) {
-    return cachedRootProjection;
-  }
-
-  // Seed the root before recursing so cyclic references terminate at the original.
-  const rootProjection: ModelProjection = { model: root, changed: false };
-  state.cache.set(rootCacheKey, rootProjection);
-
-  // Collect the root and all of its (transitive) subtypes.
-  const hierarchyModels: SdkModelType[] = [];
-  const collectSubtree = (model: SdkModelType): void => {
-    hierarchyModels.push(model);
-    getDirectSubtypes(model).forEach(collectSubtree);
-  };
-  collectSubtree(root);
-
-  // Project each model's own properties once (this also registers nested splits).
-  // The tree renames together if any model changes; otherwise it collapses.
-  const projectedPropsByModel = new Map(
-    hierarchyModels.map(
-      (model) => [model, projectOwnProperties(state, model, visibility)] as const,
-    ),
-  );
-  const treeChanged = [...projectedPropsByModel.values()].some((projection) => projection.changed);
-  if (!treeChanged) {
-    return rootProjection;
-  }
-
-  const visibilitySuffix = getVisibilitySuffix(visibility, Visibility.Read);
-  const cloneByOriginal = new Map<SdkModelType, SdkModelType>();
-
-  // First pass: clone every model (suffixed, read-only props stripped) and cache
-  // it so direct references reuse the clone.
-  for (const model of hierarchyModels) {
+function buildClones(state: SplitState): void {
+  // Pass 1 — materialize an empty-bodied shell for every node that needs a clone.
+  for (const [key, node] of state.nodes) {
+    if (!node.needsClone) {
+      continue;
+    }
     const clone: SdkModelType = {
-      ...model,
-      name: `${model.name}${visibilitySuffix}`,
-      properties: projectedPropsByModel.get(model)!.properties,
+      ...node.model,
+      name: `${node.model.name}${getVisibilitySuffix(node.visibility, Visibility.Read)}`,
+      properties: [],
     };
-    cloneByOriginal.set(model, clone);
-    state.produced.add(clone);
-    state.cache.set(cacheKeyFor(model, visibility), {
-      model: clone,
-      changed: true,
-    });
+    state.cloneByKey.set(key, clone);
   }
 
-  // Second pass: re-point inheritance and discriminator edges at the clones.
-  for (const model of hierarchyModels) {
-    const clone = cloneByOriginal.get(model)!;
-    if (model.baseModel) {
-      clone.baseModel = cloneByOriginal.get(model.baseModel) ?? model.baseModel;
+  // Pass 2 — wire every clone's edges, now that all shells exist.
+  for (const [key, node] of state.nodes) {
+    const clone = state.cloneByKey.get(key);
+    if (!clone) {
+      continue;
     }
-    if (model.discriminatedSubtypes) {
-      clone.discriminatedSubtypes = Object.fromEntries(
-        Object.entries(model.discriminatedSubtypes).map(([discriminatorValue, subtype]) => [
-          discriminatorValue,
-          cloneByOriginal.get(subtype) ?? subtype,
-        ]),
-      );
+    const { model, visibility } = node;
+
+    const properties: SdkModelPropertyType[] = [];
+    for (const property of model.properties) {
+      if (
+        property.kind === "property" &&
+        property.__raw &&
+        !state.metadata.isPayloadProperty(property.__raw, visibility)
+      ) {
+        continue;
+      }
+      let wiredProperty = property;
+      if (property.kind === "property" && property.type.kind === "model") {
+        const nestedClone = state.cloneByKey.get(nodeKeyFor(property.type, visibility));
+        if (nestedClone) {
+          wiredProperty = { ...property, type: nestedClone };
+        }
+      }
+      properties.push(wiredProperty);
+    }
+    clone.properties = properties;
+
+    if (findDiscriminatedRoot(model)) {
+      if (model.baseModel) {
+        clone.baseModel =
+          state.cloneByKey.get(nodeKeyFor(model.baseModel, visibility)) ?? model.baseModel;
+      }
+      if (model.discriminatedSubtypes) {
+        clone.discriminatedSubtypes = Object.fromEntries(
+          Object.entries(model.discriminatedSubtypes).map(([discriminatorValue, subtype]) => [
+            discriminatorValue,
+            state.cloneByKey.get(nodeKeyFor(subtype, visibility)) ?? subtype,
+          ]),
+        );
+      }
     }
   }
-
-  return state.cache.get(rootCacheKey)!;
 }
 
 function repointMethodBody(
-  state: ProjectionState,
+  state: SplitState,
   method: SdkServiceMethod<SdkHttpOperation>,
 ): void {
   const operation = method.operation;
@@ -337,25 +444,25 @@ function repointMethodBody(
       continue;
     }
 
-    const projection = projectModelToVisibility(state, methodParam.type, visibility);
-    if (!projection.changed) {
+    const clone = state.cloneByKey.get(nodeKeyFor(methodParam.type, visibility));
+    if (!clone) {
       // The write view is identical to the read model (collapse).
       continue;
     }
 
     const originalType = methodParam.type;
-    methodParam.type = projection.model;
+    methodParam.type = clone;
 
     if (originalType === bodyParam.type) {
       // Non-spread: the method parameter *is* the whole body, so repoint the
       // payload model directly (drives the whole-model serializer).
-      bodyParam.type = projection.model;
+      bodyParam.type = clone;
     } else {
       // Spread: the payload is a synthesized wrapper serialized property by
       // property, so repoint the wrapper property this parameter maps to.
       for (const bodyProperty of bodyParam.type.properties) {
         if (bodyProperty.type === originalType) {
-          bodyProperty.type = projection.model;
+          bodyProperty.type = clone;
         }
       }
     }
