@@ -543,6 +543,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@${"decoratorName"} should be applied with a language scope of ${"allowedScopes"}.`,
       },
     },
+    "unnecessary-emitter-option": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The option "${"optionName"}" is only applicable to Java and C# emitters and has no effect for "${"emitterName"}".`,
+      },
+    },
     "replace-parameter-not-found": {
       ...doc("replace-parameter-not-found"),
       severity: "error",

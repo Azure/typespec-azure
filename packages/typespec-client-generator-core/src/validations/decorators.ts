@@ -1,4 +1,10 @@
-import { DecoratorApplication, DiagnosticTarget, Model, Namespace } from "@typespec/compiler";
+import {
+  DecoratorApplication,
+  DiagnosticTarget,
+  Model,
+  Namespace,
+  NoTarget,
+} from "@typespec/compiler";
 import { TCGCContext } from "../interfaces.js";
 import { listAllUserDefinedNamespaces } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
@@ -8,15 +14,16 @@ interface DecoratorScopeRequirement {
   decoratorName: string;
   /** If provided, the scope must include at least one of these languages. If undefined, any scope is accepted. */
   allowedScopes?: string[];
-  /** If true, only check when the first boolean argument is true. */
-  onlyWhenTrue?: boolean;
 }
 
 const DECORATOR_SCOPE_REQUIREMENTS: DecoratorScopeRequirement[] = [
   {
     decoratorName: "@convenientAPI",
     allowedScopes: ["java", "csharp"],
-    onlyWhenTrue: true,
+  },
+  {
+    decoratorName: "@protocolAPI",
+    allowedScopes: ["java", "csharp"],
   },
   {
     decoratorName: "@clientOption",
@@ -38,15 +45,6 @@ function checkDecoratorScopes(
     );
 
     for (const decorator of matchingDecorators) {
-      // For decorators with onlyWhenTrue, skip validation when the first arg is false.
-      // e.g., @convenientAPI(false) is always allowed — opting out is safe for any language.
-      if (requirement.onlyWhenTrue) {
-        const firstArgValue = (decorator.args[0]?.value as any)?.value;
-        if (firstArgValue === false) {
-          continue;
-        }
-      }
-
       // Find the scope argument - it's the last string argument.
       // decorator.args[i].value is a Value object with entityKind and a nested .value for the primitive.
       const scopeArg = decorator.args.find((arg, idx) => {
@@ -123,4 +121,34 @@ function walkNamespace(context: TCGCContext, namespace: Namespace) {
 
 function walkModel(context: TCGCContext, model: Model) {
   checkDecoratorScopes(context, model.decorators, model);
+}
+
+const JAVA_CSHARP_ONLY_OPTIONS = ["generate-convenience-methods", "generate-protocol-methods"];
+const JAVA_CSHARP_EMITTER_PATTERNS = ["java", "csharp"];
+
+function isJavaOrCsharpEmitter(emitterName: string): boolean {
+  const lower = emitterName.toLowerCase();
+  return JAVA_CSHARP_EMITTER_PATTERNS.some((lang) => lower.includes(lang));
+}
+
+export function validateEmitterOptions(context: TCGCContext) {
+  const emitterOptions = context.program.compilerOptions.options;
+  if (!emitterOptions) return;
+
+  for (const [emitterName, options] of Object.entries(emitterOptions)) {
+    if (isJavaOrCsharpEmitter(emitterName)) continue;
+
+    for (const optionName of JAVA_CSHARP_ONLY_OPTIONS) {
+      if (optionName in options) {
+        reportDiagnostic(context.program, {
+          code: "unnecessary-emitter-option",
+          format: {
+            optionName,
+            emitterName,
+          },
+          target: NoTarget,
+        });
+      }
+    }
+  }
 }

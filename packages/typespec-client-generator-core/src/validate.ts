@@ -1,7 +1,7 @@
 import type { Program } from "@typespec/compiler";
 import { createTCGCContext } from "./context.js";
 import { validateClients } from "./validations/clients.js";
-import { validateDecoratorScopes } from "./validations/decorators.js";
+import { validateDecoratorScopes, validateEmitterOptions } from "./validations/decorators.js";
 import { validateHttp } from "./validations/http.js";
 import { validateMethods } from "./validations/methods.js";
 import { validatePackage } from "./validations/package.js";
@@ -13,6 +13,7 @@ export function $onValidate(program: Program) {
   });
 
   validateDecoratorScopes(tcgcContext);
+  validateEmitterOptions(tcgcContext);
   validatePackage(tcgcContext);
   validateClients(tcgcContext);
   validateMethods(tcgcContext);
