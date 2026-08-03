@@ -28,7 +28,7 @@ export interface ContainingModule {
    * the directory containing the emitted package, relative to the module root.
    * empty when emitting into the module root.
    */
-  relativePackagePath: string;
+  relativePackagePath?: string;
 
   /**
    * the subpackage to emit.
@@ -149,10 +149,9 @@ class PackageBase implements PackageBase {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 export class ContainingModule implements ContainingModule {
-  constructor(identity: string, relativePackagePath: string) {
+  constructor(identity: string) {
     this.kind = "containingModule";
     this.identity = identity;
-    this.relativePackagePath = relativePackagePath;
   }
 }
 

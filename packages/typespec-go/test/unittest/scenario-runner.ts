@@ -17,6 +17,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { assert, describe, it } from "vitest";
 import * as codegen from "../../src/codegen/index.js";
+import { setContainingModuleRelativePackagePath } from "../../src/containing-module.js";
 import type { GoEmitterOptions } from "../../src/lib.js";
 import { Adapter } from "../../src/tcgcadapter/adapter.js";
 
@@ -170,11 +171,15 @@ export async function emitGoFor(
     options: emitterOptions,
   } as unknown as EmitContext<GoEmitterOptions>;
 
-  const containingModuleRoot = emitterOptions["containing-module"]
-    ? resolveVirtualPath(baseOutputDir)
-    : undefined;
-  const adapter = await Adapter.create(context, containingModuleRoot);
+  const adapter = await Adapter.create(context);
   const codeModel = adapter.tcgcToGoCodeModel();
+  if (codeModel.root.kind === "containingModule") {
+    setContainingModuleRelativePackagePath(
+      codeModel.root,
+      resolveVirtualPath(baseOutputDir),
+      context.emitterOutputDir,
+    );
+  }
 
   let filePrefix = (emitterOptions["file-prefix"] as string | undefined) ?? "zz_";
   if (filePrefix.length > 0 && !filePrefix.endsWith("_")) {

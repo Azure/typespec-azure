@@ -58,9 +58,8 @@ function relPackageName(pkg: go.PackageContent): string {
   const parent = pkg.parent;
   if (parent.kind === "containingModule") {
     const moduleName = path.basename(parent.identity.replace(/\/v\d+$/, ""));
-    return parent.relativePackagePath
-      ? `${moduleName}/${parent.relativePackagePath}`
-      : moduleName;
+    const packagePath = parent.relativePackagePath ?? pkg.name;
+    return packagePath ? `${moduleName}/${packagePath}` : moduleName;
   }
   const parentName = relPackageName(parent);
   return `${parentName}/${pkg.name}`;

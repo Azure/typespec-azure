@@ -10,6 +10,7 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import * as codegen from "./codegen/index.js";
 import { CodeModelError } from "./codemodel/errors.js";
+import { setContainingModuleRelativePackagePath } from "./containing-module.js";
 import { GoEmitterOptions, reportDiagnostic } from "./lib.js";
 import { Adapter, ExternalError } from "./tcgcadapter/adapter.js";
 import { AdapterError } from "./tcgcadapter/errors.js";
@@ -85,8 +86,11 @@ export async function $onEmit(context: EmitContext<GoEmitterOptions>) {
       }
     }
 
-    const adapter = await Adapter.create(context, moduleRoot);
+    const adapter = await Adapter.create(context);
     const codeModel = adapter.tcgcToGoCodeModel();
+    if (codeModel.root.kind === "containingModule") {
+      setContainingModuleRelativePackagePath(codeModel.root, moduleRoot, context.emitterOutputDir);
+    }
 
     await mkdir(context.emitterOutputDir, { recursive: true });
 
