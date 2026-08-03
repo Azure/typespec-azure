@@ -1,8 +1,8 @@
 import {
-  DiagnosticTarget,
-  Model,
-  SemanticNodeListener,
-  Type,
+  type DiagnosticTarget,
+  type Model,
+  type SemanticNodeListener,
+  type Type,
   createRule,
   fileRef,
 } from "@typespec/compiler";

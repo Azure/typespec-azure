@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";

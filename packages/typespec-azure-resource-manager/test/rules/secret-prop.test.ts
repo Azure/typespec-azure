@@ -1,5 +1,5 @@
 import { Tester } from "#test/tester.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { secretProprule } from "../../src/rules/secret-prop.js";
 

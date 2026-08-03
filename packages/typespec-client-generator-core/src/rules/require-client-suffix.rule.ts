@@ -1,4 +1,10 @@
-import { createRule, fileRef, Interface, Namespace, paramMessage } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  type Interface,
+  type Namespace,
+  paramMessage,
+} from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getClient } from "../decorators.js";
 

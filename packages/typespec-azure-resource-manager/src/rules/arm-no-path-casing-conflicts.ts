@@ -2,10 +2,10 @@ import {
   createRule,
   fileRef,
   getSourceLocation,
-  Operation,
+  type Operation,
   paramMessage,
-  Program,
-  SemanticNodeListener,
+  type Program,
+  type SemanticNodeListener,
 } from "@typespec/compiler";
 import { getAllHttpServices } from "@typespec/http";
 import { isInternalTypeSpec } from "./utils.js";

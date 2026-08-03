@@ -38,6 +38,7 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
@@ -46,6 +47,7 @@ import { versionProgressionRule } from "./rules/version-progression.js";
 const rules = [
   armAgentBaseTypeChildResourcesRule,
   armAgentBaseTypeLifecycleOperationsRule,
+  useRelationshipRequiredPropertiesRule,
   armNoRecordRule,
   armNoPathCasingConflictsRule,
   noOverridePropsRule,

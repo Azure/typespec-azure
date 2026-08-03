@@ -1,15 +1,9 @@
-import type {
-  CodeFix,
-  InsertTextCodeFixEdit,
-  Model,
-  ModelProperty,
-  Program,
-} from "@typespec/compiler";
+import type { CodeFix, InsertTextCodeFixEdit, Program, Type } from "@typespec/compiler";
 import {
   createSourceFile,
   defineCodeFix,
-  getNamespaceFullName,
   getSourceLocation,
+  getTypeName,
   resolvePath,
 } from "@typespec/compiler";
 import type { TypeSpecScriptNode } from "@typespec/compiler/ast";
@@ -18,53 +12,32 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 /**
  * Get the namespace name for a target type.
  */
-function getTargetNamespace(target: Model | ModelProperty): string {
-  if (target.kind === "ModelProperty") {
-    const model = target.model;
-    if (model?.namespace) {
-      return getNamespaceFullName(model.namespace);
-    }
-    return "";
-  }
-  if (target.namespace) {
-    return getNamespaceFullName(target.namespace);
-  }
-  return "";
+function getTargetNamespace(target: Type): string {
+  const shortRef = buildShortRef(target);
+  const fqn = buildFqn(target);
+  return fqn.endsWith(`.${shortRef}`) ? fqn.slice(0, -shortRef.length - 1) : "";
 }
 
 /**
  * Build a short reference for a type target (e.g., "Model.property").
  * Used for same-file augment decorators where the namespace is already in scope.
  */
-function buildShortRef(target: Model | ModelProperty): string {
-  if (target.kind === "ModelProperty") {
-    const model = target.model;
-    return model ? `${model.name}.${target.name}` : target.name;
+function buildShortRef(target: Type): string {
+  if (target.kind === "UnionVariant" && typeof target.name === "string") {
+    return `${getTypeName(target.union, { nameOnly: true, printable: true })}.${target.name}`;
   }
-  return target.name;
+  return getTypeName(target, { nameOnly: true, printable: true });
 }
 
 /**
  * Build the fully qualified name for a type target (e.g., "Azure.Service.Model.property").
  * Used for cross-file augment decorators where the namespace may not be in scope.
  */
-function buildFqn(target: Model | ModelProperty): string {
-  if (target.kind === "ModelProperty") {
-    const model = target.model;
-    if (model && model.namespace) {
-      const nsName = getNamespaceFullName(model.namespace);
-      return nsName ? `${nsName}.${model.name}.${target.name}` : `${model.name}.${target.name}`;
-    } else if (model) {
-      return `${model.name}.${target.name}`;
-    }
-    return target.name;
+function buildFqn(target: Type): string {
+  if (target.kind === "UnionVariant" && typeof target.name === "string") {
+    return `${getTypeName(target.union, { printable: true })}.${target.name}`;
   }
-  // Model
-  if (target.namespace) {
-    const nsName = getNamespaceFullName(target.namespace);
-    return nsName ? `${nsName}.${target.name}` : target.name;
-  }
-  return target.name;
+  return getTypeName(target, { printable: true });
 }
 
 function getLineEnd(text: string, start: number): number {
@@ -119,7 +92,7 @@ function findUsingInsertPos(
  * @param args The decorator arguments as literal strings.
  */
 export function createAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: Type,
   decoratorName: string,
   args?: string[],
 ): CodeFix {
@@ -159,7 +132,7 @@ export function createAugmentDecoratorCodeFix(
  * @param args The decorator arguments as literal strings.
  */
 export function createClientTspAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: Type,
   decoratorName: string,
   program: Program,
   args?: string[],

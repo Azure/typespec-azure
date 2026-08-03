@@ -1,4 +1,11 @@
-import { DecoratorContext, Enum, Model, ModelProperty, Scalar, Union } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Enum,
+  Model,
+  ModelProperty,
+  Scalar,
+  Union,
+} from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
 
 export function $changePropertyType(

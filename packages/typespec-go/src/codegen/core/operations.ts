@@ -1503,11 +1503,17 @@ function createProtocolRequest(
           addr = "";
         }
         body = `wrapper{${fieldName}: ${addr}${body}}`;
-      } else if (bodyParam.type.kind === "time" && bodyParam.type.format !== "RFC3339") {
-        // wrap the body in the internal time type
-        // no need for RFC3339 as the JSON marshaler defaults to that.
-        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        body = `datetime.${bodyParam.type.format}(${body})`;
+      } else if (bodyParam.type.kind === "time") {
+        // utc datetimes are normalized to UTC before serialization. non-RFC3339
+        // formats are wrapped in the internal time type; RFC3339 relies on the
+        // default time.Time JSON marshaler so it only needs the UTC conversion.
+        const bodyVal = bodyParam.type.utc ? `${body}.UTC()` : body;
+        if (bodyParam.type.format !== "RFC3339") {
+          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+          body = `datetime.${bodyParam.type.format}(${bodyVal})`;
+        } else {
+          body = bodyVal;
+        }
       } else if (isArrayOfDateTimeForMarshalling(bodyParam.type)) {
         const timeInfo = isArrayOfDateTimeForMarshalling(bodyParam.type);
         let elementPtr = "*";
@@ -1517,16 +1523,37 @@ function createProtocolRequest(
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         text += `${indent.get()}aux := make([]${elementPtr}datetime.${timeInfo?.format}, len(${body}))\n`;
         text += `${indent.get()}for i := 0; i < len(${body}); i++ {\n`;
-        text += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${timeInfo?.format})(${body}[i])\n`;
-        text += `${indent.pop().get()}}\n`;
+        if (timeInfo?.utc && elementPtr === "*") {
+          text += `${indent.push().get()}if ${body}[i] != nil {\n`;
+          text += `${indent.push().get()}utcTime := ${body}[i].UTC()\n`;
+          text += `${indent.get()}aux[i] = (*datetime.${timeInfo?.format})(&utcTime)\n`;
+          text += `${indent.pop().get()}}\n`;
+          indent.pop();
+        } else {
+          const utcCall = timeInfo?.utc ? ".UTC()" : "";
+          text += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${timeInfo?.format})(${body}[i]${utcCall})\n`;
+          indent.pop();
+        }
+        text += `${indent.get()}}\n`;
         body = "aux";
       } else if (isMapOfDateTime(bodyParam.type)) {
-        const timeType = isMapOfDateTime(bodyParam.type);
+        const timeInfo = isMapOfDateTime(bodyParam.type);
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        text += `${indent.get()}aux := map[string]*datetime.${timeType}{}\n`;
+        text += `${indent.get()}aux := map[string]*datetime.${timeInfo?.format}{}\n`;
         text += `${indent.get()}for k, v := range ${body} {\n`;
-        text += `${indent.push().get()}aux[k] = (*datetime.${timeType})(v)\n`;
-        text += `${indent.pop().get()}}\n`;
+        if (timeInfo?.utc) {
+          text += `${indent.push().get()}if v != nil {\n`;
+          text += `${indent.push().get()}utcTime := v.UTC()\n`;
+          text += `${indent.get()}aux[k] = (*datetime.${timeInfo?.format})(&utcTime)\n`;
+          text += `${indent.pop().get()}} else {\n`;
+          text += `${indent.push().get()}aux[k] = nil\n`;
+          text += `${indent.pop().get()}}\n`;
+          indent.pop();
+        } else {
+          text += `${indent.push().get()}aux[k] = (*datetime.${timeInfo?.format})(v)\n`;
+          indent.pop();
+        }
+        text += `${indent.get()}}\n`;
         body = "aux";
       }
       let setBody = `runtime.MarshalAs${getMediaFormat(bodyParam.type, bodyParam.bodyFormat, `req, ${body}`)}`;
@@ -1763,7 +1790,7 @@ function getMediaFormat(type: go.WireType, mediaType: "JSON" | "XML", param: str
 
 function isArrayOfDateTimeForMarshalling(
   paramType: go.WireType,
-): { format: go.TimeFormat; elemByVal: boolean } | undefined {
+): { format: go.TimeFormat; elemByVal: boolean; utc: boolean } | undefined {
   if (paramType.kind !== "slice") {
     return undefined;
   }
@@ -1779,9 +1806,20 @@ function isArrayOfDateTimeForMarshalling(
       return {
         format: paramType.elementType.format,
         elemByVal: paramType.elementTypeByValue,
+        utc: paramType.elementType.utc,
       };
+    case "RFC3339":
+      // RFC3339 normally uses the default time.Time marshaller, but utc slices
+      // must be normalized to UTC, which requires building the wrapper slice.
+      if (paramType.elementType.utc) {
+        return {
+          format: "RFC3339",
+          elemByVal: paramType.elementTypeByValue,
+          utc: true,
+        };
+      }
+      return undefined;
     default:
-      // RFC3339 uses the default marshaller
       return undefined;
   }
 }
@@ -1830,9 +1868,9 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}result.${helpers.getResultFieldName(method)} = cp\n`;
     return unmarshallerText;
   } else if (isMapOfDateTime(type)) {
-    const timeType = isMapOfDateTime(type);
+    const timeInfo = isMapOfDateTime(type);
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeInfo?.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
@@ -2021,14 +2059,16 @@ function isArrayOfDateTime(
   };
 }
 
-function isMapOfDateTime(paramType: go.WireType): go.TimeFormat | undefined {
+function isMapOfDateTime(
+  paramType: go.WireType,
+): { format: go.TimeFormat; utc: boolean } | undefined {
   if (paramType.kind !== "map") {
     return undefined;
   }
   if (paramType.valueType.kind !== "time") {
     return undefined;
   }
-  return paramType.valueType.format;
+  return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
 /**
