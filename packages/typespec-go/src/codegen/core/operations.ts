@@ -691,6 +691,140 @@ function generateNilChecks(
   return checks.join(" && ");
 }
 
+/** emits a nil check for an optional grouped parameter */
+function emitParamGroupCheck(
+  param: go.MethodParameter,
+  indent: helpers.Indentation,
+): string {
+  if (!param.group) {
+    throw new CodegenError(
+      "InternalError",
+      `emitParamGroupCheck called for ungrouped parameter ${param.name}`,
+    );
+  }
+  let client = "";
+  if (param.location === "client") {
+    client = "client.";
+  }
+  const paramGroupName = naming.uncapitalize(param.group.name);
+  let optionalParamGroupCheck = `${client}${paramGroupName} != nil && `;
+  if (param.group.required) {
+    optionalParamGroupCheck = "";
+  }
+  return `${indent.get()}if ${optionalParamGroupCheck}${client}${paramGroupName}.${naming.capitalize(param.name)} != nil {\n`;
+}
+
+/** emits a setter for an encoded query parameter */
+function emitEncodedQueryParamSetter(
+  qp: go.QueryParameter,
+  queryParamsVar: string,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
+    let setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
+
+    let queryVal: string;
+    switch (qp.type.elementType.kind) {
+      case "constant":
+        switch (qp.type.elementType.type) {
+          case "string":
+            queryVal = "string(qv)";
+            break;
+          default:
+            imports.add("fmt");
+            queryVal = 'fmt.Sprintf("%d", qv)';
+        }
+        break;
+      case "string":
+        queryVal = "qv";
+        break;
+      default:
+        imports.add("fmt");
+        queryVal = 'fmt.Sprintf("%v", qv)';
+    }
+
+    setter += `${indent.push().get()}${queryParamsVar}.Add("${qp.queryParameter}", ${queryVal})\n`;
+    setter += `${indent.pop().get()}}`;
+    return setter;
+  }
+
+  return `${queryParamsVar}.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
+}
+
+/** emits an encoded query parameter with its required optionality checks */
+function emitEncodedQueryParam(
+  qp: go.QueryParameter,
+  setter: string,
+  queryParamsVar: string,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  let text: string;
+  if (qp.location === "method" && go.isClientSideDefault(qp.style)) {
+    text = emitClientSideDefault(
+      qp,
+      qp.style,
+      (name, val) => {
+        return `${indent.get()}${queryParamsVar}.Set(${name}, ${val})`;
+      },
+      imports,
+      indent,
+    );
+  } else if (
+    go.isRequiredParameter(qp.style) ||
+    go.isLiteralParameter(qp.style) ||
+    (qp.location === "client" && go.isClientSideDefault(qp.style))
+  ) {
+    text = `${indent.get()}${setter}\n`;
+  } else if (qp.location === "client" && !qp.group) {
+    text = `${indent.get()}if client.${qp.name} != nil {\n`;
+    text += `${indent.push().get()}${setter}\n`;
+    text += `${indent.pop().get()}}\n`;
+  } else {
+    text = emitParamGroupCheck(qp, indent);
+    text += `${indent.push().get()}${setter}\n`;
+    text += `${indent.pop().get()}}\n`;
+  }
+  return text;
+}
+
+/** emits code to add the original query parameters to a next link */
+function emitNextLinkReinjectedParams(
+  method: go.LROPageableMethod | go.PageableMethod,
+  strategy: go.PageableStrategyNextLink,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  if (strategy.reinjectedParams.length === 0) {
+    return "";
+  }
+
+  imports.add("net/url");
+  imports.add("strings");
+  let text = `${indent.get()}if len(nextLink) > 0 {\n`;
+  indent.push();
+  text += `${indent.get()}nextLinkURL, err := url.Parse(nextLink)\n`;
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return ${method.returns.name}{}, err\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}nextLinkQP, err := url.ParseQuery(strings.ReplaceAll(nextLinkURL.RawQuery, ";", "%3B"))\n`;
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return ${method.returns.name}{}, err\n`;
+  text += `${indent.pop().get()}}\n`;
+  for (const qp of strategy.reinjectedParams.sort(
+    (a: go.QueryParameter, b: go.QueryParameter) =>
+      helpers.sortAscending(a.queryParameter, b.queryParameter),
+  )) {
+    const setter = emitEncodedQueryParamSetter(qp, "nextLinkQP", imports, indent);
+    text += emitEncodedQueryParam(qp, setter, "nextLinkQP", imports, indent);
+  }
+  text += `${indent.get()}nextLinkURL.RawQuery = strings.ReplaceAll(nextLinkQP.Encode(), "+", "%20")\n`;
+  text += `${indent.get()}nextLink = nextLinkURL.String()\n`;
+  text += `${indent.pop().get()}}\n`;
+  return text;
+}
+
 /**
  * emits code that calls runtime.NewPager
  *
@@ -805,7 +939,8 @@ function emitPagerDefinition(
         break;
       }
       case "nextLink": {
-        const nextLinkPath = helpers.buildNextLinkPath(method.strategy);
+        const strategy = method.strategy;
+        const nextLinkPath = helpers.buildNextLinkPath(strategy);
         let nextLinkVar: string;
         if (method.kind === "pageableMethod") {
           text += `${indent.get()}nextLink := ""\n`;
@@ -813,9 +948,13 @@ function emitPagerDefinition(
           text += `${indent.get()}if page != nil {\n`;
           text += `${indent.push().get()}nextLink = *page.${nextLinkPath}\n`;
           text += `${indent.pop().get()}}\n`;
+        } else if (strategy.reinjectedParams.length > 0) {
+          text += `${indent.get()}nextLink := *page.${nextLinkPath}\n`;
+          nextLinkVar = "nextLink";
         } else {
           nextLinkVar = `*page.${nextLinkPath}`;
         }
+        text += emitNextLinkReinjectedParams(method, strategy, imports, indent);
         text += `${indent.get()}resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), ${nextLinkVar}, func(ctx context.Context) (*policy.Request, error) {\n`;
         text += `${indent.push().get()}return client.${method.naming.requestMethod}(${reqParams})\n`;
         text += `${indent.pop().get()}}, `;
@@ -1119,26 +1258,6 @@ function createProtocolRequest(
     hostParam = `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
-  // helper to build nil checks for param groups
-  const emitParamGroupCheck = function (param: go.MethodParameter): string {
-    if (!param.group) {
-      throw new CodegenError(
-        "InternalError",
-        `emitParamGroupCheck called for ungrouped parameter ${param.name}`,
-      );
-    }
-    let client = "";
-    if (param.location === "client") {
-      client = "client.";
-    }
-    const paramGroupName = naming.uncapitalize(param.group.name);
-    let optionalParamGroupCheck = `${client}${paramGroupName} != nil && `;
-    if (param.group.required) {
-      optionalParamGroupCheck = "";
-    }
-    return `${indent.get()}if ${optionalParamGroupCheck}${client}${paramGroupName}.${naming.capitalize(param.name)} != nil {\n`;
-  };
-
   if (hasPathParams) {
     // swagger defines path params, emit path and replace tokens
     imports.add("strings");
@@ -1186,7 +1305,7 @@ function createProtocolRequest(
       } else if (go.isClientSideDefault(pp.style)) {
         const defaultValue = naming.uncapitalize(pp.name) + "Default";
         text += `${indent.get()}${defaultValue} := ${helpers.formatLiteralValue(pp.style.defaultValue, true)}\n`;
-        text += emitParamGroupCheck(pp);
+        text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${defaultValue} = ${helpers.getParamName(pp)}\n`;
         text += `${indent.pop().get()}}\n`;
         paramValue = helpers.formatValue(defaultValue, pp.type, imports);
@@ -1196,7 +1315,7 @@ function createProtocolRequest(
         // the optional value when set.
         paramValue = `optional${naming.capitalize(pp.name)}`;
         text += `${indent.get()}${paramValue} := ""\n`;
-        text += emitParamGroupCheck(pp);
+        text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${paramValue} = ${helpers.formatParamValue(pp, imports, indent)}\n`;
         text += `${indent.pop().get()}}\n`;
 
@@ -1238,76 +1357,14 @@ function createProtocolRequest(
   const encodedParams = methodParamGroups.encodedQueryParams;
   const unencodedParams = methodParamGroups.unencodedQueryParams;
 
-  const emitQueryParam = function (qp: go.QueryParameter, setter: string): string {
-    let qpText: string;
-    if (qp.location === "method" && go.isClientSideDefault(qp.style)) {
-      qpText = emitClientSideDefault(
-        qp,
-        qp.style,
-        (name, val) => {
-          return `${indent.get()}reqQP.Set(${name}, ${val})`;
-        },
-        imports,
-        indent,
-      );
-    } else if (
-      go.isRequiredParameter(qp.style) ||
-      go.isLiteralParameter(qp.style) ||
-      (qp.location === "client" && go.isClientSideDefault(qp.style))
-    ) {
-      qpText = `${indent.get()}${setter}\n`;
-    } else if (qp.location === "client" && !qp.group) {
-      // global optional param
-      qpText = `${indent.get()}if client.${qp.name} != nil {\n`;
-      qpText += `${indent.push().get()}${setter}\n`;
-      qpText += `${indent.pop().get()}}\n`;
-    } else {
-      qpText = emitParamGroupCheck(qp);
-      qpText += `${indent.push().get()}${setter}\n`;
-      qpText += `${indent.pop().get()}}\n`;
-    }
-    return qpText;
-  };
-
   // emit encoded params first
   if (encodedParams.length > 0) {
     text += `${indent.get()}reqQP := req.Raw().URL.Query()\n`;
     for (const qp of encodedParams.sort((a: go.QueryParameter, b: go.QueryParameter) => {
       return helpers.sortAscending(a.queryParameter, b.queryParameter);
     })) {
-      let setter: string;
-      if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
-        setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
-
-        // emit a type conversion for the qv based on the array's element type
-        let queryVal: string;
-        const arrayQP = qp.type;
-        switch (arrayQP.elementType.kind) {
-          case "constant":
-            switch (arrayQP.elementType.type) {
-              case "string":
-                queryVal = "string(qv)";
-                break;
-              default:
-                imports.add("fmt");
-                queryVal = 'fmt.Sprintf("%d", qv)';
-            }
-            break;
-          case "string":
-            queryVal = "qv";
-            break;
-          default:
-            imports.add("fmt");
-            queryVal = 'fmt.Sprintf("%v", qv)';
-        }
-
-        setter += `${indent.push().get()}reqQP.Add("${qp.queryParameter}", ${queryVal})\n`;
-        setter += `${indent.pop().get()}}`;
-      } else {
-        // cannot initialize setter to this value as helpers.formatParamValue() can change imports
-        setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
-      }
-      text += emitQueryParam(qp, setter);
+      const setter = emitEncodedQueryParamSetter(qp, "reqQP", imports, indent);
+      text += emitEncodedQueryParam(qp, setter, "reqQP", imports, indent);
     }
 
     // reqQP.Encode() encodes space chars as '+' which is application/x-www-form-urlencoded
@@ -1336,7 +1393,7 @@ function createProtocolRequest(
       } else {
         setter = `unencodedParams = append(unencodedParams, "${qp.queryParameter}="+${helpers.formatParamValue(qp, imports, indent)})`;
       }
-      text += emitQueryParam(qp, setter);
+      text += emitEncodedQueryParam(qp, setter, "reqQP", imports, indent);
     }
     imports.add("strings");
     text += `${indent.get()}req.Raw().URL.RawQuery = strings.Join(unencodedParams, "&")\n`;
@@ -1423,7 +1480,7 @@ function createProtocolRequest(
       indent.pop();
       text += `${indent.get()}}\n`;
     } else {
-      text += emitParamGroupCheck(param);
+      text += emitParamGroupCheck(param, indent);
       indent.push();
       text += emitHeaderSet(param);
       indent.pop();
@@ -1566,7 +1623,7 @@ function createProtocolRequest(
         text += emitSetBodyWithErrCheck(setBody, contentType);
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
         text += emitSetBodyWithErrCheck(setBody, contentType);
         text += `${indent.get()}return req, nil\n`;
@@ -1582,7 +1639,7 @@ function createProtocolRequest(
         );
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
         text += emitSetBodyWithErrCheck(
           `req.SetBody(${helpers.getParamName(bodyParam)}, ${getContentTypeValue(bodyParam.contentType)})`,
@@ -1604,7 +1661,7 @@ function createProtocolRequest(
         );
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
         text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${helpers.getParamName(bodyParam)}))\n`;
         text += emitSetBodyWithErrCheck(
@@ -1639,7 +1696,7 @@ function createProtocolRequest(
     // now populate any optional params from the options type
     for (const partialBodyParam of partialBodyParams) {
       if (!go.isRequiredParameter(partialBodyParam.style)) {
-        text += emitParamGroupCheck(partialBodyParam);
+        text += emitParamGroupCheck(partialBodyParam, indent);
         text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.serializedName)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
         text += `${indent.pop().get()}}\n`;
       }
@@ -1687,7 +1744,7 @@ function createProtocolRequest(
         if (go.isRequiredParameter(param.style)) {
           text += `${indent.get()}${setter}\n`;
         } else {
-          text += emitParamGroupCheck(param);
+          text += emitParamGroupCheck(param, indent);
           text += `${indent.push().get()}${setter}\n`;
           text += `${indent.pop().get()}}\n`;
         }
@@ -1703,7 +1760,7 @@ function createProtocolRequest(
       if (go.isRequiredParameter(param.style)) {
         formDataText = `${indent.get()}${setter}\n`;
       } else {
-        formDataText = emitParamGroupCheck(param);
+        formDataText = emitParamGroupCheck(param, indent);
         formDataText += `${indent.push().get()}${setter}\n`;
         formDataText += `${indent.pop().get()}}\n`;
       }
