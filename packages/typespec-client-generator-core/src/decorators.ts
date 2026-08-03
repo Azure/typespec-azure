@@ -3,6 +3,8 @@ import {
   compilerAssert,
   type DecoratorContext,
   type DecoratorFunction,
+  type DecoratorValidatorCallbacks,
+  type Diagnostic,
   type DiagnosticTarget,
   type Enum,
   type EnumMember,
@@ -404,6 +406,52 @@ export function listOperationsInClient(
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
 
+const VALID_SCOPES = ["java", "csharp"];
+
+function validateJavaCsharpScope(
+  decoratorName: string,
+  entity: DiagnosticTarget,
+  scope?: LanguageScopes,
+): DecoratorValidatorCallbacks | void {
+  return {
+    onTargetFinish: () => {
+      const diagnostics: Diagnostic[] = [];
+      if (scope === undefined) {
+        diagnostics.push(
+          createDiagnostic({
+            code: "decorator-requires-scope",
+            format: {
+              decoratorName,
+              allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+            },
+            target: entity,
+          }),
+        );
+      } else {
+        const parsedScopes = scope
+          .split(",")
+          .map((s) => s.trim().toLowerCase());
+        const hasValidScope = parsedScopes.some((s) =>
+          VALID_SCOPES.some((allowed) => s.includes(allowed)),
+        );
+        if (!hasValidScope) {
+          diagnostics.push(
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          );
+        }
+      }
+      return diagnostics;
+    },
+  };
+}
+
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
@@ -411,6 +459,7 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("protocolAPI", entity, scope);
 };
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
@@ -422,6 +471,7 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("convenientAPI", entity, scope);
 };
 
 function getConvenientOrProtocolValue(
@@ -1898,6 +1948,23 @@ export const $clientOption: ClientOptionDecorator = (
   // Store the option data - each decorator application is stored separately
   // The decorator info will be exposed via the decorators array on SDK types
   setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+
+  // clientOption must be scoped to any language
+  if (scope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
+  }
+  return undefined;
 };
 
 /**
