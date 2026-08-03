@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.70.1
+
+### Bug Fixes
+
+- [1b136fa](https://github.com/Azure/typespec-azure/commit/1b136fabefbe6556b94d62be6a6dd2554991aa03) Add `csharp-model-suffix` and `csharp-use-standard-acronyms` linter rules for C# SDK model naming.
+
+
 ## 0.70.0
 
 ### Features
