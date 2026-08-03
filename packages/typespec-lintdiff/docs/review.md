@@ -2,7 +2,7 @@
 
 Review of the "Migrate Swagger LintDiff to TypeSpec lints" plan, based on the
 `feature/lintdiff-migration` branch of `Azure/typespec-azure` and the ARM coverage
-gist https://gist.github.com/catalinaperalta/b2e7d29a33b4b451bcfcc87e8314565a.
+gist https://gist.github.com/catalinaperalta/b2e7d29a33b4b451bcfcc87e8314565a and migration plan doc https://microsoft-my.sharepoint.com/:w:/p/caperal/cQo1-pAoj7UDS5x_eJ4wBOSKEgUCKPmLoi5C5qsjeXpQhQYjdg.
 
 ## Proposals
 
