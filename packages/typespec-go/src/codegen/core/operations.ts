@@ -529,7 +529,7 @@ function formatHeaderResponseValue(
     return text;
   }
 
-  let text = `${indent.get()}if val := resp.Header.Get("${headerResp.headerName}"); val != "" {\n`;
+  let text = `${indent.get()}if val := resp.Header.Get("${helpers.canonicalizeHeaderName(headerResp.headerName)}"); val != "" {\n`;
   indent.push();
   let name = naming.uncapitalize(headerResp.fieldName);
   let byRef = "&";
