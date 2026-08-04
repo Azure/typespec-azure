@@ -1641,3 +1641,41 @@ The paging operation to specify next link operation behavior for
 @post
 op listItems(): PageResult;
 ```
+
+### `@overrideClientApiVersion` {#@Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion}
+
+Overrides the wire default used for the API-version parameter of one generated interface client.
+
+The value is opaque and does not need to be declared by the service version enum. This decorator
+changes only the client parameter default; it does not change the client's supported API versions,
+version enum, or package version metadata.
+
+This decorator is considered legacy functionality and should only be used to preserve compatibility
+with an existing SDK.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion(version: valueof string, scope?: valueof string)
+```
+
+#### Target
+
+The interface represented by the generated client.
+`Interface`
+
+#### Parameters
+
+| Name    | Type             | Description                                                             |
+| ------- | ---------------- | ----------------------------------------------------------------------- |
+| version | `valueof string` | The non-empty wire value used as the API-version parameter default.     |
+| scope   | `valueof string` | Specifies the target language emitters that the decorator should apply. |
+
+#### Examples
+
+##### Override one interface client's API-version default
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
+interface Widgets {
+  get(@query("api-version") apiVersion: string): void;
+}
+```

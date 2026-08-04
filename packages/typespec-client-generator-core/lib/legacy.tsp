@@ -338,3 +338,31 @@ extern dec clientDefaultValue(
   value: valueof string | boolean | numeric,
   scope?: valueof string
 );
+
+/**
+ * Overrides the wire default used for the API-version parameter of one generated interface client.
+ *
+ * The value is opaque and does not need to be declared by the service version enum. This decorator
+ * changes only the client parameter default; it does not change the client's supported API versions,
+ * version enum, or package version metadata.
+ *
+ * This decorator is considered legacy functionality and should only be used to preserve compatibility
+ * with an existing SDK.
+ *
+ * @param target The interface represented by the generated client.
+ * @param version The non-empty wire value used as the API-version parameter default.
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ *
+ * @example Override one interface client's API-version default
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
+ * interface Widgets {
+ *   op get(@query("api-version") apiVersion: string): void;
+ * }
+ * ```
+ */
+extern dec overrideClientApiVersion(
+  target: Interface,
+  version: valueof string,
+  scope?: valueof string
+);

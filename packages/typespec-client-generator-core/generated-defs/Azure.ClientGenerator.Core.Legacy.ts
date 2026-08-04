@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   DecoratorValidatorCallbacks,
+  Interface,
   Model,
   ModelProperty,
   Numeric,
@@ -357,6 +358,34 @@ export type ClientDefaultValueDecorator = (
   scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Overrides the wire default used for the API-version parameter of one generated interface client.
+ *
+ * The value is opaque and does not need to be declared by the service version enum. This decorator
+ * changes only the client parameter default; it does not change the client's supported API versions,
+ * version enum, or package version metadata.
+ *
+ * This decorator is considered legacy functionality and should only be used to preserve compatibility
+ * with an existing SDK.
+ *
+ * @param target The interface represented by the generated client.
+ * @param version The non-empty wire value used as the API-version parameter default.
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * @example Override one interface client's API-version default
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
+ * interface Widgets {
+ *   op get(@query("api-version") apiVersion: string): void;
+ * }
+ * ```
+ */
+export type OverrideClientApiVersionDecorator = (
+  context: DecoratorContext,
+  target: Interface,
+  version: string,
+  scope?: string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;
   flattenProperty: FlattenPropertyDecorator;
@@ -365,4 +394,5 @@ export type AzureClientGeneratorCoreLegacyDecorators = {
   disablePageable: DisablePageableDecorator;
   nextLinkVerb: NextLinkVerbDecorator;
   clientDefaultValue: ClientDefaultValueDecorator;
+  overrideClientApiVersion: OverrideClientApiVersionDecorator;
 };
