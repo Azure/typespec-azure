@@ -167,6 +167,16 @@ Validate the principled approach:
 8. TypeKindChanged (Model → Array)
 9. Operation route changed
 
+### Priority 7: Mixed Phase A+B Scenarios (~5 tests)
+
+These validate correct behavior when both phases produce findings in the same analysis run:
+
+1. Phase A unsuppressed + Phase B suppressed → report shows both sections with correct badges
+2. Phase A suppressed + Phase B unsuppressed → `@approvedUnversionedChange` used for A, `@approvedBreakingChange` hint for B
+3. Both phases suppressed → all findings suppressed, version comparison table shows both phases
+4. Both phases unsuppressed → grouped tables show Phase A pairs (base → head) and Phase B pairs (v1 → v2)
+5. Changed version in Phase A feeds into Phase B → Phase B re-analyzes the modified version
+
 ## 5. End-to-End Scenarios
 
 These test the full pipeline from TypeSpec compilation through report generation. Each uses real TypeSpec fixtures compiled via the test host.
@@ -193,6 +203,11 @@ These test the full pipeline from TypeSpec compilation through report generation
 | E2E-18 | Ancestor suppression with path | B | Namespace-level decorator matches |
 | E2E-19 | Resource merge shared model | B | Request+Response → single Resource |
 | E2E-20 | No changes (clean run) | A+B | Green checkmark message |
+| E2E-21 | Phase A unsuppressed + Phase B suppressed | A+B | Report shows ❌ for Phase A, ⚠️ for Phase B in same run |
+| E2E-22 | Phase A suppressed + Phase B unsuppressed | A+B | Report shows ⚠️ for Phase A, ❌ for Phase B in same run |
+| E2E-23 | Phase A + B both suppressed | A+B | All findings suppressed, correct decorator types per phase |
+| E2E-24 | Phase A + B both unsuppressed | A+B | Both phases show unsuppressed tables with correct version headings |
+| E2E-25 | Changed version triggers Phase B recheck | A+B | Modified existing version feeds into Phase B candidates |
 
 ## 6. Execution Estimate
 
@@ -204,10 +219,44 @@ These test the full pipeline from TypeSpec compilation through report generation
 | P4: Resource merge edges | 5 | 30 min | orchestrator branch +10% |
 | P5: Reporter & summary | 9 | 30 min | reporter-markdown 63% → 95% |
 | P6: Diff engine edges | 9 | 30 min | diff-types branch 80% → 92% |
-| E2E scenarios | 20 | 60 min | Integration confidence |
-| **Total** | **~59** | **~4 hours** | **83% → 95% branch** |
+| P7: Mixed Phase A+B | 5 | 30 min | Cross-phase interaction validated |
+| E2E scenarios | 25 | 75 min | Integration confidence |
+| **Total** | **~69** | **~5 hours** | **83% → 95% branch** |
 
-## 7. Relationship to Validation Strategy
+## 7. Performance Testing
+
+Performance tests are in `integration-real-spec.test.ts` and validate that analysis completes within CI budget (target: <60 seconds). Detailed results are documented in `PROTOTYPE-EVALUATION.md` (Q8).
+
+### Existing Performance Benchmarks
+
+| Spec | TSP Files | Operations | Versions | Pairs | Analysis Time |
+|------|-----------|-----------|----------|-------|---------------|
+| AppConfiguration | 14 | 29 | 3 (preview) | 0 | **0s** (no comparisons) |
+| ContainerService/fleet | 12 | 12–42 | 13 (3 stable + 10 preview) | 8 | **8.4s** |
+| Network | 127 | 739 | 2 (stable) | 1 | **7.0s** |
+
+**Key findings:**
+- All specs complete **7x under** the 60s budget
+- Bottleneck: version mutator application (~50%) + diff engine (~45%)
+- Scaling: linear with `operations × version_pairs`
+- Per-view mutator cost: ~180ms
+
+### Performance Tests in CI
+
+```typescript
+// integration-real-spec.test.ts
+it("performance: full analysis completes in under 30 seconds", ...)
+expect(result.timing.totalMs).toBeLessThan(30_000);
+```
+
+### Future Performance Test Additions
+
+1. ❌ Phase A + B combined timing on large spec (fleet with base/head programs)
+2. ❌ Suppression matching performance with 50+ decorators
+3. ❌ Resource merge performance with 100+ shared-model operations
+4. ❌ Regression benchmark: track timing across prototype changes
+
+## 8. Relationship to Validation Strategy
 
 This document covers **unit and integration test coverage** for the prototype. The broader validation strategy (`typespec-breaking-change-validation-strategy.md`) covers:
 
@@ -218,3 +267,8 @@ This document covers **unit and integration test coverage** for the prototype. T
 - Phase 5: Graduated gating (promotion to enforcement)
 
 The tests in this document correspond to early Phase 2 work (internal validation). OAD conversion (Phase 1) and production validation (Phases 3-5) are separate workstreams that build on top of this foundation.
+
+Performance testing in Phases 3-5 should expand to include:
+- Side-by-side latency comparison with OAD-based tools
+- Dashboard metrics for p50/p95/p99 analysis time across all PRs
+- Performance regression gates in CI

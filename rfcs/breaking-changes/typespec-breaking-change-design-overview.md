@@ -674,32 +674,84 @@ This keeps two review questions separate but visible in the same PR:
 The tool surfaces both the overall suppression summary and the exact approvals that need attention.
 A reviewer should be able to see, from the PR comment alone, whether the suppression state is unchanged or whether the PR is asking for new approval authority.
 
-#### Phase B Output
+#### Phase B Output (Implemented)
 
-```text
-✅ Approved breaking changes (no new review needed):
+Phase B reports use the same structured format as Phase A, with unsuppressed and suppressed sections grouped by version pair. Suppression hints use `@approvedBreakingChange` and the report title defaults to "Breaking Change Analysis".
 
-| Rule | Original | New | Description | Reason |
-|------|----------|-----|-------------|--------|
-| ResponseTypeWidened | [v2024-01-01#BarProperties.count](link) | [v2025-01-01#BarProperties.count](link) | int32 → int64 | Widening count for large resource counts |
+**Unsuppressed findings:**
 
-⚠️ NEW approvals in this PR — require reviewer sign-off:
+```markdown
+## Breaking Change Analysis
 
-| Rule | Original | New | Description | Reason |
-|------|----------|-----|-------------|--------|
-| ResponsePropertyRemoved | [v2024-01-01#BarProperties.legacyStatus](link) | [v2025-01-01#BarProperties](link) | Property removed | Removed after deprecation period |
+❌ **1 unsuppressed breaking change detected**
 
-Label required: BreakingChangeReviewRequired
+1 unsuppressed · 2 version pairs compared
+
+### Unsuppressed Breaking Changes
+
+#### v2024-01-01 → v2025-01-01
+
+| Kind | Identity | Suppression |
+|------|----------|-------------|
+| [ResourcePropertyRemoved](link) | [DELETE .../bars/{}](link) `body.properties.legacyStatus` | `@approvedBreakingChange("ResourcePropertyRemoved", { path: "properties.legacyStatus", reason: "<your reason>" })` |
+
+<details>
+<summary>Suppression examples</summary>
+
+**ResourcePropertyRemoved (legacyStatus):**
+```diff
++ @approvedBreakingChange("ResourcePropertyRemoved", { path: "properties.legacyStatus", reason: "<your reason>" })
+  model BarProperties {
 ```
 
-```text
-❌ Unsuppressed breaking changes:
+</details>
+```
 
-| Rule | Original | New | Description | Suggested Suppression |
-|------|----------|-----|-------------|-----------------------|
-| ResponsePropertyRemoved | [v2024-01-01#Bar.legacyField](link) | [v2025-01-01#Bar](link) | Property removed | `@approvedBreakingChange("ResponsePropertyRemoved", { path: "properties.legacyField", reason: "<your reason>" })` |
+**Suppressed findings:**
 
-Label required: BreakingChangeReviewRequired
+```markdown
+## Breaking Change Analysis
+
+⚠️ **1 new suppressed breaking change** — review required
+
+0 unsuppressed · 1 suppressed · 2 version pairs compared
+
+### New Suppressed Breaking Changes
+
+The following breaking changes have suppression decorators.
+Reviewers should verify these changes are intentional and properly justified.
+
+#### v2024-01-01 → v2025-01-01
+
+| Kind | Identity | Reason |
+|------|----------|--------|
+| [ResourcePropertyRemoved](link) | [DELETE .../bars/{}](link) `body.properties.legacyStatus` | Removed after deprecation period |
+```
+
+**No findings:**
+
+```markdown
+## Breaking Change Analysis
+
+✅ **No cross-version breaking changes found**
+
+0 unsuppressed · 2 version pairs compared
+```
+
+**Version Comparisons (collapsible detail):**
+
+Both Phase A and Phase B reports include a collapsible "Version Comparisons" section showing all pairs analyzed:
+
+```markdown
+<details>
+<summary>Version Comparisons</summary>
+
+| Service | Version Pair | Phase | Result |
+|---------|-------------|-------|--------|
+| Contoso.Management | v2024-01-01 (base → head) | same-version | ❌ 1 error |
+| Contoso.Management | v2024-01-01 → v2025-01-01 | cross-version | ✅ No breaking changes |
+
+</details>
 ```
 
 #### Phase A Output (Implemented)
@@ -907,6 +959,8 @@ Recursive type graphs are handled by caching: once we encounter a type already c
 
 What remains open is the exact scaling curve and which optimizations and restrictions are required for acceptable CI latency.
 
+> **Prototype result:** Performance testing on real Azure specs answered these questions — see Section 8.8 and `PROTOTYPE-EVALUATION.md` (Q8) for measured benchmarks.
+
 ## 8. Implementation Architecture (Prototype)
 
 This section documents the actual implementation in `packages/typespec-breaking-change`.
@@ -991,3 +1045,22 @@ The tool is both a standalone CLI and a TypeSpec library (providing suppression 
 | `cli.ts` | CLI entry point |
 | `decorators.ts` | Decorator JS implementations |
 | `lib/decorators.tsp` | Decorator TSP declarations and option models |
+
+### 8.8 Performance Results
+
+Performance was validated on real Azure specs during prototype evaluation. All benchmarks measure analysis time only (excluding initial TypeSpec compilation).
+
+| Spec | Operations | Versions | Pairs | Analysis Time |
+|------|-----------|----------|-------|---------------|
+| AppConfiguration | 29 | 3 (preview) | 0 | **0s** |
+| ContainerService/fleet | 12–42 | 13 (3 stable + 10 preview) | 8 | **8.4s** |
+| Network | 739 | 2 (stable) | 1 | **7.0s** |
+
+**Findings:**
+- All specs complete well under the 60-second CI budget (7x margin).
+- Bottleneck split: version mutator application (~50%), diff engine comparison (~45%), classification/suppression (~5%).
+- Scaling is linear with `operations × version_pairs`. Per-view mutator cost is ~180ms.
+- No parallelization or caching optimizations needed at current scale.
+- Integration tests enforce `expect(timing.totalMs).toBeLessThan(30_000)`.
+
+For full details, see `PROTOTYPE-EVALUATION.md` (Q8) and `typespec-breaking-change-test-coverage.md` (Section 7).
