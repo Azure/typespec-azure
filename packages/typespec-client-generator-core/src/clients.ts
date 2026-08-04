@@ -5,6 +5,7 @@ import {
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
+  getEffectiveClientApiVersionOverride,
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
@@ -203,6 +204,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
+  const apiVersionDefaultValue = getEffectiveClientApiVersionOverride(context, client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -213,6 +215,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
     versionsEnum: getVersionsEnum(context, client),
+    ...(apiVersionDefaultValue !== undefined && { apiVersionDefaultValue }),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
@@ -279,6 +282,10 @@ function addDefaultClientParameters<
       multipleServiceApiVersionParam.optional = true;
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
+      if (client.apiVersionDefaultValue !== undefined) {
+        apiVersionParam = { ...apiVersionParam };
+        apiVersionParam.clientDefaultValue = client.apiVersionDefaultValue;
+      }
       // For single-service clients, API version parameters are optional only when they have a client default value
       if (apiVersionParam.clientDefaultValue !== undefined) {
         apiVersionParam.optional = true;

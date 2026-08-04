@@ -36,10 +36,13 @@ export class ClientAdapter {
   // to avoid duplicates when the same parameter group is used in multiple methods
   private readonly parameterGroups: Map<string, go.ParameterGroup>;
 
+  private readonly clientApiVersionOverrides: Map<go.Client, string>;
+
   constructor(ta: TypeAdapter) {
     this.ta = ta;
     this.clientParams = new Map<string, go.MethodParameter>();
     this.parameterGroups = new Map<string, go.ParameterGroup>();
+    this.clientApiVersionOverrides = new Map<go.Client, string>();
   }
 
   /**
@@ -125,6 +128,9 @@ export class ClientAdapter {
 
     const goClient = new go.Client(this.ta.getPkg(), clientName, docs);
     goClient.parent = parent;
+    if (sdkClient.apiVersionDefaultValue !== undefined) {
+      this.clientApiVersionOverrides.set(goClient, sdkClient.apiVersionDefaultValue);
+    }
 
     // NOTE: per tcgc convention, if there is no param of kind credential
     // it means that the client doesn't require any kind of authentication.
@@ -1367,16 +1373,17 @@ export class ClientAdapter {
       // the ClientOptions.APIVersion setting is used to change the version.
       let paramType: go.Literal | go.String;
       let paramStyle: go.ParameterStyle;
-      if (opParam.clientDefaultValue) {
-        const client = method.receiver.type;
+      const client = method.receiver.type;
+      const clientDefaultValue =
+        this.clientApiVersionOverrides.get(client) ??
+        (typeof opParam.clientDefaultValue === "string" ? opParam.clientDefaultValue : undefined);
+      if (clientDefaultValue) {
         // check if we already have a ConstantDef for this API version.
-        let versionConst = client.apiVersions.find(
-          (e) => e.literal.literal === opParam.clientDefaultValue,
-        );
+        let versionConst = client.apiVersions.find((e) => e.literal.literal === clientDefaultValue);
         if (!versionConst) {
-          const literalValue = new go.Literal(this.ta.getStringType(), opParam.clientDefaultValue);
+          const literalValue = new go.Literal(this.ta.getStringType(), clientDefaultValue);
           versionConst = new go.ConstantDef(
-            `version${ensureNameCase(<string>opParam.clientDefaultValue)}`,
+            `version${ensureNameCase(clientDefaultValue)}`,
             literalValue,
           );
           client.apiVersions.push(versionConst);

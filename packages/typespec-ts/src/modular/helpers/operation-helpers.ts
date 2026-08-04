@@ -135,7 +135,7 @@ export function getSendPrivateFunction(
   let pathStr = `"${operationPath}"`;
   const urlTemplateParams = [
     ...getPathParameters(operation),
-    ...getQueryParameters(dpgContext, operation),
+    ...getQueryParameters(dpgContext, operation, client),
   ];
   if (urlTemplateParams.length > 0) {
     // Generate a unique local variable name that doesn't conflict with parameter names
@@ -1628,6 +1628,11 @@ export function getParameterMap(
   context: SdkContext,
   param: SdkHttpParameter,
   paramAccessor: string,
+  apiVersionOptions?: {
+    contextParamName?: string;
+    defaultValue?: string;
+    useDefaultOnly: boolean;
+  },
 ): string {
   // Use lowercase for header names since HTTP headers are case-insensitive
   const serializedName =
@@ -1638,12 +1643,18 @@ export function getParameterMap(
   }
 
   // Special case for api-version parameters with default values
-  if (param.isApiVersionParam && param.clientDefaultValue) {
-    // For multi-service, use only the default value (don't reference context.apiVersion)
-    if (context.emitterOptions?.isMultiService) {
-      return `"${serializedName}": "${param.clientDefaultValue}"`;
+  if (
+    param.isApiVersionParam &&
+    (param.clientDefaultValue !== undefined || apiVersionOptions?.defaultValue !== undefined)
+  ) {
+    const defaultValue = apiVersionOptions?.defaultValue ?? param.clientDefaultValue;
+    // A parent client's runtime API-version option must not cross into a child
+    // client with a distinct API-version default.
+    if (context.emitterOptions?.isMultiService || apiVersionOptions?.useDefaultOnly) {
+      return `"${serializedName}": "${defaultValue}"`;
     }
-    return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? "${param.clientDefaultValue}"`;
+    const paramName = apiVersionOptions?.contextParamName ?? param.name;
+    return `"${serializedName}": ${param.onClient ? "context." : ""}${paramName} ?? "${defaultValue}"`;
   }
 
   if (hasCollectionFormatInfo(param.kind, (param as any).collectionFormat)) {
@@ -1862,7 +1873,11 @@ function getPathParameters(operation: ServiceOperation, optionalParamName: strin
 /**
  * Extract the query parameters
  */
-function getQueryParameters(dpgContext: SdkContext, operation: ServiceOperation): string[] {
+function getQueryParameters(
+  dpgContext: SdkContext,
+  operation: ServiceOperation,
+  client?: SdkClientType<SdkHttpOperation>,
+): string[] {
   if (!operation.parameters) {
     return [];
   }
@@ -1871,6 +1886,18 @@ function getQueryParameters(dpgContext: SdkContext, operation: ServiceOperation)
     {
       query: [],
     };
+  const owner = client ? findClientForOperation(client, operation) : undefined;
+  const apiVersionContextParam = client?.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  const apiVersionOptions = {
+    contextParamName: apiVersionContextParam?.name,
+    defaultValue: owner?.apiVersionDefaultValue,
+    useDefaultOnly:
+      owner !== undefined &&
+      owner !== client &&
+      owner.apiVersionDefaultValue !== client?.apiVersionDefaultValue,
+  };
 
   for (const param of operationParameters) {
     if (param.kind === "query") {
@@ -1887,6 +1914,7 @@ function getQueryParameters(dpgContext: SdkContext, operation: ServiceOperation)
               serializedName: getUriTemplateQueryParamName(param.serializedName),
             },
             paramAccessor,
+            apiVersionOptions,
           ),
           param,
         });
@@ -1897,6 +1925,22 @@ function getQueryParameters(dpgContext: SdkContext, operation: ServiceOperation)
   const paramStr: string[] = parametersImplementation.query.map((i) => i.paramMap);
 
   return paramStr;
+}
+
+function findClientForOperation(
+  client: SdkClientType<SdkHttpOperation>,
+  operation: ServiceOperation,
+): SdkClientType<SdkHttpOperation> | undefined {
+  if (client.methods.includes(operation)) {
+    return client;
+  }
+  for (const child of client.children ?? []) {
+    const owner = findClientForOperation(child, operation);
+    if (owner) {
+      return owner;
+    }
+  }
+  return undefined;
 }
 
 function getUriTemplateQueryParamName(name: string) {
