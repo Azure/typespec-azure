@@ -9,6 +9,9 @@ namespace RawJson;
 model ContainsRawJson {
   anything1: unknown;
   anything2: unknown;
+
+  @doc("Additional properties supplied by the caller.")
+  extras?: unknown;
 }
 
 @put
@@ -37,5 +40,9 @@ type ContainsRawJSON struct {
 
 	// REQUIRED; The contents of this field are raw JSON.
 	Anything2 []byte
+
+	// Additional properties supplied by the caller.
+	// The contents of this field are raw JSON.
+	Extras []byte
 }
 ```
