@@ -1,27 +1,27 @@
 import {
   isReadOnly,
-  SdkClientInitializationType,
-  SdkClientType,
-  SdkExampleValue,
-  SdkHttpOperationExample,
-  SdkHttpParameterExampleValue,
-  SdkModelPropertyType,
-  SdkServiceOperation,
+  type SdkClientInitializationType,
+  type SdkClientType,
+  type SdkExampleValue,
+  type SdkHttpOperationExample,
+  type SdkHttpParameterExampleValue,
+  type SdkModelPropertyType,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
 import { joinPaths, NoTarget } from "@typespec/compiler";
-import { FunctionDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
+import { type FunctionDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
 import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
-  ServiceOperation,
+  type ServiceOperation,
 } from "../utils/operation-util.js";
 import {
   getClientParameterName,
@@ -32,7 +32,7 @@ import {
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
 import { buildPropertyNameMapper, isSpreadBodyParameter } from "./helpers/type-helpers.js";
-import { ModelOverrideOptions } from "./serialization/serialize-utils.js";
+import type { ModelOverrideOptions } from "./serialization/serialize-utils.js";
 
 /**
  * Interfaces for samples generations

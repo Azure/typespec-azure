@@ -1,4 +1,4 @@
-import { NoTarget, Program, resolvePath, type CompilerHost } from "@typespec/compiler";
+import { NoTarget, resolvePath, type CompilerHost, type Program } from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
 
 export async function pathExists(host: CompilerHost, targetPath: string): Promise<boolean> {

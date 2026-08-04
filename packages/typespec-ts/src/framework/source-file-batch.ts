@@ -1,7 +1,7 @@
 import {
-  ExportDeclarationStructure,
+  type ExportDeclarationStructure,
   SourceFile,
-  StatementStructures,
+  type StatementStructures,
   StructureKind,
 } from "ts-morph";
 

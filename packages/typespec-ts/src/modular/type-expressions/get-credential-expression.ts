@@ -1,4 +1,4 @@
-import { SdkCredentialType } from "@azure-tools/typespec-client-generator-core";
+import type { SdkCredentialType } from "@azure-tools/typespec-client-generator-core";
 import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 

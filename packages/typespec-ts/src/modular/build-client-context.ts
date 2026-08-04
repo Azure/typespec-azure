@@ -6,9 +6,9 @@ import {
   getClientParameters,
   getClientParametersDeclaration,
 } from "./helpers/client-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import {
+import type {
   SdkClientType,
   SdkCredentialParameter,
   SdkEndpointParameter,
@@ -24,7 +24,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";

@@ -8,20 +8,20 @@ import {
   isApiVersion,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  Discriminator,
-  EncodeData,
-  Enum,
-  EnumMember,
-  Model,
-  ModelProperty,
+  type Discriminator,
+  type EncodeData,
+  type Enum,
+  type EnumMember,
+  type Model,
+  type ModelProperty,
   NoTarget,
-  Program,
-  Scalar,
-  Service,
-  Type,
-  Union,
-  UnionVariant,
-  Value,
+  type Program,
+  type Scalar,
+  type Service,
+  type Type,
+  type Union,
+  type UnionVariant,
+  type Value,
   getDiscriminator,
   getDoc,
   getEffectiveModelType,
@@ -50,11 +50,11 @@ import {
   listServices,
 } from "@typespec/compiler";
 import {
-  HttpOperation,
-  HttpOperationHeaderParameter,
-  HttpOperationParameters,
-  HttpOperationPathParameter,
-  HttpOperationQueryParameter,
+  type HttpOperation,
+  type HttpOperationHeaderParameter,
+  type HttpOperationParameters,
+  type HttpOperationPathParameter,
+  type HttpOperationQueryParameter,
   Visibility,
   getHeaderFieldName,
   getHttpFileModel,
@@ -64,14 +64,14 @@ import {
   isBody,
   isStatusCode,
 } from "@typespec/http";
-import { GetSchemaOptions, SdkContext } from "./interfaces.js";
+import type { GetSchemaOptions, SdkContext } from "./interfaces.js";
 import { KnownMediaType, hasMediaType, isMediaTypeMultipartFormData } from "./media-types.js";
 
 import {
-  ArraySchema,
-  DictionarySchema,
-  ObjectSchema,
-  Schema,
+  type ArraySchema,
+  type DictionarySchema,
+  type ObjectSchema,
+  type Schema,
   SchemaContext,
 } from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";

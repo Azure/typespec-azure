@@ -3,14 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { DiagnosticSeverity, EmitContext, NoTarget } from "@typespec/compiler";
+import { type DiagnosticSeverity, type EmitContext, NoTarget } from "@typespec/compiler";
 import { execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync } from "fs";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import * as codegen from "./codegen/index.js";
 import { CodeModelError } from "./codemodel/errors.js";
-import { GoEmitterOptions, reportDiagnostic } from "./lib.js";
+import { type GoEmitterOptions, reportDiagnostic } from "./lib.js";
 import { Adapter, ExternalError } from "./tcgcadapter/adapter.js";
 import { AdapterError } from "./tcgcadapter/errors.js";
 

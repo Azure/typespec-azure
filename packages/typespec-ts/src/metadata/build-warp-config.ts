@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 
 export interface WarpConfigOptions {
   /** Source-level exports, e.g. { ".": "./src/index.ts", "./models": "./src/models/index.ts" } */

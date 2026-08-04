@@ -2,25 +2,29 @@
 // Licensed under the MIT License.
 
 import {
-  SdkClient,
+  type SdkClient,
   getHttpOperationWithCache,
   isApiVersion,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, Type, isVoidType } from "@typespec/compiler";
-import { HttpOperation, HttpOperationParameter, HttpOperationParameters } from "@typespec/http";
+import { NoTarget, type Type, isVoidType } from "@typespec/compiler";
+import type {
+  HttpOperation,
+  HttpOperationParameter,
+  HttpOperationParameters,
+} from "@typespec/http";
 import {
-  ApiVersionInfo,
-  Imports,
-  ObjectSchema,
-  OperationParameter,
-  ParameterBodyMetadata,
-  ParameterMetadata,
-  Schema,
+  type ApiVersionInfo,
+  type Imports,
+  type ObjectSchema,
+  type OperationParameter,
+  type ParameterBodyMetadata,
+  type ParameterMetadata,
+  type Schema,
   SchemaContext,
 } from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import {
   KnownMediaType,
   extractMediaTypes,

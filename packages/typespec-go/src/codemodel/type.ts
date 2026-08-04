@@ -7,7 +7,7 @@
 
 import * as path from "path";
 import { Client, ClientOptions } from "./client.js";
-import { PackageContent, PackageType, getPackageName } from "./module.js";
+import { type PackageContent, type PackageType, getPackageName } from "./module.js";
 import { ParameterGroup } from "./param.js";
 import { ResponseEnvelope } from "./result.js";
 

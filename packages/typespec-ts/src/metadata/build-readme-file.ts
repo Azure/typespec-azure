@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 import { getClientName } from "../utils/name-constructors.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { renderTemplate } from "./render-template.js";
