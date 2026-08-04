@@ -237,7 +237,14 @@ export interface ModelFieldAnnotations {
 
   /** unmarshal an empty string as nil. the default is false */
   unmarshalEmptyStringAsNil: boolean;
+
+  /** delimiter encoding used to serialize a string-like array as one string */
+  arrayEncoding?: ArrayEncoding;
 }
+
+/** supported delimiter encodings for model array properties */
+export type ArrayEncoding =
+  "commaDelimited" | "spaceDelimited" | "pipeDelimited" | "newlineDelimited";
 
 /** a struct that participates in serialization over the wire */
 export interface Model extends ModelBase {

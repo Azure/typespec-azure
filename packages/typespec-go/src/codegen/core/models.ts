@@ -513,6 +513,28 @@ function generateJSONMarshallerBody(
         // this will enable support for custom types that aren't (yet) described in the swagger.
         marshaller += `${indent.get()}objectMap["${field.serializedName}"] = ${receiver}.${field.name}\n`;
       }
+    } else if (field.type.kind === "slice" && field.annotations.arrayEncoding) {
+      imports.add("strings");
+      imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+      const source = `${receiver}.${field.name}`;
+      const delimiter = getArrayEncodingDelimiter(field.annotations.arrayEncoding);
+      marshaller += `${indent.get()}if azcore.IsNullValue(${source}) {\n`;
+      marshaller += `${indent.push().get()}objectMap["${field.serializedName}"] = nil\n`;
+      marshaller += `${indent.pop().get()}} else if ${source} != nil {\n`;
+      marshaller += `${indent.push().get()}encodedValue := make([]string, len(${source}))\n`;
+      marshaller += `${indent.get()}for i := range ${source} {\n`;
+      indent.push();
+      if (field.type.elementTypeByValue) {
+        marshaller += `${indent.get()}encodedValue[i] = ${getStringArrayElementExpression(field.type.elementType, `${source}[i]`)}\n`;
+      } else {
+        marshaller += `${indent.get()}if ${source}[i] != nil {\n`;
+        marshaller += `${indent.push().get()}encodedValue[i] = ${getStringArrayElementExpression(field.type.elementType, `*${source}[i]`)}\n`;
+        marshaller += `${indent.pop().get()}}\n`;
+      }
+      indent.pop();
+      marshaller += `${indent.get()}}\n`;
+      marshaller += `${indent.get()}objectMap["${field.serializedName}"] = strings.Join(encodedValue, "${delimiter}")\n`;
+      marshaller += `${indent.pop().get()}}\n`;
     } else if (field.type.kind === "encodedBytes") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       marshaller += `${indent.get()}populateByteArray(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() any {\n`;
@@ -736,6 +758,43 @@ function generateJSONUnmarshallerBody(
       if (hasDiscriminatorInterface(field.type)) {
         unmarshalBody += generateDiscriminatorUnmarshaller(modelDef.Model, field, receiver, indent);
         needsErrCheck = true;
+      } else if (field.type.kind === "slice" && field.annotations.arrayEncoding) {
+        imports.add("strings");
+        const delimiter = getArrayEncodingDelimiter(field.annotations.arrayEncoding);
+        const elementTypeName = go.getTypeDeclaration(field.type.elementType, modelDef.Model.pkg);
+        const sliceTypeName = go.getTypeDeclaration(field.type, modelDef.Model.pkg);
+        unmarshalBody += `${indent.get()}if val != nil && string(val) != "null" {\n`;
+        unmarshalBody += `${indent.push().get()}var encodedValue string\n`;
+        unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &encodedValue)\n`;
+        unmarshalBody += `${indent.get()}if err == nil {\n`;
+        unmarshalBody += `${indent.push().get()}if encodedValue == "" {\n`;
+        unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = ${sliceTypeName}{}\n`;
+        unmarshalBody += `${indent.pop().get()}} else {\n`;
+        unmarshalBody += `${indent.push().get()}values := strings.Split(encodedValue, "${delimiter}")\n`;
+        if (field.type.elementTypeByValue && field.type.elementType.kind === "string") {
+          unmarshalBody += `${indent.get()}${receiver}.${field.name} = values\n`;
+        } else {
+          unmarshalBody += `${indent.get()}${receiver}.${field.name} = make(${sliceTypeName}, len(values))\n`;
+          unmarshalBody += `${indent.get()}for i := range values {\n`;
+          indent.push();
+          const conversion =
+            field.type.elementType.kind === "string"
+              ? "values[i]"
+              : `${elementTypeName}(values[i])`;
+          if (field.type.elementTypeByValue) {
+            unmarshalBody += `${indent.get()}${receiver}.${field.name}[i] = ${conversion}\n`;
+          } else {
+            unmarshalBody += `${indent.get()}value := ${conversion}\n`;
+            unmarshalBody += `${indent.get()}${receiver}.${field.name}[i] = &value\n`;
+          }
+          indent.pop();
+          unmarshalBody += `${indent.get()}}\n`;
+        }
+        unmarshalBody += `${indent.pop().get()}}\n`;
+        unmarshalBody += `${indent.pop().get()}}\n`;
+        unmarshalBody += `${indent.pop().get()}}\n`;
+        modelDef.SerDe.needsJSONUnpopulate = true;
+        needsErrCheck = true;
       } else if (field.type.kind === "time") {
         unmarshalBody += `${indent.get()}err = unpopulateTime[datetime.${field.type.format}](val, "${field.name}", &${receiver}.${field.name})\n`;
         modelDef.SerDe.needsJSONUnpopulateTime = true;
@@ -855,6 +914,26 @@ function generateJSONUnmarshallerBody(
   unmarshalBody += `${indent.get()}}\n`; // end for key, val := range rawMsg
   unmarshalBody += `${indent.get()}return nil\n`;
   return unmarshalBody;
+}
+
+function getArrayEncodingDelimiter(encoding: go.ArrayEncoding): string {
+  switch (encoding) {
+    case "commaDelimited":
+      return ",";
+    case "spaceDelimited":
+      return " ";
+    case "pipeDelimited":
+      return "|";
+    case "newlineDelimited":
+      return "\\n";
+  }
+}
+
+function getStringArrayElementExpression(type: go.SliceElementType, value: string): string {
+  if (type.kind === "string") {
+    return value;
+  }
+  return `string(${value})`;
 }
 
 // returns true if item has a discriminator interface.
