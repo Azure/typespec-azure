@@ -25,12 +25,6 @@ export interface ContainingModule {
   identity: string;
 
   /**
-   * the directory containing the emitted package, relative to the module root.
-   * empty when emitting into the module root.
-   */
-  relativePackagePath?: string;
-
-  /**
    * the subpackage to emit.
    * NOTE: callers MUST set this post construction
    */

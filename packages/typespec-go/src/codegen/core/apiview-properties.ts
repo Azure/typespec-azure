@@ -9,9 +9,9 @@ import { fixUpMethodName } from "./operations.js";
 
 /** the shape of the apiview-properties.json file */
 interface ApiViewProperties {
-  CrossLanguagePackageId?: string;
+  CrossLanguagePackageId: string;
   CrossLanguageDefinitionId: Record<string, string>;
-  CrossLanguageVersion?: string;
+  CrossLanguageVersion: string;
 }
 
 /**
@@ -20,16 +20,20 @@ interface ApiViewProperties {
  * so that APIView can link the Go API surface to the other languages.
  *
  * @param codeModel the code model for which to generate the mapping
+ * @param containingModuleRelativePackagePath the emitted package's path relative to its containing module root
  * @returns the JSON content or the empty string when there's nothing to emit
  */
-export function generateApiViewProperties(codeModel: go.CodeModel): string {
+export function generateApiViewProperties(
+  codeModel: go.CodeModel,
+  containingModuleRelativePackagePath?: string,
+): string {
   const rootPkg =
     codeModel.root.kind === "module" ? codeModel.root : codeModel.root.package;
 
   const definitionIDs = new Map<string, string>();
   collectPackage(
     rootPkg,
-    relPackageName(rootPkg),
+    relPackageName(rootPkg, containingModuleRelativePackagePath),
     codeModel.type,
     codeModel.info.title,
     definitionIDs,
@@ -55,19 +59,23 @@ export function generateApiViewProperties(codeModel: go.CodeModel): string {
  * APIView parser qualifies every line ID. e.g. azblob or azblob/blob
  *
  * @param pkg the package for which to compute the name
+ * @param containingModuleRelativePackagePath the emitted package's path relative to its containing module root
  * @returns the module-relative package path
  */
-function relPackageName(pkg: go.PackageContent): string {
+function relPackageName(
+  pkg: go.PackageContent,
+  containingModuleRelativePackagePath?: string,
+): string {
   if (pkg.kind === "module") {
     return go.getPackageName(pkg);
   }
   const parent = pkg.parent;
   if (parent.kind === "containingModule") {
     const moduleName = path.basename(parent.identity.replace(/\/v\d+$/, ""));
-    const packagePath = parent.relativePackagePath ?? pkg.name;
+    const packagePath = containingModuleRelativePackagePath ?? pkg.name;
     return packagePath ? `${moduleName}/${packagePath}` : moduleName;
   }
-  const parentName = relPackageName(parent);
+  const parentName = relPackageName(parent, containingModuleRelativePackagePath);
   return `${parentName}/${pkg.name}`;
 }
 

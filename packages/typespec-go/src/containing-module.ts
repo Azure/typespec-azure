@@ -4,24 +4,21 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as path from "path";
-import type { ContainingModule } from "./codemodel/index.js";
 
 /**
- * Sets the emitted package's path relative to its containing module root when
- * the output directory is within that root. Otherwise, the caller's fallback
- * remains in effect.
+ * Returns the emitted package's path relative to its containing module root
+ * when the output directory is within that root.
  *
- * @param module the containing module to update
  * @param moduleRoot the directory containing the module's go.mod
  * @param emitterOutputDir the directory receiving generated files
+ * @returns the module-relative package path, or undefined when it cannot be calculated
  */
-export function setContainingModuleRelativePackagePath(
-  module: ContainingModule,
+export function getContainingModuleRelativePackagePath(
   moduleRoot: string | undefined,
   emitterOutputDir: string,
-): void {
+): string | undefined {
   if (!moduleRoot) {
-    return;
+    return undefined;
   }
 
   const relativePath = path.relative(moduleRoot, emitterOutputDir);
@@ -30,8 +27,8 @@ export function setContainingModuleRelativePackagePath(
     relativePath.startsWith(`..${path.sep}`) ||
     path.isAbsolute(relativePath)
   ) {
-    return;
+    return undefined;
   }
 
-  module.relativePackagePath = relativePath.split(path.sep).join("/");
+  return relativePath.split(path.sep).join("/");
 }

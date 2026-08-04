@@ -94,8 +94,10 @@ export class Adapter {
       throw new AdapterError("InvalidArgument", "missing argument module or containing-module");
     }
 
-    const info = new go.Info(this.ctx.sdkPackage.crossLanguagePackageId);
-    info.crossLanguageVersion = this.ctx.sdkPackage.crossLanguageVersion;
+    const info = new go.Info(
+      this.ctx.sdkPackage.crossLanguagePackageId,
+      this.ctx.sdkPackage.crossLanguageVersion,
+    );
     const codeModelType: go.CodeModelType = this.ctx.arm === true ? "azure-arm" : "data-plane";
     this.codeModel = new go.CodeModel(info, codeModelType, goOptions, root);
     this.codeModel.metadata = buildMetadata(this.ctx.sdkPackage.metadata);

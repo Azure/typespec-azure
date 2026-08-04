@@ -17,7 +17,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { assert, describe, it } from "vitest";
 import * as codegen from "../../src/codegen/index.js";
-import { setContainingModuleRelativePackagePath } from "../../src/containing-module.js";
+import { getContainingModuleRelativePackagePath } from "../../src/containing-module.js";
 import type { GoEmitterOptions } from "../../src/lib.js";
 import { Adapter } from "../../src/tcgcadapter/adapter.js";
 
@@ -173,9 +173,9 @@ export async function emitGoFor(
 
   const adapter = await Adapter.create(context);
   const codeModel = adapter.tcgcToGoCodeModel();
+  let containingModuleRelativePackagePath: string | undefined;
   if (codeModel.root.kind === "containingModule") {
-    setContainingModuleRelativePackagePath(
-      codeModel.root,
+    containingModuleRelativePackagePath = getContainingModuleRelativePackagePath(
       resolveVirtualPath(baseOutputDir),
       context.emitterOutputDir,
     );
@@ -203,7 +203,7 @@ export async function emitGoFor(
   if (codeModel.options.generateExamples) {
     await emitter.emitExamples();
   }
-  await emitter.emitApiViewPropertiesFile();
+  await emitter.emitApiViewPropertiesFile(containingModuleRelativePackagePath);
 
   return files;
 }
