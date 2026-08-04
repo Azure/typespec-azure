@@ -158,7 +158,11 @@ export function generateOperations(
       for (const param of client.parameters) {
         if (go.isLiteralParameter(param.style)) {
           continue;
-        } else if (clientAccessor.returns.parameters.some((p) => p.name === param.name)) {
+        } else if (
+          clientAccessor.returns.parameters.some(
+            (p) => p.name === param.name && !go.isLiteralParameter(p.style),
+          )
+        ) {
           // only propagate ctor params that are common between parent/child
           initFields.push(`${param.name}: client.${param.name}`);
         }
@@ -312,7 +316,13 @@ function generateConstructors(
           case "queryScalarParam":
           case "uriParam":
             if (param.isApiVersion) {
-              apiVersionParam = param;
+              const currentIsPath =
+                apiVersionParam?.kind === "pathScalarParam" ||
+                apiVersionParam?.kind === "uriParam";
+              const paramIsPath = param.kind === "pathScalarParam" || param.kind === "uriParam";
+              if (!apiVersionParam || (currentIsPath && !paramIsPath)) {
+                apiVersionParam = param;
+              }
             }
         }
       }

@@ -1251,12 +1251,29 @@ export class ClientAdapter {
 
         // we must check via param name and not reference equality. this is because a client param
         // can be used in multiple ways. e.g. a client param "apiVersion" that's used as a path param
-        // in one method and a query param in another.
-        if (
-          !method.receiver.type.parameters.find((v: go.ClientParameter) => {
-            return v.name === adaptedParam.name;
-          })
-        ) {
+        // in one method and a query param in another. path API versions are kept separately because
+        // they require a client field while query/header API versions are handled by the pipeline.
+        const isPathAPIVersionWithDefault =
+          adaptedParam.kind === "pathScalarParam" &&
+          adaptedParam.isApiVersion &&
+          go.isClientSideDefault(adaptedParam.style);
+        const addClientParameter = (client: go.Client): void => {
+          const existingParam = client.parameters.find((v: go.ClientParameter) => {
+            if (v.name !== adaptedParam.name) {
+              return false;
+            }
+            if (!go.isAPIVersionParameter(v) || !go.isAPIVersionParameter(adaptedParam)) {
+              return true;
+            }
+            return (
+              v.kind === adaptedParam.kind ||
+              (v.kind !== "pathScalarParam" && adaptedParam.kind !== "pathScalarParam")
+            );
+          });
+          if (existingParam) {
+            return;
+          }
+
           if (
             this.ta.codeModel.type === "azure-arm" &&
             adaptedParam.style !== "literal" &&
@@ -1268,13 +1285,30 @@ export class ClientAdapter {
               opParam.__raw?.node,
             );
           }
-          method.receiver.type.parameters.push(adaptedParam);
-          if (method.receiver.type.instance?.kind === "constructable") {
+
+          client.parameters.push(adaptedParam);
+          if (client.instance?.kind === "constructable") {
             // if this is an instantiable client then also add
             // the client parameter to all constructors
-            for (const ctor of method.receiver.type.instance.constructors) {
+            for (const ctor of client.instance.constructors) {
               ctor.parameters.push(adaptedParam);
             }
+            if (
+              client.instance.options.kind === "clientOptions" &&
+              isPathAPIVersionWithDefault &&
+              !client.instance.options.parameters.some((param) => param.name === adaptedParam.name)
+            ) {
+              client.instance.options.parameters.push(adaptedParam);
+            }
+          }
+        };
+
+        addClientParameter(method.receiver.type);
+        if (go.isAPIVersionParameter(adaptedParam)) {
+          let parent = method.receiver.type.parent;
+          while (parent) {
+            addClientParameter(parent);
+            parent = parent.parent;
           }
         }
       }
@@ -1317,8 +1351,9 @@ export class ClientAdapter {
       | tcgc.SdkQueryParameter,
   ): go.MethodParameter {
     if (opParam.isApiVersionParam) {
-      // we emit the api version param inline as a literal, never as a param.
-      // the ClientOptions.APIVersion setting is used to change the version.
+      // Header/query API versions are emitted inline and overridden by the pipeline.
+      // Path API versions must be stored on the client because the pipeline cannot
+      // replace a path segment after the request URL has been constructed.
       let paramType: go.Literal | go.String;
       let paramStyle: go.ParameterStyle;
       if (opParam.clientDefaultValue) {
@@ -1335,8 +1370,23 @@ export class ClientAdapter {
           );
           client.apiVersions.push(versionConst);
         }
-        paramType = new go.Literal(versionConst, versionConst.name);
-        paramStyle = "literal";
+        const versionLiteral = new go.Literal(versionConst, versionConst.name);
+        let rootClient = client;
+        while (rootClient.parent) {
+          rootClient = rootClient.parent;
+        }
+        if (
+          opParam.kind === "path" &&
+          opParam.onClient &&
+          rootClient.instance?.kind === "constructable" &&
+          rootClient.instance.options.kind === "clientOptions"
+        ) {
+          paramType = this.ta.getStringType();
+          paramStyle = new go.ClientSideDefault(versionLiteral);
+        } else {
+          paramType = versionLiteral;
+          paramStyle = "literal";
+        }
       } else {
         paramType = this.ta.getStringType();
         paramStyle = opParam.optional ? "optional" : "required";
@@ -1366,6 +1416,9 @@ export class ClientAdapter {
             true,
             paramLoc,
           );
+          if (go.isClientSideDefault(paramStyle)) {
+            apiVersionParam.omitEmptyStringCheck = true;
+          }
           break;
         case "query":
           apiVersionParam = new go.QueryScalarParameter(
