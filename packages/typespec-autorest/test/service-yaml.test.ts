@@ -2,8 +2,8 @@ import { resolvePath, type Diagnostic } from "@typespec/compiler";
 import { expectDiagnostics, type EmitterTester } from "@typespec/compiler/testing";
 import { assert, describe, expect, it } from "vitest";
 import { parse } from "yaml";
-import { AutorestEmitterOptions } from "../src/lib.js";
-import { ServiceYaml } from "../src/types.js";
+import type { AutorestEmitterOptions } from "../src/lib.js";
+import type { ServiceYaml } from "../src/types.js";
 import { AzureTester, Tester } from "./test-host.js";
 
 interface EmitServiceYamlResult {

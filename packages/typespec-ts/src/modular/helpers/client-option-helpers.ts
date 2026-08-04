@@ -1,4 +1,4 @@
-import { DecoratedType, SdkModelType } from "@azure-tools/typespec-client-generator-core";
+import type { DecoratedType, SdkModelType } from "@azure-tools/typespec-client-generator-core";
 
 /**
  * Represents a header-to-property mapping from @clientOption("header", ...).

@@ -1,5 +1,9 @@
-import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
+  FinalStateValue,
+  type LroMetadata,
+  type ParameterSource,
+} from "@azure-tools/typespec-azure-core";
+import type {
   DateTimeKnownEncoding,
   Diagnostic,
   DurationKnownEncoding,
@@ -18,11 +22,11 @@ import {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
-  HttpAuth,
-  HttpOperation,
-  HttpOperationResponse,
-  HttpStatusCodeRange,
-  HttpVerb,
+  type HttpAuth,
+  type HttpOperation,
+  type HttpOperationResponse,
+  type HttpStatusCodeRange,
+  type HttpVerb,
   Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";

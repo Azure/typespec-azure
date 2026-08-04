@@ -1,4 +1,4 @@
-import { Operation, Program, Type, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, type Program, type Type, createRule, fileRef } from "@typespec/compiler";
 import { getHeaderFieldName, isHeader } from "@typespec/http";
 import { getOperationLink } from "../decorators/operation-link.js";
 import {

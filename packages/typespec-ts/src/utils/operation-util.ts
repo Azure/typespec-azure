@@ -7,19 +7,26 @@ import {
   getHttpOperationWithCache,
   getWireName,
   InitializedByFlags,
-  SdkBodyParameter,
-  SdkClient,
-  SdkClientType,
-  SdkHttpOperation,
-  SdkHttpParameter,
-  SdkMethod,
-  SdkMethodParameter,
-  SdkServiceMethod,
-  SdkServiceOperation,
+  type SdkBodyParameter,
+  type SdkClient,
+  type SdkClientType,
+  type SdkHttpOperation,
+  type SdkHttpParameter,
+  type SdkMethod,
+  type SdkMethodParameter,
+  type SdkServiceMethod,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { isList, ModelProperty, NoTarget, Operation, Program, Type } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/typekit";
 import {
+  isList,
+  type ModelProperty,
+  NoTarget,
+  type Operation,
+  type Program,
+  type Type,
+} from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
+import type {
   HttpOperation,
   HttpOperationParameter,
   HttpOperationResponse,
@@ -29,15 +36,15 @@ import { resolveReference } from "../framework/reference.js";
 import {
   OPERATION_LRO_HIGH_PRIORITY,
   OPERATION_LRO_LOW_PRIORITY,
-  OperationLroDetail,
-  Paths,
-  ResponseMetadata,
-  ResponseTypes,
+  type OperationLroDetail,
+  type Paths,
+  type ResponseMetadata,
+  type ResponseTypes,
 } from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
 import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
 import { listOperationsUnderClient } from "./client-utils.js";
-import { SdkContext } from "./interfaces.js";
+import type { SdkContext } from "./interfaces.js";
 import {
   isMediaTypeMultipart,
   isMediaTypeXml,

@@ -13,7 +13,7 @@ using Rest;
  * is accessible at multiple, fixed resource paths.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceName Optional. The name of the resource type described in this template
  */
 interface LegacyOperations<
@@ -34,7 +34,7 @@ interface LegacyOperations<
  * is accessible at multiple, fixed resource paths. Can be used with static routes.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  * @template RoutedResourceName Optional. The name of the resource type described in this template
  */
@@ -660,7 +660,7 @@ op CreateOrReplaceSync<
 
 /**
  * A resource list operation, at the subscription scope, that lists only a single page
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -681,7 +681,7 @@ op ArmListSinglePageBySubscription<
 
 /**
  * A resource list operation, at the scope of the resource's parent that lists only a single page.
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource

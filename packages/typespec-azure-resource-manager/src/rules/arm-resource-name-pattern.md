@@ -8,7 +8,7 @@ The resource name lacks the required pattern restriction, violating the RPC cont
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [ResourceNameRestriction](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [ResourceNameRestriction](https://github.com/Azure/azure-openapi-validator/blob/main/docs/resource-name-restriction.md).
 
 ## ❌ Incorrect
 

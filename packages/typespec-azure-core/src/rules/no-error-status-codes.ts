@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
+import { type Operation, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 

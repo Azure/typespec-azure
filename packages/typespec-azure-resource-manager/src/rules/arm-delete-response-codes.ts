@@ -1,4 +1,4 @@
-import { Program, createRule, fileRef } from "@typespec/compiler";
+import { type Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { getArmResources } from "../resource.js";

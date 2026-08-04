@@ -1,7 +1,7 @@
 import {
-  DecoratedType,
-  Decorator,
-  Type,
+  type DecoratedType,
+  type Decorator,
+  type Type,
   createRule,
   fileRef,
   getTypeName,

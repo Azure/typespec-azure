@@ -1,4 +1,10 @@
-import { Model, createRule, fileRef, getNamespaceFullName, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  createRule,
+  fileRef,
+  getNamespaceFullName,
+  paramMessage,
+} from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";

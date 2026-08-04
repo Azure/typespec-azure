@@ -5,7 +5,7 @@ import {
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { UnionEnumVariant } from "../../src/helpers/union-enums.js";
+import type { UnionEnumVariant } from "../../src/helpers/union-enums.js";
 import { getUnionAsEnum } from "../../src/index.js";
 
 async function testUnionAsEnum(code: string) {

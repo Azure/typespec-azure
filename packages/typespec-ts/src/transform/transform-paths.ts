@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import {
-  SdkClient,
+  type SdkClient,
   getHttpOperationWithCache,
   isApiVersion,
 } from "@azure-tools/typespec-client-generator-core";
-import { HttpOperation, HttpOperationParameters } from "@typespec/http";
+import type { HttpOperation, HttpOperationParameters } from "@typespec/http";
 import { getImportedModelName, getSchemaForType, isBodyRequired } from "../utils/model-utils.js";
 import {
   extractOperationLroDetail,
@@ -20,9 +20,15 @@ import {
 } from "../utils/operation-util.js";
 
 import { getDoc } from "@typespec/compiler";
-import { Imports, OperationMethod, PathMetadata, Paths, SchemaContext } from "../interfaces.js";
+import {
+  type Imports,
+  type OperationMethod,
+  type PathMetadata,
+  type Paths,
+  SchemaContext,
+} from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { getParameterTypeName, getResponseTypeName } from "../utils/name-constructors.js";
 import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
 

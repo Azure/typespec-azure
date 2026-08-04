@@ -8,7 +8,7 @@
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
 import * as go from "../codemodel/index.js";
-import { GoEmitterOptions } from "../lib.js";
+import type { GoEmitterOptions } from "../lib.js";
 import * as naming from "../naming/index.js";
 import { ClientAdapter } from "./clients.js";
 import { AdapterError } from "./errors.js";
@@ -35,7 +35,11 @@ export class Adapter {
     // however, it's filtered out by default so we need
     // to add it to the allow list of decorators
     const ctx = await tcgc.createSdkContext(context, "@azure-tools/typespec-go", {
-      additionalDecorators: ["TypeSpec\\.@encodedName", "@deserializeEmptyStringAsNull"],
+      additionalDecorators: [
+        "TypeSpec\\.@encodedName",
+        "@deserializeEmptyStringAsNull",
+        "@responseAsBool",
+      ],
       disableUsageAccessPropagationToBase: true,
     });
 

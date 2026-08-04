@@ -1,12 +1,12 @@
 import {
-  Interface,
-  Operation,
-  Program,
+  type Interface,
+  type Operation,
+  type Program,
   createRule,
   fileRef,
   getNamespaceFullName,
 } from "@typespec/compiler";
-import { TypeReferenceNode } from "@typespec/compiler/ast";
+import type { TypeReferenceNode } from "@typespec/compiler/ast";
 import { isExcludedCoreType } from "./utils.js";
 
 function getTypeReferenceNamespace(program: Program, ref: TypeReferenceNode): string {

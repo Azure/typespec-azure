@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 
 const esLintConfigEsmAzureSdk = `import azsdkEslint from "@azure/eslint-plugin-azure-sdk";
 

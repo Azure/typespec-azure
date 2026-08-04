@@ -8,7 +8,7 @@ Nesting resources beyond three levels violates the RPC contract.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [TrackedResourceBeyondThirdLevel](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [TrackedResourceBeyondThirdLevel](https://github.com/Azure/azure-openapi-validator/blob/main/docs/tracked-resource-beyond-thrid-level.md).
 
 ## ❌ Incorrect
 

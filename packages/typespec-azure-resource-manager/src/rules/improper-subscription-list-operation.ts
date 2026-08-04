@@ -1,4 +1,4 @@
-import { createRule, fileRef, Program } from "@typespec/compiler";
+import { createRule, fileRef, type Program } from "@typespec/compiler";
 import { getArmResources, getResourceBaseType, ResourceBaseType } from "../resource.js";
 import { getInterface } from "./utils.js";
 

@@ -1,11 +1,11 @@
 import {
   createRule,
   isNullType,
-  Model,
-  ModelProperty,
+  type Model,
+  type ModelProperty,
   paramMessage,
-  Program,
-  Union,
+  type Program,
+  type Union,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import {

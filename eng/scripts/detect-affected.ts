@@ -9,7 +9,8 @@ import { pathToFileURL } from "node:url";
 // Upstream *package* dependencies are NOT listed there: they are derived from
 // the real pnpm workspace graph (`getAffectedPackages`, via
 // `pnpm --filter "...[base]"`). The config only declares what the graph cannot
-// express (ignore globs, shared/extra CI-infra paths, the submodule path, and
+// express (ignore/test-pattern globs, shared/extra CI-infra paths, the submodule
+// path, and
 // the target -> package mapping).
 //
 // TO ADD A NEW TARGET (e.g. `go`):
@@ -42,8 +43,21 @@ interface Target {
 interface Config {
   /** Git path that changes when the git-submodule pointer moves (triggers all targets). */
   submodulePath: string;
-  /** Globs whose sole change should NOT trigger anything; passed to pnpm via `--changed-files-ignore-pattern`. */
+  /**
+   * Globs whose sole change should NOT trigger anything, for any package. Passed
+   * to pnpm via `--changed-files-ignore-pattern`: a package whose only changes
+   * match these globs is not reported as affected at all (e.g. `**\/*.md`).
+   */
   ignore: string[];
+  /**
+   * Globs identifying test files, passed to pnpm via `--test-pattern`. A package
+   * whose only changes are test files is still reported as affected (so its own
+   * target runs and executes the new/updated tests), but the change does NOT
+   * propagate to its graph dependents. In other words the "ignore test changes"
+   * behavior applies only to *upstream* packages, not to the package that owns
+   * the tests (Azure/typespec-azure test-only PRs must still run their target).
+   */
+  ignoreUpstream: string[];
   /** Paths that trigger every target (shared CI infra + the root pnpm workspace file). */
   sharedExtra: string[];
   targets: Record<string, Target>;
@@ -70,7 +84,7 @@ function runPnpm(args: string[]): string {
  * because that is all the non-package CI-infra paths ever need:
  *   - `dir/**`  — the file is `dir` or lives anywhere under it.
  *   - exact     — the file path equals the pattern.
- * (Test/markdown ignore globs are handled by pnpm, not here.)
+ * (Ignore/test-pattern globs are handled by pnpm, not here.)
  */
 export function matchesAny(file: string, patterns: string[]): boolean {
   return patterns.some((pattern) => {
@@ -125,16 +139,31 @@ function getChangedFiles(base: string, head: string): string[] {
  * meaningful change plus all of its graph dependents. Change detection, dependent
  * expansion, and test/markdown filtering are all delegated to pnpm:
  *
- *   pnpm --filter "...[<base>]" --changed-files-ignore-pattern <glob> list --depth -1 --json
+ *   pnpm --filter "...[<base>]"
+ *        --changed-files-ignore-pattern <glob>   (repeated per `ignore` glob)
+ *        --test-pattern <glob>                   (repeated per `ignoreUpstream` glob)
+ *        list --depth -1 --json
  *
  * `...[base]` diffs `base` against the working tree (in CI the checkout is HEAD,
- * so this is `base..HEAD`). Each `ignore` glob is passed as its own
- * `--changed-files-ignore-pattern`; a package whose only changes match those
- * globs is not reported.
+ * so this is `base..HEAD`).
+ *
+ * Each `ignore` glob is passed as its own `--changed-files-ignore-pattern`; a
+ * package whose only changes match those globs (e.g. markdown) is not reported.
+ *
+ * Each `ignoreUpstream` glob is passed as its own `--test-pattern`. Unlike the
+ * ignore globs, a test-only change still reports the owning package as affected
+ * (so a test-only PR runs that package's target), it just does not propagate to
+ * the package's dependents. This keeps the "ignore test changes" behavior
+ * scoped to *upstream* packages only.
  */
-function getAffectedPackages(base: string, ignore: string[]): Set<string> {
+function getAffectedPackages(
+  base: string,
+  ignore: string[],
+  ignoreUpstream: string[],
+): Set<string> {
   const args = ["--filter", `...[${base}]`];
   for (const glob of ignore) args.push("--changed-files-ignore-pattern", glob);
+  for (const glob of ignoreUpstream) args.push("--test-pattern", glob);
   args.push("list", "--depth", "-1", "--json");
   const out = runPnpm(args).trim();
   if (!out) return new Set();
@@ -153,7 +182,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
 
   const changedFiles = getChangedFiles(base, head);
-  const affectedPackages = getAffectedPackages(base, CONFIG.ignore);
+  const affectedPackages = getAffectedPackages(base, CONFIG.ignore, CONFIG.ignoreUpstream);
   const affected = computeAffected(affectedPackages, changedFiles, CONFIG);
 
   console.log(`Base: ${base}`);
