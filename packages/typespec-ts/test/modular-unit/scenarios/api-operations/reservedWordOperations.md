@@ -160,3 +160,67 @@ export async function global(
   return _globalDeserialize(result);
 }
 ```
+
+# should rename reserved word operation using singularized operation group name
+
+## TypeSpec
+
+```tsp
+@route("/conversations")
+interface Conversations {
+  @delete
+  delete(@path conversationName: string): void;
+}
+```
+
+```yaml
+enable-operation-group: true
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "../index.js";
+import { expandUrlTemplate } from "../../static-helpers/urlTemplate.js";
+import { ConversationsDeleteOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  PathUncheckedResponse,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+
+export function _deleteConversationSend(
+  context: Client,
+  conversationName: string,
+  options: ConversationsDeleteOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  const path = expandUrlTemplate(
+    "/conversations/{conversationName}",
+    {
+      conversationName: conversationName,
+    },
+    {
+      allowReserved: options?.requestOptions?.skipUrlEncoding,
+    },
+  );
+  return context.path(path).delete({ ...operationOptionsToRequestParameters(options) });
+}
+
+export async function _deleteConversationDeserialize(result: PathUncheckedResponse): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+export async function deleteConversation(
+  context: Client,
+  conversationName: string,
+  options: ConversationsDeleteOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _deleteConversationSend(context, conversationName, options);
+  return _deleteConversationDeserialize(result);
+}
+```
