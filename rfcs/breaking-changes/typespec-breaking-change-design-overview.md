@@ -702,17 +702,71 @@ Label required: BreakingChangeReviewRequired
 Label required: BreakingChangeReviewRequired
 ```
 
-#### Phase A Output
+#### Phase A Output (Implemented)
 
-```text
-❌ Same-version regression detected:
+Phase A reports use the same structured format as Phase B, with unsuppressed and suppressed sections grouped by version pair. The key differences are: the report title defaults to "Versioning Change Analysis", the source links point to the head branch (not a version pair), and suppression hints use `@approvedUnversionedChange` instead of `@approvedBreakingChange`.
 
-| Rule | Base | Head | Description | Suggested Suppression |
-|------|------|------|-------------|-----------------------|
-| RequestTypeChanged | [base@v2024-01-01#Widget.count](link) | [head@v2024-01-01#Widget.count](link) | int32 → string | `@approvedUnversionedChange("RequestTypeChanged", { reason: "<your reason>" })` |
+**Unsuppressed findings:**
 
-Label required: VersioningReviewRequired
+```markdown
+## Versioning Change Analysis
+
+❌ **1 unsuppressed breaking change detected**
+
+1 unsuppressed · 1 version pair compared
+
+### Unsuppressed Breaking Changes
+
+#### v2024-01-01 (base → head)
+
+| Kind | Identity | Suppression |
+|------|----------|-------------|
+| [ResourcePropertyRemoved](link) | [DELETE .../widgets/{}](link) `body.properties.city` | `@approvedUnversionedChange("ResourcePropertyRemoved", { path: "city", reason: "<your reason>" })` |
+
+<details>
+<summary>Suppression examples</summary>
+
+**ResourcePropertyRemoved (city):**
+```diff
++ @approvedUnversionedChange("ResourcePropertyRemoved", { path: "city", reason: "<your reason>" })
+  model WidgetProperties {
 ```
+
+</details>
+```
+
+**Suppressed findings:**
+
+```markdown
+## Versioning Change Analysis
+
+⚠️ **1 new suppressed breaking change** — review required
+
+0 unsuppressed · 1 suppressed · 1 version pair compared
+
+### New Suppressed Breaking Changes
+
+The following breaking changes have suppression decorators.
+Reviewers should verify these changes are intentional and properly justified.
+
+#### v2024-01-01 (base → head)
+
+| Kind | Identity | Reason |
+|------|----------|--------|
+| [ResourcePropertyRemoved](link) | [DELETE .../widgets/{}](link) `body.properties.city` | Removed after deprecation period |
+```
+
+**No findings:**
+
+```markdown
+## Versioning Change Analysis
+
+✅ **No unversioned changes found**
+
+0 unsuppressed · 1 version pair compared
+```
+
+Note that Phase A findings use `Resource*` kinds (e.g., `ResourcePropertyRemoved`) when the same property appears in both request and response contexts, because the post-processing pipeline merges `Request*` + `Response*` findings before reporting. Suppression hints include `path:` when the finding targets a removed property, directing authors to place the decorator on the surviving parent model.
 
 This reporting format keeps the reason, the before/after links, and the suggested suppression visible in one place.
 It means authors do not need to reconstruct the right `DiffKind`, path syntax, or placement rule from memory.
