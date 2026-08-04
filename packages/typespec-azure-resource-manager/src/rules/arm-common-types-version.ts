@@ -1,4 +1,4 @@
-import { Program, SemanticNodeListener, createRule, fileRef } from "@typespec/compiler";
+import { type Program, type SemanticNodeListener, createRule, fileRef } from "@typespec/compiler";
 import { getAllHttpServices } from "@typespec/http";
 import { getVersion } from "@typespec/versioning";
 import { getArmProviderNamespace } from "../namespace.js";

@@ -1,4 +1,4 @@
-import {
+import type {
   Enum,
   EnumMember,
   Interface,
@@ -12,11 +12,14 @@ import {
   Union,
   UnionVariant,
 } from "@typespec/compiler";
-import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespec/compiler/ast";
+import type {
+  AugmentDecoratorStatementNode,
+  DecoratorExpressionNode,
+} from "@typespec/compiler/ast";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
   clientKey,

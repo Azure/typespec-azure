@@ -1,6 +1,6 @@
-import { SdkClientInitializationType } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, Program } from "@typespec/compiler";
-import { Authentication, HttpAuth } from "@typespec/http";
+import type { SdkClientInitializationType } from "@azure-tools/typespec-client-generator-core";
+import { NoTarget, type Program } from "@typespec/compiler";
+import type { Authentication, HttpAuth } from "@typespec/http";
 import { reportDiagnostic } from "../lib.js";
 
 /**

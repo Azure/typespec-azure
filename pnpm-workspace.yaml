@@ -15,7 +15,10 @@ packages:
 verifyDepsBeforeRun: false
 
 overrides:
-  "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
+  "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5"
+  "diff@>=6.0.0 <8.0.3": ">=8.0.3"
+  dompurify: ^3.3.3
+  "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
 
 onlyBuiltDependencies:
   - tree-sitter
@@ -74,7 +77,6 @@ catalog:
   "@scalar/json-magic": ^0.12.15
   "@scalar/openapi-parser": ^0.28.6
   "@scalar/openapi-types": ^0.9.1
-  "@storybook/cli": ^10.3.5
   "@storybook/react-vite": ^10.3.5
   "@testing-library/dom": ^10.4.1
   "@testing-library/jest-dom": ^7.0.0

@@ -1,6 +1,6 @@
 import {
-  Model,
-  ModelProperty,
+  type Model,
+  type ModelProperty,
   createRule,
   fileRef,
   getKeyName,

@@ -1,14 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { MethodSignatureStructure, OptionalKind, ParameterDeclarationStructure } from "ts-morph";
+import type {
+  MethodSignatureStructure,
+  OptionalKind,
+  ParameterDeclarationStructure,
+} from "ts-morph";
 import {
-  ClientModel,
-  Methods,
-  ObjectSchema,
-  ParameterMetadata,
-  PathParameter,
-  Schema,
+  type ClientModel,
+  type Methods,
+  type ObjectSchema,
+  type ParameterMetadata,
+  type PathParameter,
+  type Schema,
   SchemaContext,
 } from "../interfaces.js";
 import { NameType, normalizeName, pascalCase } from "./name-utils.js";

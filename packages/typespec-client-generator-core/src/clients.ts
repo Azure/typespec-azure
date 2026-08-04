@@ -1,6 +1,6 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getServers, HttpServer } from "@typespec/http";
+import { getServers, type HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -8,19 +8,19 @@ import {
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
-  ClientInitializationOptions,
+  type ClientInitializationOptions,
   InitializedByFlags,
-  SdkClient,
-  SdkClientInitializationType,
-  SdkClientType,
-  SdkEndpointParameter,
-  SdkEndpointType,
-  SdkEnumType,
-  SdkHttpOperation,
-  SdkPathParameter,
-  SdkServiceOperation,
-  SdkUnionType,
-  TCGCContext,
+  type SdkClient,
+  type SdkClientInitializationType,
+  type SdkClientType,
+  type SdkEndpointParameter,
+  type SdkEndpointType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkPathParameter,
+  type SdkServiceOperation,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {

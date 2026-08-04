@@ -1,4 +1,4 @@
-import { ModelProperty, Scalar, createRule, fileRef } from "@typespec/compiler";
+import { type ModelProperty, type Scalar, createRule, fileRef } from "@typespec/compiler";
 
 export const preventFormatRule = createRule({
   name: "no-format",

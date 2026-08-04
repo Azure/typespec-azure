@@ -1,5 +1,5 @@
 import {
-  ModelProperty,
+  type ModelProperty,
   UsageFlags,
   createAddDecoratorCodeFix,
   createRule,

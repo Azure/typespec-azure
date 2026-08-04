@@ -8,7 +8,7 @@ Inconsistent PATCH properties violate the RPC contract.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [ConsistentPatchProperties](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [ConsistentPatchProperties](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-patch-properties.md).
 
 ## ❌ Incorrect
 

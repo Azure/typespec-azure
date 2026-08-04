@@ -1,5 +1,5 @@
 import {
-  Operation,
+  type Operation,
   createRule,
   fileRef,
   getNamespaceFullName,

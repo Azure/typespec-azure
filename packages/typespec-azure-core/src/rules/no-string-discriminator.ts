@@ -1,4 +1,10 @@
-import { Model, createRule, fileRef, getDiscriminator, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  createRule,
+  fileRef,
+  getDiscriminator,
+  paramMessage,
+} from "@typespec/compiler";
 
 export const noStringDiscriminatorRule = createRule({
   name: "no-string-discriminator",

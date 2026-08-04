@@ -1,4 +1,4 @@
-import { ClientOptions } from "../interfaces.js";
+import type { ClientOptions } from "../interfaces.js";
 
 export interface ModularOptions {
   sourceRoot: string;

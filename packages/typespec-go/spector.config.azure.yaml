@@ -38,6 +38,7 @@ specs:
     { options: { module: coreclientlocationmoverootclientgroup } }
   "azure/client-generator-core/deserialize-empty-string-as-null":
     { options: { module: emptystringgroup } }
+  "azure/client-generator-core/exact-name": { options: { module: exactnamegroup } }
   "azure/client-generator-core/flatten-property": { options: { module: flattengroup } }
   "azure/client-generator-core/hierarchy-building": { options: { module: hierarchygroup } }
   "azure/client-generator-core/next-link-verb":
@@ -83,5 +84,3 @@ specs:
 
   # --- Not generated yet (tracked skips) ---
   "azure/client-generator-core/alternate-type": false
-  # emitter bug: generated fakes reference an unexported model (my_model)
-  "azure/client-generator-core/exact-name": false

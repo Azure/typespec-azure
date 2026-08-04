@@ -1,15 +1,15 @@
 import {
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
   createRule,
   fileRef,
   isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
-import { HttpVerb, getOperationVerb } from "@typespec/http";
+import { type HttpVerb, getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
 import {
   getNamespaceName,

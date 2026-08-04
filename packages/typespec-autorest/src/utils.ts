@@ -10,15 +10,15 @@ import {
   isGlobalNamespace,
   isService,
   isTemplateInstance,
-  ModelProperty,
-  Operation,
-  Program,
-  Service,
-  Type,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Service,
+  type Type,
 } from "@typespec/compiler";
 import { capitalize } from "@typespec/compiler/casing";
 import { getOperationId } from "@typespec/openapi";
-import { OpenApi2DocumentProxy } from "./types.js";
+import type { OpenApi2DocumentProxy } from "./types.js";
 
 export interface AutorestEmitterContext {
   readonly program: Program;

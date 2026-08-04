@@ -3,10 +3,10 @@ import {
   fileRef,
   getNamespaceFullName,
   ignoreDiagnostics,
-  Operation,
+  type Operation,
   paramMessage,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperationPathParameter } from "@typespec/http";
+import { getHttpOperation, type HttpOperationPathParameter } from "@typespec/http";
 import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
 interface PathParamInfo {

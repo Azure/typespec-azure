@@ -1,4 +1,4 @@
-import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { csharpUseStandardAcronymsRule } from "../../src/rules/csharp-use-standard-acronyms.js";
 import { d, SimpleBaseTester, SimpleTester } from "../tester.js";

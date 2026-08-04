@@ -1,13 +1,16 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getClassicalOperation } from "./helpers/classical-operation-helpers.js";
 import { getClassicalLayerPrefix } from "./helpers/naming-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
 export function buildClassicOperationFiles(
   dpgContext: SdkContext,

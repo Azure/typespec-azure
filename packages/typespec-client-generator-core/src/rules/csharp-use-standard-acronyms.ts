@@ -1,12 +1,12 @@
 import {
-  Enum,
-  Model,
-  ModelProperty,
-  Program,
   createRule,
   fileRef,
   paramMessage,
+  type Enum,
   type LinterRuleContext,
+  type Model,
+  type ModelProperty,
+  type Program,
 } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
