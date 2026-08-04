@@ -40,6 +40,15 @@ export function formatSuppressionGuidance(finding: Finding): SuppressionGuidance
 export function formatSuppressionHint(finding: Finding): string {
   const decoratorName =
     finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
+
+  // For Phase A removals, include path option to target the removed property
+  if (finding.phase === "same-version" && finding.diff.origin) {
+    const propertyPath = getPropertyPath(finding.diff.origin);
+    if (propertyPath) {
+      return `${decoratorName}("your reason here", #{ kind: "${finding.diff.kind}", path: "${propertyPath}" })`;
+    }
+  }
+
   return `${decoratorName}("your reason here", #{ kind: "${finding.diff.kind}" })`;
 }
 
@@ -174,18 +183,14 @@ function getPropertyPath(origin: OriginDeclaration): string | undefined {
 
 /**
  * Build a diff snippet from a source location: decorator as added line, target line as context.
+ * Uses standard diff format (+ prefix for additions, space for context) for GitHub rendering.
  */
 function buildDiffFromLocation(loc: SourceLocation, decorator: string): string {
   const { text } = loc.file;
   const targetLine = getLineAtPos(text, loc.pos);
-  const targetLineNum = getLineNumber(text, loc.pos);
   const targetText = targetLine.trim();
 
-  const numWidth = String(targetLineNum).length;
-  const decorLineNum = targetLineNum > 1 ? targetLineNum - 1 : targetLineNum;
-  const pad = (n: number) => String(n).padStart(numWidth, " ");
-
-  return `${pad(decorLineNum)} + ${decorator}\n${pad(targetLineNum)}   ${targetText}`;
+  return `+ ${decorator}\n  ${targetText}`;
 }
 
 /**
@@ -200,17 +205,12 @@ function buildRemovedPropertyDiff(origin: OriginDeclaration, decorator: string):
   const loc = origin.sourceLocation;
   if (loc) {
     const { text } = loc.file;
-    // Search backwards from the property pos to find the model declaration
     const modelPattern = new RegExp(`model\\s+${parentName}\\s*`);
     const textBefore = text.substring(0, loc.pos);
     const match = textBefore.match(modelPattern);
     if (match && match.index !== undefined) {
-      const modelLineNum = getLineNumber(text, match.index);
       const modelLine = getLineAtPos(text, match.index).trim();
-      const numWidth = String(modelLineNum).length;
-      const pad = (n: number) => String(n).padStart(numWidth, " ");
-      const decorLineNum = modelLineNum > 1 ? modelLineNum - 1 : modelLineNum;
-      return `${pad(decorLineNum)} + ${decorator}\n${pad(modelLineNum)}   ${modelLine}`;
+      return `+ ${decorator}\n  ${modelLine}`;
     }
   }
 

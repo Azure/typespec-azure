@@ -2,10 +2,19 @@ import type { Program, Type } from "@typespec/compiler";
 import {
   findSuppressions,
   findUnversionedSuppressions,
+  scanAllUnversionedSuppressions,
   type ResolvedSuppression,
 } from "./decorators.js";
 import { isOperationIdentity } from "./types.js";
 import type { Finding, OperationDiffIdentity } from "./types.js";
+
+/**
+ * Scan the head program's unversioned suppression state map for Phase A
+ * cross-compilation fallback. Returns all suppressions — the caller filters by kind/path.
+ */
+function scanUnversionedSuppressions(program: Program): ResolvedSuppression[] {
+  return scanAllUnversionedSuppressions(program);
+}
 
 /**
  * Apply suppression metadata to classified findings.
@@ -57,6 +66,12 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
 
 /**
  * Collect suppressions from the wire type, origin type, and operation type.
+ *
+ * For Phase A (same-version) findings, the targetType comes from the base program
+ * but suppressions are stored in the head program's state map. Since TypeSpec state
+ * maps use object identity, base types will never match head program entries.
+ * In this case we fall back to scanning all unversioned suppressions in the head
+ * program and matching by kind + path.
  */
 function collectSuppressions(
   finding: Finding,
@@ -78,13 +93,30 @@ function collectSuppressions(
     suppressions.push(...finder(program, operationType));
   }
 
+  // Phase A cross-compilation fallback: when targetType is from the base program,
+  // identity-based lookup against the head program's state map won't match.
+  // Scan all unversioned suppressions in the head program for kind+path matches.
+  if (finding.phase === "same-version" && suppressions.length === 0) {
+    suppressions.push(...scanUnversionedSuppressions(program));
+  }
+
   return suppressions;
 }
 
 function matchesKind(suppression: ResolvedSuppression, finding: Finding): boolean {
-  return (
-    suppression.suppression.kind === undefined || suppression.suppression.kind === finding.diff.kind
-  );
+  if (suppression.suppression.kind === undefined) return true;
+  if (suppression.suppression.kind === finding.diff.kind) return true;
+  // For Resource* findings (merged from Request + Response), also match
+  // if the suppression uses the constituent Request* or Response* kind
+  const findingKind = finding.diff.kind;
+  const suppressionKind = suppression.suppression.kind;
+  if (findingKind.startsWith("Resource")) {
+    const suffix = findingKind.slice("Resource".length);
+    if (suppressionKind === `Request${suffix}` || suppressionKind === `Response${suffix}`) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function matchesVersion(suppression: ResolvedSuppression, finding: Finding): boolean {

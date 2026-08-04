@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeDiffs } from "../src/diff-engine.js";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/orchestrator.js";
 import { resolveFindingLocation } from "../src/resolve-location.js";
 import type { Finding, VersionedView } from "../src/types.js";
 import { createVersionedView, enumerateVersions } from "../src/versions.js";
@@ -563,6 +564,128 @@ describe("resolveFindingLocation", () => {
           expect(location, `No location for ${diff.kind}`).toBeDefined();
         }
       }
+    });
+  });
+
+  describe("source link for removed properties — principled behavior", () => {
+    it("Phase A: property truly deleted from head → links to parent model in HEAD", async () => {
+      // Base has city property, head does not — property truly doesn't exist in head source
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Widget {
+          name: string;
+          city: string;
+        }
+
+        @route("/widgets") @get op listWidgets(): Widget[];
+      `);
+
+      const { program: headProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Widget {
+          name: string;
+        }
+
+        @route("/widgets") @get op listWidgets(): Widget[];
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, { phase: "same-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+      expect(removal).toBeDefined();
+
+      const location = resolveFindingLocation(removal!);
+      expect(location).toBeDefined();
+      // Location should be from HEAD source (which doesn't contain "city")
+      const fileText = location!.file.text;
+      expect(fileText).toContain("model Widget");
+      expect(fileText).not.toContain("city");
+    });
+
+    it("Phase B: property with @removed → links to property itself (exists in head source)", async () => {
+      // Single program, property has @removed — it still exists in head source
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @removed(Versions.v2)
+          city: string;
+        }
+
+        @route("/widgets") @get op listWidgets(): Widget[];
+      `);
+
+      const result = analyzeProgram(program, { phase: "cross-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+      expect(removal).toBeDefined();
+
+      const location = resolveFindingLocation(removal!);
+      expect(location).toBeDefined();
+      // Should point to the city property itself since it exists in head source
+      // (same program — baseSourceLocation IS head source)
+      const fileText = location!.file.text;
+      expect(fileText).toContain("city");
+    });
+
+    it("Phase A: property with @added(v2) in head → links to property in HEAD (exists in head source)", async () => {
+      // Base has property in v1 (no @added). Head adds @added(v2) which projects it out of v1.
+      // Phase A comparing v1: base has it, head@v1 doesn't. But property EXISTS in head source.
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          city: string;
+        }
+
+        @route("/widgets") @get op listWidgets(): Widget[];
+      `);
+
+      const { program: headProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @added(Versions.v2)
+          city: string;
+        }
+
+        @route("/widgets") @get op listWidgets(): Widget[];
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, { phase: "same-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+      expect(removal).toBeDefined();
+
+      const location = resolveFindingLocation(removal!);
+      expect(location).toBeDefined();
+      // Should point to the city property itself in HEAD source
+      // (property exists in head, just projected out of v1 via @added(v2))
+      const fileText = location!.file.text;
+      expect(fileText).toContain("city");
+      expect(fileText).toContain("@added");
     });
   });
 });

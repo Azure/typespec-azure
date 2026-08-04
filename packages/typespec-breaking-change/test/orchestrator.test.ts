@@ -439,6 +439,8 @@ describe("orchestrator", () => {
       ]),
       buildPhaseBPairs: vi.fn(() => []),
       createVersionedView: vi.fn(),
+      defaultVersionClassifier: (version: string) =>
+        version.endsWith("-preview") ? "preview" : "stable",
     }));
     vi.doMock("../src/suppression.js", () => ({
       applySuppressions: vi.fn((findings: unknown[]) => findings),
@@ -946,6 +948,91 @@ describe("orchestrator", () => {
       // No Resource merging happened (different element paths)
       const resourceFindings = result.findings.filter((f) => f.diff.kind.startsWith("Resource"));
       expect(resourceFindings).toHaveLength(0);
+    });
+
+    // Scenario 11: Resource kind in suppression matches after merge
+    it("suppression with ResourcePropertyRemoved kind matches merged findings", async () => {
+      const { program } = await TesterWithSuppressions.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @approvedBreakingChange("intentional removal", #{ kind: "ResourcePropertyRemoved" })
+          @removed(Versions.v2)
+          city?: string;
+        }
+
+        @route("/widgets/{name}")
+        @get op getWidget(@path name: string): Widget;
+
+        @route("/widgets/{name}")
+        @put op createWidget(@path name: string, @body widget: Widget): Widget;
+      `);
+
+      const result = analyzeProgram(program);
+      const cityFindings = result.findings.filter((f) =>
+        f.diff.identity.element.includes("city"),
+      );
+
+      expect(cityFindings.length).toBeGreaterThan(0);
+      // All should be suppressed — ResourcePropertyRemoved matches the merged finding
+      for (const f of cityFindings) {
+        expect(f.suppressed).toBe(true);
+        expect(f.diff.kind).toBe("ResourcePropertyRemoved");
+      }
+    });
+
+    // Scenario 12: Source link resolution for spread models (TrackedResource pattern)
+    it("source link resolves via node parent ID for spread/projected models", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Resource<T> { name: string; properties: T; }
+
+        model EmployeeProperties {
+          department: string;
+          city?: string;
+        }
+
+        @route("/employees/{name}")
+        @put op createEmployee(@path name: string, @body body: Resource<EmployeeProperties>): Resource<EmployeeProperties>;
+      `);
+
+      const { program: headProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Resource<T> { name: string; properties: T; }
+
+        model EmployeeProperties {
+          department: string;
+        }
+
+        @route("/employees/{name}")
+        @put op createEmployee(@path name: string, @body body: Resource<EmployeeProperties>): Resource<EmployeeProperties>;
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, { phase: "same-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+      expect(removal).toBeDefined();
+
+      // headSourceLocation should point to HEAD's EmployeeProperties model
+      // (property truly deleted — resolved via node parent ID lookup)
+      expect(removal!.diff.headSourceLocation).toBeDefined();
+      const headFile = removal!.diff.headSourceLocation!.file.text;
+      expect(headFile).toContain("model EmployeeProperties");
+      expect(headFile).not.toContain("city");
     });
   });
 });

@@ -73,6 +73,15 @@ const validDiffKinds = new Set<DiffKind>([
   "DefaultValueAdded",
   "DefaultValueRemoved",
   "DefaultValueChanged",
+  // Resource-level (merged from matching Request + Response findings)
+  "ResourcePropertyAdded",
+  "ResourcePropertyRemoved",
+  "ResourcePropertyRenamed",
+  "ResourcePropertyTypeChanged",
+  "ResourcePropertyTypeNarrowed",
+  "ResourcePropertyTypeWidened",
+  "ResourcePropertyMadeRequired",
+  "ResourcePropertyMadeOptional",
 ]);
 
 /**
@@ -151,6 +160,22 @@ export function getSuppressions(program: Program, type: Type): SuppressionMetada
 
 export function getUnversionedSuppressions(program: Program, type: Type): SuppressionMetadata[] {
   return program.stateMap(BreakingChangeStateKeys.approvedUnversionedChange).get(type) ?? [];
+}
+
+/**
+ * Scan ALL entries in the head program's unversioned suppression state map.
+ * Used for Phase A cross-compilation fallback when identity-based lookup fails
+ * because the target type is from a different (base) program.
+ */
+export function scanAllUnversionedSuppressions(program: Program): ResolvedSuppression[] {
+  const results: ResolvedSuppression[] = [];
+  const stateMap = program.stateMap(BreakingChangeStateKeys.approvedUnversionedChange);
+  for (const [target, suppressions] of stateMap) {
+    for (const suppression of suppressions as SuppressionMetadata[]) {
+      results.push({ suppression, target: target as Type });
+    }
+  }
+  return results;
 }
 
 export function findSuppressions(program: Program, type: Type): ResolvedSuppression[] {

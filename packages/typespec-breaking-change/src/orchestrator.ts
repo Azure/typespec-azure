@@ -1,6 +1,7 @@
 import type { Namespace, Program } from "@typespec/compiler";
 import { computeDiffs } from "./diff-engine.js";
 import { classifyDiffs } from "./policy.js";
+import { resolveHeadSourceLocations } from "./resolve-location.js";
 import { applySuppressions } from "./suppression.js";
 import type {
   AnalysisResult,
@@ -15,6 +16,7 @@ import {
   buildPhaseAPairs,
   buildPhaseBPairs,
   createVersionedView,
+  defaultVersionClassifier,
   enumerateVersions,
 } from "./versions.js";
 
@@ -38,6 +40,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   const versionComparisons: VersionComparisonSummary[] = [];
   let servicesAnalyzed = 0;
   let comparisonsPerformed = 0;
+  let hasStableVersion = false;
 
   for (const service of enumerateVersions(program)) {
     if (!shouldAnalyzeService(service.service, options)) {
@@ -45,6 +48,9 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     }
 
     servicesAnalyzed++;
+    if (service.versions.some((v) => defaultVersionClassifier(v) === "stable")) {
+      hasStableVersion = true;
+    }
     options?.log?.(`Analyzing service: ${service.service.name} (${service.versions.length} versions)`);
 
     if (options?.phase === "same-version") {
@@ -78,15 +84,16 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   const dedupedFindings = deduplicateBySourceType(allFindings);
   timing.classifyMs += Date.now() - dedupStart;
 
+  const merged = mergeRequestResponseToResource(dedupedFindings);
+  const deduped = collapsePhaseADuplicates(merged);
+
   const suppressStart = Date.now();
-  const suppressedFindings = applySuppressions(dedupedFindings, program);
+  const findings = applySuppressions(deduped, program);
   timing.suppressMs += Date.now() - suppressStart;
 
-  const merged = mergeRequestResponseToResource(suppressedFindings);
-  const findings = collapsePhaseADuplicates(merged);
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options);
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options, hasStableVersion);
   return { findings, timing, summary };
 }
 
@@ -106,6 +113,7 @@ export function analyzeBaseAndHead(
   let comparisonsPerformed = 0;
 
   const baseServices = enumerateVersions(baseProgram);
+  let hasStableVersion = false;
 
   for (const headService of enumerateVersions(headProgram)) {
     if (!shouldAnalyzeService(headService.service, options)) {
@@ -113,6 +121,9 @@ export function analyzeBaseAndHead(
     }
 
     servicesAnalyzed++;
+    if (headService.versions.some((v) => defaultVersionClassifier(v) === "stable")) {
+      hasStableVersion = true;
+    }
     options?.log?.(`Analyzing service: ${headService.service.name} (${headService.versions.length} versions)`);
     const baseService = baseServices.find((candidate) => candidate.service.name === headService.service.name);
     const changedVersions: string[] = [];
@@ -185,15 +196,22 @@ export function analyzeBaseAndHead(
   const dedupedFindings = deduplicateBySourceType(allFindings);
   timing.classifyMs += Date.now() - dedupStart;
 
+  const merged = mergeRequestResponseToResource(dedupedFindings);
+  const deduped = collapsePhaseADuplicates(merged);
+
   const suppressStart = Date.now();
-  const suppressedFindings = applySuppressions(dedupedFindings, headProgram);
+  const findings = applySuppressions(deduped, headProgram);
   timing.suppressMs += Date.now() - suppressStart;
 
-  const merged = mergeRequestResponseToResource(suppressedFindings);
-  const findings = collapsePhaseADuplicates(merged);
+  // Resolve head source locations for cross-compilation findings.
+  // Looks up types by name in the unmutated head program to determine
+  // whether a type truly doesn't exist in head (link to parent) vs
+  // exists but is projected out (link to the type itself).
+  resolveHeadSourceLocations(findings, headProgram);
+
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options);
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options, hasStableVersion);
   return { findings, timing, summary };
 }
 
@@ -250,6 +268,7 @@ function buildSummary(
   comparisonsPerformed: number,
   versionComparisons: VersionComparisonSummary[] = [],
   options?: AnalysisOptions,
+  hasStableVersion?: boolean,
 ): AnalysisSummary {
   const summary: AnalysisSummary = {
     servicesAnalyzed,
@@ -264,6 +283,9 @@ function buildSummary(
     } else if (options?.phase === "same-version") {
       summary.noComparisonReason =
         "Phase A (same-version) requires a base program for comparison. Use analyzeBaseAndHead() instead.";
+    } else if (hasStableVersion) {
+      summary.noComparisonReason =
+        "No cross-version comparisons needed: no comparisons to stable versions needed.";
     } else {
       summary.noComparisonReason =
         "No cross-version comparisons needed: all versions are preview (no stable baseline exists).";
