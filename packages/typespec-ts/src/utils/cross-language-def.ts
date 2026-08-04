@@ -3,7 +3,7 @@
 
 import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import { transformModularEmitterOptions } from "../modular/build-modular-options.js";
-import { SdkContext } from "./interfaces.js";
+import type { SdkContext } from "./interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
 import { getMethodHierarchiesMap } from "./operation-util.js";
 

@@ -1,4 +1,7 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { joinPaths, NoTarget } from "@typespec/compiler";
 import { Project, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
@@ -12,14 +15,14 @@ import {
 } from "../framework/source-file-batch.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
 import { AzureCoreDependencies } from "./external-dependencies.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { isLroOnlyOperation } from "./helpers/operation-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 import { CloudSettingHelpers, MultipartHelpers, PagingHelpers } from "./static-helpers-metadata.js";
 
 export function buildRootIndex(
