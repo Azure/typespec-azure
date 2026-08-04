@@ -10,6 +10,16 @@ Validate that ARM Resource operations include an `api-version` parameter referen
 
 In ARM, it is important that the api-version parameter references the common-types `ApiVersionParameter` rather than a plain string parameter.
 
+## Impact
+
+- **Area:** API, SDK
+
+An operation without the standard API version parameter cannot evolve safely and is difficult for SDKs to represent consistently.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [ApiVersionParameterRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/api-version-parameter-required.md).
+
 #### ❌ Incorrect
 
 Operations missing an api-version parameter:

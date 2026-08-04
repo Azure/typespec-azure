@@ -20,6 +20,12 @@ This rule only applies to custom operations. Operations using standard ARM resou
 | DELETE    | `@armResourceDelete`                                   |
 | POST      | `@armResourceAction` or `@armResourceCollectionAction` |
 
+## Impact
+
+- **Area:** API, SDK, Emitters
+
+Missing or mismatched decorators prevent resource operations from being associated with the correct resource, which can break SDK generation and resource-aware tooling.
+
 #### ❌ Incorrect
 
 Operations must use the correct ARM resource decorator for the HTTP verb:
