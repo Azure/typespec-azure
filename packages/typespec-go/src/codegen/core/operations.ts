@@ -94,9 +94,13 @@ export function generateOperations(
     }
 
     const indent = new helpers.Indentation();
+    const pathAPIVersionOverride = client.hasPathAPIVersion;
 
     clientText += `type ${client.name} struct {\n`;
     clientText += `${indent.get()}internal *${azureARM ? "arm" : "azcore"}.Client\n`;
+    if (pathAPIVersionOverride) {
+      clientText += `${indent.get()}apiVersion string\n`;
+    }
 
     // check for any optional host params
     const optionalParams = new Array<go.ClientParameter>();
@@ -146,6 +150,9 @@ export function generateOperations(
       opText += `func (client *${client.name}) ${clientAccessor.name}(${getAPIParametersSig(clientAccessor, imports)}) *${subClientDecl} {\n`;
       opText += `${indent.get()}return &${subClientDecl}{\n`;
       const initFields = new Array<string>("internal: client.internal");
+      if (clientAccessor.returns.hasPathAPIVersion) {
+        initFields.push("apiVersion: client.apiVersion");
+      }
       // propagate all client params
       for (const param of clientAccessor.parameters) {
         // by convention, the client accessor params have the
@@ -262,6 +269,7 @@ function generateConstructors(
   for (const constructor of client.instance.constructors) {
     const ctorParams = new Array<string>();
     const paramDocs = new Array<string>();
+    let pathAPIVersionValue = "options.APIVersion";
 
     // ctor params can also be present in the supplemental endpoint parameters
     const consolidatedCtorParams = new Array<go.ClientParameter>();
@@ -446,6 +454,13 @@ function generateConstructors(
     ctorText += `${indent.get()}if err != nil {\n`;
     ctorText += `${indent.push().get()}return nil, err\n`;
     ctorText += `${indent.pop().get()}}\n`;
+    if (client.hasPathAPIVersion && clientOptions.kind === "armClientOptions") {
+      pathAPIVersionValue = "pathAPIVersion";
+      ctorText += `${indent.get()}${pathAPIVersionValue} := ""\n`;
+      ctorText += `${indent.get()}if options != nil {\n`;
+      ctorText += `${indent.push().get()}${pathAPIVersionValue} = options.APIVersion\n`;
+      ctorText += `${indent.pop().get()}}\n`;
+    }
 
     // handle any client-side defaults
     if (clientOptions.kind === "clientOptions") {
@@ -497,6 +512,9 @@ function generateConstructors(
     // as any supplemental endpoint params are ephemeral and
     // consumed during client construction.
     indent.push();
+    if (client.hasPathAPIVersion) {
+      ctorText += `${indent.get()}apiVersion: ${pathAPIVersionValue},\n`;
+    }
     for (const parameter of client.parameters) {
       if (go.isLiteralParameter(parameter.style)) {
         continue;
@@ -1115,6 +1133,7 @@ function createProtocolRequest(
 
   const methodParamGroups = helpers.getMethodParamGroups(method);
   const hasPathParams = methodParamGroups.pathParams.length > 0;
+  const pathAPIVersionOverride = method.receiver.type.hasPathAPIVersion;
 
   // storage needs the client.u to be the source-of-truth for the full path.
   // however, swagger requires that all operations specify a path, which is at odds with storage.
@@ -1159,6 +1178,13 @@ function createProtocolRequest(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
+        if (pp.kind === "pathScalarParam" && pp.isApiVersion && pathAPIVersionOverride) {
+          text += `${indent.get()}apiVersion := ${paramValue}\n`;
+          text += `${indent.get()}if client.apiVersion != "" {\n`;
+          text += `${indent.push().get()}apiVersion = client.apiVersion\n`;
+          text += `${indent.pop().get()}}\n`;
+          paramValue = "apiVersion";
+        }
       } else if (pp.style === "required" || pp.location === "client") {
         // NOTE: we include client params here since they behave
         // like required params (i.e. not grouped).

@@ -1253,10 +1253,6 @@ export class ClientAdapter {
         // can be used in multiple ways. e.g. a client param "apiVersion" that's used as a path param
         // in one method and a query param in another. path API versions are kept separately because
         // they require a client field while query/header API versions are handled by the pipeline.
-        const isPathAPIVersionWithDefault =
-          adaptedParam.kind === "pathScalarParam" &&
-          adaptedParam.isApiVersion &&
-          go.isClientSideDefault(adaptedParam.style);
         const addClientParameter = (client: go.Client): void => {
           const existingParam = client.parameters.find((v: go.ClientParameter) => {
             if (v.name !== adaptedParam.name) {
@@ -1292,13 +1288,6 @@ export class ClientAdapter {
             // the client parameter to all constructors
             for (const ctor of client.instance.constructors) {
               ctor.parameters.push(adaptedParam);
-            }
-            if (
-              client.instance.options.kind === "clientOptions" &&
-              isPathAPIVersionWithDefault &&
-              !client.instance.options.parameters.some((param) => param.name === adaptedParam.name)
-            ) {
-              client.instance.options.parameters.push(adaptedParam);
             }
           }
         };
@@ -1358,6 +1347,19 @@ export class ClientAdapter {
       let paramStyle: go.ParameterStyle;
       if (opParam.clientDefaultValue) {
         const client = method.receiver.type;
+        if (opParam.kind === "path" && opParam.onClient) {
+          let rootClient = client;
+          while (rootClient.parent) {
+            rootClient = rootClient.parent;
+          }
+          if (rootClient.instance?.kind === "constructable") {
+            let currentClient: go.Client | undefined = client;
+            while (currentClient) {
+              currentClient.hasPathAPIVersion = true;
+              currentClient = currentClient.parent;
+            }
+          }
+        }
         // check if we already have a ConstantDef for this API version.
         let versionConst = client.apiVersions.find(
           (e) => e.literal.literal === opParam.clientDefaultValue,
@@ -1370,23 +1372,8 @@ export class ClientAdapter {
           );
           client.apiVersions.push(versionConst);
         }
-        const versionLiteral = new go.Literal(versionConst, versionConst.name);
-        let rootClient = client;
-        while (rootClient.parent) {
-          rootClient = rootClient.parent;
-        }
-        if (
-          opParam.kind === "path" &&
-          opParam.onClient &&
-          rootClient.instance?.kind === "constructable" &&
-          rootClient.instance.options.kind === "clientOptions"
-        ) {
-          paramType = this.ta.getStringType();
-          paramStyle = new go.ClientSideDefault(versionLiteral);
-        } else {
-          paramType = versionLiteral;
-          paramStyle = "literal";
-        }
+        paramType = new go.Literal(versionConst, versionConst.name);
+        paramStyle = "literal";
       } else {
         paramType = this.ta.getStringType();
         paramStyle = opParam.optional ? "optional" : "required";
@@ -1416,9 +1403,6 @@ export class ClientAdapter {
             true,
             paramLoc,
           );
-          if (go.isClientSideDefault(paramStyle)) {
-            apiVersionParam.omitEmptyStringCheck = true;
-          }
           break;
         case "query":
           apiVersionParam = new go.QueryScalarParameter(

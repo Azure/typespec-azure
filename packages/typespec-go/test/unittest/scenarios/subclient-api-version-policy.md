@@ -80,12 +80,8 @@ func NewVersionedClientWithNoCredential(endpoint string, options *VersionedClien
 	if err != nil {
 		return nil, err
 	}
-	apiVersion := version20221201Preview
-	if options.APIVersion != "" {
-		apiVersion = options.APIVersion
-	}
 	client := &VersionedClient{
-		apiVersion: apiVersion,
+		apiVersion: options.APIVersion,
 		endpoint:   endpoint,
 		internal:   cl,
 	}
@@ -124,7 +120,11 @@ func (client *VersionedClient) WithPathAPIVersion(ctx context.Context, options *
 // withPathAPIVersionCreateRequest creates the WithPathAPIVersion request.
 func (client *VersionedClient) withPathAPIVersionCreateRequest(ctx context.Context, _ *VersionedClientWithPathAPIVersionOptions) (*policy.Request, error) {
 	urlPath := "/with-path-api-version/{apiVersion}"
-	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(client.apiVersion))
+	apiVersion := version20221201Preview
+	if client.apiVersion != "" {
+		apiVersion = client.apiVersion
+	}
+	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(apiVersion))
 	req, err := runtime.NewRequest(ctx, http.MethodHead, runtime.JoinPaths(client.endpoint, urlPath))
 	if err != nil {
 		return nil, err
