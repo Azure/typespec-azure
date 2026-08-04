@@ -475,6 +475,9 @@ The enum member that represents the feature
 | ------- | --------------------------------------------------------- | -------------------------------- |
 | options | [valueof `ArmFeatureFileOptions`](#armfeaturefileoptions) | The options for the feature file |
 
+`ArmFeatureFileOptions` supports an optional `version` string for overriding the API version
+used by clients generated from that feature file. The value must not be empty or whitespace-only.
+
 #### `@featureFiles`
 
 Decorator to define a set of feature files for splitting output

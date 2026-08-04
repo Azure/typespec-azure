@@ -26,6 +26,7 @@ import {
   $nextLinkVerb,
   $operationGroup,
   $override,
+  $overrideClientApiVersion,
   $paramAlias,
   $protocolAPI,
   $responseAsBool,
@@ -79,6 +80,7 @@ export const $decorators = {
     disablePageable: $disablePageable,
     nextLinkVerb: $nextLinkVerb,
     clientDefaultValue: $clientDefaultValue,
+    overrideClientApiVersion: $overrideClientApiVersion,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };
 
