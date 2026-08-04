@@ -450,3 +450,21 @@ it("boolean scalar encoded as string", async function () {
   strictEqual(sdkType.wireType?.kind, "string");
   strictEqual(sdkType.baseType?.kind, "boolean");
 });
+
+it("string model property encoded with custom encoding and encodedAs type", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode("abc", int32)
+        value: string;
+      }
+      `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "string");
+  strictEqual(sdkType.encode, "abc");
+  strictEqual(sdkType.wireType?.kind, "int32");
+  strictEqual(sdkType.baseType, undefined);
+});
