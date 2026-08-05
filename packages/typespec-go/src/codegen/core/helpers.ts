@@ -72,6 +72,21 @@ export function sortAscending(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+/** returns the header name using Go's canonical MIME header key casing */
+export function canonicalizeHeaderName(name: string): string {
+  if (!/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/.test(name)) {
+    return name;
+  }
+
+  let canonicalName = "";
+  let upper = true;
+  for (const char of name) {
+    canonicalName += upper ? char.toUpperCase() : char.toLowerCase();
+    upper = char === "-";
+  }
+  return canonicalName;
+}
+
 /**
  * returns the parameter's type definition with a possible '*' prefix
  *

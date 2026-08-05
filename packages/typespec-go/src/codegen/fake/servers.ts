@@ -562,7 +562,7 @@ function generateServerTransportMethods(
             content += `${indent.pop().get()}}\n`;
           } else {
             content += `${indent.get()}if val := server.GetResponse(respr).${header.fieldName}; val != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set("${header.headerName}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
+            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
             content += `${indent.pop().get()}}\n`;
           }
         }
