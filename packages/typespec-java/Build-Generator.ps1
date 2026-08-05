@@ -25,7 +25,7 @@ if (-not (Test-Path $generatorPom)) {
 }
 
 Write-Host "Build JAR"
-mvn clean install -DskipTests --define spotless:skip --no-transfer-progress -T 1C -f $generatorPom
+mvn clean install -DskipTests --define spotless.apply.skip=true --define spotless.check.skip=true --no-transfer-progress -T 1C -f $generatorPom
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
