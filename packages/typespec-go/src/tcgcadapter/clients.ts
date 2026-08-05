@@ -1292,13 +1292,17 @@ export class ClientAdapter {
           }
         };
 
-        addClientParameter(method.receiver.type);
-        if (go.isAPIVersionParameter(adaptedParam)) {
-          let parent = method.receiver.type.parent;
-          while (parent) {
-            addClientParameter(parent);
-            parent = parent.parent;
+        const isApiVersion = go.isAPIVersionParameter(adaptedParam);
+        const isLiteralApiVersion = isApiVersion && go.isLiteralParameter(adaptedParam.style);
+        let client: go.Client | undefined = method.receiver.type;
+        if (isLiteralApiVersion) {
+          while (client.instance?.kind !== "constructable" && client.parent) {
+            client = client.parent;
           }
+        }
+        while (client) {
+          addClientParameter(client);
+          client = isApiVersion && !isLiteralApiVersion ? client.parent : undefined;
         }
       }
     }
@@ -1341,7 +1345,7 @@ export class ClientAdapter {
   ): go.MethodParameter {
     if (opParam.isApiVersionParam) {
       // Header/query API versions are emitted inline and overridden by the pipeline.
-      // Path API versions must be stored on the client because the pipeline cannot
+      // Path API version overrides must be stored on the client because the pipeline cannot
       // replace a path segment after the request URL has been constructed.
       let paramType: go.Literal | go.String;
       let paramStyle: go.ParameterStyle;

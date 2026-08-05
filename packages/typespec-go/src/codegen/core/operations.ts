@@ -94,11 +94,10 @@ export function generateOperations(
     }
 
     const indent = new helpers.Indentation();
-    const pathAPIVersionOverride = client.hasPathAPIVersion;
 
     clientText += `type ${client.name} struct {\n`;
     clientText += `${indent.get()}internal *${azureARM ? "arm" : "azcore"}.Client\n`;
-    if (pathAPIVersionOverride) {
+    if (client.hasPathAPIVersion) {
       clientText += `${indent.get()}apiVersion string\n`;
     }
 
@@ -165,11 +164,7 @@ export function generateOperations(
       for (const param of client.parameters) {
         if (go.isLiteralParameter(param.style)) {
           continue;
-        } else if (
-          clientAccessor.returns.parameters.some(
-            (p) => p.name === param.name && !go.isLiteralParameter(p.style),
-          )
-        ) {
+        } else if (clientAccessor.returns.parameters.some((p) => p.name === param.name)) {
           // only propagate ctor params that are common between parent/child
           initFields.push(`${param.name}: client.${param.name}`);
         }
@@ -244,6 +239,12 @@ function generateConstructors(
   const clientOptions = client.instance.options;
 
   let ctorText = "";
+  const emitDefaultOptions = (optionsTypeName: string): string => {
+    let text = `${indent.get()}if options == nil {\n`;
+    text += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
+    text += `${indent.pop().get()}}\n`;
+    return text;
+  };
 
   if (clientOptions.kind === "clientOptions") {
     // for non-ARM, the options type will always be a parameter group
@@ -269,7 +270,6 @@ function generateConstructors(
   for (const constructor of client.instance.constructors) {
     const ctorParams = new Array<string>();
     const paramDocs = new Array<string>();
-    let pathAPIVersionValue = "options.APIVersion";
 
     // ctor params can also be present in the supplemental endpoint parameters
     const consolidatedCtorParams = new Array<go.ClientParameter>();
@@ -306,9 +306,7 @@ function generateConstructors(
       plOpts?: string,
     ): string {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
-      let bodyText = `${indent.get()}if options == nil {\n`;
-      bodyText += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
-      bodyText += `${indent.pop().get()}}\n`;
+      let bodyText = emitDefaultOptions(optionsTypeName);
       let apiVersionConfig = "";
       // check if there's an api version parameter
       let apiVersionParam:
@@ -427,7 +425,11 @@ function generateConstructors(
             case "armClientOptions":
               // this is the ARM case
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/arm");
-              prolog = `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
+              prolog = "";
+              if (client.hasPathAPIVersion) {
+                prolog += emitDefaultOptions(go.getTypeDeclaration(clientOptions, client.pkg));
+              }
+              prolog += `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
               break;
           }
           break;
@@ -454,13 +456,6 @@ function generateConstructors(
     ctorText += `${indent.get()}if err != nil {\n`;
     ctorText += `${indent.push().get()}return nil, err\n`;
     ctorText += `${indent.pop().get()}}\n`;
-    if (client.hasPathAPIVersion && clientOptions.kind === "armClientOptions") {
-      pathAPIVersionValue = "pathAPIVersion";
-      ctorText += `${indent.get()}${pathAPIVersionValue} := ""\n`;
-      ctorText += `${indent.get()}if options != nil {\n`;
-      ctorText += `${indent.push().get()}${pathAPIVersionValue} = options.APIVersion\n`;
-      ctorText += `${indent.pop().get()}}\n`;
-    }
 
     // handle any client-side defaults
     if (clientOptions.kind === "clientOptions") {
@@ -513,7 +508,7 @@ function generateConstructors(
     // consumed during client construction.
     indent.push();
     if (client.hasPathAPIVersion) {
-      ctorText += `${indent.get()}apiVersion: ${pathAPIVersionValue},\n`;
+      ctorText += `${indent.get()}apiVersion: options.APIVersion,\n`;
     }
     for (const parameter of client.parameters) {
       if (go.isLiteralParameter(parameter.style)) {

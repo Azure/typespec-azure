@@ -4,9 +4,18 @@
 package apiversionpathgroup_test
 
 import (
+	"context"
 	"testing"
+
+	"apiversionpathgroup"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPathClient_PathAPIVersion(t *testing.T) {
-	t.Skip("https://github.com/Azure/autorest.go/issues/1743")
+	client, err := apiversionpathgroup.NewPathClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+
+	resp, err := client.PathAPIVersion(context.Background(), nil)
+	require.NoError(t, err)
+	require.Zero(t, resp)
 }

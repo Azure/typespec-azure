@@ -49,16 +49,15 @@ type TestClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewTestClient(credential azcore.TokenCredential, options *arm.ClientOptions) (*TestClient, error) {
+	if options == nil {
+		options = &arm.ClientOptions{}
+	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
 	}
-	pathAPIVersion := ""
-	if options != nil {
-		pathAPIVersion = options.APIVersion
-	}
 	client := &TestClient{
-		apiVersion: pathAPIVersion,
+		apiVersion: options.APIVersion,
 		internal:   cl,
 	}
 	return client, nil
