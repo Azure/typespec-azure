@@ -112,7 +112,7 @@ catalog:
   "@vscode/vsce": ^3.7.1
   ajv: ^8.18.0
   ajv-formats: ^3.0.1
-  astro: ^7.0.9
+  astro: ^7.1.1
   astro-expressive-code: ^0.44.0
   astro-rehype-relative-markdown-links: ^0.19.0
   autorest: ^3.7.1
