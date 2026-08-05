@@ -1249,16 +1249,14 @@ export class ClientAdapter {
           continue;
         }
 
-        // check via param name and not reference equality as a client param can be
-        // referenced by multiple methods.
-        const addClientParameter = (client: go.Client): void => {
-          const existingParam = client.parameters.find(
-            (v: go.ClientParameter) => v.name === adaptedParam.name,
-          );
-          if (existingParam) {
-            return;
-          }
-
+        // we must check via param name and not reference equality. this is because a client param
+        // can be used in multiple ways. e.g. a client param "apiVersion" that's used as a path param
+        // in one method and a query param in another.
+        if (
+          !method.receiver.type.parameters.find((v: go.ClientParameter) => {
+            return v.name === adaptedParam.name;
+          })
+        ) {
           if (
             this.ta.codeModel.type === "azure-arm" &&
             adaptedParam.style !== "literal" &&
@@ -1270,28 +1268,14 @@ export class ClientAdapter {
               opParam.__raw?.node,
             );
           }
-
-          client.parameters.push(adaptedParam);
-          if (client.instance?.kind === "constructable") {
+          method.receiver.type.parameters.push(adaptedParam);
+          if (method.receiver.type.instance?.kind === "constructable") {
             // if this is an instantiable client then also add
             // the client parameter to all constructors
-            for (const ctor of client.instance.constructors) {
+            for (const ctor of method.receiver.type.instance.constructors) {
               ctor.parameters.push(adaptedParam);
             }
           }
-        };
-
-        const isApiVersion = go.isAPIVersionParameter(adaptedParam);
-        const isLiteralApiVersion = isApiVersion && go.isLiteralParameter(adaptedParam.style);
-        let client: go.Client | undefined = method.receiver.type;
-        if (isLiteralApiVersion) {
-          while (client.instance?.kind !== "constructable" && client.parent) {
-            client = client.parent;
-          }
-        }
-        while (client) {
-          addClientParameter(client);
-          client = isApiVersion && !isLiteralApiVersion ? client.parent : undefined;
         }
       }
     }
@@ -1340,18 +1324,12 @@ export class ClientAdapter {
       let paramStyle: go.ParameterStyle;
       if (opParam.clientDefaultValue) {
         const client = method.receiver.type;
-        if (opParam.kind === "path" && opParam.onClient) {
-          let rootClient = client;
-          while (rootClient.parent) {
-            rootClient = rootClient.parent;
-          }
-          if (rootClient.instance?.kind === "constructable") {
-            let currentClient: go.Client | undefined = client;
-            while (currentClient) {
-              currentClient.hasPathAPIVersion = true;
-              currentClient = currentClient.parent;
-            }
-          }
+        if (
+          opParam.kind === "path" &&
+          opParam.onClient &&
+          client.instance?.kind === "constructable"
+        ) {
+          client.hasPathAPIVersion = true;
         }
         // check if we already have a ConstantDef for this API version.
         let versionConst = client.apiVersions.find(
