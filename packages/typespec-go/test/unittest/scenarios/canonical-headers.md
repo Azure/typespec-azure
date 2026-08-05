@@ -22,9 +22,7 @@ model HeaderResponse {
 }
 
 @get
-op read(
-  @header("x-request-header") requestHeader: string,
-): HeaderResponse;
+op read(@header("x-request-header") requestHeader: string): HeaderResponse;
 ```
 
 ## The generated client canonicalizes response header names but preserves direct map access
