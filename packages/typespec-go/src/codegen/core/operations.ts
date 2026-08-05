@@ -20,6 +20,18 @@ export class OperationGroupContent {
   }
 }
 
+function supportsPathAPIVersionOverride(client: go.Client): boolean {
+  return (
+    client.instance?.kind === "constructable" &&
+    client.parameters.some(
+      (param) =>
+        param.kind === "pathScalarParam" &&
+        param.isApiVersion &&
+        go.isLiteralParameter(param.style),
+    )
+  );
+}
+
 /**
  * Creates the content for all the *_client.go files.
  *
@@ -94,10 +106,11 @@ export function generateOperations(
     }
 
     const indent = new helpers.Indentation();
+    const pathAPIVersionOverride = supportsPathAPIVersionOverride(client);
 
     clientText += `type ${client.name} struct {\n`;
     clientText += `${indent.get()}internal *${azureARM ? "arm" : "azcore"}.Client\n`;
-    if (client.hasPathAPIVersion) {
+    if (pathAPIVersionOverride) {
       clientText += `${indent.get()}apiVersion string\n`;
     }
 
@@ -138,7 +151,13 @@ export function generateOperations(
     // end of client definition
     clientText += "}\n\n";
 
-    clientText += generateConstructors(client, target, imports, indent);
+    clientText += generateConstructors(
+      client,
+      target,
+      imports,
+      indent,
+      pathAPIVersionOverride,
+    );
 
     // generate client accessors and operations
     let opText = "";
@@ -149,9 +168,6 @@ export function generateOperations(
       opText += `func (client *${client.name}) ${clientAccessor.name}(${getAPIParametersSig(clientAccessor, imports)}) *${subClientDecl} {\n`;
       opText += `${indent.get()}return &${subClientDecl}{\n`;
       const initFields = new Array<string>("internal: client.internal");
-      if (clientAccessor.returns.hasPathAPIVersion) {
-        initFields.push("apiVersion: client.apiVersion");
-      }
       // propagate all client params
       for (const param of clientAccessor.parameters) {
         // by convention, the client accessor params have the
@@ -231,6 +247,7 @@ function generateConstructors(
   type: go.CodeModelType,
   imports: ImportManager,
   indent: helpers.Indentation,
+  pathAPIVersionOverride: boolean,
 ): string {
   if (client.instance?.kind !== "constructable") {
     return "";
@@ -420,7 +437,7 @@ function generateConstructors(
               // this is the ARM case
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/arm");
               prolog = "";
-              if (client.hasPathAPIVersion) {
+              if (pathAPIVersionOverride) {
                 prolog += emitDefaultOptions(go.getTypeDeclaration(clientOptions, client.pkg));
               }
               prolog += `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
@@ -501,7 +518,7 @@ function generateConstructors(
     // as any supplemental endpoint params are ephemeral and
     // consumed during client construction.
     indent.push();
-    if (client.hasPathAPIVersion) {
+    if (pathAPIVersionOverride) {
       ctorText += `${indent.get()}apiVersion: options.APIVersion,\n`;
     }
     for (const parameter of client.parameters) {
@@ -1122,7 +1139,6 @@ function createProtocolRequest(
 
   const methodParamGroups = helpers.getMethodParamGroups(method);
   const hasPathParams = methodParamGroups.pathParams.length > 0;
-  const pathAPIVersionOverride = method.receiver.type.hasPathAPIVersion;
 
   // storage needs the client.u to be the source-of-truth for the full path.
   // however, swagger requires that all operations specify a path, which is at odds with storage.
@@ -1167,7 +1183,11 @@ function createProtocolRequest(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
-        if (pp.kind === "pathScalarParam" && pp.isApiVersion && pathAPIVersionOverride) {
+        if (
+          pp.kind === "pathScalarParam" &&
+          pp.isApiVersion &&
+          supportsPathAPIVersionOverride(method.receiver.type)
+        ) {
           text += `${indent.get()}apiVersion := ${paramValue}\n`;
           text += `${indent.get()}if client.apiVersion != "" {\n`;
           text += `${indent.push().get()}apiVersion = client.apiVersion\n`;

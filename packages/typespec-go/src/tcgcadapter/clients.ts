@@ -1317,20 +1317,12 @@ export class ClientAdapter {
       | tcgc.SdkQueryParameter,
   ): go.MethodParameter {
     if (opParam.isApiVersionParam) {
-      // Header/query API versions are emitted inline and overridden by the pipeline.
-      // Path API version overrides must be stored on the client because the pipeline cannot
-      // replace a path segment after the request URL has been constructed.
+      // we emit the api version param inline as a literal, never as a param.
+      // the ClientOptions.APIVersion setting is used to change the version.
       let paramType: go.Literal | go.String;
       let paramStyle: go.ParameterStyle;
       if (opParam.clientDefaultValue) {
         const client = method.receiver.type;
-        if (
-          opParam.kind === "path" &&
-          opParam.onClient &&
-          client.instance?.kind === "constructable"
-        ) {
-          client.hasPathAPIVersion = true;
-        }
         // check if we already have a ConstantDef for this API version.
         let versionConst = client.apiVersions.find(
           (e) => e.literal.literal === opParam.clientDefaultValue,

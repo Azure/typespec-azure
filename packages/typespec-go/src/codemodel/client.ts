@@ -47,9 +47,6 @@ export interface Client {
    */
   apiVersions: Array<type.ConstantDef>;
 
-  /** indicates that this client stores an API version override for operation paths */
-  hasPathAPIVersion: boolean;
-
   /** the parent client in a hierarchical client */
   parent?: Client;
 }
@@ -400,7 +397,6 @@ export class Client implements Client {
     this.parameters = new Array<ClientParameter>();
     this.pkg = pkg;
     this.apiVersions = new Array<type.ConstantDef>();
-    this.hasPathAPIVersion = false;
   }
 }
 
