@@ -557,7 +557,7 @@ function generateServerTransportMethods(
           if (header.kind === "headerMapResponse") {
             content += `${indent.get()}for k, v := range server.GetResponse(respr).${header.fieldName} {\n`;
             content += `${indent.push().get()}if v != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}"+k, *v)\n`;
+            content += `${indent.push().get()}resp.Header.Set("${header.headerName}"+k, *v)\n`;
             content += `${indent.pop().get()}}\n`;
             content += `${indent.pop().get()}}\n`;
           } else {
