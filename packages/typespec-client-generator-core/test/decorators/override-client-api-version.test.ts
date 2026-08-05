@@ -97,7 +97,7 @@ describe("@overrideClientApiVersion", () => {
   });
 
   it("rejects an explicit root client declared as an interface", async () => {
-    const { program } = await SimpleTester.compile(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       @versioned(Versions)
       namespace WidgetService {
@@ -114,13 +114,39 @@ describe("@overrideClientApiVersion", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
 
-    expectDiagnostics(context.diagnostics, {
+    expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-client-api-version-override",
       message:
         "@overrideClientApiVersion can only be applied to an interface that resolves to a subclient.",
     });
+  });
+
+  it("accepts an explicit interface client nested under an explicit root client", async () => {
+    const { program } = await SimpleTester.compile(`
+      @service
+      @versioned(Versions)
+      namespace WidgetService {
+        enum Versions {
+          v1: "2024-01-01",
+          v2: "2025-01-01",
+        }
+      }
+
+      @client({ name: "WidgetServiceClient", service: WidgetService })
+      namespace WidgetServiceClient {
+        @client({ name: "WidgetsClient" })
+        @${decorator}("2099-01-01")
+        interface WidgetsClient {
+          @route("/widgets")
+          op get(@query("api-version") apiVersion: string): void;
+        }
+      }
+    `);
+
+    const context = await createSdkContextForTester(program);
+    const client = requireClient(context.sdkPackage.clients, "WidgetsClient");
+    strictEqual(getApiVersionDefault(client), "2099-01-01");
   });
 
   it("selects the override by emitter scope", async () => {
