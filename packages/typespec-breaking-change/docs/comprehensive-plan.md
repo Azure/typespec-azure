@@ -196,6 +196,81 @@ These were open during design/prototype and are now answered with evidence.
 3. Document CI integration contract (exit codes, output paths, environment variables)
 4. Share with specs team for review
 
+### B9. ARM Template Type Parameter Tracing
+
+**Problem:** Origin resolution achieves only ~56% on the Network spec and ~70% on AppConfiguration. The gap is primarily in properties flowing through ARM template type parameters (`TrackedResource<T>`, `StandardResourceOperations`). When a property enters a template boundary, the `sourceProperty` chain does not extend through to the template argument.
+
+**Current state:** `traceToCanonicalProperty()` handles visibility-filtered copies (e.g., `EmployeePropertiesCreateOrUpdate`) via AST node identity. But properties that flow through ARM resource template patterns (the `T` in `TrackedResource<T>`) are not traced back to the original type parameter.
+
+**Investigation plan:**
+1. Investigate `templateMapper` / `templateArguments` on the compiler's type graph
+2. Determine if the compiler preserves a link from template-expanded properties to the original `T`
+3. If yes, extend `resolveOrigin()` to follow template argument chains
+4. If no, evaluate whether the TypeSpec compiler could be extended to preserve this link
+5. Target: 90%+ origin resolution on representative ARM specs
+
+### B10. Linter Rule Integration and IDE Feedback
+
+**Problem:** The tool currently runs only as a CLI. TypeSpec supports linter rules via `createRule()` that provide real-time IDE feedback during spec authoring. Should the tool also surface findings as linter diagnostics?
+
+**Options:**
+1. **CLI only** (current): Findings appear only in CI. Authors don't see issues until PR.
+2. **CLI + linter rule**: Cross-version rules run in the IDE as the author types. Requires the tool to be a library dependency.
+3. **CLI + Language Server Protocol**: More complex but could provide richer IDE integration.
+
+**Investigation plan:**
+1. Prototype a single rule (e.g., `OperationRemoved`) as a `createRule()` linter rule
+2. Evaluate whether version mutators + comparison can run fast enough for IDE latency (<1s)
+3. Determine which rules make sense in real-time vs batch-only
+4. Decision: which surface(s) to support for v1
+
+### B11. Adding APIs to Azure Core
+
+**Problem:** Some functionality in this tool could benefit the broader TypeSpec ecosystem if upstreamed to `@azure-tools/typespec-azure-core` or `@typespec/http`:
+
+- **Operation identity** (`{method, normalizedPath}`) — useful for any tool that needs stable operation references
+- **Version enumeration and pair construction** — useful for any version-aware analysis
+- **Canonical HTTP comparison utilities** — useful for any HTTP contract analysis tool
+- **Suppression decorator infrastructure** — could be generalized for any TypeSpec tool that needs per-declaration suppressions
+
+**Investigation plan:**
+1. Identify which APIs are generic enough to upstream vs tool-specific
+2. Propose API surfaces to the TypeSpec/Azure core team
+3. Evaluate impact on this tool if dependencies move upstream
+4. Consider whether suppression decorators belong in core (see B2)
+
+### B12. Git-Revision-Based Analysis
+
+**Problem:** The CLI currently requires explicit `--base <path>` and `--head <path>` pointing to directories. Production CI needs `--base origin/main` or `--base <commitish>` to automatically check out and compile the base revision.
+
+**Current state:** The demo workflow uses git worktrees to create base directories manually. This works but is not ergonomic for CI.
+
+**Investigation plan:**
+1. Add `--base <commitish>` support: tool checks out the base revision to a temp directory
+2. Handle sparse checkout (only the relevant spec folder)
+3. Consider caching compiled base programs to avoid recompilation on every PR
+4. Evaluate integration with GitHub Actions' checkout action
+
+### B13. Multi-Service Spec Validation
+
+**Problem:** The tool supports multiple `@service` namespaces in a single program, but this path hasn't been validated against real multi-service specs.
+
+**Investigation plan:**
+1. Find real multi-service specs in azure-rest-api-specs (if any exist)
+2. Create synthetic multi-service fixtures if none exist
+3. Validate each service is analyzed independently with correct findings
+4. Verify report output attributes findings to correct service
+
+### B14. Suppression by Version Range
+
+**Problem:** Current `since:` scoping ties a suppression to a single introducing version. Production may need version range support (e.g., "suppress for all versions >= 2024-06-01 and < 2025-01-01") for temporary breaking changes that are later reverted.
+
+**Investigation plan:**
+1. Evaluate frequency of this pattern in real specs
+2. Design `since`/`until` range semantics
+3. Consider interaction with stale approval detection
+4. Defer to post-v1 unless real-world demand is demonstrated
+
 ---
 
 ## Part C: Prioritized Work Items
@@ -208,10 +283,12 @@ These items fix known gaps that would cause incorrect behavior in production.
 |---|------|-----------|--------|
 | 1.1 | Implement new-vs-existing suppression comparison | B1 | 3 days |
 | 1.2 | Unified source tracing algorithm with fallbacks | B3 | 2 days |
-| 1.3 | Catastrophic change detection tests | B5 | 1 day |
-| 1.4 | Narrowing/widening classification audit | B4 | 1 day |
-| 1.5 | Validate `path` and `since` narrowing | B6 | 0.5 day |
-| 1.6 | Phase A optimization validation tests | B7 | 0.5 day |
+| 1.3 | ARM template type parameter tracing (higher origin%) | B9 | 2 days |
+| 1.4 | Catastrophic change detection tests | B5 | 1 day |
+| 1.5 | Narrowing/widening classification audit | B4 | 1 day |
+| 1.6 | Validate `path` and `since` narrowing | B6 | 0.5 day |
+| 1.7 | Phase A optimization validation tests | B7 | 0.5 day |
+| 1.8 | Phase A with real base/head programs (beyond demo PRs) | B3 | 1 day |
 
 ### Phase 2: Debuggability and Logging (1 week)
 
@@ -247,6 +324,7 @@ See `typespec-breaking-change-test-coverage.md` for detailed scenario list.
 | 4.2 | Code documentation (TSDoc for all public APIs) | — | 2 days |
 | 4.3 | CI integration guide (for specs repo team) | B8 | 1 day |
 | 4.4 | Decorator placement decision memo | B2 | 1 day |
+| 4.5 | API upstream evaluation memo (what belongs in core) | B11 | 1 day |
 
 ### Phase 5: Production Hardening (2 weeks)
 
@@ -254,9 +332,12 @@ See `typespec-breaking-change-test-coverage.md` for detailed scenario list.
 |---|------|-----------|--------|
 | 5.1 | Real-spec validation: 5+ ARM specs, 3+ data-plane specs | — | 3 days |
 | 5.2 | Complex pattern testing (polymorphism, discriminators, envelopes) | — | 2 days |
-| 5.3 | Wide suppression flagging in reports | B6 | 1 day |
-| 5.4 | Stale suppression detection and codefix | — | 2 days |
-| 5.5 | Version scoping (`since:`) implementation | — | 2 days |
+| 5.3 | Multi-service spec validation | B13 | 1 day |
+| 5.4 | Wide suppression flagging in reports | B6 | 1 day |
+| 5.5 | Stale suppression detection and codefix | — | 2 days |
+| 5.6 | Version scoping (`since:`) implementation | — | 2 days |
+| 5.7 | Git-revision-based analysis (`--base <commitish>`) | B12 | 2 days |
+| 5.8 | Linter rule integration prototype | B10 | 2 days |
 
 ### Phase 6: OAD Parity and Side-by-Side (3-4 weeks)
 
@@ -286,12 +367,17 @@ Decisions to be made during execution. Record outcomes here.
 | Decision | Options | Status | Outcome |
 |----------|---------|--------|---------|
 | Decorator placement | This package / azure-core / structured file | **Open** | — |
+| Structured vs decorator suppressions | Decorators / structured file / custom suppressions / hybrid | **Open** | — |
+| APIs to upstream to core | Operation identity / version utils / suppression infra / none | **Open** | — |
 | Wildcard suppressions | Exact only / glob / regex | **Deferred** to post-v1 | — |
 | Blanket suppress-all | Allow / disallow / flag | **Open** | — |
 | Scalar transition table scope | Full / progressive | **Open** | — |
 | Source trace target | 100% on N specs / best-effort | **Open** | — |
 | Report structure for wide suppressions | Same section / separate warning / flag | **Open** | — |
 | New-vs-existing threshold | Compare decorators / compare findings | **Open** | — |
+| Linter rule integration | CLI only / CLI + linter / CLI + LSP | **Open** | — |
+| Git revision support | Path only / commitish / sparse checkout | **Open** | — |
+| Version range suppression | Single `since` / `since`+`until` range | **Deferred** to post-v1 | — |
 
 ---
 
@@ -311,10 +397,36 @@ Decisions to be made during execution. Record outcomes here.
 
 | Document | Scope | Status |
 |----------|-------|--------|
-| `rfcs/breaking-changes/typespec-breaking-change-design-overview.md` | Architecture, rules, suppression design | Updated 2026-08-04 |
+| `rfcs/breaking-changes/typespec-breaking-change-design-overview.md` | Architecture, rules, suppression design, implementation | Updated 2026-08-04 |
 | `rfcs/breaking-changes/typespec-breaking-change-validation-strategy.md` | Multi-phase validation (OAD parity → gating) | Current |
 | `rfcs/breaking-changes/typespec-breaking-change-test-coverage.md` | Unit/integration test scenarios | Updated 2026-08-04 |
-| `PROTOTYPE-EVALUATION.md` | Prototype Q&A with benchmarks | Current |
+| `PROTOTYPE-EVALUATION.md` | Prototype Q&A with benchmarks, open questions P1-P5 | Current |
 | `docs/prototype-dev-guide.md` | Deployment runbook, pitfalls, environment | Created 2026-08-04 |
 | `docs/violations-reference.md` | DiffKind reference for spec authors | Current |
+| `docs/presentation-notes.md` | Slide deck talking points | Current |
 | This document | Comprehensive next-steps plan | Active |
+
+### Items Integrated from Other Documents
+
+The following items from existing documents have been integrated into this plan:
+
+| Source | Item | Integrated As |
+|--------|------|---------------|
+| `PROTOTYPE-EVALUATION.md` P1 | ARM template type parameter tracing | B9, Phase 1.3 |
+| `PROTOTYPE-EVALUATION.md` P2 | Linter rule integration | B10, Phase 5.8 |
+| `PROTOTYPE-EVALUATION.md` P3 | Multi-service specs | B13, Phase 5.3 |
+| `PROTOTYPE-EVALUATION.md` P4 | Suppression by version range | B14 (deferred) |
+| `PROTOTYPE-EVALUATION.md` P5 | Phase A with real base/head | Phase 1.8 |
+| `presentation-notes.md` | Git-revision-based analysis | B12, Phase 5.7 |
+| `source-tracing-analysis.md` | AST node identity for dedup | A4 (resolved) |
+| User observations (2026-08-04) | New vs existing suppressions | B1, Phase 1.1 |
+| User observations (2026-08-04) | Decorator placement / structured suppressions | B2 |
+| User observations (2026-08-04) | Source tracing unified algorithm | B3, Phase 1.2 |
+| User observations (2026-08-04) | Narrowing/widening classification | B4, Phase 1.5 |
+| User observations (2026-08-04) | Catastrophic breaking changes | B5, Phase 1.4 |
+| User observations (2026-08-04) | Wildcard/blanket suppressions | B6 |
+| User observations (2026-08-04) | Debuggability / logging levels | Phase 2 |
+| User observations (2026-08-04) | Large-spec testing | Phase 3.9, Phase 5.1 |
+| User observations (2026-08-04) | Output format documentation | B8, Phase 4 |
+| User observations (2026-08-04) | Code documentation | Phase 4.2 |
+| User observations (2026-08-04) | APIs to upstream to core | B11, Phase 4.5 |
