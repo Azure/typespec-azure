@@ -83,26 +83,30 @@ These were open during design/prototype and are now answered with evidence.
 - PR modifying suppression reason → shown as "modified"
 - Mix of new + existing suppressions in same PR
 
-### B2. Decorator Placement Strategy
+### B2. Suppression Mechanism Strategy
 
-**Problem:** Where should the suppression decorators live long-term?
+**Problem:** The prototype uses custom decorators (`@approvedBreakingChange`, `@approvedUnversionedChange`) for suppression. There are several alternatives to evaluate:
 
 **Options:**
-1. **In this package** (current): `@azure-tools/typespec-breaking-change` provides `@approvedBreakingChange` and `@approvedUnversionedChange`. Spec authors must depend on this package.
-2. **In `@azure-tools/typespec-azure-core`**: More discoverable, no extra dependency for spec authors already using Azure patterns. But adds coupling.
-3. **Structured suppressions**: Move away from decorators entirely. Use a separate structured file (e.g., `tsp-breaking-change-suppressions.yaml`) or structured comments. Decouples suppression from type graph.
+1. **Custom decorators in this package** (current): Decorators carry structured metadata (kind, path, since, reason) on the type graph. Requires spec authors to depend on this package. Provides full TypeSpec type-system integration.
+2. **Custom decorators in `@azure-tools/typespec-azure-core`**: Same decorator approach but hosted in a package spec authors already depend on. Reduces friction but couples core to this tool's concerns.
+3. **`#suppress` directive** (TypeSpec built-in): TypeSpec's standard `#suppress` comment directive is already used across specs for linter rule suppression. Could use `#suppress "@azure-tools/typespec-breaking-change/ResourcePropertyRemoved" "reason"` with no custom decorator needed. Lightweight, familiar pattern, but carries less structured metadata (no `path`, `since`, `kind` as structured fields).
+4. **Customized suppress directive**: Extend or customize the `#suppress` mechanism to carry the additional metadata needed (path, since, kind). Would need TypeSpec compiler support or a custom parser.
+5. **Hybrid**: Use `#suppress` for simple cases, custom decorators for cases needing structured metadata (path, since).
 
 **Considerations:**
-- Decorators are TypeSpec-native and reviewable inline
-- Structured suppressions avoid polluting the spec with tool-specific metadata
-- Decorator approach requires the tool package to be a dependency of every spec
-- Structured approach requires path-based matching (already partially designed)
+- `#suppress` is already the standard pattern TypeSpec authors know for silencing diagnostics
+- Custom decorators provide richer metadata (version scoping, path targeting, structured reason)
+- `#suppress` does not naturally support parent placement with `path:` for removed nodes
+- Decorator approach requires the tool to be a dependency; `#suppress` does not
+- Hybrid adds complexity but may offer the best ergonomic tradeoff
 
 **Investigation plan:**
-1. Survey how other TypeSpec tools handle per-declaration metadata (linter suppressions, etc.)
-2. Prototype a structured suppression format and compare authoring ergonomics
-3. Consult with TypeSpec team on recommended patterns
-4. Decision point: commit to decorators for v1, evaluate structured for v2
+1. Survey how `#suppress` is used in existing Azure specs and what metadata it carries
+2. Evaluate whether `#suppress` can carry structured options (kind, path, since) or only a reason string
+3. Prototype suppression matching using `#suppress` and compare with decorator approach
+4. Consult with TypeSpec team on recommended patterns for tool-specific suppressions
+5. Decision point: commit to one approach for v1
 
 ### B3. Source Tracing Algorithm Completeness
 
@@ -323,7 +327,7 @@ See `typespec-breaking-change-test-coverage.md` for detailed scenario list.
 | 4.1 | Output format documentation (JSON schema, Markdown spec) | B8 | 2 days |
 | 4.2 | Code documentation (TSDoc for all public APIs) | — | 2 days |
 | 4.3 | CI integration guide (for specs repo team) | B8 | 1 day |
-| 4.4 | Decorator placement decision memo | B2 | 1 day |
+| 4.4 | Suppression mechanism decision memo (`#suppress` vs decorators) | B2 | 1 day |
 | 4.5 | API upstream evaluation memo (what belongs in core) | B11 | 1 day |
 
 ### Phase 5: Production Hardening (2 weeks)
@@ -366,14 +370,14 @@ Decisions to be made during execution. Record outcomes here.
 
 | Decision | Options | Status | Outcome |
 |----------|---------|--------|---------|
-| Decorator placement | This package / azure-core / structured file | **Open** | — |
-| Structured vs decorator suppressions | Decorators / structured file / custom suppressions / hybrid | **Open** | — |
+| Suppression mechanism | Custom decorators / `#suppress` directive / customized suppress / hybrid | **Open** | — |
+| Decorator hosting (if decorators chosen) | This package / azure-core | **Open** | — |
 | APIs to upstream to core | Operation identity / version utils / suppression infra / none | **Open** | — |
 | Wildcard suppressions | Exact only / glob / regex | **Deferred** to post-v1 | — |
 | Blanket suppress-all | Allow / disallow / flag | **Open** | — |
-| Scalar transition table scope | Full / progressive | **Open** | — |
-| Source trace target | 100% on N specs / best-effort | **Open** | — |
-| Report structure for wide suppressions | Same section / separate warning / flag | **Open** | — |
+| Wide suppression reporting | Same section / separate warning section / flag in table | **Open** | — |
+| Scalar transition table scope | Full table in v1 / flag all type changes uniformly / progressive | **Open** | — |
+| Source trace target | 100% on N specs / best-effort with fallbacks | **Open** | — |
 | New-vs-existing threshold | Compare decorators / compare findings | **Open** | — |
 | Linter rule integration | CLI only / CLI + linter / CLI + LSP | **Open** | — |
 | Git revision support | Path only / commitish / sparse checkout | **Open** | — |
@@ -420,7 +424,7 @@ The following items from existing documents have been integrated into this plan:
 | `presentation-notes.md` | Git-revision-based analysis | B12, Phase 5.7 |
 | `source-tracing-analysis.md` | AST node identity for dedup | A4 (resolved) |
 | User observations (2026-08-04) | New vs existing suppressions | B1, Phase 1.1 |
-| User observations (2026-08-04) | Decorator placement / structured suppressions | B2 |
+| User observations (2026-08-04) | Decorator vs `#suppress` / structured suppressions | B2 |
 | User observations (2026-08-04) | Source tracing unified algorithm | B3, Phase 1.2 |
 | User observations (2026-08-04) | Narrowing/widening classification | B4, Phase 1.5 |
 | User observations (2026-08-04) | Catastrophic breaking changes | B5, Phase 1.4 |
