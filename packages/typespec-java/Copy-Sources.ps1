@@ -35,6 +35,20 @@ try {
     Copy-Item -Path (Join-Path $emitterRoot "src") -Destination $packageRoot -Exclude "options.ts" -Recurse -Force
     Copy-Item -Path (Join-Path $emitterRoot "test") -Destination $packageRoot -Recurse -Force
 
+    # Diagnostic file references retain the upstream package-relative path.
+    $diagnosticsSource = Join-Path $packageRoot "src" "diagnostics"
+    $diagnosticsDestination = Join-Path $packageRoot "emitter" "src" "diagnostics"
+    Remove-Item $diagnosticsDestination -Recurse -Force -ErrorAction SilentlyContinue
+    if (Test-Path $diagnosticsSource) {
+        New-Item -ItemType Directory -Path $diagnosticsDestination | Out-Null
+        Copy-Item -Path (Join-Path $diagnosticsSource "*") -Destination $diagnosticsDestination -Recurse -Force
+        Get-ChildItem -Path $diagnosticsDestination -Filter "*.md" | ForEach-Object {
+            $content = Get-Content -Raw $_.FullName
+            $content.Replace("@typespec/http-client-java", "@azure-tools/typespec-java") |
+                Set-Content -NoNewline $_.FullName
+        }
+    }
+
     # Copy the Java generator sources out of the submodule and apply the Azure
     # customization patch (core.patch) to the copy, so building emitter.jar
     # (Build-Generator.ps1) never mutates the core/ submodule. The patch paths are

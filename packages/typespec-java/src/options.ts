@@ -5,6 +5,8 @@ import {
 import { JSONSchemaType } from "@typespec/compiler";
 
 export const LIB_NAME = "@azure-tools/typespec-java";
+export const DIAGNOSTIC_DOCS_BASE_URL =
+  "https://azure.github.io/typespec-azure/docs/emitters/clients/typespec-java/reference/diagnostics";
 
 export interface DevOptions {
   "generate-code-model"?: boolean;
