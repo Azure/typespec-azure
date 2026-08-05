@@ -1,0 +1,10 @@
+{
+  "$schema": "./azure-rest-api-specs.schema.json",
+  "_description": "Pinned commit of Azure/azure-rest-api-specs used by .scripts/sync-azure-rest-api-specs.js and tspcompile.js. To update specs, change `commit` to a newer SHA from https://github.com/Azure/azure-rest-api-specs/commits/main, then run `pnpm tspcompile`.",
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "commit": "f437f2fe14e41383b15850c619b599468333007b",
+  "sparseCheckoutPaths": [
+    "specification/keyvault/data-plane/Keys",
+    "specification/storage/data-plane/BlobStorage"
+  ]
+}

@@ -6,6 +6,38 @@ import { coreRepoRoot, repoRoot } from "./helpers.js";
 
 const WorkspaceYamlFile = "pnpm-workspace.yaml";
 
+/**
+ * Parses a top-level key/value section (e.g. `catalog:` or `overrides:`) from a
+ * pnpm-workspace.yaml document, returning a map of entry name to version.
+ */
+function parseKeyValueSection(content: string, section: string): Record<string, string> {
+  const entries: Record<string, string> = {};
+  const lines = content.split("\n");
+  const header = new RegExp(`^${section}:\\s*$`);
+  let inSection = false;
+
+  for (const line of lines) {
+    if (header.test(line)) {
+      inSection = true;
+      continue;
+    }
+    // A non-indented, non-empty, non-comment line ends the section
+    if (inSection && line.length > 0 && !line.startsWith(" ") && !line.startsWith("#")) {
+      break;
+    }
+    if (!inSection) continue;
+    // Skip comment lines so they aren't parsed as fake entries.
+    if (line.trim().startsWith("#")) continue;
+
+    const match = line.match(/^\s+"?([^":]+)"?\s*:\s*"?([^"]+)"?\s*$/);
+    if (match) {
+      entries[match[1].trim()] = match[2].trim();
+    }
+  }
+
+  return entries;
+}
+
 /** Parses the `catalog:` section from a pnpm-workspace.yaml file. */
 function parseCatalog(filePath: string): Record<string, string> {
   let content: string;
@@ -14,39 +46,86 @@ function parseCatalog(filePath: string): Record<string, string> {
   } catch {
     return {};
   }
+  return parseKeyValueSection(content, "catalog");
+}
 
-  const catalog: Record<string, string> = {};
+/** Parses the `overrides:` section from a pnpm-workspace.yaml file. */
+function parseOverrides(filePath: string): Record<string, string> {
+  let content: string;
+  try {
+    content = readFileSync(filePath, "utf8");
+  } catch {
+    return {};
+  }
+  return parseKeyValueSection(content, "overrides");
+}
+
+/**
+ * Parses the comments in the `catalog:` section, associating each comment (or run
+ * of consecutive comments) with the dependency entry that immediately follows it.
+ * This lets us keep an explanatory comment attached to its entry when the catalog
+ * is re-sorted and re-serialized.
+ */
+function parseCatalogComments(content: string): Record<string, string[]> {
+  const comments: Record<string, string[]> = {};
   const lines = content.split("\n");
   let inCatalog = false;
+  let pending: string[] = [];
 
   for (const line of lines) {
     if (/^catalog:\s*$/.test(line)) {
       inCatalog = true;
       continue;
     }
-    // A non-indented, non-empty, non-comment line ends the catalog section
-    if (inCatalog && line.length > 0 && !line.startsWith(" ") && !line.startsWith("#")) {
-      break;
-    }
     if (!inCatalog) continue;
+    // A non-indented, non-empty, non-comment line ends the catalog section
+    if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("#")) break;
 
-    const match = line.match(/^\s+"?([^":]+)"?\s*:\s*"?([^"]+)"?\s*$/);
-    if (match) {
-      catalog[match[1].trim()] = match[2].trim();
+    const trimmed = line.trim();
+    if (trimmed.startsWith("#")) {
+      pending.push(trimmed);
+      continue;
     }
+    if (trimmed === "") {
+      // Blank line breaks the association so comments only attach to an adjacent entry.
+      pending = [];
+      continue;
+    }
+
+    const match = line.match(/^\s+"?([^":]+)"?\s*:/);
+    if (match && pending.length > 0) {
+      comments[match[1].trim()] = pending;
+    }
+    pending = [];
   }
 
-  return catalog;
+  return comments;
 }
 
-/** Serializes a catalog object into YAML. */
-function serializeCatalog(catalog: Record<string, string>): string {
+/**
+ * Determines whether a catalog version value must be quoted to be a valid YAML
+ * plain scalar. Safe plain scalars are caret/tilde ranges (e.g. `^1.2.3`) or tag
+ * names starting with a letter (e.g. `latest`). Anything else — values starting
+ * with a digit (parsed as a number) or containing YAML indicator characters such
+ * as whitespace, `>`, `<`, `:` or `*` (e.g. `>=0.33.0 <1.0.0`) — must be quoted.
+ */
+function needsQuoting(version: string): boolean {
+  return !/^[\^~]?[A-Za-z0-9][A-Za-z0-9.\-]*$/.test(version) || /^\d/.test(version);
+}
+
+/** Serializes a catalog object into YAML, re-emitting any associated comments. */
+function serializeCatalog(
+  catalog: Record<string, string>,
+  comments: Record<string, string[]> = {},
+): string {
   const lines = ["catalog:"];
   const sorted = Object.entries(catalog).sort(([a], [b]) => a.localeCompare(b));
   for (const [dep, version] of sorted) {
+    for (const comment of comments[dep] ?? []) {
+      lines.push(`  ${comment}`);
+    }
     const key = dep.startsWith("@") ? `"${dep}"` : dep;
-    // Quote versions that start with a digit so YAML doesn't parse them as numbers
-    const val = /^\d/.test(version) ? `"${version}"` : version;
+    const val = needsQuoting(version) ? `"${version}"` : version;
     lines.push(`  ${key}: ${val}`);
   }
   return lines.join("\n") + "\n";
@@ -77,10 +156,53 @@ function replaceCatalogSection(content: string, catalog: Record<string, string>)
   }
 
   const before = beforeCatalog.join("\n").replace(/\n+$/, "\n");
-  const catalogStr = "\n" + serializeCatalog(catalog);
+  const catalogStr = "\n" + serializeCatalog(catalog, parseCatalogComments(content));
   const after = afterCatalog.length > 0 ? "\n" + afterCatalog.join("\n") : "";
 
   return before + catalogStr + after;
+}
+
+/** Serializes an overrides object into YAML, quoting keys/values when required. */
+function serializeOverrides(overrides: Record<string, string>): string {
+  const lines = ["overrides:"];
+  const sorted = Object.entries(overrides).sort(([a], [b]) => a.localeCompare(b));
+  for (const [key, version] of sorted) {
+    const k = needsQuoting(key) ? `"${key}"` : key;
+    const val = needsQuoting(version) ? `"${version}"` : version;
+    lines.push(`  ${k}: ${val}`);
+  }
+  return lines.join("\n") + "\n";
+}
+
+/** Replaces the overrides section in a pnpm-workspace.yaml file. */
+function replaceOverridesSection(content: string, overrides: Record<string, string>): string {
+  const lines = content.split("\n");
+  const beforeOverrides: string[] = [];
+  const afterOverrides: string[] = [];
+
+  let state: "before" | "in" | "after" = "before";
+  for (const line of lines) {
+    if (state === "before") {
+      if (/^overrides:\s*$/.test(line)) {
+        state = "in";
+      } else {
+        beforeOverrides.push(line);
+      }
+    } else if (state === "in") {
+      if (line.length > 0 && !line.startsWith(" ") && !line.startsWith("#")) {
+        state = "after";
+        afterOverrides.push(line);
+      }
+    } else {
+      afterOverrides.push(line);
+    }
+  }
+
+  const before = beforeOverrides.join("\n").replace(/\n+$/, "\n");
+  const overridesStr = "\n" + serializeOverrides(overrides);
+  const after = afterOverrides.length > 0 ? "\n" + afterOverrides.join("\n") : "";
+
+  return before + overridesStr + after;
 }
 
 interface Mismatch {
@@ -199,10 +321,10 @@ function main() {
   if (mode !== "check" && mode !== "fix") {
     console.error("Usage: pnpm deps <check|fix>");
     console.error(
-      "  check  - Verify catalog sync with core and enforce catalog: usage (exits non-zero if any issues)",
+      "  check  - Verify catalog & overrides sync with core and enforce catalog: usage (exits non-zero if any issues)",
     );
     console.error(
-      "  fix    - Sync catalog from core, align packageManager, and remove unused entries",
+      "  fix    - Sync catalog & overrides from core, align packageManager, and remove unused entries",
     );
     process.exit(1);
   }
@@ -236,6 +358,26 @@ function main() {
     }
   }
 
+  // Compare the `overrides:` section so security/pinning overrides from core are
+  // carried over into this repo's workspace as well.
+  const repoOverrides = parseOverrides(repoWorkspaceYaml);
+  const coreOverrides = parseOverrides(coreWorkspaceYaml);
+
+  const overrideMismatches: Mismatch[] = [];
+  const overrideMissing: Missing[] = [];
+
+  for (const [dep, coreVersion] of Object.entries(coreOverrides)) {
+    if (dep in repoOverrides) {
+      if (repoOverrides[dep] !== coreVersion) {
+        overrideMismatches.push({ dep, repoVersion: repoOverrides[dep], coreVersion });
+      }
+    } else {
+      overrideMissing.push({ dep, coreVersion });
+    }
+  }
+
+  const overridesOutOfSync = overrideMismatches.length > 0 || overrideMissing.length > 0;
+
   // Check packageManager field
   const repoPackageJson = resolve(repoRoot, "package.json");
   const corePackageJson = resolve(coreRepoRoot, "package.json");
@@ -245,8 +387,13 @@ function main() {
   const corePM = coreManifest.packageManager;
   const packageManagerMismatch = repoPM && corePM && repoPM !== corePM;
 
-  if (mismatches.length === 0 && missing.length === 0 && !packageManagerMismatch) {
-    console.log(pc.green("✓") + " Catalog is in sync with core.");
+  if (
+    mismatches.length === 0 &&
+    missing.length === 0 &&
+    !overridesOutOfSync &&
+    !packageManagerMismatch
+  ) {
+    console.log(pc.green("✓") + " Catalog and overrides are in sync with core.");
     checkAndReportCatalogUsage(mode, coreCatalog);
     process.exit(0);
   }
@@ -272,6 +419,24 @@ function main() {
     }
   }
 
+  if (overrideMismatches.length > 0) {
+    console.log(
+      `\nFound ${pc.yellow(String(overrideMismatches.length))} override mismatch(es) with core:\n`,
+    );
+    for (const { dep, repoVersion, coreVersion } of overrideMismatches) {
+      console.log(`  ${pc.cyan(dep)}: ${pc.red(repoVersion)} → ${pc.green(coreVersion)}`);
+    }
+  }
+
+  if (overrideMissing.length > 0) {
+    console.log(
+      `\nFound ${pc.yellow(String(overrideMissing.length))} override(s) in core missing from this repo:\n`,
+    );
+    for (const { dep, coreVersion } of overrideMissing) {
+      console.log(`  ${pc.cyan(dep)}: ${pc.green(coreVersion)}`);
+    }
+  }
+
   if (mode === "check") {
     console.log(`\nRun with ${pc.cyan("fix")} to apply these changes.`);
     process.exit(1);
@@ -286,9 +451,21 @@ function main() {
     updatedCatalog[dep] = coreVersion;
   }
 
-  const content = readFileSync(repoWorkspaceYaml, "utf8");
-  const updated = replaceCatalogSection(content, updatedCatalog);
-  writeFileSync(repoWorkspaceYaml, updated);
+  let content = readFileSync(repoWorkspaceYaml, "utf8");
+  content = replaceCatalogSection(content, updatedCatalog);
+
+  if (overridesOutOfSync) {
+    const updatedOverrides = { ...repoOverrides };
+    for (const { dep, coreVersion } of overrideMismatches) {
+      updatedOverrides[dep] = coreVersion;
+    }
+    for (const { dep, coreVersion } of overrideMissing) {
+      updatedOverrides[dep] = coreVersion;
+    }
+    content = replaceOverridesSection(content, updatedOverrides);
+  }
+
+  writeFileSync(repoWorkspaceYaml, content);
 
   if (packageManagerMismatch) {
     repoManifest.packageManager = corePM;

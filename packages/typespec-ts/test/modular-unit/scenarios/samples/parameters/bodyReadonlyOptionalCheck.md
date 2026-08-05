@@ -133,7 +133,6 @@ export async function _readDeserialize(
 
   return _readResponseDeserializer(result.body);
 }
-
 /** show example demo */
 export async function read(
   context: Client,

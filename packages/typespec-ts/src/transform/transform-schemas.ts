@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { SdkClient, getHttpOperationWithCache } from "@azure-tools/typespec-client-generator-core";
-import { Model, Type } from "@typespec/compiler";
-import { HttpOperation, getServers } from "@typespec/http";
+import {
+  type SdkClient,
+  getHttpOperationWithCache,
+} from "@azure-tools/typespec-client-generator-core";
+import type { Model, Type } from "@typespec/compiler";
+import { type HttpOperation, getServers } from "@typespec/http";
 import { KnownMediaType, extractMediaTypes } from "../utils/media-types.js";
 import {
   getBodyType,
@@ -15,19 +18,19 @@ import {
 } from "../utils/model-utils.js";
 
 import { useContext } from "../context-manager.js";
-import { SchemaContext } from "../rlc-common/index.js";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import { SchemaContext } from "../interfaces.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
 
 export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;
-  const metatree = useContext("rlcMetaTree");
+  const metatree = useContext("clientTypeMetaTree");
   const schemas: Map<string, SchemaContext[]> = new Map<string, SchemaContext[]>();
   const schemaMap: Map<any, any> = new Map<any, any>();
   const usageMap = new Map<Type, SchemaContext[]>();
   const requestBodySet = new Set<Type>();
   const contentTypeMap = new Map<Type, KnownMediaType[]>();
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -78,7 +81,7 @@ export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
     }
   }
   function transformHostParameters() {
-    const serviceNs = getDefaultService(program, dpgContext.rlcOptions?.isModularLibrary)?.type;
+    const serviceNs = getDefaultService(program)?.type;
     if (serviceNs) {
       const host = getServers(program, serviceNs);
       if (host && host?.[0] && host?.[0]?.parameters) {
@@ -103,7 +106,7 @@ export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
     if (model) {
       model.usage = context;
     }
-    metatree.set(tspModel, { rlcType: model });
+    metatree.set(tspModel, { clientType: model });
     if (model.name === "") {
       return;
     }

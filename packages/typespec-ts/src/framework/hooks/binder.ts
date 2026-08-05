@@ -1,16 +1,15 @@
-import { normalizePath } from "@typespec/compiler";
-import path from "path/posix";
+import { joinPaths, normalizePath } from "@typespec/compiler";
 import {
-  ImportDeclarationStructure,
-  ImportSpecifierStructure,
+  type ImportDeclarationStructure,
+  type ImportSpecifierStructure,
   Project,
   SourceFile,
   StructureKind,
 } from "ts-morph";
 import { provideContext, useContext } from "../../context-manager.js";
 import { generateLocallyUniqueName } from "../../modular/helpers/naming-helpers.js";
-import { ReferenceableSymbol } from "../dependency.js";
-import { SourceFileSymbol, StaticHelperMetadata } from "../load-static-helpers.js";
+import type { ReferenceableSymbol } from "../dependency.js";
+import { SourceFileSymbol, type StaticHelperMetadata } from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
 import { provideDependencies, useDependencies } from "./use-dependencies.js";
 
@@ -23,9 +22,6 @@ export interface DeclarationInfo {
 export interface BinderOptions {
   staticHelpers?: Map<string, StaticHelperMetadata>;
   dependencies?: Record<string, ReferenceableSymbol>;
-  /** When true, use #platform/ subpath imports for static helpers with platform variants.
-   *  Should be true for warp (azureSdkForJs) packages; false for tshy packages. */
-  useSubpathImports?: boolean;
 }
 
 export interface Binder {
@@ -51,7 +47,6 @@ class BinderImp implements Binder {
   private project: Project;
   private dependencies: Record<string, ReferenceableSymbol>;
   private staticHelpers: Map<string, StaticHelperMetadata>;
-  private useSubpathImports: boolean;
 
   constructor(project: Project, options: BinderOptions = {}) {
     this.project = project;
@@ -59,7 +54,6 @@ class BinderImp implements Binder {
     provideDependencies(options.dependencies);
     this.staticHelpers = options.staticHelpers ?? new Map();
     this.dependencies = useDependencies();
-    this.useSubpathImports = options.useSubpathImports ?? false;
   }
 
   trackDeclaration(refkey: unknown, name: string, sourceFile: SourceFile): string {
@@ -187,27 +181,6 @@ class BinderImp implements Binder {
   }
 
   /**
-   * Returns the #platform/ subpath import specifier for a static helper file
-   * that has a polyfill variant (-browser.mts or -react-native.mts sibling),
-   * or undefined if subpath imports are disabled or no variant exists.
-   * e.g. "src/static-helpers/serialization/get-binary-response.ts"
-   *   -> "#platform/static-helpers/serialization/get-binary-response"
-   */
-  private getPlatformImportSpecifier(declarationSourceFile: SourceFile): string | undefined {
-    if (!this.useSubpathImports) return undefined;
-    const filePath = declarationSourceFile.getFilePath();
-    const srcIndex = filePath.indexOf("/src/");
-    if (srcIndex === -1) return undefined;
-    // Check if a -browser.mts or -react-native.mts sibling exists
-    const basePath = filePath.replace(/\.ts$/, "");
-    const hasBrowserVariant = this.project.getSourceFile(basePath + "-browser.mts");
-    const hasReactNativeVariant = this.project.getSourceFile(basePath + "-react-native.mts");
-    if (!hasBrowserVariant && !hasReactNativeVariant) return undefined;
-    const relativePath = filePath.substring(srcIndex + "/src/".length);
-    return "#platform/" + relativePath.replace(/\.ts$/, "");
-  }
-
-  /**
    * Applies all tracked imports to their respective source files.
    */
   resolveAllReferences(sourceRoot: string, testRoot?: string): void {
@@ -317,9 +290,7 @@ class BinderImp implements Binder {
 
       if (file !== declarationSourceFile) {
         this.trackReference(declarationKey, file);
-        // Use #platform/ subpath import specifier for static helpers in warp packages
-        const platformSpecifier = this.getPlatformImportSpecifier(declarationSourceFile);
-        const importTarget = platformSpecifier ?? declarationSourceFile;
+        const importTarget = declarationSourceFile;
         const importDec = this.addImport(file, importTarget, name);
         name = importDec.alias ?? name;
       }
@@ -354,7 +325,7 @@ class BinderImp implements Binder {
 
     // Also keep files that are imported by any used helper file
     const helperFiles = this.project.getSourceFiles(
-      normalizePath(path.join(sourceRoot, "static-helpers/**/*.*ts")),
+      normalizePath(joinPaths(sourceRoot, "static-helpers/**/*.*ts")),
     );
     const usedFiles = helperFiles.filter((file) => !isFileUnused(file, usedHelperNames));
     for (const usedFile of usedFiles) {
@@ -378,7 +349,7 @@ class BinderImp implements Binder {
     }
     this.project
       //normalizae the final path to adapt to different systems
-      .getSourceFiles(normalizePath(path.join(testRoot, "test/generated/util/**/*.*ts")))
+      .getSourceFiles(normalizePath(joinPaths(testRoot, "test/generated/util/**/*.*ts")))
       .filter((file) => isFileUnused(file, usedHelperNames))
       .forEach((helperFile) => helperFile.delete());
   }

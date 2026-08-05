@@ -1,10 +1,18 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
+import { joinPaths } from "@typespec/compiler";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import { join } from "path";
-import { Node, SourceFile } from "ts-morph";
+import { Node, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import {
+  beginSourceFileBatch,
+  enqueueStatement,
+  flushSourceFileBatch,
+} from "../framework/source-file-batch.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 
 export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
@@ -18,8 +26,22 @@ export function buildSubpathIndexFile(
   clientMap?: [string[], SdkClientType<SdkServiceOperation>],
   options: buildSubpathIndexFileOptions = {},
 ) {
+  beginSourceFileBatch();
+  try {
+    buildSubpathIndexFileImpl(emitterOptions, subpath, clientMap, options);
+  } finally {
+    flushSourceFileBatch();
+  }
+}
+
+function buildSubpathIndexFileImpl(
+  emitterOptions: ModularEmitterOptions,
+  subpath: string,
+  clientMap?: [string[], SdkClientType<SdkServiceOperation>],
+  options: buildSubpathIndexFileOptions = {},
+) {
   const project = useContext("outputProject");
-  const subfolder = clientMap ? (getModularClientOptions(clientMap).subfolder ?? "") : "";
+  const subfolder = clientMap ? (getClientModuleInfo(clientMap).subfolder ?? "") : "";
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];
@@ -29,7 +51,7 @@ export function buildSubpathIndexFile(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, subpath).replace(/\\/g, "/");
+        const targetPath = joinPaths(srcPath, subfolder, subpath).replace(/\\/g, "/");
         return (
           formattedDir.startsWith(targetPath) && !project.getSourceFile(`${formattedDir}/index.ts`)
         );
@@ -38,10 +60,10 @@ export function buildSubpathIndexFile(
         return dir.getPath().replace(/\\/g, "/");
       });
   } else {
-    folders = [join(srcPath, subfolder, subpath).replace(/\\/g, "/")];
+    folders = [joinPaths(srcPath, subfolder, subpath).replace(/\\/g, "/")];
   }
   for (const folder of folders) {
-    const apiFilePattern = subpath === "models" ? join(folder, "models.ts") : folder;
+    const apiFilePattern = subpath === "models" ? joinPaths(folder, "models.ts") : folder;
     const apiFiles = project.getSourceFiles().filter((file) => {
       if (subpath === "api" && options.recursive) {
         return file.getDirectoryPath().replace(/\\/g, "/") === apiFilePattern.replace(/\\/g, "/");
@@ -137,14 +159,16 @@ export function partitionAndEmitExports(
     }
   }
   if (typeOnlyExports.length > 0) {
-    indexFile.addExportDeclaration({
+    enqueueStatement(indexFile, {
+      kind: StructureKind.ExportDeclaration,
       isTypeOnly: true,
       moduleSpecifier,
       namedExports: typeOnlyExports,
     });
   }
   if (valueExports.length > 0) {
-    indexFile.addExportDeclaration({
+    enqueueStatement(indexFile, {
+      kind: StructureKind.ExportDeclaration,
       moduleSpecifier,
       namedExports: valueExports,
     });

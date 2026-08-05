@@ -35,7 +35,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -82,7 +81,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -211,7 +209,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   requiredHeader: string,
@@ -286,7 +283,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   nullableRequiredHeader: string | null,
@@ -341,7 +337,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -396,7 +391,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   bars: Bar[],
@@ -458,7 +452,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<
 
   return _readResponseArrayDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -517,7 +510,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<B
 
   return barArrayDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -578,7 +570,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -638,7 +629,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -714,7 +704,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<_
 
   return _barDeserializer(result.body);
 }
-
 export function test(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
@@ -803,7 +792,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<_
 
   return _childDeserializer(result.body);
 }
-
 export function test(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
@@ -835,7 +823,7 @@ op get(): TestArrayModel;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -901,7 +889,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Te
 
   return testArrayModelDeserializer(result.body);
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -928,7 +915,7 @@ op get(): TestDictionary;
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -996,7 +983,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Te
 
   return testDictionaryDeserializer(result.body);
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -1023,7 +1009,7 @@ op createOrUpdateEndpoint(@path endpointName: string, @body endpoint: Endpoint):
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1094,7 +1080,6 @@ export async function _createOrUpdateEndpointDeserialize(
 
   return endpointDeserializer(result.body);
 }
-
 export async function createOrUpdateEndpoint(
   context: Client,
   endpointName: string,
@@ -1153,7 +1138,7 @@ withRawContent: true
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1225,7 +1210,6 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<_L
 
   return _listTestResultDeserializer(result.body);
 }
-
 export function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
@@ -1257,7 +1241,6 @@ export async function _barDeserialize(result: PathUncheckedResponse): Promise<_L
 
   return _listTestResultDeserializer(result.body);
 }
-
 export function bar(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },

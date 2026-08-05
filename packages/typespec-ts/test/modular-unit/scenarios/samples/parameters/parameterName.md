@@ -287,7 +287,6 @@ export async function _publishDeserialize(result: PathUncheckedResponse): Promis
 
   return;
 }
-
 export async function publish(
   context: Client,
   endpointParam: DocumentBase,

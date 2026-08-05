@@ -1,0 +1,11 @@
+name: Setup Java
+description: Setup JDK and Maven for typespec-java package development and CI
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup mise
+      uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      with:
+        install_args: "java maven"

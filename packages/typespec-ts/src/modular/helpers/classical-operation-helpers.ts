@@ -1,19 +1,22 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import {
-  FunctionDeclarationStructure,
-  InterfaceDeclarationStructure,
-  OptionalKind,
-  PropertySignatureStructure,
+  type FunctionDeclarationStructure,
+  type InterfaceDeclarationStructure,
+  type OptionalKind,
+  type PropertySignatureStructure,
   SourceFile,
   StructureKind,
 } from "ts-morph";
 import { addDeclaration } from "../../framework/declaration.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
-import { getModularClientOptions } from "../../utils/client-utils.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import { ServiceOperation } from "../../utils/operation-util.js";
+import { getClientModuleInfo } from "../../utils/client-utils.js";
+import type { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
+import type { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
 import { getClassicalLayerPrefix } from "./naming-helpers.js";
@@ -55,18 +58,18 @@ export function getClassicalOperation(
 ) {
   const prefixes = operationGroup[0];
   const operations = operationGroup[1];
-  const { rlcClientName } = getModularClientOptions(clientMap);
+  const { clientName } = getClientModuleInfo(clientMap);
   const hasClientContextImport = classicFile.getImportDeclarations().filter((i) => {
     return (
       i.getModuleSpecifierValue() ===
-      `${"../".repeat(layer + 2)}api/${normalizeName(rlcClientName, NameType.File)}.js`
+      `${"../".repeat(layer + 2)}api/${normalizeName(clientName, NameType.File)}.js`
     );
   });
   if (!hasClientContextImport || hasClientContextImport.length === 0) {
     classicFile.addImportDeclaration({
-      namedImports: [rlcClientName],
+      namedImports: [clientName],
       moduleSpecifier: `${"../".repeat(layer + 2)}api/${normalizeName(
-        rlcClientName,
+        clientName,
         NameType.File,
       )}.js`,
     });
@@ -78,7 +81,7 @@ export function getClassicalOperation(
   >();
   const operationDeclarations: OptionalKind<FunctionDeclarationStructure>[] = operations.map(
     (operation) => {
-      const declaration = getOperationFunction(dpgContext, [prefixes, operation], rlcClientName);
+      const declaration = getOperationFunction(dpgContext, [prefixes, operation], clientName);
       operationDeclarationMap.set(declaration, {
         declaration,
         oriName: operation.oriName,
@@ -141,7 +144,7 @@ export function getClassicalOperation(
       });
       // add LRO helper methods if applicable
       if (
-        dpgContext.rlcOptions?.compatibilityLro &&
+        dpgContext.emitterOptions?.compatibilityLro &&
         (operationInfo?.isLro || operationInfo?.isLroPaging)
       ) {
         const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
@@ -207,7 +210,7 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName,
+          type: clientName,
         },
       ],
       statements: `return {
@@ -237,7 +240,7 @@ export function getClassicalOperation(
             ];
             // add LRO helper methods if applicable
             if (
-              dpgContext.rlcOptions?.compatibilityLro &&
+              dpgContext.emitterOptions?.compatibilityLro &&
               (operationInfo?.isLro || operationInfo?.isLroPaging)
             ) {
               const getSimplePollerReference = resolveReference(
@@ -336,7 +339,7 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName,
+          type: clientName,
         },
       ],
       returnType: resolveReference(refkey(interfaceName, layer, "classicOperations")),

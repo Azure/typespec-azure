@@ -547,6 +547,119 @@ it("remove optional query param and add secret name", async () => {
   strictEqual(maxResultsParam.name, "maxresults");
 });
 
+it("reports diagnostic when override parameter is missing @path", async () => {
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    @route("/items/{itemId}")
+    op getItem(@path itemId: string): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op getItemOverride(itemId: string): void;
+
+    @@override(MyService.getItem, MyCustomizations.getItemOverride);
+    `,
+    ),
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+  });
+});
+
+it("does not report missing @path when the parameter is not a realized path parameter", async () => {
+  // A parameter can carry the `@path` decorator in the type graph (for example
+  // inside a body model) without being realized as a path parameter in the
+  // operation's actual route. Dropping `@path` from such a parameter in the
+  // override must not report an override-parameters-mismatch diagnostic.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    model Body {
+      @path name: string;
+      value: string;
+    }
+
+    @route("/items")
+    @post
+    op create(@body body: Body): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op createOverride(name: string, value: string): void;
+
+    @@override(MyService.create, MyCustomizations.createOverride);
+    `,
+    ),
+  );
+  ok(
+    !diagnostics.some(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    ),
+  );
+});
+
+it("does not report mismatch when the override adds parameters", async () => {
+  // Overrides are allowed to add parameters. Matching parameters by name (rather
+  // than by sorted position) ensures an added parameter does not shift the
+  // remaining parameters out of alignment and produce a false mismatch.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    @route("/items/{itemId}")
+    op getItem(@path itemId: string, @query filter: string): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op getItemOverride(@path itemId: string, @query filter: string, extra: string): void;
+
+    @@override(MyService.getItem, MyCustomizations.getItemOverride);
+    `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+});
+
+it("matches parameters by name when the override reorders and adds parameters", async () => {
+  // The override declares the original parameters in a different order and adds
+  // an extra parameter. Name-based matching must still pair each original
+  // parameter with its override counterpart without reporting a mismatch.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
+
+    op func(...Params): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op func(added: string, bar: string, foo: string): void;
+
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+});
+
 describe("@clientName", () => {
   it("original method", async () => {
     const { program } = await SimpleBaseTester.compile(

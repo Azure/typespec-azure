@@ -1,5 +1,5 @@
-import { SdkContext } from "../utils/interfaces.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
 let CASING: "camel" | "snake" = "snake";
 
@@ -10,11 +10,11 @@ export function transformModularEmitterOptions(
 ): ModularEmitterOptions {
   CASING = options.casing ?? CASING;
   const emitterOptions: ModularEmitterOptions = {
-    options: dpgContext.rlcOptions ?? {},
+    options: dpgContext.emitterOptions ?? {},
     modularOptions: {
       sourceRoot: modularSourcesRoot,
-      compatibilityMode: !!dpgContext.rlcOptions?.compatibilityMode,
-      experimentalExtensibleEnums: !!dpgContext.rlcOptions?.experimentalExtensibleEnums,
+      compatibilityMode: !!dpgContext.emitterOptions?.compatibilityMode,
+      experimentalExtensibleEnums: !!dpgContext.emitterOptions?.experimentalExtensibleEnums,
     },
   };
 

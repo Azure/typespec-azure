@@ -191,6 +191,23 @@ export type ArmBodyRootDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Controls visibility of a base type property based on whether the property is present
+ * and whether the deployment model is Appliance or Platform.
+ *
+ * If `isPresent` is false, the property is made invisible (removed from all lifecycle visibility).
+ * If `isAppliance` is true, the property is made read-only.
+ *
+ * @param isPresent Whether this property is present in the current template instantiation.
+ * @param isAppliance Whether the current deployment model is Appliance (true) or Platform (false).
+ */
+export type BaseTypeOptionalDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isPresent: boolean,
+  isAppliance: boolean,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * designates a type as a legacy type and emits a warning diagnostic when used
  */
 export type LegacyTypeDecorator = (
@@ -222,13 +239,7 @@ export type LegacyResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -247,13 +258,7 @@ export type ExtensionResourceOperationDecorator = (
   targetResourceType: Model,
   extensionResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -272,13 +277,7 @@ export type BuiltInResourceOperationDecorator = (
   parentResourceType: Model,
   builtInResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -295,13 +294,7 @@ export type LegacyExtensionResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -349,6 +342,7 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  baseTypeOptional: BaseTypeOptionalDecorator;
   legacyType: LegacyTypeDecorator;
   resourceParentType: ResourceParentTypeDecorator;
   legacyResourceOperation: LegacyResourceOperationDecorator;

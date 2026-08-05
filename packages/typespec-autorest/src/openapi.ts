@@ -1,7 +1,7 @@
 import {
   FinalStateValue,
-  LroMetadata,
-  UnionEnum,
+  type LroMetadata,
+  type UnionEnum,
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
@@ -10,7 +10,7 @@ import {
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
-  ArmFeatureOptions,
+  type ArmFeatureOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
@@ -29,34 +29,35 @@ import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
+  isInScope,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  BooleanLiteral,
-  CompilerHost,
-  Diagnostic,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
-  IntrinsicScalarName,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Namespace,
+  type BooleanLiteral,
+  type CompilerHost,
+  type Diagnostic,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
+  type IntrinsicScalarName,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   NoTarget,
-  NumericLiteral,
-  Operation,
-  PagingOperation,
-  Program,
-  Scalar,
-  Service,
-  StringLiteral,
-  StringTemplate,
-  Type,
-  TypeNameOptions,
-  Union,
-  UnionVariant,
-  Value,
+  type NumericLiteral,
+  type Operation,
+  type PagingOperation,
+  type Program,
+  type Scalar,
+  type Service,
+  type StringLiteral,
+  type StringTemplate,
+  type Type,
+  type TypeNameOptions,
+  type Union,
+  type UnionVariant,
+  type Value,
   compilerAssert,
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
@@ -112,22 +113,22 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { DuplicateTracker, TwoLevelMap } from "@typespec/compiler/utils";
 import {
-  AuthenticationOptionReference,
-  AuthenticationReference,
-  HttpAuth,
-  HttpAuthRef,
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationParameters,
-  HttpOperationResponse,
-  HttpPayloadBody,
-  HttpProperty,
-  HttpServiceAuthentication,
-  HttpStatusCodeRange,
-  HttpStatusCodesEntry,
-  MetadataInfo,
-  OAuth2FlowType,
+  type AuthenticationOptionReference,
+  type AuthenticationReference,
+  type HttpAuth,
+  type HttpAuthRef,
+  type HttpOperation,
+  type HttpOperationBody,
+  type HttpOperationMultipartBody,
+  type HttpOperationParameters,
+  type HttpOperationResponse,
+  type HttpPayloadBody,
+  type HttpProperty,
+  type HttpServiceAuthentication,
+  type HttpStatusCodeRange,
+  type HttpStatusCodesEntry,
+  type MetadataInfo,
+  type OAuth2FlowType,
   Visibility,
   createMetadataInfo,
   getHeaderFieldOptions,
@@ -142,7 +143,7 @@ import {
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
-  AdditionalInfo,
+  type AdditionalInfo,
   checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
@@ -156,7 +157,7 @@ import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
-import {
+import type {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2ExternalDocs,
@@ -182,15 +183,15 @@ import {
   XmsPageable,
 } from "./openapi2-document.js";
 import {
-  LateBoundReference,
-  OpenApi2DocumentProxy,
-  PendingSchema,
-  ProcessedSchema,
   type AutorestEmitterResult,
+  LateBoundReference,
   type LoadedExample,
+  type OpenApi2DocumentProxy,
+  type PendingSchema,
+  type ProcessedSchema,
 } from "./types.js";
 import {
-  AutorestEmitterContext,
+  type AutorestEmitterContext,
   getClientName,
   isSupportedAutorestFormat,
   resolveOperationId,
@@ -261,6 +262,18 @@ export interface AutorestDocumentEmitterOptions {
    * @default false
    */
   readonly skipExampleCopying?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix for types outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). Default.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). Conflicts are
+   *   reported as an error.
+   * @default "namespaced"
+   */
+  readonly typeNameStrategy?: "namespaced" | "name-only";
 }
 
 type HttpParameterProperties = Extract<
@@ -278,6 +291,11 @@ export async function getOpenAPIForService(
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
+      // With the "name-only" strategy, strip every namespace so names are not prefixed by their
+      // namespace (e.g. `Foo` instead of `LiftrBase.Foo`).
+      if (options.typeNameStrategy === "name-only") {
+        return false;
+      }
       return !isService(program, ns);
     },
   };
@@ -335,12 +353,16 @@ export async function getOpenAPIForService(
   program.reportDiagnostics(diagnostics);
 
   const routes = httpService.operations;
-  reportIfNoRoutes(program, routes);
+  // Filter routes to only include operations in scope for this emitter
+  const inScopeRoutes = routes.filter((route) =>
+    isInScope(context.tcgcSdkContext, route.operation),
+  );
+  reportIfNoRoutes(program, inScopeRoutes);
 
   const xmlEnabled = xmlStrategy !== "none";
 
   // The set of produces/consumes values found in all operations
-  let allResponseContentTypes = routes
+  let allResponseContentTypes = inScopeRoutes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
     .flatMap((res) => res.body?.contentTypes ?? [])
@@ -353,7 +375,7 @@ export async function getOpenAPIForService(
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
 
-  let allRequestContentTypes = routes
+  let allRequestContentTypes = inScopeRoutes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
     .filter(
@@ -371,7 +393,7 @@ export async function getOpenAPIForService(
     globalConsumes.size === 1 &&
     globalConsumes.has("application/xml");
 
-  routes.forEach(emitOperation);
+  inScopeRoutes.forEach(emitOperation);
 
   emitParameters();
   emitSchemas(service.type);
@@ -1012,6 +1034,9 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
+      if (!isInScope(context.tcgcSdkContext, httpProperty.property)) {
+        continue;
+      }
       const shared = params.get(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
@@ -1921,6 +1946,9 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (!isInScope(context.tcgcSdkContext, prop)) {
+        continue;
+      }
       if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
         const baseProp = rawBaseModel.properties.get(prop.name);
         if (baseProp?.name === prop.name && baseProp.type === prop.type) {

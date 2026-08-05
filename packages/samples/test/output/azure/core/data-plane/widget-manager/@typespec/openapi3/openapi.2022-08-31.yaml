@@ -1271,7 +1271,9 @@ paths:
             schema:
               $ref: '#/components/schemas/WidgetRepairRequest'
 security:
-  - ApiKeyAuth: []
+  - WidgetManagerApiKeyAuth: []
+  - WidgetManagerOauth2Auth:
+      - https://widget.contoso.com/.default
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -1684,7 +1686,16 @@ components:
             - SentToManufacturer
       description: The repair state of a widget.
   securitySchemes:
-    ApiKeyAuth:
+    WidgetManagerApiKeyAuth:
       type: apiKey
       in: header
       name: X-Key
+      description: Authenticate requests with an API key in the X-Key header.
+    WidgetManagerOauth2Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.contoso.com/common/oauth2/v2.0/authorize
+          scopes:
+            https://widget.contoso.com/.default: ''
+      description: Authenticate requests with OAuth2 using the widget service scope.

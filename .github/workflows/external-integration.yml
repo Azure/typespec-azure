@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: true
           fetch-depth: 0
@@ -39,7 +39,7 @@ jobs:
 
           # Also pack TypeSpec core packages
           cd core
-          pnpm chronus pack --pack-destination ../tgz-packages --exclude standalone
+          pnpm chronus pack --pack-destination ../tgz-packages --exclude standalone --exclude typespec-vs
           cd ..
 
           echo "Created tgz packages:"

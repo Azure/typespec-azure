@@ -1,14 +1,13 @@
-import { existsSync, rmSync } from "fs";
-import { join } from "path";
+import { type CompilerHost, joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { SdkContext } from "../utils/interfaces.js";
-import { ServiceOperation } from "../utils/operation-util.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
+import type { ServiceOperation } from "../utils/operation-util.js";
 import { AzureTestDependencies } from "./external-dependencies.js";
 import {
   buildParameterValueMap,
-  ClientEmitOptions,
+  type ClientEmitOptions,
   createSourceFile,
   generateMethodCall,
   generateResponseAssertions,
@@ -22,23 +21,36 @@ import { CreateRecorderHelpers } from "./static-helpers-metadata.js";
 /**
  * Clean up the test/generated folder before generating new tests
  */
-async function cleanupTestFolder(dpgContext: SdkContext) {
+async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
   const clients = dpgContext.sdkPackage.clients;
-  const baseTestFolder = join(dpgContext.generationPathDetail?.rootDir ?? "", "test", "generated");
+  const baseTestFolder = joinPaths(
+    dpgContext.generationPathDetail?.rootDir ?? "",
+    "test",
+    "generated",
+  );
+
+  async function dirExists(path: string): Promise<boolean> {
+    try {
+      const s = await host.stat(path);
+      return s.isDirectory();
+    } catch {
+      return false;
+    }
+  }
 
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
       const subFolder = normalizeName(getClassicalClientName(client), NameType.File);
-      const clientTestFolder = join(baseTestFolder, subFolder);
-      if (existsSync(clientTestFolder)) {
-        rmSync(clientTestFolder, { recursive: true, force: true });
+      const clientTestFolder = joinPaths(baseTestFolder, subFolder);
+      if (await dirExists(clientTestFolder)) {
+        await host.rm(clientTestFolder, { recursive: true });
       }
     }
   } else {
     // Single client, clean up the entire test/generated folder
-    if (existsSync(baseTestFolder)) {
-      rmSync(baseTestFolder, { recursive: true, force: true });
+    if (await dirExists(baseTestFolder)) {
+      await host.rm(baseTestFolder, { recursive: true });
     }
   }
 }
@@ -46,9 +58,14 @@ async function cleanupTestFolder(dpgContext: SdkContext) {
 /**
  * Helpers to emit tests similar to samples
  */
-export async function emitTests(dpgContext: SdkContext): Promise<SourceFile[]> {
+export async function emitTests(
+  dpgContext: SdkContext,
+  host?: CompilerHost,
+): Promise<SourceFile[]> {
   // Clean up the test/generated folder before generating new tests
-  await cleanupTestFolder(dpgContext);
+  if (host) {
+    await cleanupTestFolder(dpgContext, host);
+  }
 
   return iterateClientsAndMethods(dpgContext, emitMethodTests);
 }

@@ -25,7 +25,7 @@ op stopTest(
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -91,7 +91,6 @@ export async function _stopTestDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
-
 export async function stopTest(
   context: Client,
   body: {
@@ -163,7 +162,6 @@ export async function _stopOptionalWrapperTestDeserialize(
 
   return;
 }
-
 export async function stopOptionalWrapperTest(
   context: Client,
   options: StopOptionalWrapperTestOptionalParams = { requestOptions: {} },
@@ -235,7 +233,6 @@ export async function _stopOptionalPropTestDeserialize(
 
   return;
 }
-
 export async function stopOptionalPropTest(
   context: Client,
   body: {
@@ -307,7 +304,6 @@ export async function _stopBothOptionalTestDeserialize(
 
   return;
 }
-
 export async function stopBothOptionalTest(
   context: Client,
   options: StopBothOptionalTestOptionalParams = { requestOptions: {} },

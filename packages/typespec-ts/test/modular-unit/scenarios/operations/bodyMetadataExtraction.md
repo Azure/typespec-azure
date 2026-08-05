@@ -21,7 +21,7 @@ op bodyRootWithHeader(@bodyRoot body: RequestBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -84,7 +84,6 @@ export async function _bodyRootWithHeaderDeserialize(result: PathUncheckedRespon
 
   return;
 }
-
 export async function bodyRootWithHeader(
   context: Client,
   body: RequestBody,
@@ -117,7 +116,7 @@ op createResource(body: ResourceBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -178,7 +177,6 @@ export async function _createResourceDeserialize(result: PathUncheckedResponse):
 
   return;
 }
-
 export async function createResource(
   context: Client,
   body: ResourceBody,
@@ -211,7 +209,7 @@ op bodyRootWithOptionalHeader(@bodyRoot body: OptionalHeaderBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -279,7 +277,6 @@ export async function _bodyRootWithOptionalHeaderDeserialize(
 
   return;
 }
-
 export async function bodyRootWithOptionalHeader(
   context: Client,
   body: OptionalHeaderBody,
@@ -311,7 +308,7 @@ op createOptionalPathResource(body: OptionalPathBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -374,7 +371,6 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
-
 export async function createOptionalPathResource(
   context: Client,
   body: OptionalPathBody,
@@ -407,7 +403,7 @@ op createOptionalPathResource(body?: OptionalBodyWithHeader): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -476,7 +472,6 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
-
 export async function createOptionalPathResource(
   context: Client,
   options: CreateOptionalPathResourceOptionalParams = { requestOptions: {} },

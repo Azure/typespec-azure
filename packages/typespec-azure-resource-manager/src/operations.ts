@@ -1,20 +1,20 @@
 import {
   $doc,
-  DecoratorContext,
+  type DecoratorContext,
   getFriendlyName,
   ignoreDiagnostics,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
 import {
   unsafe_mutateSubgraph as mutateSubgraph,
-  unsafe_Mutator as Mutator,
+  type unsafe_Mutator as Mutator,
   unsafe_MutatorFlow as MutatorFlow,
 } from "@typespec/compiler/experimental";
 import { useStateMap } from "@typespec/compiler/utils";
-import { $route, getHttpOperation, HttpOperation, isPathParam } from "@typespec/http";
+import { $route, getHttpOperation, type HttpOperation, isPathParam } from "@typespec/http";
 import {
   $actionSegment,
   $autoRoute,
@@ -27,7 +27,7 @@ import {
   getSegment,
 } from "@typespec/rest";
 import { pascalCase } from "change-case";
-import {
+import type {
   ArmResourceActionDecorator,
   ArmResourceCheckExistenceDecorator,
   ArmResourceCollectionActionDecorator,
@@ -37,7 +37,7 @@ import {
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import {
+import type {
   ArmOperationOptions,
   ArmOperationRouteDecorator,
   RenamePathParameterDecorator,
@@ -55,11 +55,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind =
-  | "read"
-  | "createOrUpdate"
-  | "update"
-  | "delete"
-  | "checkExistence";
+  "read" | "createOrUpdate" | "update" | "delete" | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {

@@ -1,6 +1,10 @@
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkBasicServiceMethod, SdkBuiltInType, SdkHttpOperation } from "../../src/interfaces.js";
+import type {
+  SdkBasicServiceMethod,
+  SdkBuiltInType,
+  SdkHttpOperation,
+} from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 describe("bytes SdkMethodParameter", () => {

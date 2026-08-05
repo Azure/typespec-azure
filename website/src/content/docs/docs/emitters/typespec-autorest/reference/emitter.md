@@ -193,3 +193,19 @@ Determines whether output should be split into multiple files. The only supporte
 **Default:** `false`
 
 When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.
+
+### `type-name-strategy`
+
+**Type:** `"namespaced" | "name-only"`
+
+**Default:** `"namespaced"`
+
+Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.
+
+### `service-yaml`
+
+**Type:** `"auto" | "always" | "never"`
+
+**Default:** `"auto"`
+
+Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.

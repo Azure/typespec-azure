@@ -1,21 +1,21 @@
 import {
-  SdkArrayType,
-  SdkDictionaryType,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkType,
-  SdkUnionType,
+  type SdkArrayType,
+  type SdkDictionaryType,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkType,
+  type SdkUnionType,
   UsageFlags,
 } from "@azure-tools/typespec-client-generator-core";
 import { NoTarget } from "@typespec/compiler";
-import { FunctionDeclarationStructure, StructureKind } from "ts-morph";
+import { type FunctionDeclarationStructure, StructureKind } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.js";
 import {
   getAllAncestors,
@@ -29,7 +29,7 @@ import {
   getAllDiscriminatedValues,
   isDiscriminatedUnion,
   isSupportedSerializeType,
-  ModelSerializeOptions,
+  type ModelSerializeOptions,
 } from "./serialize-utils.js";
 
 export function buildPropertyDeserializer(
@@ -447,7 +447,7 @@ function getAdditionalPropertiesStatement(
   if (typeof deserializerFunction === "string") {
     params.push(deserializerFunction);
   }
-  return context.rlcOptions?.compatibilityMode === true
+  return context.emitterOptions?.compatibilityMode === true
     ? "...item,"
     : `${getAdditionalPropertiesName(context, type)}: ${resolveReference(SerializationHelpers.serializeRecord)}(${params.join(",")}),`;
 }

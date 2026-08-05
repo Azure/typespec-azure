@@ -1,12 +1,15 @@
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { useContext } from "../context-manager.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildOperationOptions } from "./build-operations.js";
 
@@ -20,12 +23,12 @@ export function buildApiOptions(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const modelOptionsFiles = [];
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const methodMap = getMethodHierarchiesMap(context, client);
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
     const modelOptionsFile = project.createSourceFile(
-      path.join(
+      joinPaths(
         emitterOptions.modularOptions.sourceRoot,
         subfolder ?? "",
         `api`,

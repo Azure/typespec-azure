@@ -1,12 +1,11 @@
-import { NameType } from "../rlc-common/index.js";
-
-import path from "path/posix";
+import { getRelativePathFromDirectory, joinPaths } from "@typespec/compiler";
 import { useContext } from "../context-manager.js";
-import { getClientHierarchyMap, getModularClientOptions } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import { getClientHierarchyMap, getClientModuleInfo } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { NameType } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getClassicalLayerPrefix } from "./helpers/naming-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
 /**
  * Computes the relative path prefix (e.g. `./src` or `./src/generated`) from
@@ -19,7 +18,10 @@ function getSourceRootPrefix(emitterOptions: ModularEmitterOptions, context: Sdk
   const rootDir = (context.generationPathDetail?.rootDir ?? "").replace(/\\/g, "/");
 
   if (rootDir && sourceRoot.startsWith(rootDir)) {
-    const relativePath = path.relative(rootDir, sourceRoot).replace(/\\/g, "/");
+    const relativePath = getRelativePathFromDirectory(rootDir, sourceRoot, false).replace(
+      /\\/g,
+      "/",
+    );
     return `./${relativePath}`;
   }
 
@@ -39,7 +41,7 @@ function buildExportsForMultiClient(
     if (hierarchy.length === 0) {
       hasTopLevelClient = true;
     }
-    const { subfolder } = getModularClientOptions([hierarchy, client]);
+    const { subfolder } = getClientModuleInfo([hierarchy, client]);
     if (subfolder !== "" && methodMap.size > 0) {
       packageInfo.exports[`./${subfolder}`] = `${srcPrefix}/${subfolder}/index.ts`;
 
@@ -53,7 +55,7 @@ function buildExportsForMultiClient(
     // TODO: support api subpath exports for multi-service. Skip for now. https://github.com/Azure/autorest.typescript/issues/3717
     if (!emitterOptions.options.isMultiService) {
       for (const flattenedClient of clientMap) {
-        const { subfolder } = getModularClientOptions(flattenedClient);
+        const { subfolder } = getClientModuleInfo(flattenedClient);
         const client = flattenedClient[1];
         const methodMap = getMethodHierarchiesMap(context, client);
         for (const [prefixKey, _] of methodMap) {
@@ -95,7 +97,7 @@ export function getModuleExports(context: SdkContext, emitterOptions: ModularEmi
 function getModelSubpaths(emitterOptions: ModularEmitterOptions) {
   const outputProject = useContext("outputProject");
   const modelFiles = outputProject.getSourceFiles(
-    path.join(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), `models/**/*.ts`),
+    joinPaths(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), `models/**/*.ts`),
   );
   const subpath = new Set<string>();
   for (const modelFile of modelFiles) {
@@ -104,7 +106,11 @@ function getModelSubpaths(emitterOptions: ModularEmitterOptions) {
       continue;
     }
     subpath.add(
-      path.relative(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), filepath),
+      getRelativePathFromDirectory(
+        emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"),
+        filepath,
+        false,
+      ),
     );
   }
   return Array.from(subpath);

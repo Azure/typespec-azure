@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-metadata",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "TypeSpec emitter that produces structured metadata snapshots for APIView and other tooling.",
   "type": "module",
   "license": "MIT",
@@ -36,8 +36,8 @@
     "build": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist ./temp",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
@@ -47,11 +47,19 @@
     "yaml": "catalog:"
   },
   "peerDependencies": {
-    "@typespec/compiler": "workspace:^"
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "rimraf": "catalog:",

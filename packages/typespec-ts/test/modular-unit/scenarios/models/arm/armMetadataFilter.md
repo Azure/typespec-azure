@@ -40,7 +40,7 @@ model PrivateLinkParameters {
   privateLinkName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getPrivateLink(
   ...ApiVersionParameter,
@@ -59,7 +59,7 @@ mustEmptyDiagnostic: false
 ## Models interface PrivateLinkParameters
 
 ```ts models interface PrivateLinkParameters
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -111,7 +111,7 @@ model ParamBagReadCreate {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadCreate): ArmResponse<{}> | ErrorResponse;
 ```
@@ -125,7 +125,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadCreate
 
 ```ts models interface ParamBagReadCreate
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -176,7 +176,7 @@ model ParamBagReadOnly {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadOnly): ArmResponse<{}> | ErrorResponse;
 ```
@@ -190,7 +190,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadOnly
 
 ```ts models interface ParamBagReadOnly
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -239,7 +239,7 @@ model ParamBagReadUpdateCreate {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadUpdateCreate): ArmResponse<{}> | ErrorResponse;
 ```
@@ -253,7 +253,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadUpdateCreate
 
 ```ts models interface ParamBagReadUpdateCreate
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */

@@ -1,16 +1,16 @@
 import {
-  Diagnostic,
-  Enum,
-  EnumMember,
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Scalar,
-  Type,
-  Union,
-  UnionVariant,
+  type Diagnostic,
+  type Enum,
+  type EnumMember,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Scalar,
+  type Type,
+  type Union,
+  type UnionVariant,
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
@@ -21,7 +21,7 @@ import {
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
-  HttpOperation,
+  type HttpOperation,
   Visibility,
   getHttpOperation,
   getServers,
@@ -29,11 +29,11 @@ import {
   isVisible,
 } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
-import { Version, getVersions } from "@typespec/versioning";
+import { type Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
 import { normalizeExactName } from "./functions.js";
-import {
+import type {
   DecoratedType,
   SdkBodyParameter,
   SdkClient,
@@ -53,8 +53,8 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
-  ContextNode,
-  TspLiteralType,
+  type ContextNode,
+  type TspLiteralType,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
@@ -74,7 +74,12 @@ export function getDefaultApiVersion(
 ): Version | undefined {
   try {
     const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    removeVersionsLargerThanExplicitlySpecified(context, versions);
+    removeVersionsLargerThanExplicitlySpecified(
+      context,
+      versions,
+      serviceNamespace,
+      context.getPackageVersions().size > 1,
+    );
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {

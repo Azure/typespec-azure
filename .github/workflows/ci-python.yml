@@ -1,29 +1,17 @@
 name: "python / test e2e"
 
 on:
-  pull_request:
-    branches:
-      - main
-      - release/*
-    paths:
-      - "packages/typespec-python/**"
-      - ".github/workflows/ci-python.yml"
-      - ".github/actions/setup-python/**"
-  merge_group:
+  workflow_call:
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build:
     name: "Build & Regenerate"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -43,6 +31,10 @@ jobs:
 
       - name: Regenerate
         run: pnpm run regenerate
+        working-directory: packages/typespec-python
+
+      - name: Check for unstaged changes
+        run: pnpm run check-unstaged
         working-directory: packages/typespec-python
 
       - name: Pre-build wheels
@@ -69,7 +61,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -105,7 +97,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -135,7 +127,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -173,7 +165,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 

@@ -8,12 +8,10 @@ using Azure.ResourceManager.Foundations;
 using Rest;
 
 /**
- * @dev List the private endpoint connections over a resource
+ * List the private endpoint connections over a resource
  * @template ParentResource the parent resource of the PrivateEndpointConnection
  * @template Resource Optional. The PrivateEndpointConnection resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
- * @template ParentName Optional. The name of the parent resource
- * @template ParentFriendlyName Optional. The friendly name of the parent resource
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -39,7 +37,7 @@ op ListSinglePageByParent<
 >;
 
 /**
- * @dev Synchronous PUT operation for a Private endpoint connection to a resource
+ * Synchronous PUT operation for a Private endpoint connection to a resource
  * @template ParentResource the parent resource of the PrivateEndpointConnection
  * @template Resource the PrivateEndpointConnection resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -76,7 +74,7 @@ op CreateOrReplaceSync<
 >;
 
 /**
- * @dev A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
+ * A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
  * @template ParentResource the parent resource of the PrivateEndpointConnection
  * @template Resource the PrivateEndpointConnection resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -161,7 +159,7 @@ op CustomPatchAsync<
 >;
 
 /**
- * @dev A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
+ * A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
  * @template ParentResource The parent resource of the PrivateEndpointConnection
  * @template Resource Optional. The PrivateEndpointConnection resource being patched
  * @template PatchModel The input model for the PATCH request

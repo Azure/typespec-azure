@@ -638,6 +638,34 @@ it("duplicate operation with @clientLocation to new clients", async () => {
   ]);
 });
 
+it("no duplicate operation when @clientLocation and @client are used on different scopes", async () => {
+  // Regression test for https://github.com/Azure/typespec-azure/issues/4850
+  // `@clientLocation` moves the operation for all scopes except `java`, while a `@client`
+  // interface re-declares it for `java` only. These never coexist in the same scope, so no
+  // duplicate should be reported.
+  const diagnostics = await SimpleTester.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+
+    namespace OpGroup {
+      @route("/a")
+      op listUpdates(): void;
+    }
+
+    @@clientLocation(OpGroup.listUpdates, "DeviceUpdate", "!java");
+
+    @client({ name: "JavaClient", service: Contoso.WidgetManager }, "java")
+    interface JavaClient {
+      @route("/java/a")
+      listUpdates is OpGroup.listUpdates;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
 it("duplicate operation warning for .NET", async () => {
   const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
@@ -962,4 +990,256 @@ describe("namespace flag duplicate name validation", () => {
     const unionNames = new Set([stringProp!.type.name, intProp!.type.name, boolProp!.type.name]);
     strictEqual(unionNames.size, 3, "All three union types should have unique names");
   });
+});
+
+it("emit error when operations from multiple services in the same client have the same name", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      op test(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  expectDiagnostics(duplicateDiags, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+  ]);
+});
+
+it("no error when operations from multiple services have different names", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op testA(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      op testB(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(duplicateDiags.length, 0);
+});
+
+it("no error when @clientName resolves the conflict across services", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      @clientName("testFromB") op test(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(duplicateDiags.length, 0);
+});
+
+it("no error when operations with the same name are in different sub-clients", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService {
+      @route("/a")
+      namespace GroupA {
+        op test(): void;
+      }
+      @route("/b")
+      namespace GroupB {
+        op test(): void;
+      }
+    }
+    `,
+      ``,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(duplicateDiags.length, 0);
+});
+
+it("emit error for all instances in three-way service merge with same operation name", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceC {
+      @route("/c")
+      op test(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB, ServiceC]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  expectDiagnostics(duplicateDiags, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+  ]);
+});
+
+it("error only for the language where @clientName causes a conflict", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op getItem(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      @clientName("getItem", "python") op fetchItem(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  // Python emitter should see a conflict (getItem vs getItem)
+  const pythonContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const pythonDiags = pythonContext.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(pythonDiags.length, 2, "python should have 2 duplicate diagnostics");
+
+  // Java emitter should see no conflict (getItem vs fetchItem)
+  const javaContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const javaDiags = javaContext.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(javaDiags.length, 0, "java should have no duplicate diagnostics");
+});
+
+it("@clientName fixes conflict for one language but not others", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      @clientName("testFromB", "python") op test(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  // Python emitter should see no conflict (test vs testFromB)
+  const pythonContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const pythonDiags = pythonContext.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(pythonDiags.length, 0, "python should have no duplicate diagnostics");
+
+  // Java emitter should see a conflict (test vs test)
+  const javaContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const javaDiags = javaContext.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  strictEqual(javaDiags.length, 2, "java should have 2 duplicate diagnostics");
 });

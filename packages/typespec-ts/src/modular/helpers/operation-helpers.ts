@@ -2,30 +2,30 @@ import {
   getClientOptions,
   isHttpMetadata,
   isReadOnly,
-  SdkBodyParameter,
-  SdkClientType,
-  SdkConstantType,
-  SdkEnumType,
-  SdkHttpOperation,
-  SdkHttpParameter,
-  SdkLroPagingServiceMethod,
-  SdkLroServiceMethod,
-  SdkMethod,
-  SdkMethodParameter,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkPagingServiceMethod,
-  SdkServiceResponseHeader,
-  SdkType,
+  type SdkBodyParameter,
+  type SdkClientType,
+  type SdkConstantType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkHttpParameter,
+  type SdkLroPagingServiceMethod,
+  type SdkLroServiceMethod,
+  type SdkMethod,
+  type SdkMethodParameter,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkPagingServiceMethod,
+  type SdkServiceResponseHeader,
+  type SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, Program } from "@typespec/compiler";
+import { NoTarget, type Program } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
-  FunctionDeclarationStructure,
-  OptionalKind,
-  ParameterDeclarationStructure,
+  type FunctionDeclarationStructure,
+  type OptionalKind,
+  type ParameterDeclarationStructure,
   StructureKind,
-  TypeAliasDeclarationStructure,
+  type TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { useSdkTypes } from "../../framework/hooks/sdk-types.js";
@@ -33,9 +33,9 @@ import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getCollectionFormatFromArrayEncoding,
   getCollectionFormatHelper,
@@ -46,9 +46,9 @@ import {
   isMultipartPayload,
   isXmlPayload,
   KnownCollectionFormat,
-  ServiceOperation,
+  type ServiceOperation,
 } from "../../utils/operation-util.js";
-import { AzurePollingDependencies } from "../external-dependencies.js";
+import { AzureCoreDependencies, AzurePollingDependencies } from "../external-dependencies.js";
 import {
   buildModelDeserializer,
   buildPropertyDeserializer,
@@ -66,11 +66,10 @@ import {
   getPropertyWithOverrides,
   isNormalUnion,
   isSpecialHandledUnion,
-  ModelOverrideOptions,
+  type ModelOverrideOptions,
 } from "../serialization/serialize-utils.js";
 import {
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   StorageCompatHelpers,
@@ -213,11 +212,11 @@ export function getDeserializePrivateFunction(
     };
   } else if (response.type) {
     // When response.optional is true, some HTTP responses have no body (e.g. 204), so
-    // the return type must include undefined to reflect that possibility.
+    // the return type must include void to reflect that possibility.
     const baseType = getTypeExpression(context, response.type);
     returnType = {
       name: (response as any).name ?? "",
-      type: response.optional ? `${baseType} | undefined` : baseType,
+      type: response.optional ? `${baseType} | void` : baseType,
     };
   } else if (isHeadAsBooleanOperation(operation)) {
     returnType = { name: "", type: "boolean" };
@@ -405,15 +404,15 @@ export function getDeserializePrivateFunction(
       }
       if (deserializeFunctionName) {
         if (needsBodyGuard) {
-          // Use ternary form: return result.body ? deserializer(result.body) : undefined
           statements.push(
-            `return ${deserializedRoot} ? ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix} : undefined`,
-          );
-        } else {
-          statements.push(
-            `return ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix}`,
+            `if (!${deserializedRoot}) {
+            return;
+          }`,
           );
         }
+        statements.push(
+          `return ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix}`,
+        );
       } else if (isAzureCoreErrorType(context.program, deserializedType.__raw)) {
         statements.push(`return ${deserializedRoot}${multipartCastSuffix}`);
       } else if (isHeadAsBooleanOperation(operation)) {
@@ -464,8 +463,8 @@ export function getDeserializeHeadersPrivateFunction(
   operation: ServiceOperation,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
   const responseHeaders = getResponseHeaders(operation.operation.responses);
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
-  const isStorageCompatEnabled = context.rlcOptions?.enableStorageCompat === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
+  const isStorageCompatEnabled = context.emitterOptions?.enableStorageCompat === true;
 
   // Only generate if headers exist and a relevant feature is enabled
   if (responseHeaders.length === 0 || (!isResponseHeadersEnabled && !isStorageCompatEnabled)) {
@@ -617,7 +616,7 @@ export function getDeserializeExceptionHeadersPrivateFunction(
   context: SdkContext,
   operation: ServiceOperation,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
   if (!isResponseHeadersEnabled) {
     return undefined;
   }
@@ -673,7 +672,7 @@ function getExceptionThrowStatement(context: SdkContext, operation: ServiceOpera
   const { customized, defaultDeserializer, defaultXmlDeserializer, defaultIsXmlOnly } =
     getExceptionDetails(context, operation);
 
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
 
   // Check if exception headers function exists and build the call
   const exceptionHeaders = getExceptionResponseHeaders(operation.operation.exceptions);
@@ -916,8 +915,8 @@ export function getOperationFunction(
   const response = operation.response;
   const responseHeaders = getResponseHeaders(operation.operation.responses);
   const hasHeaderOnlyResponse = !response.type && responseHeaders.length > 0;
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
-  const isStorageCompatEnabled = context.rlcOptions?.enableStorageCompat === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
+  const isStorageCompatEnabled = context.emitterOptions?.enableStorageCompat === true;
 
   // Track the raw body type separately for storage-compat (before header merging)
   const hasResponseBody = !!response.type;
@@ -949,13 +948,13 @@ export function getOperationFunction(
       const baseCompositeType = buildCompositeResponseType(context, type, responseHeaders);
       returnType = {
         name: (type as any).name ?? "",
-        type: response.optional ? `${baseCompositeType} | undefined` : baseCompositeType,
+        type: response.optional ? `${baseCompositeType} | void` : baseCompositeType,
       };
     } else {
       const baseType = getTypeExpression(context, type!);
       returnType = {
         name: (type as any).name ?? "",
-        type: response.optional ? `${baseType} | undefined` : baseType,
+        type: response.optional ? `${baseType} | void` : baseType,
       };
     }
   } else if (hasHeaderOnlyResponse && isResponseHeadersEnabled) {
@@ -1043,7 +1042,7 @@ export function getOperationFunction(
     statements.push(`const ${streamableMethodVarName} = _${name}Send(${sendParameterList});`);
     const binaryHelper =
       wrapReturn && wrapReturnIsBinary
-        ? SerializationHelpers.getBinaryStreamResponse
+        ? AzureCoreDependencies["getBinaryStreamResponse"]
         : SerializationHelpers.getBinaryResponse;
     statements.push(
       `const ${resultVarName} = await ${resolveReference(binaryHelper)}(${streamableMethodVarName});`,
@@ -1404,7 +1403,7 @@ export function getOperationOptionsName(
 
 /**
  * This function build the request parameters that we will provide to the
- * RLC internally. This will translate High Level parameters into the RLC ones.
+ * REST-level request internally. This will translate high-level parameters into the REST-level ones.
  * Figuring out what goes in headers, body, path and qsp.
  */
 function getHeaderAndBodyParameters(
@@ -1632,7 +1631,7 @@ export function getParameterMap(
   // Special case for api-version parameters with default values
   if (param.isApiVersionParam && param.clientDefaultValue) {
     // For multi-service, use only the default value (don't reference context.apiVersion)
-    if (context.rlcOptions?.isMultiService) {
+    if (context.emitterOptions?.isMultiService) {
       return `"${serializedName}": "${param.clientDefaultValue}"`;
     }
     return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? "${param.clientDefaultValue}"`;
@@ -2060,7 +2059,7 @@ function getSerializationExpressionForFlatten(
   );
   const optionalPrefix = property.optional
     ? `${resolveReference(SerializationHelpers.areAllPropsUndefined)}(${propertyPath}, [${validProps
-        .map((p) => `"${p.name}"`)
+        .map((p) => normalizeModelPropertyName(context, p))
         .join(", ")}]) ? undefined : `
     : "";
   return `${optionalPrefix}${serializeFunctionName}(${propertyPath})`;
@@ -2141,8 +2140,8 @@ export function getRequestModelProperties(
 
 /**
  *
- * This function helps translating an HLC request to RLC request,
- * extracting properties from body and headers and building the RLC response object
+ * This function helps translating a high-level request to a REST-level request,
+ * extracting properties from body and headers and building the REST-level request object
  */
 export function getRequestModelMapping(
   context: SdkContext,
@@ -2177,8 +2176,8 @@ function getHeaderSerializedName(param: SdkHttpParameter) {
 }
 
 /**
- * This function helps translating an RLC response to an HLC response,
- * extracting properties from body and headers and building the HLC response object
+ * This function helps translating a REST-level response to a high-level response,
+ * extracting properties from body and headers and building the high-level response object
  */
 export function getResponseMapping(
   context: SdkContext,
@@ -2324,7 +2323,7 @@ export function serializeRequestValue(
       } else if (
         isSpecialHandledUnion({
           ...type,
-          isNonExhaustive: context.rlcOptions?.experimentalExtensibleEnums ?? false,
+          isNonExhaustive: context.emitterOptions?.experimentalExtensibleEnums ?? false,
         })
       ) {
         const sdkType = getSdkType(type.__raw!);
@@ -2750,7 +2749,7 @@ function getApiVersionExpression(
     return undefined;
   }
   // For multi-service, use only the default value (don't reference context.apiVersion)
-  if (dpgContext.rlcOptions?.isMultiService) {
+  if (dpgContext.emitterOptions?.isMultiService) {
     return queryApiVersionParam.clientDefaultValue
       ? `"${queryApiVersionParam.clientDefaultValue}"`
       : undefined;
@@ -2918,7 +2917,7 @@ export function getOperationResponseTypeName(method: [string[], ServiceOperation
 function isWrappableType(context: SdkContext, type: SdkType): boolean {
   if (type.kind === "array" && type.valueType.kind === "model") return false;
   if (type.kind === "dict" || type.kind === "model") return false;
-  if (type.kind === "unknown" && context.rlcOptions?.treatUnknownAsRecord) return false;
+  if (type.kind === "unknown" && context.emitterOptions?.treatUnknownAsRecord) return false;
   return true;
 }
 
@@ -2952,7 +2951,7 @@ export function checkWrapNonModelReturn(
   }
 
   // Only if the feature flag is enabled
-  if (!context.rlcOptions?.wrapNonModelReturn) {
+  if (!context.emitterOptions?.wrapNonModelReturn) {
     return noWrap;
   }
 
@@ -3003,7 +3002,7 @@ export function buildNonModelResponseTypeDeclaration(
   let typeBody: string;
 
   if (isBinary) {
-    const nodeReadableStreamRef = resolveReference(PlatformTypeHelpers.NodeReadableStream);
+    const nodeReadableStreamRef = resolveReference(AzureCoreDependencies["NodeReadableStream"]);
     typeBody = `{
       /**
        * BROWSER ONLY

@@ -1,7 +1,7 @@
-import { SdkEnumType } from "@azure-tools/typespec-client-generator-core";
+import type { SdkEnumType } from "@azure-tools/typespec-client-generator-core";
 import { resolveReference } from "../../framework/reference.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import { EmitTypeOptions, getTypeExpression } from "./get-type-expression.js";
+import type { SdkContext } from "../../utils/interfaces.js";
+import { type EmitTypeOptions, getTypeExpression } from "./get-type-expression.js";
 import { shouldEmitInline } from "./utils.js";
 
 export function getEnumExpression(
@@ -19,5 +19,5 @@ export function getEnumExpression(
 }
 
 export function isExtensibleEnum(context: SdkContext, type: SdkEnumType): boolean {
-  return !type.isFixed && context.rlcOptions?.experimentalExtensibleEnums === true;
+  return !type.isFixed && context.emitterOptions?.experimentalExtensibleEnums === true;
 }

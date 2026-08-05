@@ -58,11 +58,15 @@ Specifies the directory where the emitter will look for example files. If the fl
 
 **Type:** `boolean`
 
+**Default:** `true`
+
 When set to `true`, the emitter will generate Java sample code. Default value is `true`.
 
 ### `generate-tests`
 
 **Type:** `boolean`
+
+**Default:** `true`
 
 When set to `true`, the emitter will generate Java test code (mock test for management-plane SDK, disabled live test for data-plane SDK). Default value is `true`.
 
@@ -70,11 +74,15 @@ When set to `true`, the emitter will generate Java test code (mock test for mana
 
 **Type:** `boolean`
 
+**Default:** `true`
+
 When set to `true`, the generated SDK uses synchronous REST API invocation. Default value is `true`. This option is to be deprecated.
 
 ### `stream-style-serialization`
 
 **Type:** `boolean`
+
+**Default:** `true`
 
 When set to `true`, the generated SDK uses stream style serialization. Default value is `true`. This option is to be deprecated.
 
@@ -82,11 +90,15 @@ When set to `true`, the generated SDK uses stream style serialization. Default v
 
 **Type:** `boolean`
 
+**Default:** `false`
+
 When set to `true`, the emitter generates Java `Object` for TypeSpec `unknown`; otherwise, the emitter generates `BinaryData`. Default value is `false`. This option is for backward-compatibility.
 
 ### `client-side-validations`
 
 **Type:** `boolean`
+
+**Default:** `false`
 
 When set to `true`, the model classes would be generated with a `validate()` API for validating required properties, during REST API invocation. Default value is `false`. This option is for backward-compatibility.
 
@@ -94,11 +106,15 @@ When set to `true`, the model classes would be generated with a `validate()` API
 
 **Type:** `boolean`
 
+**Default:** `true`
+
 When set to `true`, the emitter generates Java `double` for TypeSpec `float32`; otherwise, the emitter generates `float`. Default value is `true`. This option is for backward-compatibility.
 
 ### `uuid-as-string`
 
 **Type:** `boolean`
+
+**Default:** `true`
 
 When set to `true`, the emitter generates Java `String` for TypeSpec `Azure.Core.uuid`; otherwise, the emitter generates `UUID`. Default value is `true`. This option is for backward-compatibility.
 
@@ -117,6 +133,8 @@ When set to `true`, the emitter will generate convenience methods for each servi
 ### `partial-update`
 
 **Type:** `boolean`
+
+**Default:** `false`
 
 When set to `true`, the emitter will merge the generated code with existing code on `emitter-output-dir`, during post-process. Default value is `false`.
 
@@ -152,7 +170,7 @@ Rename the model classes, in case they cannot be renamed via TCGC. E.g., anonymo
 
 ### `skip-special-headers`
 
-**Type:** `array`
+**Type:** `string[]`
 
 Specify headers that emitter will ignore.
 
@@ -160,17 +178,26 @@ Specify headers that emitter will ignore.
 
 **Type:** `boolean`
 
+**Default:** `false`
+
 When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.
 
 ### `api-version`
 
-**Type:** `string`
+**Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
 
 ### `advanced-versioning`
 
 **Type:** `boolean`
+
+**Default:** `false`
 
 When set to `true`, the emitter will take the history of api-versions in TypeSpec, and try generate SDK without breaking changes compared to SDK generated from prior api-versions. Default value is `false`. This is an experimental feature.
 
@@ -178,10 +205,22 @@ When set to `true`, the emitter will take the history of api-versions in TypeSpe
 
 **Type:** `boolean`
 
+**Default:** `false`
+
 When set to `true`, the emitter will not include `##-preview` api-versions in ServiceVersion class, if the release targets a stable api-version. Default value is `true`. The option should be set to `true`, if the intended release is SDK of stable version.
 
 ### `dev-options`
 
-**Type:** `object`
+**Type:** `object { generate-code-model, debug, loglevel, java-temp-dir, profile }`
 
 Developer options for http-client-java emitter.
+
+**Properties:**
+
+| Name                  | Type                                              | Default | Description                                                       |
+| --------------------- | ------------------------------------------------- | ------- | ----------------------------------------------------------------- |
+| `generate-code-model` | `boolean`                                         |         | Generate intermittent 'code-model.yaml' file in output directory. |
+| `debug`               | `boolean`                                         |         | Enable Java remote debug on port 5005.                            |
+| `loglevel`            | `"off" \| "debug" \| "info" \| "warn" \| "error"` |         | Log level for Java logging. Default is 'warn'.                    |
+| `java-temp-dir`       | `string`                                          |         | Temporary working directory for Java code generator.              |
+| `profile`             | `boolean`                                         |         | Enable performance profiling.                                     |

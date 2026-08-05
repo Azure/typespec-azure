@@ -6,7 +6,7 @@ llmstxt: true
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the default generation logic for client's basic method as well as how to customize it.
-For advanced paging, long-running or multipart operations, see the [Paging Operations](../05pagingoperations/), [Long-Running Operations](../06longrunningoperations/) and [Multipart Operations](../07multipart/) pages.
+For advanced paging, long-running, multipart or streaming operations, see the [Paging Operations](../05pagingoperations/), [Long-Running Operations](../06longrunningoperations/), [Multipart Operations](../07multipart/) and [Streaming Operations](../13streaming/) pages.
 
 ## Convenience and protocol methods
 
@@ -1795,6 +1795,10 @@ func (client *ContosoProviderHubClient) Get(ctx context.Context, subscriptionID 
 
 </ClientTabs>
 
+:::caution
+`@clientLocation` cannot move multiple parameters that share the same name but have **different types** to the same client. This commonly happens when `@clientLocation` is applied to a templated parameter that is instantiated with different types across operations. Doing so emits a `client-location-conflict` warning and produces a broken client where the parameter collapses to a single type. Move the parameter on each operation instead, so it keeps a consistent type on the client.
+:::
+
 ## Customizing method signatures with `@override`
 
 The `@override` decorator allows you to customize method signatures in generated client SDKs. This is useful when you need to:
@@ -1815,6 +1819,10 @@ The `@override` decorator takes a target operation and a custom operation that d
 ```
 
 When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching.
+
+:::caution
+The override operation must preserve every parameter that is realized as a path parameter in the original operation's HTTP route, keeping its `@path` decorator. Dropping such a parameter — or redeclaring it without `@path` — reports an `override-parameters-mismatch` error, because the underlying route still requires that value. To relocate a parameter instead of dropping it, use [`@clientLocation`](#using-clientlocation-to-control-parameter-placement).
+:::
 
 ### Simple parameter customization
 

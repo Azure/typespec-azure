@@ -1,7 +1,7 @@
-import { SdkNullableType } from "@azure-tools/typespec-client-generator-core";
+import type { SdkNullableType } from "@azure-tools/typespec-client-generator-core";
 import { resolveReference } from "../../framework/reference.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import { EmitTypeOptions, getTypeExpression } from "./get-type-expression.js";
+import type { SdkContext } from "../../utils/interfaces.js";
+import { type EmitTypeOptions, getTypeExpression } from "./get-type-expression.js";
 import { shouldEmitInline } from "./utils.js";
 
 export function getNullableExpression(
@@ -11,7 +11,7 @@ export function getNullableExpression(
 ): string {
   if (shouldEmitInline(type, options)) {
     // Check if we should ignore null for optional properties
-    const ignoreNullableOnOptional = context.rlcOptions?.ignoreNullableOnOptional ?? false;
+    const ignoreNullableOnOptional = context.emitterOptions?.ignoreNullableOnOptional ?? false;
     const isOptional = options.isOptional ?? false;
 
     const nonNullableType = getTypeExpression(context, type.type, options);

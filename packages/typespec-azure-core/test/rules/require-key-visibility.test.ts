@@ -1,4 +1,4 @@
-import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { requireKeyVisibility } from "../../src/rules/require-key-visibility.js";
 import { Tester } from "../test-host.js";

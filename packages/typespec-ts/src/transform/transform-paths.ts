@@ -2,20 +2,11 @@
 // Licensed under the MIT License.
 
 import {
-  SdkClient,
+  type SdkClient,
   getHttpOperationWithCache,
   isApiVersion,
 } from "@azure-tools/typespec-client-generator-core";
-import { HttpOperation, HttpOperationParameters } from "@typespec/http";
-import {
-  Imports,
-  OperationMethod,
-  PathMetadata,
-  Paths,
-  SchemaContext,
-  getParameterTypeName,
-  getResponseTypeName,
-} from "../rlc-common/index.js";
+import type { HttpOperation, HttpOperationParameters } from "@typespec/http";
 import { getImportedModelName, getSchemaForType, isBodyRequired } from "../utils/model-utils.js";
 import {
   extractOperationLroDetail,
@@ -29,8 +20,16 @@ import {
 } from "../utils/operation-util.js";
 
 import { getDoc } from "@typespec/compiler";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import {
+  type Imports,
+  type OperationMethod,
+  type PathMetadata,
+  type Paths,
+  SchemaContext,
+} from "../interfaces.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { getParameterTypeName, getResponseTypeName } from "../utils/name-constructors.js";
 import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
 
 export function transformPaths(
@@ -40,7 +39,7 @@ export function transformPaths(
 ): Paths {
   const pathParamsImportedSet = new Set<string>();
   const paths: Paths = {};
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -50,7 +49,7 @@ export function transformPaths(
   }
 
   if (pathParamsImportedSet.size > 0) {
-    importDetails.rlcClientDefinition.importsSet = pathParamsImportedSet;
+    importDetails.clientDefinition.importsSet = pathParamsImportedSet;
   }
 
   return paths;

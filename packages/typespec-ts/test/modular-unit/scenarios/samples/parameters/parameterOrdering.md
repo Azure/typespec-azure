@@ -121,7 +121,6 @@ export async function _verifyDeserialize(
 
   return testVerificationResultDeserializer(result.body);
 }
-
 /** Resource action operation template. */
 export async function verify(
   context: Client,

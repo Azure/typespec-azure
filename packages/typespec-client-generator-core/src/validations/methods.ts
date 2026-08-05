@@ -1,5 +1,5 @@
 import { getClientNameOverride } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 import { listScopedDecoratorData, overrideKey } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
@@ -13,7 +13,6 @@ function validateClientNameNotOnOverriddenMethods(context: TCGCContext) {
     if (clientNameOverride) {
       reportDiagnostic(context.program, {
         code: "client-name-ineffective",
-        messageId: "override",
         target: override,
         format: {
           name: clientNameOverride,

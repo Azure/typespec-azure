@@ -51,7 +51,6 @@ export async function _templateDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
-
 export async function template(
   context: Client,
   param: string,

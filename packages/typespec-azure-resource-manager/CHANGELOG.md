@@ -1,5 +1,78 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.70.0
+
+### Features
+
+- [#4842](https://github.com/Azure/typespec-azure/pull/4842) Add `no-reserved-resource-property` linter rule that flags reserved property names (matched case-insensitively, e.g. `billingData`) present in an ARM resource's property bag. The reserved-name list and diagnostic reason are extensible.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+### Bug Fixes
+
+- [#4884](https://github.com/Azure/typespec-azure/pull/4884) Refine the experimental Agent base type conversation and response items: remove the redundant `conversationId` and `responseId` properties (inferred from the resource `name`), model the message author `role` as a `MessageRole` enum (`Developer`, `User`, `Assistant`, `Tool`), and extend `ConversationItem` and `ResponseItem` with a `type` discriminator (`message`, `function_call`, `function_call_output`, `compaction`) whose variant-specific fields are all optional.
+- [#4855](https://github.com/Azure/typespec-azure/pull/4855) Align the experimental Agent base type with ARM naming and datatype guidelines: use PascalCase values for the `ResponseStatus` enum (for example `Completed`, `InProgress`), and use `utcDateTime` instead of `unixTimestamp32` for the `createdAt` timestamp properties (on `ConversationProperties` and `ResponseProperties`) to match other ARM datetime properties.
+- [#4857](https://github.com/Azure/typespec-azure/pull/4857) Make `ArmTopParameter`, `ArmFilterParameter`, and `ArmSkipParameter` properties optional as query parameters should be.
+
+
+## 0.69.2
+
+### Bug Fixes
+
+- [#4627](https://github.com/Azure/typespec-azure/pull/4627) Remove `@armCommonDefinition` decorators from `CustomerManagedKeyEncryption` and `Encryption` types so they are emitted inline rather than as common-types `$ref` entries in OpenAPI output.
+  
+  ```tsp
+  // These types are now emitted inline in specs that reference them:
+  model MyEncryptionConfig {
+    customerManagedKeyEncryption?: Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption;
+  }
+  ```
+
+
+## 0.69.1
+
+### Bug Fixes
+
+- [#4621](https://github.com/Azure/typespec-azure/pull/4621) Adding Azure Resource Manager Base Types, including the Agent base type.
+  
+  Base types provide structured constraints for resources including required and optional
+  properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+  base type metadata to resource models for validation.
+  
+  Example of creating an Agent resource:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes;
+  using Azure.ResourceManager.BaseTypes.Agents;
+  
+  model MyDefinition is AgentDefinitionPlatform<true, true> {}
+  
+  model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyAgent is Agent<MyAgentProperties> {
+    ...ResourceNameParameter<MyAgent>;
+  }
+  
+  model MyConversationProperties is ConversationProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+    ...ResourceNameParameter<MyConversation>;
+  }
+  
+  model MyResponseProperties is ResponseProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+    ...ResourceNameParameter<MyResponse>;
+  }
+  ```
+
+
 ## 0.69.0
 
 ### Features

@@ -40,10 +40,7 @@ withRawContent: true
 ## classicClient
 
 ```ts classicClient
-import { list } from "./api/operations.js";
-import { ListOptionalParams } from "./api/options.js";
-import { Operation } from "./models/models.js";
-import { PagedAsyncIterableIterator } from "./static-helpers/pagingHelpers.js";
+import { OperationsOperations, _getOperationsOperations } from "./classic/operations/index.js";
 import { TokenCredential } from "@azure/core-auth";
 import { Pipeline } from "@azure/core-rest-pipeline";
 
@@ -56,23 +53,13 @@ export class GlobalServiceClient {
 
   /** Client.GlobalService Resource Provider management API. */
   constructor(credential: TokenCredential, options: GlobalServiceClientOptionalParams = {}) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createGlobalService(credential, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createGlobalService(credential, options);
     this.pipeline = this._client.pipeline;
+    this.operations = _getOperationsOperations(this._client);
   }
 
-  /** List the operations for the provider */
-  list(
-    options: ListOptionalParams = { requestOptions: {} },
-  ): PagedAsyncIterableIterator<Operation> {
-    return list(this._client, options);
-  }
+  /** The operation groups for operations */
+  public readonly operations: OperationsOperations;
 }
 ```
 
@@ -159,6 +146,7 @@ The config would be like:
 
 ```yaml
 withRawContent: true
+hierarchy-client: false
 ```
 
 ## classicClient
@@ -193,14 +181,7 @@ export class StandardServiceClient {
     subscriptionId: string,
     options: StandardServiceClientOptionalParams = {},
   ) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createStandardService(credential, subscriptionId, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createStandardService(credential, subscriptionId, options);
     this.pipeline = this._client.pipeline;
   }
 
@@ -304,6 +285,7 @@ The config would be like:
 
 ```yaml
 withRawContent: true
+hierarchy-client: false
 ```
 
 ## classicClient
@@ -344,14 +326,7 @@ export class MixedServiceClient {
     }
 
     options = options ?? {};
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createMixedService(credential, subscriptionId ?? "", {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createMixedService(credential, subscriptionId ?? "", options);
     this.pipeline = this._client.pipeline;
   }
 

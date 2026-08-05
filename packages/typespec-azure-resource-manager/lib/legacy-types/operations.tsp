@@ -13,7 +13,7 @@ using Rest;
  * is accessible at multiple, fixed resource paths.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceName Optional. The name of the resource type described in this template
  */
 interface LegacyOperations<
@@ -34,7 +34,7 @@ interface LegacyOperations<
  * is accessible at multiple, fixed resource paths. Can be used with static routes.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  * @template RoutedResourceName Optional. The name of the resource type described in this template
  */
@@ -246,7 +246,7 @@ interface RoutedOperations<
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
-   * @dev Get a resource
+   * Get a resource
    * @template Resource The resource being read
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
@@ -434,17 +434,19 @@ interface RoutedOperations<
   ): Response | OverrideErrorType;
 }
 /**
- * @dev DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
+ * DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
  * @template Resource Optional.  The resource to get the provider namespace for.
  */
+@doc("")
 model Provider<Resource extends {} = TenantActionScope> {
   ...ProviderNamespace<Resource>;
 }
 
 /**
- * @dev Get the provider namespace key-value pair
+ * Get the provider namespace key-value pair
  * @template Resource The resource to get the provider namespace for.
  */
+@doc("")
 model ProviderParameter<Resource extends {}> {
   ...ProviderNamespace<Resource>;
 }
@@ -658,7 +660,7 @@ op CreateOrReplaceSync<
 
 /**
  * A resource list operation, at the subscription scope, that lists only a single page
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -679,7 +681,7 @@ op ArmListSinglePageBySubscription<
 
 /**
  * A resource list operation, at the scope of the resource's parent that lists only a single page.
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource
@@ -709,13 +711,14 @@ op ArmListSinglePageByParent<
 >;
 
 /**
- * @dev The base template for Azure Resource Manager PUT Operations.
+ * The base template for Azure Resource Manager PUT Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
+@doc("")
 op CreateOperation<
   HttpParameters extends {},
   BodyParameter extends {} | void,
@@ -731,13 +734,14 @@ op CreateOperation<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Legacy Azure Resource Manager PATCH Operations.
+ * The base template for Legacy Azure Resource Manager PATCH Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
+@doc("")
 op UpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {} | void,

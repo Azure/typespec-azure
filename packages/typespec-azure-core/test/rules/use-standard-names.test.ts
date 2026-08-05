@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { useStandardNames } from "../../src/rules/use-standard-names.js";
 
@@ -121,7 +121,6 @@ it("is valid for operations that follow naming standards", async () => {
     
     #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     @route("6")
-    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     @patch(#{implicitOptionality: true}) op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
     
     @route("7")

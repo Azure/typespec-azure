@@ -16,11 +16,11 @@ options:
 
 For ARM services, use the following file structure:
 
-- **main.tsp**: Entry point for the TypeSpec specification containing service information
+- **main.tsp**: Entry point for the TypeSpec specification containing service information. It imports `client.tsp` so the whole specification (including client customizations) compiles from `main.tsp`.
 - **{resource-name}.tsp**: Resource-specific operations for each ARM resource type
 - **routes.tsp**: All other operations that don't belong to specific resources
 - **models.tsp**: All the model definitions used across operations
-- **(optional) client.tsp**: Client-specific customizations and configurations
+- **(optional) client.tsp**: Client-specific customizations and configurations, imported by `main.tsp`
 - **(optional) back-compatible.tsp**: Backward compatibility definitions and legacy support
 
 This structure helps maintain a clear separation of concerns between the API description and the client SDK and makes the TypeSpec specification easier to navigate and maintain.

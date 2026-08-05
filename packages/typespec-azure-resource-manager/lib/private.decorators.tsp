@@ -119,6 +119,22 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
 
+/**
+ * Controls visibility of a base type property based on whether the property is present
+ * and whether the deployment model is Appliance or Platform.
+ *
+ * If `isPresent` is false, the property is made invisible (removed from all lifecycle visibility).
+ * If `isAppliance` is true, the property is made read-only.
+ *
+ * @param isPresent Whether this property is present in the current template instantiation.
+ * @param isAppliance Whether the current deployment model is Appliance (true) or Platform (false).
+ */
+extern dec baseTypeOptional(
+  target: ModelProperty,
+  isPresent: valueof boolean,
+  isAppliance: valueof boolean
+);
+
 /** designates a type as a legacy type and emits a warning diagnostic when used */
 extern dec legacyType(target: Model | Operation | Interface | Scalar);
 

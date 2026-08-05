@@ -13,14 +13,14 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 This basic case uses TypeSpec's `Http.File`, which specifies an optional `filename` and `contentType`. Since both are optional, the customer can pass the file's content directly to the `basicFile` property. If the customer wants to specify the filename or content type, they can use the wrapper object.
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface RequestBody */
 export interface RequestBody {
   basicFile: FileContents | { contents: FileContents; contentType?: string; filename?: string };
@@ -64,7 +64,6 @@ export async function _doThingDeserialize(result: PathUncheckedResponse): Promis
 
   return;
 }
-
 export async function doThing(
   context: Client,
   bodyParam: RequestBody,
@@ -94,14 +93,14 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 The filename must be provided _somehow_. This can either be done by passing a `File` object, which has a required filename property, or by using the wrapper object to pass a `filename` alongside the `contents`.
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface RequestBody */
 export interface RequestBody {
   nameRequired: File | { contents: FileContents; contentType?: string; filename: string };
@@ -129,14 +128,14 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 ## Models
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface RequestBody */
 export interface RequestBody {
   image: FileContents | { contents: FileContents; contentType?: "image/png"; filename?: string };
@@ -162,14 +161,14 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 Each provided file in the input corresponds to one part in the multipart request.
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface RequestBody */
 export interface RequestBody {
   files: Array<FileContents | { contents: FileContents; contentType?: string; filename?: string }>;

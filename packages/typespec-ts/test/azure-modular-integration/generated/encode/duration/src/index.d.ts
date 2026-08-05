@@ -12,6 +12,7 @@ export declare class DurationClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: DurationClientOptionalParams);
+    readonly lossy: LossyOperations;
     readonly header: HeaderOperations;
     readonly property: PropertyOperations;
     readonly query: QueryOperations;
@@ -132,6 +133,17 @@ export declare interface ISO8601DurationProperty {
 }
 
 export { isRestError }
+
+export declare interface LossyIntMillisecondsOptionalParams extends OperationOptions {
+}
+
+export declare interface LossyIntSecondsOptionalParams extends OperationOptions {
+}
+
+export declare interface LossyOperations {
+    intMilliseconds: (input: number, options?: LossyIntMillisecondsOptionalParams) => Promise<void>;
+    intSeconds: (input: number, options?: LossyIntSecondsOptionalParams) => Promise<void>;
+}
 
 export declare interface PropertyDefaultOptionalParams extends OperationOptions {
 }

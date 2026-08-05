@@ -54,12 +54,6 @@ export interface ArrowField {
 ```
 
 ```ts models interface ArrowConfiguration
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Represents the Apache Arrow configuration. */
 export interface ArrowConfiguration {
   /** The Apache Arrow schema */
@@ -138,12 +132,6 @@ export interface BlobTag {
 ```
 
 ```ts models interface BlobTags
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Container for tags */
 export interface BlobTags {
   /** The tag set */

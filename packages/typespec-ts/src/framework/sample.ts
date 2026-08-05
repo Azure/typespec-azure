@@ -1,6 +1,6 @@
 import {
-  FunctionDeclarationStructure,
-  InterfaceDeclarationStructure,
+  type FunctionDeclarationStructure,
+  type InterfaceDeclarationStructure,
   Project,
   StructureKind,
 } from "ts-morph";
@@ -9,7 +9,7 @@ import { useBinder } from "./hooks/binder.js";
 import { resolveReference } from "./reference.js";
 
 // Create a new ts-morph project
-const project = new Project();
+const project = new Project({ useInMemoryFileSystem: true });
 
 // Create a source file
 const sourceFile = project.createSourceFile("test.ts", "", { overwrite: true });

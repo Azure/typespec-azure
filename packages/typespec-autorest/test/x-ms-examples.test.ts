@@ -1,9 +1,9 @@
 import {
-  EmitterTesterInstance,
+  type EmitterTesterInstance,
   expectDiagnosticEmpty,
   expectDiagnostics,
   resolveVirtualPath,
-  TestEmitterCompileResult,
+  type TestEmitterCompileResult,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";

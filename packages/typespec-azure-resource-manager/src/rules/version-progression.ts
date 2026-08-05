@@ -1,4 +1,10 @@
-import { EnumMember, Namespace, createRule, paramMessage } from "@typespec/compiler";
+import {
+  type EnumMember,
+  type Namespace,
+  createRule,
+  fileRef,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getVersion } from "@typespec/versioning";
 
@@ -29,6 +35,7 @@ function parseVersionDate(value: string): string | undefined {
  */
 export const versionProgressionRule = createRule({
   name: "version-progression",
+  docs: fileRef.fromPackageRoot("src/rules/version-progression.md"),
   severity: "warning",
   description:
     "Validate that ARM service versions all use unique dates and are declared in strictly increasing chronological order.",

@@ -13,7 +13,7 @@ import {
   listOperationsInClient,
   listSubClients,
 } from "../../src/decorators.js";
-import { SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
+import type { SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import {

@@ -13,7 +13,7 @@ namespace Azure.ResourceManager;
  */
 interface Operations {
   /**
-   * @dev List the operations for the provider.
+   * List the operations for the provider.
    */
   @tag("Operations")
   @autoRoute
@@ -146,9 +146,10 @@ interface ResourceCollectionOperations<
  */
 interface ResourceListBySubscription<Resource extends Foundations.SimpleResource> {
   /**
-   * @dev List resources by subscription.
+   * List resources by subscription.
    * @template Resource The ArmResource to list.
    */
+  @doc("List {name} resources by subscription ID", Resource)
   listBySubscription is ArmListBySubscription<Resource>;
 }
 
@@ -166,7 +167,7 @@ interface ResourceListByParent<
   ParentFriendlyName extends valueof string = ""
 > {
   /**
-   * @dev List resources by parent.
+   * List resources by parent.
    * @template Resource The ArmResource to list.
    * @template BaseParameters The http parameters that are part of the request
    * @template ParentName The name of the parent resource
@@ -186,10 +187,11 @@ interface ResourceRead<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Retrieve a resource.
+   * Retrieve a resource.
    * @template Resource The ArmResource to retrieve.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Get a {name}", Resource)
   get is ArmResourceRead<Resource, BaseParameters>;
 }
 
@@ -203,10 +205,11 @@ interface ResourceCreateSync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Create or update a resource using the synchronous call pattern.
+   * Create or update a resource using the synchronous call pattern.
    * @template Resource The ArmResource to create or update.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrReplaceSync<Resource, BaseParameters>;
 }
 
@@ -220,15 +223,16 @@ interface ResourceCreateAsync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Create or update a resource using the asynchronous call pattern.
+   * Create or update a resource using the asynchronous call pattern.
    * @template Resource The ArmResource to create or update.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a long-running delete operation.
+ * A composite interface for resources that include a long-running delete operation.
  *      DEPRECATED: Use ResourceDeleteWithoutOkAsync instead
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
@@ -240,15 +244,17 @@ interface ResourceDeleteAsync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the asynchronous call pattern.
+   * Delete a resource using the asynchronous call pattern.
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteAsync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a synchronous delete operation.
+ * A composite interface for resources that include a long-running delete operation
+ * without returning a final OK response.
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
@@ -258,10 +264,11 @@ interface ResourceDeleteWithoutOkAsync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the asynchronous call pattern.
+   * Delete a resource using the asynchronous call pattern.
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteWithoutOkAsync<Resource, BaseParameters>;
 }
 
@@ -276,15 +283,16 @@ interface ResourceDeleteSync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the synchronous call pattern.
+   * Delete a resource using the synchronous call pattern.
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteSync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a long-running update operation.
+ * A composite interface for resources that include a long-running update operation.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
@@ -296,11 +304,12 @@ interface ResourceUpdateAsync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Update a resource using the asynchronous call pattern.
+   * Update a resource using the asynchronous call pattern.
    * @template Resource The ArmResource to update.
    * @template Properties RP-specific property bag for the resource
    * @template BaseParameters The http parameters that are part of the request
    */
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchAsync<
     Resource,
     ResourceUpdateModel<Resource, Properties>,
@@ -321,13 +330,14 @@ interface ResourceUpdateSync<
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Update a resource using the synchronous call pattern.
+   * Update a resource using the synchronous call pattern.
    * @template Resource The ArmResource to update.
    * @template Properties RP-specific property bag for the resource
    * @template BaseParameters The http parameters that are part of the request
    */
   #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @patch(#{ implicitOptionality: true })
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 

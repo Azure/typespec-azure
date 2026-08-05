@@ -1,5 +1,4 @@
-import { InterfaceDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
-import { NameType, normalizeName } from "../rlc-common/index.js";
+import { type InterfaceDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import {
   getDeserializeExceptionHeadersPrivateFunction,
   getDeserializeHeadersPrivateFunction,
@@ -11,9 +10,9 @@ import {
   isLroAndPagingOperation,
   isLroOnlyOperation,
 } from "./helpers/operation-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import {
+import type {
   SdkClientType,
   SdkMethodParameter,
   SdkServiceOperation,
@@ -23,16 +22,17 @@ import { addDeclaration } from "../framework/declaration.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isRLCMultiEndpoint } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
-  ServiceOperation,
+  type ServiceOperation,
 } from "../utils/operation-util.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
-import { OperationPathAndDeserDetails } from "./interfaces.js";
+import type { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
 /**
@@ -48,9 +48,9 @@ export function buildOperationFiles(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const operationFiles: Set<SourceFile> = new Set();
-  const { subfolder, rlcClientName } = getModularClientOptions(clientMap);
-  const isMultiEndpoint = isRLCMultiEndpoint(dpgContext);
-  const clientType = isMultiEndpoint ? `Client.${rlcClientName}` : "Client";
+  const { subfolder, clientName } = getClientModuleInfo(clientMap);
+  const isMultiEndpoint = isMultiEndpointClient(dpgContext);
+  const clientType = isMultiEndpoint ? `Client.${clientName}` : "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
@@ -102,7 +102,7 @@ export function buildOperationFiles(
 
     const indexPathPrefix = "../".repeat(prefixKey === "" ? 0 : prefixes.length) || "./";
     operationGroupFile.addImportDeclaration({
-      namedImports: [`${rlcClientName} as Client`],
+      namedImports: [`${clientName} as Client`],
       moduleSpecifier: `${indexPathPrefix}index.js`,
     });
     operationGroupFile.fixUnusedIdentifiers();

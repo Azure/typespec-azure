@@ -11,12 +11,19 @@ export interface StoreResultsOptions {
   commit: string;
   /** Branch name for storing results. */
   branch?: string;
+  /**
+   * Top-level directory (on the data branch) to store results and history in.
+   * Defaults to "results". Use a distinct directory (e.g. "external-results")
+   * to keep a group of specs separate from the main baseline.
+   */
+  resultsDir?: string;
 }
 
 /** Store benchmark results to an orphan git branch and push. */
 export function storeResults(options: StoreResultsOptions): void {
   const { resultsFile, commit } = options;
   const branch = options.branch ?? DEFAULT_BRANCH;
+  const resultsDirName = options.resultsDir ?? "results";
   const worktreeDir = "/tmp/bench-data";
 
   if (!existsSync(resultsFile)) {
@@ -37,7 +44,6 @@ export function storeResults(options: StoreResultsOptions): void {
       git(`worktree add --detach ${worktreeDir}`);
       git(`checkout --orphan ${branch}`, worktreeDir);
       gitSilent("rm -rf .", worktreeDir);
-      mkdirSync(join(worktreeDir, "results"), { recursive: true });
 
       const readmeContent =
         "# Benchmark Data\n\nThis branch stores TypeSpec benchmark results. Do not merge into main.\n";
@@ -47,8 +53,9 @@ export function storeResults(options: StoreResultsOptions): void {
       git('commit -m "Initialize benchmark-data branch"', worktreeDir);
     }
 
-    // Copy results
-    const resultsDir = join(worktreeDir, "results");
+    // Results and history live under `<resultsDir>/` (default "results"); a
+    // distinct directory keeps a spec group separate from the main baseline.
+    const resultsDir = join(worktreeDir, resultsDirName);
     mkdirSync(resultsDir, { recursive: true });
     copyFileSync(resultsFile, join(resultsDir, `${commit}.json`));
     copyFileSync(resultsFile, join(resultsDir, "latest.json"));
@@ -58,12 +65,36 @@ export function storeResults(options: StoreResultsOptions): void {
     writeFileSync(join(resultsDir, "history.json"), JSON.stringify(history, null, 2));
 
     // Commit and push
-    git("add results/", worktreeDir);
-    git(`commit -m "Benchmark results for ${commit}"`, worktreeDir);
-    git(`push origin HEAD:${branch}`, worktreeDir);
+    git(`add ${resultsDirName}/`, worktreeDir);
+    git(`commit -m "Benchmark results (${resultsDirName}) for ${commit}"`, worktreeDir);
+    pushWithRetry(branch, worktreeDir);
 
-    console.log(`Benchmark results stored on ${branch} branch for commit ${commit}`);
+    console.log(
+      `Benchmark results stored on ${branch} branch for commit ${commit} (dir: ${resultsDirName})`,
+    );
   } finally {
     gitSilent(`worktree remove ${worktreeDir} --force`);
+  }
+}
+
+/**
+ * Push to the data branch, retrying on non-fast-forward rejection. Multiple
+ * benchmark workflows (e.g. main and external) may push to the same branch
+ * concurrently; since each writes a distinct results directory, rebasing our
+ * commit onto the latest remote branch and retrying resolves the race cleanly.
+ */
+function pushWithRetry(branch: string, worktreeDir: string, attempts = 5): void {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    if (gitSilent(`push origin HEAD:${branch}`, worktreeDir)) {
+      return;
+    }
+    if (attempt === attempts) {
+      throw new Error(`Failed to push to ${branch} after ${attempts} attempts`);
+    }
+    console.log(
+      `Push to ${branch} rejected (attempt ${attempt}); rebasing on latest and retrying...`,
+    );
+    git(`fetch origin ${branch}`, worktreeDir);
+    git(`rebase origin/${branch}`, worktreeDir);
   }
 }

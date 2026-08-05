@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
+import type {
   SdkHttpOperation,
   SdkMethodResponse,
   SdkServiceMethod,

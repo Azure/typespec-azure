@@ -1,16 +1,16 @@
 import {
-  Enum,
-  Interface,
+  type Enum,
+  type Interface,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  Namespace,
-  Operation,
+  type Namespace,
+  type Operation,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
-import { SdkClient, TCGCContext } from "./interfaces.js";
+import type { SdkClient, TCGCContext } from "./interfaces.js";
 import {
   clientKey,
   clientLocationKey,
@@ -41,6 +41,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
   const servicesNs = new Set<Namespace>();
   clients.forEach((c) => c.services.forEach((s) => servicesNs.add(s)));
+  const isMultiService = servicesNs.size > 1;
 
   // handle versioning with mutated types
   context.__packageVersions = new Map<Namespace, string[]>();
@@ -54,10 +55,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       continue;
     }
 
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-    }
+    // Filter versions based on the resolved `apiVersion` config for this service
+    removeVersionsLargerThanExplicitlySpecified(context, versions, serviceNs, isMultiService);
 
     context.__packageVersionEnum!.set(serviceNs, versions[0].enumMember.enum);
     context.__packageVersions!.set(

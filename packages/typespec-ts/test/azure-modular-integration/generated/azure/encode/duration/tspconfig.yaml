@@ -4,7 +4,6 @@ options:
   "@azure-tools/typespec-ts":
     emitter-output-dir: "{project-root}"
     add-credentials: false
-    azure-sdk-for-js: false
     package-details:
       name: "@azure/encode-duration"
       description: "Azure Encode Duration Test Service"

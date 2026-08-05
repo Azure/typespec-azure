@@ -74,8 +74,10 @@ model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
  * @template Parameters Object describing the query parameters.
  */
 @trait
-model ListQueryParametersTrait<Parameters extends Model>
-  is QueryParametersTrait<Parameters, TraitContext.List>;
+model ListQueryParametersTrait<Parameters extends Model> is QueryParametersTrait<
+  Parameters,
+  TraitContext.List
+>;
 
 /**
  * Declares a trait that is applied as a request header parameter.

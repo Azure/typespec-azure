@@ -27,6 +27,20 @@ extends:
         jobs:
           - template: /eng/pipelines/jobs/build-for-publish.yml@self
 
+      # Emitter e2e tests + spector coverage upload. Runs in parallel with the
+      # publish path (publish_npm does not depend on this stage), so it never
+      # gates npm publishing. dependsOn build only to consume the turbo-cache
+      # artifact and avoid recompiling the repo.
+      - stage: spector_coverage
+        displayName: Spector Coverage
+        dependsOn: build
+        pool:
+          name: $(LINUXPOOL)
+          image: $(LINUXVMIMAGE)
+          os: linux
+        jobs:
+          - template: /eng/pipelines/jobs/spector-coverage.yml@self
+
       - stage: publish_npm
         displayName: Publish Npm Packages
         dependsOn: build

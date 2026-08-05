@@ -1,18 +1,21 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import path from "path";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
+import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
+import type { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildLroDeserDetailMap } from "./build-operations.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { isLroOnlyOperation } from "./helpers/operation-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 import { PollingHelpers } from "./static-helpers-metadata.js";
 
 export function buildRestorePoller(
@@ -23,7 +26,7 @@ export function buildRestorePoller(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const dependencies = useDependencies();
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const methodMap = getMethodHierarchiesMap(context, client);
   const hasLro = Array.from(methodMap.values()).some((operations) => {
     return operations.some(isLroOnlyOperation);
@@ -32,7 +35,7 @@ export function buildRestorePoller(
     return;
   }
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const filePath = path.join(
+  const filePath = joinPaths(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}restorePollerHelpers.ts`,
   );
   const restorePollerFile = project.createSourceFile(filePath, undefined, {

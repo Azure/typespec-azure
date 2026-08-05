@@ -131,6 +131,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
       },
     },
+    "basetypes-experimental": {
+      severity: "warning",
+      messages: {
+        default:
+          "Azure Resource Manager BaseTypes are experimental and may be subject to breaking changes.",
+      },
+    },
   },
 });
 
