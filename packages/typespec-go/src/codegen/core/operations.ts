@@ -990,16 +990,16 @@ function generateOperation(
       text += `${indent.get()}return httpResp, nil\n`;
     } else if (method.returns.result) {
       switch (method.returns.result.kind) {
-        case 'binaryResult':
+        case "binaryResult":
           text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.Body}, nil\n`;
           break;
-        case 'headAsBooleanResult':
+        case "headAsBooleanResult":
           text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.StatusCode >= 200 && httpResp.StatusCode < 300}, nil\n`;
           break;
         default:
           // we should never get here as the remaining kinds are all modeled results
           // thus should have been handled by the needsResponseHandler check earlier
-          throw new CodegenError('InternalError', `unexpected method result kind ${method.returns.result.kind}`);
+          throw new CodegenError("InternalError", `unexpected method result kind ${method.returns.result.kind}`);
       }
     } else {
       // no result type, just response envelope
@@ -1947,7 +1947,7 @@ function createProtocolResponse(
     text += formatHeaderResponseValue(
       method,
       header,
-      "result",
+      resultVarName,
       `${method.returns.name}{}`,
       imports,
       indent,
