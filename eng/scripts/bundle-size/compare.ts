@@ -9,8 +9,8 @@
 
 import { appendFile, mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
-import type { PackageSize, SizeReport } from "./measure.js";
-import { formatBytes, formatDelta, formatPercent } from "./utils.js";
+import type { PackageSize, SizeReport } from "./measure.ts";
+import { formatBytes, formatDelta, formatPercent } from "./utils.ts";
 
 /** Hidden marker so the comment workflow can find & update its own comment. */
 export const COMMENT_MARKER = "<!-- bundle-size-report -->";

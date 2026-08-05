@@ -52,7 +52,7 @@ jobs:
         run: pnpm run-all build
 
       - name: Measure head sizes
-        run: pnpm tsx eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/head.json
+        run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/head.json
 
       # --- Measure the base branch ---
       - name: Checkout base
@@ -72,11 +72,11 @@ jobs:
         run: pnpm run-all build
 
       - name: Measure base sizes
-        run: pnpm tsx eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
+        run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
 
       # --- Compare and prepare the comment payload ---
       - name: Compare sizes
-        run: pnpm tsx eng/scripts/bundle-size/compare.ts --base ./temp/bundle-size/base.json --head ./temp/bundle-size/head.json --out ./temp/bundle-size/comment.md
+        run: node eng/scripts/bundle-size/compare.ts --base ./temp/bundle-size/base.json --head ./temp/bundle-size/head.json --out ./temp/bundle-size/comment.md
 
       - name: Record PR number
         run: echo "${{ github.event.pull_request.number }}" > ./temp/bundle-size/pr-number.txt

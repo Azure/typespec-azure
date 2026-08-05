@@ -10,7 +10,7 @@
 import { execFileSync } from "child_process";
 import { mkdir, writeFile } from "fs/promises";
 import { dirname } from "path";
-import { listPackages } from "../helpers.js";
+import { listPackages } from "./utils.ts";
 
 export interface PackageSize {
   version: string;
@@ -51,16 +51,16 @@ function measurePackage(dir: string): NpmPackResult | undefined {
 }
 
 export async function measureAllPackages(): Promise<SizeReport> {
-  const packages = await listPackages();
+  const packages = listPackages();
   const report: SizeReport = {};
 
   for (const pkg of packages) {
-    const name = pkg.manifest.name;
-    if (!name || pkg.manifest.private) {
+    const name = pkg.name;
+    if (!name || pkg.private) {
       continue; // Skip unnamed or private (non-publishable) packages.
     }
     try {
-      const result = measurePackage(pkg.rootDir);
+      const result = measurePackage(pkg.path);
       if (result) {
         report[name] = {
           version: result.version,
