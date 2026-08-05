@@ -322,13 +322,7 @@ function generateConstructors(
           case "queryScalarParam":
           case "uriParam":
             if (param.isApiVersion) {
-              const currentIsPath =
-                apiVersionParam?.kind === "pathScalarParam" ||
-                apiVersionParam?.kind === "uriParam";
-              const paramIsPath = param.kind === "pathScalarParam" || param.kind === "uriParam";
-              if (!apiVersionParam || (currentIsPath && !paramIsPath)) {
-                apiVersionParam = param;
-              }
+              apiVersionParam ??= param;
             }
         }
       }

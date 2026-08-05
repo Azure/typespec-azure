@@ -1249,23 +1249,12 @@ export class ClientAdapter {
           continue;
         }
 
-        // we must check via param name and not reference equality. this is because a client param
-        // can be used in multiple ways. e.g. a client param "apiVersion" that's used as a path param
-        // in one method and a query param in another. path API versions are kept separately because
-        // they require a client field while query/header API versions are handled by the pipeline.
+        // check via param name and not reference equality as a client param can be
+        // referenced by multiple methods.
         const addClientParameter = (client: go.Client): void => {
-          const existingParam = client.parameters.find((v: go.ClientParameter) => {
-            if (v.name !== adaptedParam.name) {
-              return false;
-            }
-            if (!go.isAPIVersionParameter(v) || !go.isAPIVersionParameter(adaptedParam)) {
-              return true;
-            }
-            return (
-              v.kind === adaptedParam.kind ||
-              (v.kind !== "pathScalarParam" && adaptedParam.kind !== "pathScalarParam")
-            );
-          });
+          const existingParam = client.parameters.find(
+            (v: go.ClientParameter) => v.name === adaptedParam.name,
+          );
           if (existingParam) {
             return;
           }

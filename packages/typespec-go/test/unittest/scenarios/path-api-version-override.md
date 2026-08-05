@@ -19,10 +19,6 @@ enum Versions {
 }
 
 @head
-@route("/with-query-api-version")
-op withQueryApiVersion(@query("api-version") apiVersion: string): void;
-
-@head
 @route("/with-path-api-version/{apiVersion}")
 op withPathApiVersion(@path apiVersion: string): void;
 ```
@@ -70,8 +66,7 @@ func NewVersionedClientWithNoCredential(endpoint string, options *VersionedClien
 	}
 	cl, err := azcore.NewClient(moduleName, moduleVersion, runtime.PipelineOptions{
 		APIVersion: runtime.APIVersionOptions{
-			Name:     "api-version",
-			Location: runtime.APIVersionLocationQueryParam,
+			Location: runtime.APIVersionLocationPath,
 		},
 	}, &options.ClientOptions)
 	if err != nil {
@@ -118,40 +113,6 @@ func (client *VersionedClient) withPathAPIVersionCreateRequest(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	return req, nil
-}
-
-// WithQueryAPIVersion -
-// If the operation fails it returns an *azcore.ResponseError type.
-//   - options - VersionedClientWithQueryAPIVersionOptions contains the optional parameters for the VersionedClient.WithQueryAPIVersion
-//     method.
-func (client *VersionedClient) WithQueryAPIVersion(ctx context.Context, options *VersionedClientWithQueryAPIVersionOptions) (VersionedClientWithQueryAPIVersionResponse, error) {
-	var err error
-	req, err := client.withQueryAPIVersionCreateRequest(ctx, options)
-	if err != nil {
-		return VersionedClientWithQueryAPIVersionResponse{}, err
-	}
-	httpResp, err := client.internal.Pipeline().Do(req)
-	if err != nil {
-		return VersionedClientWithQueryAPIVersionResponse{}, err
-	}
-	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return VersionedClientWithQueryAPIVersionResponse{}, err
-	}
-	return VersionedClientWithQueryAPIVersionResponse{}, nil
-}
-
-// withQueryAPIVersionCreateRequest creates the WithQueryAPIVersion request.
-func (client *VersionedClient) withQueryAPIVersionCreateRequest(ctx context.Context, _ *VersionedClientWithQueryAPIVersionOptions) (*policy.Request, error) {
-	urlPath := "/with-query-api-version"
-	req, err := runtime.NewRequest(ctx, http.MethodHead, runtime.JoinPaths(client.endpoint, urlPath))
-	if err != nil {
-		return nil, err
-	}
-	reqQP := req.Raw().URL.Query()
-	reqQP.Set("api-version", version20221201Preview)
-	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
 	return req, nil
 }
 ```
