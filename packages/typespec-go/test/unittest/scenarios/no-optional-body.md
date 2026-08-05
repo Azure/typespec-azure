@@ -90,8 +90,7 @@ func (client *NoOptionalBodyClient) Patch(ctx context.Context, body Widget, opti
 		return NoOptionalBodyClientPatchResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return NoOptionalBodyClientPatchResponse{}, err
+		return NoOptionalBodyClientPatchResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return NoOptionalBodyClientPatchResponse{}, nil
 }
@@ -123,8 +122,7 @@ func (client *NoOptionalBodyClient) Post(ctx context.Context, options *NoOptiona
 		return NoOptionalBodyClientPostResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return NoOptionalBodyClientPostResponse{}, err
+		return NoOptionalBodyClientPostResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return NoOptionalBodyClientPostResponse{}, nil
 }
@@ -159,8 +157,7 @@ func (client *NoOptionalBodyClient) Put(ctx context.Context, body Widget, option
 		return NoOptionalBodyClientPutResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return NoOptionalBodyClientPutResponse{}, err
+		return NoOptionalBodyClientPutResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return NoOptionalBodyClientPutResponse{}, nil
 }
