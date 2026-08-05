@@ -2,7 +2,6 @@ import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, type HttpServer } from "@typespec/http";
 import {
-  getClientApiVersionOverride,
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
@@ -200,19 +199,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (
-    parent === undefined &&
-    client.type?.kind === "Interface" &&
-    getClientApiVersionOverride(context, client.type) !== undefined
-  ) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "invalid-client-api-version-override",
-        messageId: "requiresSubclient",
-        target: client.type,
-      }),
-    );
-  }
   let name = client.name;
   if (client.type && getClientNameOverride(context, client.type)) {
     name = getLibraryName(context, client.type);
