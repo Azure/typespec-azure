@@ -97,7 +97,7 @@ describe("@overrideClientApiVersion", () => {
   });
 
   it("rejects an explicit root client declared as an interface", async () => {
-    const diagnostics = await SimpleTester.diagnose(`
+    const { program } = await SimpleTester.compile(`
       @service
       @versioned(Versions)
       namespace WidgetService {
@@ -114,8 +114,9 @@ describe("@overrideClientApiVersion", () => {
         }
       }
     `);
+    const context = await createSdkContextForTester(program);
 
-    expectDiagnostics(diagnostics, {
+    expectDiagnostics(context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-client-api-version-override",
       message:
         "@overrideClientApiVersion can only be applied to an interface that resolves to a subclient.",
