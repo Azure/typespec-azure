@@ -243,7 +243,6 @@ packages/typespec-go/test/**/testdata
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
 packages/typespec-java/test/**
-packages/typespec-java/emitter/**
 # Java emitter.jar + assets staged from the core generator build.
 packages/typespec-java/generator/**
 
