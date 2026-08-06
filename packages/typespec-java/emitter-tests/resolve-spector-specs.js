@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 // Resolve the opt-in spector.config.yaml into a JSON list of specs to generate,
-// consumed by Generate.ps1. Each entry is { tspFile, options } where options are
+// consumed by eng/scripts/generate.ts. Each entry is { tspFile, options } where options are
 // fully-qualified @azure-tools/typespec-java emitter options (without the random
-// output-dir, which Generate.ps1 appends per run).
+// output-dir, which generate.ts appends per run).
 //
 // Usage: node resolve-spector-specs.js <specsDir>
 import { existsSync } from "fs";

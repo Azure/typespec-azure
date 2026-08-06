@@ -28,11 +28,11 @@ http-specs, etc.).
 
 Run from the parent (`packages/typespec-java`) folder:
 
-```pwsh
+```bash
 pnpm run regenerate
 ```
 
-`regenerate` runs [`Generate.ps1`](../Generate.ps1), which builds the emitter
+`regenerate` runs [`eng/scripts/generate.ts`](../eng/scripts/generate.ts), which builds the emitter
 (`pnpm build`), then regenerates the SDK from the local `tsp/` sources and the
 [http-specs]/[azure-http-specs] specs into the (gitignored) `src/main/java` folder.
 This takes a while.
@@ -41,11 +41,11 @@ This takes a while.
 
 From `packages/typespec-java`:
 
-```pwsh
+```bash
 pnpm run test:java:e2e
 ```
 
-This runs [`Spector-Tests.ps1`](../Spector-Tests.ps1): it starts the `tsp-spector`
+This runs [`eng/scripts/spector-tests.ts`](../eng/scripts/spector-tests.ts): it starts the `tsp-spector`
 mock server, runs the JUnit tests (`mvn clean test`) against the generated SDK, then
 stops the server. It also writes `tsp-spector-coverage-java.json`.
 
@@ -64,7 +64,7 @@ are synced from the unbranded test project in the `core/` submodule
 (`core/packages/http-client-java/http-client-generator-test`). Refresh them from
 `packages/typespec-java` with:
 
-```pwsh
+```bash
 pnpm run sync-tests
 ```
 
@@ -90,4 +90,3 @@ new versions.
 
 [http-specs]: https://github.com/microsoft/typespec/tree/main/packages/http-specs
 [azure-http-specs]: https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs
-
