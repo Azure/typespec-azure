@@ -1,13 +1,13 @@
 import { type CompilerHost, joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
-import { ServiceOperation } from "../utils/operation-util.js";
+import type { ServiceOperation } from "../utils/operation-util.js";
 import { AzureTestDependencies } from "./external-dependencies.js";
 import {
   buildParameterValueMap,
-  ClientEmitOptions,
+  type ClientEmitOptions,
   createSourceFile,
   generateMethodCall,
   generateResponseAssertions,

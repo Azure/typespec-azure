@@ -8,7 +8,7 @@
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
 import * as go from "../codemodel/index.js";
-import { GoEmitterOptions } from "../lib.js";
+import type { GoEmitterOptions } from "../lib.js";
 import * as naming from "../naming/index.js";
 import { ClientAdapter } from "./clients.js";
 import { AdapterError } from "./errors.js";

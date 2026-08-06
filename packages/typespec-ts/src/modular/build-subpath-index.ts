@@ -1,6 +1,9 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { joinPaths } from "@typespec/compiler";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
 import { Node, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";

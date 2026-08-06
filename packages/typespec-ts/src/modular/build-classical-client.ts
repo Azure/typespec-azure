@@ -1,26 +1,26 @@
 import {
   ClassDeclaration,
-  MethodDeclarationStructure,
+  type MethodDeclarationStructure,
   Scope,
   SourceFile,
   StructureKind,
 } from "ts-morph";
 import { getClientParametersDeclaration } from "./helpers/client-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
 import {
   InitializedByFlags,
-  SdkClientType,
-  SdkServiceMethod,
-  SdkServiceOperation,
+  type SdkClientType,
+  type SdkServiceMethod,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
