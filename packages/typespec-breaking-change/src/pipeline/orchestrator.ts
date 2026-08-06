@@ -1,8 +1,8 @@
 import type { Namespace, Program } from "@typespec/compiler";
-import { computeDiffs } from "./diff-engine.js";
+import { computeDiffs } from "../diff/diff-engine.js";
 import { classifyDiffs } from "./policy.js";
 import { resolveHeadSourceLocations } from "./resolve-location.js";
-import { applySuppressions } from "./suppression.js";
+import { applySuppressions } from "../suppression/suppression.js";
 import type {
   AnalysisResult,
   AnalysisSummary,
@@ -11,7 +11,7 @@ import type {
   TimingInfo,
   VersionComparisonSummary,
   VersionPair,
-} from "./types.js";
+} from "../types.js";
 import {
   buildPhaseAPairs,
   buildPhaseBPairs,
@@ -363,6 +363,9 @@ const REQUEST_RESPONSE_PAIRS: Record<string, string> = {
   PropertyMadeOptional: "ResourcePropertyMadeOptional",
 };
 
+const mergeIdentityIds = new WeakMap<object, number>();
+let nextMergeIdentityId = 0;
+
 /**
  * Merge matching Request + Response findings into single Resource findings.
  *
@@ -430,7 +433,24 @@ function getPropertySuffix(kind: string, prefix: string): string | undefined {
 function buildMergeKey(f: Finding, suffix: string): string | undefined {
   const versionKey = `${f.versionPair.baseVersion}|${f.versionPair.headVersion}`;
   const suppressedKey = f.suppressed ? "s" : "u";
-  return `${f.diff.identity.element}|${versionKey}|${suffix}|${suppressedKey}`;
+  const identityKey = getMergeIdentityKey(f);
+  return `${identityKey}|${versionKey}|${suffix}|${suppressedKey}`;
+}
+
+function getMergeIdentityKey(f: Finding): string {
+  const sourceType = f.diff.headType ?? f.diff.baseType;
+  const mergeIdentity = sourceType && (sourceType as any).node ? (sourceType as any).node : sourceType;
+
+  if (mergeIdentity && typeof mergeIdentity === "object") {
+    let id = mergeIdentityIds.get(mergeIdentity);
+    if (id === undefined) {
+      id = nextMergeIdentityId++;
+      mergeIdentityIds.set(mergeIdentity, id);
+    }
+    return `node:${id}`;
+  }
+
+  return `path:${f.diff.identity.element}`;
 }
 
 /**

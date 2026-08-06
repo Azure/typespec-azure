@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { analyzeBaseAndHead, analyzeProgram } from "../src/orchestrator.js";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 describe("orchestrator", () => {
@@ -424,7 +424,7 @@ describe("orchestrator", () => {
   });
 
   it("skips Phase A pairs when the matching base service is missing", async () => {
-    vi.doMock("../src/versions.js", () => ({
+    vi.doMock("../src/pipeline/versions.js", () => ({
       enumerateVersions: vi.fn((program: object) =>
         program === baseProgram
           ? []
@@ -442,11 +442,11 @@ describe("orchestrator", () => {
       defaultVersionClassifier: (version: string) =>
         version.endsWith("-preview") ? "preview" : "stable",
     }));
-    vi.doMock("../src/suppression.js", () => ({
+    vi.doMock("../src/suppression/suppression.js", () => ({
       applySuppressions: vi.fn((findings: unknown[]) => findings),
     }));
 
-    const { analyzeBaseAndHead: mockedAnalyzeBaseAndHead } = await import("../src/orchestrator.js");
+    const { analyzeBaseAndHead: mockedAnalyzeBaseAndHead } = await import("../src/pipeline/orchestrator.js");
     const baseProgram = {};
     const headProgram = {};
 
@@ -1033,6 +1033,162 @@ describe("orchestrator", () => {
       const headFile = removal!.diff.headSourceLocation!.file.text;
       expect(headFile).toContain("model EmployeeProperties");
       expect(headFile).not.toContain("city");
+    });
+  });
+
+  describe("resource merge edge cases", () => {
+    it("keeps request-only removals as RequestPropertyRemoved", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model CreateWidgetRequest {
+          @removed(Versions.v2) legacy?: string;
+          name: string;
+        }
+
+        @route("/widgets")
+        @post
+        op createWidget(@body body: CreateWidgetRequest): void;
+      `);
+
+      const result = analyzeProgram(program);
+      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+
+      expect(legacyFindings).toHaveLength(1);
+      expect(legacyFindings[0].diff.kind).toBe("RequestPropertyRemoved");
+      expect(result.findings.some((f) => f.diff.kind === "ResourcePropertyRemoved")).toBe(false);
+    });
+
+    it("keeps response-only removals as ResponsePropertyRemoved", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          @removed(Versions.v2) legacy?: string;
+          name: string;
+        }
+
+        @route("/widgets/{name}")
+        @get
+        op getWidget(@path name: string): Widget;
+      `);
+
+      const result = analyzeProgram(program);
+      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+
+      expect(legacyFindings).toHaveLength(1);
+      expect(legacyFindings[0].diff.kind).toBe("ResponsePropertyRemoved");
+      expect(result.findings.some((f) => f.diff.kind === "ResourcePropertyRemoved")).toBe(false);
+    });
+
+    it("merges nested request and response property removals with the correct path", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Config {
+          @removed(Versions.v2) timeout?: int32;
+          mode: string;
+        }
+
+        model Widget {
+          name: string;
+          config: Config;
+        }
+
+        @route("/widgets/{name}")
+        @put
+        op createWidget(@path name: string, @body body: Widget): Widget;
+      `);
+
+      const result = analyzeProgram(program);
+      const timeoutFindings = result.findings.filter((f) => f.diff.identity.element.includes("timeout"));
+
+      expect(timeoutFindings).toHaveLength(1);
+      expect(timeoutFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
+      expect(timeoutFindings[0].diff.identity.element).toBe("body.properties.config.properties.timeout");
+    });
+
+    it("merges GET, PUT, and PATCH findings into a single ResourcePropertyRemoved", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          @removed(Versions.v2) legacy?: string;
+          name: string;
+        }
+
+        @route("/widgets/{name}")
+        @get
+        op getWidget(@path name: string): Widget;
+
+        @route("/widgets/{name}")
+        @put
+        op createWidget(@path name: string, @body body: Widget): Widget;
+
+        @route("/widgets/{name}")
+        @patch
+        op updateWidget(@path name: string, @body body: Widget): void;
+      `);
+
+      const result = analyzeProgram(program);
+      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+
+      expect(legacyFindings).toHaveLength(1);
+      expect(legacyFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
+      expect(legacyFindings.some((f) => f.diff.kind === "RequestPropertyRemoved")).toBe(false);
+      expect(legacyFindings.some((f) => f.diff.kind === "ResponsePropertyRemoved")).toBe(false);
+    });
+
+    it("does not merge request and response findings from different models with the same property name", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model WidgetRequest {
+          @removed(Versions.v2) name?: string;
+          sku: string;
+        }
+
+        model WidgetResponse {
+          id: string;
+          @removed(Versions.v2) name?: string;
+        }
+
+        @route("/widgets")
+        @post
+        op createWidget(@body body: WidgetRequest): void;
+
+        @route("/widgets/{id}")
+        @get
+        op getWidget(@path id: string): WidgetResponse;
+      `);
+
+      const result = analyzeProgram(program);
+      const nameFindings = result.findings.filter((f) => f.diff.identity.element.endsWith(".name"));
+
+      expect(nameFindings).toHaveLength(2);
+      expect(nameFindings.filter((f) => f.diff.kind === "RequestPropertyRemoved")).toHaveLength(1);
+      expect(nameFindings.filter((f) => f.diff.kind === "ResponsePropertyRemoved")).toHaveLength(1);
+      expect(nameFindings.filter((f) => f.diff.kind === "ResourcePropertyRemoved")).toHaveLength(0);
     });
   });
 });
