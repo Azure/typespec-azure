@@ -32,7 +32,6 @@ const rawRedirects = {
   "/docs/libraries/azure-resource-manager/rules/post-operation-response-codes/": `/docs/libraries/azure-resource-manager/rules/arm-post-operation-response-codes/`,
   "/docs/libraries/azure-resource-manager/rules/put-operation-response-codes/": `/docs/libraries/azure-resource-manager/rules/arm-put-operation-response-codes/`,
   "/docs/libraries/azure-resource-manager/rules/resource-name-pattern/": `/docs/libraries/azure-resource-manager/rules/arm-resource-name-pattern/`,
-  "/docs/libraries/azure-resource-manager/rules/arm-resource-operation/": `/docs/libraries/azure-resource-manager/rules/use-interface/`,
 };
 
 const normalizedRedirects = Object.fromEntries(
