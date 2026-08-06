@@ -983,16 +983,23 @@ raw findings ── deduplicateBySourceType ── mergeRequestResponseToResourc
 
 ### 8.2 Source Link Resolution
 
-The tool links findings to TypeSpec source locations. For Phase B (single-program), source locations come directly from the compiler. For Phase A (cross-compilation), source locations require special handling because types from the base program have source positions in base files, not head files.
+The tool now resolves each finding through a six-level source chain and returns `ResolvedLocation { location, sourceTraceLevel, elementPath? }`, where `SourceTraceLevel = "direct" | "origin" | "base" | "parentModel" | "operation" | "namespace"`.
 
-**The principle:** Link to the type in HEAD when it exists in HEAD source; link to the parent model when the type does not exist in HEAD (i.e., it was removed).
+`resolveFindingLocation()` applies the following priority order:
+1. `headSourceLocation`
+2. `origin.sourceLocation`
+3. `baseSourceLocation`
+4. parent-type fallback (`resolveTypeLocationWithModelFallback`)
+5. `operationSourceLocation`
+6. service namespace source location + `elementPath`
 
-**Implementation:** `resolveHeadSourceLocations` looks up each finding's affected type in the unmutated head program by name. The lookup uses `prop.node?.parent?.id?.sv` (the AST source model name) rather than `prop.model?.name` (which returns the projected/mutated model name, e.g., `EmployeePropertiesCreateOrUpdate` instead of `EmployeeProperties`).
+For same-program diffs, `headSourceLocation` usually comes directly from the compiler. For cross-compilation findings, `resolveHeadSourceLocations()` runs after suppression and before reporting. It looks up the affected declaration in the unmutated HEAD program by AST source name (`prop.node?.parent?.id?.sv`), first by origin declaration path, then in the matching service namespace, then globally. This scoped lookup avoids ambiguous same-name models while still recovering links for projected or copied types.
 
-The fallback priority for `resolveFindingLocation` is:
-1. `headSourceLocation` (resolved by `resolveHeadSourceLocations`)
-2. `origin` (the origin type's source location)
-3. `baseSourceLocation` (last resort — points to base branch file)
+The guiding rule is: **link to HEAD when the declaration still exists in HEAD source; link to the parent model only when the declaration is truly deleted**. Accordingly, `resolveHeadSourceLocations()` sets `headSourceLocation` to the property when it still exists and to the model when only the parent survives, recording `headSourceTraceLevel` on `ApiDiff` so downstream suppression guidance can choose between direct decoration and parent-model-with-path decoration.
+
+Origin tracing in `src/diff/origin.ts` complements this by recovering declaration-scoped anchors for deduplication and suppression. In addition to `sourceProperty` chains and canonical-property tracing, it follows template-instantiation metadata (`sourceModels` and `templateMapper.args`) so template-generated properties resolve back to the named source declaration (the B5 fix).
+
+Measured on real ARM specs, this produced **92.3%** origin coverage on Network, **88.6%** on fleet, and **100%** source-link resolution in both evaluated Phase B specs.
 
 ### 8.3 Cross-Compilation Suppression Identity
 
