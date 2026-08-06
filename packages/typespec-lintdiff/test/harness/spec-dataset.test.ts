@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { aggregateResults, parseViolations, updateAutorestOption } from "./spec-dataset.js";
+import {
+  aggregateResults,
+  parseViolations,
+  selectLatestApiVersion,
+  updateAutorestOption,
+} from "./spec-dataset.js";
 
 const project = {
   sourcePath: "specification/contoso/resource-manager/Microsoft.Contoso/Contoso",
@@ -101,5 +106,11 @@ describe("spec dataset results", () => {
       ),
     );
     expect(updated.match(/^options:/gm)).toHaveLength(1);
+  });
+
+  it("selects the newest API date regardless of stable or preview status", () => {
+    expect(selectLatestApiVersion(["2024-10-01", "2025-01-15-preview", "2023-11-01"])).toBe(
+      "2025-01-15-preview",
+    );
   });
 });

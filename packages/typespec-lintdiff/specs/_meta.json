@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "complete": true,
   "specsRepository": "https://github.com/Azure/azure-rest-api-specs.git",
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-06T03:44:30.428Z",
+  "generatedAt": "2026-08-06T04:09:04.941Z",
   "generator": "test/harness/spec-dataset.ts",
   "validatorCommand": "npm exec -- autorest --v3 --spectral --azure-validator --semantic-validator=false --model-validator=false --message-format=json --openapi-type=arm --openapi-subtype=arm --use=<openapi-validator> --input-file=<swagger>",
   "readmeSuppressionsApplied": false,
-  "commonTypesPath": "swagger/specification/common-types/resource-management",
+  "commonTypesPath": "common-types/resource-management",
   "filters": {
     "serviceType": "resource-manager",
     "path": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
@@ -17,28 +17,27 @@
     "discoveredProjects": 1,
     "compiledProjects": 1,
     "failedProjects": 0,
-    "emittedSwaggerFiles": 2,
+    "emittedSwaggerFiles": 1,
     "validatedProjects": 1,
     "validationFailures": 0,
-    "violations": 116,
+    "violations": 61,
     "distinctRules": 5
   },
   "projects": [
     {
       "sourcePath": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
+      "typespecPath": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/typespec",
+      "apiVersion": "2025-01-15-preview",
       "compileStatus": "success",
-      "compileDurationMs": 4151,
+      "compileDurationMs": 4220,
       "swaggerFiles": [
-        "swagger/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-        "swagger/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json"
+        "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json"
       ],
       "validationStatus": "success",
-      "validationDurationMs": 12492,
+      "validationDurationMs": 6058,
       "rawFiles": [
-        "raw/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.jsonl",
-        "raw/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.stderr.txt",
-        "raw/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.jsonl",
-        "raw/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.stderr.txt"
+        "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/raw/preview/2025-01-15-preview/fabric.jsonl",
+        "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/raw/preview/2025-01-15-preview/fabric.stderr.txt"
       ]
     }
   ]

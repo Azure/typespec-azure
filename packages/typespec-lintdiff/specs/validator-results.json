@@ -1,20 +1,20 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-06T03:44:30.428Z",
-  "totalViolations": 116,
+  "generatedAt": "2026-08-06T04:09:04.941Z",
+  "totalViolations": 61,
   "rules": {
     "LatestVersionOfCommonTypesMustBeUsed": {
-      "count": 100,
+      "count": 52,
       "levels": {
-        "warning": 100
+        "warning": 52
       },
       "results": [
         {
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -44,7 +44,7 @@
               },
               "end": {
                 "line": 59,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -53,7 +53,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -85,7 +85,7 @@
               },
               "end": {
                 "line": 66,
-                "column": 121
+                "column": 130
               }
             }
           }
@@ -94,7 +94,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -126,7 +126,7 @@
               },
               "end": {
                 "line": 72,
-                "column": 115
+                "column": 124
               }
             }
           }
@@ -135,7 +135,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -165,7 +165,7 @@
               },
               "end": {
                 "line": 95,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -174,7 +174,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -204,7 +204,7 @@
               },
               "end": {
                 "line": 98,
-                "column": 122
+                "column": 131
               }
             }
           }
@@ -213,7 +213,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -245,7 +245,7 @@
               },
               "end": {
                 "line": 111,
-                "column": 115
+                "column": 124
               }
             }
           }
@@ -254,7 +254,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -284,7 +284,7 @@
               },
               "end": {
                 "line": 134,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -293,7 +293,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -323,7 +323,7 @@
               },
               "end": {
                 "line": 137,
-                "column": 122
+                "column": 131
               }
             }
           }
@@ -332,7 +332,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -362,7 +362,7 @@
               },
               "end": {
                 "line": 140,
-                "column": 116
+                "column": 125
               }
             }
           }
@@ -371,7 +371,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -403,7 +403,7 @@
               },
               "end": {
                 "line": 148,
-                "column": 130
+                "column": 139
               }
             }
           }
@@ -412,7 +412,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -444,7 +444,7 @@
               },
               "end": {
                 "line": 156,
-                "column": 131
+                "column": 140
               }
             }
           }
@@ -453,7 +453,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -485,7 +485,7 @@
               },
               "end": {
                 "line": 162,
-                "column": 115
+                "column": 124
               }
             }
           }
@@ -494,7 +494,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -524,7 +524,7 @@
               },
               "end": {
                 "line": 182,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -533,7 +533,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -563,7 +563,7 @@
               },
               "end": {
                 "line": 185,
-                "column": 122
+                "column": 131
               }
             }
           }
@@ -572,7 +572,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -602,7 +602,7 @@
               },
               "end": {
                 "line": 188,
-                "column": 116
+                "column": 125
               }
             }
           }
@@ -611,7 +611,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -643,7 +643,7 @@
               },
               "end": {
                 "line": 201,
-                "column": 115
+                "column": 124
               }
             }
           }
@@ -652,7 +652,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -682,7 +682,7 @@
               },
               "end": {
                 "line": 224,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -691,7 +691,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -721,1787 +721,6 @@
               },
               "end": {
                 "line": 227,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 240,
-                "column": 22
-              },
-              "end": {
-                "line": 240,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 263,
-                "column": 20
-              },
-              "end": {
-                "line": 263,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 266,
-                "column": 20
-              },
-              "end": {
-                "line": 266,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 269,
-                "column": 20
-              },
-              "end": {
-                "line": 269,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 282,
-                "column": 22
-              },
-              "end": {
-                "line": 282,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 305,
-                "column": 20
-              },
-              "end": {
-                "line": 305,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 308,
-                "column": 20
-              },
-              "end": {
-                "line": 308,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "get",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "get",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 311,
-                "column": 20
-              },
-              "end": {
-                "line": 311,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 334,
-                "column": 22
-              },
-              "end": {
-                "line": 334,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "put",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "put",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 352,
-                "column": 20
-              },
-              "end": {
-                "line": 352,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "put",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "put",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 355,
-                "column": 20
-              },
-              "end": {
-                "line": 355,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "put",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "put",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 358,
-                "column": 20
-              },
-              "end": {
-                "line": 358,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "put",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "put",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 407,
-                "column": 22
-              },
-              "end": {
-                "line": 407,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 429,
-                "column": 20
-              },
-              "end": {
-                "line": 429,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 432,
-                "column": 20
-              },
-              "end": {
-                "line": 432,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 435,
-                "column": 20
-              },
-              "end": {
-                "line": 435,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 481,
-                "column": 22
-              },
-              "end": {
-                "line": 481,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "delete",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "delete",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 503,
-                "column": 20
-              },
-              "end": {
-                "line": 503,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "delete",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "delete",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 506,
-                "column": 20
-              },
-              "end": {
-                "line": 506,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "delete",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "delete",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 509,
-                "column": 20
-              },
-              "end": {
-                "line": 509,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "delete",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "delete",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 543,
-                "column": 22
-              },
-              "end": {
-                "line": 543,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-            "post",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-              "post",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 567,
-                "column": 20
-              },
-              "end": {
-                "line": 567,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-            "post",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-              "post",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 570,
-                "column": 20
-              },
-              "end": {
-                "line": 570,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-            "post",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-              "post",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 573,
-                "column": 20
-              },
-              "end": {
-                "line": 573,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-            "post",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-              "post",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 607,
-                "column": 22
-              },
-              "end": {
-                "line": 607,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 631,
-                "column": 20
-              },
-              "end": {
-                "line": 631,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 634,
-                "column": 20
-              },
-              "end": {
-                "line": 634,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-            "get",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-              "get",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 637,
-                "column": 20
-              },
-              "end": {
-                "line": 637,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/skus",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 660,
-                "column": 22
-              },
-              "end": {
-                "line": 660,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-            "post",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-              "post",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 683,
-                "column": 20
-              },
-              "end": {
-                "line": 683,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-            "post",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-              "post",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 686,
-                "column": 20
-              },
-              "end": {
-                "line": 686,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-            "post",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-              "post",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 689,
-                "column": 20
-              },
-              "end": {
-                "line": 689,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-            "post",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-              "post",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 723,
-                "column": 22
-              },
-              "end": {
-                "line": 723,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "definitions",
-            "FabricCapacity",
-            "allOf",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "definitions",
-              "FabricCapacity",
-              "allOf",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 780,
-                "column": 18
-              },
-              "end": {
-                "line": 780,
-                "column": 113
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/providers/Microsoft.Fabric/operations",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/providers/Microsoft.Fabric/operations",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 59,
-                "column": 20
-              },
-              "end": {
-                "line": 59,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/providers/Microsoft.Fabric/operations",
-            "get",
-            "responses",
-            "200",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/providers/Microsoft.Fabric/operations",
-              "get",
-              "responses",
-              "200",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 66,
-                "column": 22
-              },
-              "end": {
-                "line": 66,
-                "column": 121
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/providers/Microsoft.Fabric/operations",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/providers/Microsoft.Fabric/operations",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 72,
-                "column": 22
-              },
-              "end": {
-                "line": 72,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 95,
-                "column": 20
-              },
-              "end": {
-                "line": 95,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 98,
-                "column": 20
-              },
-              "end": {
-                "line": 98,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 111,
-                "column": 22
-              },
-              "end": {
-                "line": 111,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 134,
-                "column": 20
-              },
-              "end": {
-                "line": 134,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 137,
-                "column": 20
-              },
-              "end": {
-                "line": 137,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 140,
-                "column": 20
-              },
-              "end": {
-                "line": 140,
-                "column": 116
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "parameters",
-            "3",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "parameters",
-              "3",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 148,
-                "column": 22
-              },
-              "end": {
-                "line": 148,
-                "column": 130
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "responses",
-            "200",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "responses",
-              "200",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 156,
-                "column": 22
-              },
-              "end": {
-                "line": 156,
                 "column": 131
               }
             }
@@ -2511,126 +730,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-            "post",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/locations/{location}/checkNameAvailability",
-              "post",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 162,
-                "column": 22
-              },
-              "end": {
-                "line": 162,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 182,
-                "column": 20
-              },
-              "end": {
-                "line": 182,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 185,
-                "column": 20
-              },
-              "end": {
-                "line": 185,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -2645,164 +745,6 @@
             "jsonpath": [
               "paths",
               "/subscriptions/{subscriptionId}/providers/Microsoft.Fabric/skus",
-              "get",
-              "responses",
-              "default",
-              "schema",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 198,
-                "column": 22
-              },
-              "end": {
-                "line": 198,
-                "column": 115
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "0",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "0",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 221,
-                "column": 20
-              },
-              "end": {
-                "line": 221,
-                "column": 118
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "1",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "1",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 224,
-                "column": 20
-              },
-              "end": {
-                "line": 224,
-                "column": 122
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "parameters",
-            "2",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-              "get",
-              "parameters",
-              "2",
-              "$ref"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "",
-            "range": {
-              "start": {
-                "line": 227,
-                "column": 20
-              },
-              "end": {
-                "line": 227,
-                "column": 125
-              }
-            }
-          }
-        },
-        {
-          "rule": "LatestVersionOfCommonTypesMustBeUsed",
-          "level": "warning",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Use the latest version v6 of types.json.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
-            "get",
-            "responses",
-            "default",
-            "schema",
-            "$ref"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
               "get",
               "responses",
               "default",
@@ -2820,7 +762,7 @@
               },
               "end": {
                 "line": 240,
-                "column": 115
+                "column": 124
               }
             }
           }
@@ -2829,11 +771,11 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
             "get",
             "parameters",
             "0",
@@ -2842,7 +784,7 @@
           "details": {
             "jsonpath": [
               "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
               "get",
               "parameters",
               "0",
@@ -2859,7 +801,7 @@
               },
               "end": {
                 "line": 263,
-                "column": 118
+                "column": 127
               }
             }
           }
@@ -2868,11 +810,11 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
             "get",
             "parameters",
             "1",
@@ -2881,7 +823,7 @@
           "details": {
             "jsonpath": [
               "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
               "get",
               "parameters",
               "1",
@@ -2898,7 +840,7 @@
               },
               "end": {
                 "line": 266,
-                "column": 122
+                "column": 131
               }
             }
           }
@@ -2907,11 +849,11 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
             "get",
             "parameters",
             "2",
@@ -2920,7 +862,7 @@
           "details": {
             "jsonpath": [
               "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
               "get",
               "parameters",
               "2",
@@ -2937,7 +879,7 @@
               },
               "end": {
                 "line": 269,
-                "column": 125
+                "column": 134
               }
             }
           }
@@ -2946,7 +888,165 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
+          "message": "Use the latest version v6 of types.json.",
+          "path": [
+            "paths",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
+            "get",
+            "responses",
+            "default",
+            "schema",
+            "$ref"
+          ],
+          "details": {
+            "jsonpath": [
+              "paths",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities",
+              "get",
+              "responses",
+              "default",
+              "schema",
+              "$ref"
+            ],
+            "validationCategory": "",
+            "providerNamespace": false,
+            "resourceType": false,
+            "rpcGuidelineCode": "",
+            "range": {
+              "start": {
+                "line": 282,
+                "column": 22
+              },
+              "end": {
+                "line": 282,
+                "column": 124
+              }
+            }
+          }
+        },
+        {
+          "rule": "LatestVersionOfCommonTypesMustBeUsed",
+          "level": "warning",
+          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
+          "message": "Use the latest version v6 of types.json.",
+          "path": [
+            "paths",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "get",
+            "parameters",
+            "0",
+            "$ref"
+          ],
+          "details": {
+            "jsonpath": [
+              "paths",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "get",
+              "parameters",
+              "0",
+              "$ref"
+            ],
+            "validationCategory": "",
+            "providerNamespace": false,
+            "resourceType": false,
+            "rpcGuidelineCode": "",
+            "range": {
+              "start": {
+                "line": 305,
+                "column": 20
+              },
+              "end": {
+                "line": 305,
+                "column": 127
+              }
+            }
+          }
+        },
+        {
+          "rule": "LatestVersionOfCommonTypesMustBeUsed",
+          "level": "warning",
+          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
+          "message": "Use the latest version v6 of types.json.",
+          "path": [
+            "paths",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "get",
+            "parameters",
+            "1",
+            "$ref"
+          ],
+          "details": {
+            "jsonpath": [
+              "paths",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "get",
+              "parameters",
+              "1",
+              "$ref"
+            ],
+            "validationCategory": "",
+            "providerNamespace": false,
+            "resourceType": false,
+            "rpcGuidelineCode": "",
+            "range": {
+              "start": {
+                "line": 308,
+                "column": 20
+              },
+              "end": {
+                "line": 308,
+                "column": 131
+              }
+            }
+          }
+        },
+        {
+          "rule": "LatestVersionOfCommonTypesMustBeUsed",
+          "level": "warning",
+          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
+          "message": "Use the latest version v6 of types.json.",
+          "path": [
+            "paths",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+            "get",
+            "parameters",
+            "2",
+            "$ref"
+          ],
+          "details": {
+            "jsonpath": [
+              "paths",
+              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
+              "get",
+              "parameters",
+              "2",
+              "$ref"
+            ],
+            "validationCategory": "",
+            "providerNamespace": false,
+            "resourceType": false,
+            "rpcGuidelineCode": "",
+            "range": {
+              "start": {
+                "line": 311,
+                "column": 20
+              },
+              "end": {
+                "line": 311,
+                "column": 134
+              }
+            }
+          }
+        },
+        {
+          "rule": "LatestVersionOfCommonTypesMustBeUsed",
+          "level": "warning",
+          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -2973,12 +1073,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 292,
+                "line": 334,
                 "column": 22
               },
               "end": {
-                "line": 292,
-                "column": 115
+                "line": 334,
+                "column": 124
               }
             }
           }
@@ -2987,7 +1087,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3012,12 +1112,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 310,
+                "line": 352,
                 "column": 20
               },
               "end": {
-                "line": 310,
-                "column": 118
+                "line": 352,
+                "column": 127
               }
             }
           }
@@ -3026,7 +1126,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3051,12 +1151,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 313,
+                "line": 355,
                 "column": 20
               },
               "end": {
-                "line": 313,
-                "column": 122
+                "line": 355,
+                "column": 131
               }
             }
           }
@@ -3065,7 +1165,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3090,12 +1190,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 316,
+                "line": 358,
                 "column": 20
               },
               "end": {
-                "line": 316,
-                "column": 125
+                "line": 358,
+                "column": 134
               }
             }
           }
@@ -3104,7 +1204,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3131,12 +1231,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 365,
+                "line": 407,
                 "column": 22
               },
               "end": {
-                "line": 365,
-                "column": 115
+                "line": 407,
+                "column": 124
               }
             }
           }
@@ -3145,7 +1245,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3170,12 +1270,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 387,
+                "line": 429,
                 "column": 20
               },
               "end": {
-                "line": 387,
-                "column": 118
+                "line": 429,
+                "column": 127
               }
             }
           }
@@ -3184,7 +1284,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3209,12 +1309,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 390,
+                "line": 432,
                 "column": 20
               },
               "end": {
-                "line": 390,
-                "column": 122
+                "line": 432,
+                "column": 131
               }
             }
           }
@@ -3223,7 +1323,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3248,12 +1348,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 393,
+                "line": 435,
                 "column": 20
               },
               "end": {
-                "line": 393,
-                "column": 125
+                "line": 435,
+                "column": 134
               }
             }
           }
@@ -3262,7 +1362,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3289,12 +1389,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 439,
+                "line": 481,
                 "column": 22
               },
               "end": {
-                "line": 439,
-                "column": 115
+                "line": 481,
+                "column": 124
               }
             }
           }
@@ -3303,7 +1403,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3328,12 +1428,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 461,
+                "line": 503,
                 "column": 20
               },
               "end": {
-                "line": 461,
-                "column": 118
+                "line": 503,
+                "column": 127
               }
             }
           }
@@ -3342,7 +1442,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3367,12 +1467,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 464,
+                "line": 506,
                 "column": 20
               },
               "end": {
-                "line": 464,
-                "column": 122
+                "line": 506,
+                "column": 131
               }
             }
           }
@@ -3381,7 +1481,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3406,12 +1506,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 467,
+                "line": 509,
                 "column": 20
               },
               "end": {
-                "line": 467,
-                "column": 125
+                "line": 509,
+                "column": 134
               }
             }
           }
@@ -3420,7 +1520,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3447,12 +1547,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 501,
+                "line": 543,
                 "column": 22
               },
               "end": {
-                "line": 501,
-                "column": 115
+                "line": 543,
+                "column": 124
               }
             }
           }
@@ -3461,7 +1561,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3486,12 +1586,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 525,
+                "line": 567,
                 "column": 20
               },
               "end": {
-                "line": 525,
-                "column": 118
+                "line": 567,
+                "column": 127
               }
             }
           }
@@ -3500,7 +1600,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3525,12 +1625,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 528,
+                "line": 570,
                 "column": 20
               },
               "end": {
-                "line": 528,
-                "column": 122
+                "line": 570,
+                "column": 131
               }
             }
           }
@@ -3539,7 +1639,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3564,12 +1664,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 531,
+                "line": 573,
                 "column": 20
               },
               "end": {
-                "line": 531,
-                "column": 125
+                "line": 573,
+                "column": 134
               }
             }
           }
@@ -3578,7 +1678,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3605,12 +1705,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 565,
+                "line": 607,
                 "column": 22
               },
               "end": {
-                "line": 565,
-                "column": 115
+                "line": 607,
+                "column": 124
               }
             }
           }
@@ -3619,7 +1719,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3644,12 +1744,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 589,
+                "line": 631,
                 "column": 20
               },
               "end": {
-                "line": 589,
-                "column": 118
+                "line": 631,
+                "column": 127
               }
             }
           }
@@ -3658,7 +1758,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3683,12 +1783,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 592,
+                "line": 634,
                 "column": 20
               },
               "end": {
-                "line": 592,
-                "column": 122
+                "line": 634,
+                "column": 131
               }
             }
           }
@@ -3697,7 +1797,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3722,12 +1822,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 595,
+                "line": 637,
                 "column": 20
               },
               "end": {
-                "line": 595,
-                "column": 125
+                "line": 637,
+                "column": 134
               }
             }
           }
@@ -3736,7 +1836,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3763,12 +1863,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 618,
+                "line": 660,
                 "column": 22
               },
               "end": {
-                "line": 618,
-                "column": 115
+                "line": 660,
+                "column": 124
               }
             }
           }
@@ -3777,7 +1877,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3802,12 +1902,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 641,
+                "line": 683,
                 "column": 20
               },
               "end": {
-                "line": 641,
-                "column": 118
+                "line": 683,
+                "column": 127
               }
             }
           }
@@ -3816,7 +1916,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3841,12 +1941,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 644,
+                "line": 686,
                 "column": 20
               },
               "end": {
-                "line": 644,
-                "column": 122
+                "line": 686,
+                "column": 131
               }
             }
           }
@@ -3855,7 +1955,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3880,12 +1980,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 647,
+                "line": 689,
                 "column": 20
               },
               "end": {
-                "line": 647,
-                "column": 125
+                "line": 689,
+                "column": 134
               }
             }
           }
@@ -3894,7 +1994,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "paths",
@@ -3921,12 +2021,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 681,
+                "line": 723,
                 "column": 22
               },
               "end": {
-                "line": 681,
-                "column": 115
+                "line": 723,
+                "column": 124
               }
             }
           }
@@ -3935,7 +2035,7 @@
           "rule": "LatestVersionOfCommonTypesMustBeUsed",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Use the latest version v6 of types.json.",
           "path": [
             "definitions",
@@ -3958,12 +2058,12 @@
             "rpcGuidelineCode": "",
             "range": {
               "start": {
-                "line": 738,
+                "line": 780,
                 "column": 18
               },
               "end": {
-                "line": 738,
-                "column": 113
+                "line": 780,
+                "column": 122
               }
             }
           }
@@ -3971,16 +2071,16 @@
       ]
     },
     "PatchBodyParametersSchema": {
-      "count": 6,
+      "count": 3,
       "levels": {
-        "error": 6
+        "error": 3
       },
       "results": [
         {
           "rule": "PatchBodyParametersSchema",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Properties of a PATCH request body must not be required, property:members.",
           "path": [
             "paths",
@@ -4023,7 +2123,7 @@
           "rule": "PatchBodyParametersSchema",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Properties of a PATCH request body must not be required, property:name.",
           "path": [
             "paths",
@@ -4066,136 +2166,7 @@
           "rule": "PatchBodyParametersSchema",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
-          "message": "Properties of a PATCH request body must not be required, property:tier.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "4",
-            "schema",
-            "properties",
-            "sku"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "4",
-              "schema",
-              "properties",
-              "sku"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "RPC-Patch-V1-10",
-            "range": {
-              "start": {
-                "line": 1,
-                "column": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 0
-              }
-            }
-          }
-        },
-        {
-          "rule": "PatchBodyParametersSchema",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Properties of a PATCH request body must not be required, property:members.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "4",
-            "schema",
-            "properties",
-            "properties"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "4",
-              "schema",
-              "properties",
-              "properties"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "RPC-Patch-V1-10",
-            "range": {
-              "start": {
-                "line": 1,
-                "column": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 0
-              }
-            }
-          }
-        },
-        {
-          "rule": "PatchBodyParametersSchema",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Properties of a PATCH request body must not be required, property:name.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-            "patch",
-            "parameters",
-            "4",
-            "schema",
-            "properties",
-            "sku"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}",
-              "patch",
-              "parameters",
-              "4",
-              "schema",
-              "properties",
-              "sku"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "RPC-Patch-V1-10",
-            "range": {
-              "start": {
-                "line": 1,
-                "column": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 0
-              }
-            }
-          }
-        },
-        {
-          "rule": "PatchBodyParametersSchema",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Properties of a PATCH request body must not be required, property:tier.",
           "path": [
             "paths",
@@ -4237,16 +2208,16 @@
       ]
     },
     "PostResponseCodes": {
-      "count": 4,
+      "count": 2,
       "levels": {
-        "error": 4
+        "error": 2
       },
       "results": [
         {
           "rule": "PostResponseCodes",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "200 return code does not have a schema specified. LRO POST must have a 200 return code if only if the final response is intended to have a schema, if not the 200 return code must not be specified.",
           "path": [
             "paths",
@@ -4279,7 +2250,7 @@
           "rule": "PostResponseCodes",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "200 return code does not have a schema specified. LRO POST must have a 200 return code if only if the final response is intended to have a schema, if not the 200 return code must not be specified.",
           "path": [
             "paths",
@@ -4307,72 +2278,6 @@
               }
             }
           }
-        },
-        {
-          "rule": "PostResponseCodes",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "200 return code does not have a schema specified. LRO POST must have a 200 return code if only if the final response is intended to have a schema, if not the 200 return code must not be specified.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-            "post"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/resume",
-              "post"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03",
-            "range": {
-              "start": {
-                "line": 517,
-                "column": 13
-              },
-              "end": {
-                "line": 577,
-                "column": 43
-              }
-            }
-          }
-        },
-        {
-          "rule": "PostResponseCodes",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "200 return code does not have a schema specified. LRO POST must have a 200 return code if only if the final response is intended to have a schema, if not the 200 return code must not be specified.",
-          "path": [
-            "paths",
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-            "post"
-          ],
-          "details": {
-            "jsonpath": [
-              "paths",
-              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Fabric/capacities/{capacityName}/suspend",
-              "post"
-            ],
-            "validationCategory": "",
-            "providerNamespace": false,
-            "resourceType": false,
-            "rpcGuidelineCode": "RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03",
-            "range": {
-              "start": {
-                "line": 633,
-                "column": 13
-              },
-              "end": {
-                "line": 693,
-                "column": 43
-              }
-            }
-          }
         }
       ]
     },
@@ -4386,7 +2291,7 @@
           "rule": "PreviewVersionOverOneYear",
           "level": "warning",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "The API version:2025-01-15-preview having been in a preview state over one year , please move it to GA or retire.",
           "path": [
             "info",
@@ -4415,16 +2320,16 @@
       ]
     },
     "RequiredPropertiesMissingInResourceModel": {
-      "count": 5,
+      "count": 3,
       "levels": {
-        "error": 5
+        "error": 3
       },
       "results": [
         {
           "rule": "RequiredPropertiesMissingInResourceModel",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Model definition 'PagedQuota' must have the properties 'name', 'id' and 'type' in its hierarchy and these properties must be marked as readonly.",
           "path": [
             "definitions",
@@ -4454,7 +2359,7 @@
           "rule": "RequiredPropertiesMissingInResourceModel",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Model definition 'RpSkuEnumerationForNewResourceResult' must have the properties 'name', 'id' and 'type' in its hierarchy and these properties must be marked as readonly.",
           "path": [
             "definitions",
@@ -4484,7 +2389,7 @@
           "rule": "RequiredPropertiesMissingInResourceModel",
           "level": "error",
           "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/preview/2025-01-15-preview/fabric.json",
+          "swaggerFile": "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/swagger/preview/2025-01-15-preview/fabric.json",
           "message": "Model definition 'RpSkuEnumerationForExistingResourceResult' must have the properties 'name', 'id' and 'type' in its hierarchy and these properties must be marked as readonly.",
           "path": [
             "definitions",
@@ -4505,66 +2410,6 @@
               },
               "end": {
                 "line": 1141,
-                "column": 6
-              }
-            }
-          }
-        },
-        {
-          "rule": "RequiredPropertiesMissingInResourceModel",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Model definition 'RpSkuEnumerationForNewResourceResult' must have the properties 'name', 'id' and 'type' in its hierarchy and these properties must be marked as readonly.",
-          "path": [
-            "definitions",
-            "RpSkuEnumerationForNewResourceResult"
-          ],
-          "details": {
-            "jsonpath": [
-              "definitions",
-              "RpSkuEnumerationForNewResourceResult"
-            ],
-            "validationCategory": "ARMViolation",
-            "providerNamespace": false,
-            "resourceType": false,
-            "range": {
-              "start": {
-                "line": 1034,
-                "column": 45
-              },
-              "end": {
-                "line": 1054,
-                "column": 6
-              }
-            }
-          }
-        },
-        {
-          "rule": "RequiredPropertiesMissingInResourceModel",
-          "level": "error",
-          "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
-          "swaggerFile": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric/stable/2023-11-01/fabric.json",
-          "message": "Model definition 'RpSkuEnumerationForExistingResourceResult' must have the properties 'name', 'id' and 'type' in its hierarchy and these properties must be marked as readonly.",
-          "path": [
-            "definitions",
-            "RpSkuEnumerationForExistingResourceResult"
-          ],
-          "details": {
-            "jsonpath": [
-              "definitions",
-              "RpSkuEnumerationForExistingResourceResult"
-            ],
-            "validationCategory": "ARMViolation",
-            "providerNamespace": false,
-            "resourceType": false,
-            "range": {
-              "start": {
-                "line": 1013,
-                "column": 50
-              },
-              "end": {
-                "line": 1033,
                 "column": 6
               }
             }

@@ -18,11 +18,15 @@ An explicit `--commit` always regenerates the complete dataset. Running without
 The layout is:
 
 - `_meta.json`: commit, filters, project list, generation status and file index.
-- `swagger/`: Swagger emitted directly from each TypeSpec `main.tsp`.
-  The commit's ARM common-types files are copied once under
-  `swagger/specification/common-types/resource-management` so emitted `$ref`s
-  remain portable with the dataset.
-- `raw/`: untouched AutoRest stdout (`.jsonl`) and stderr for each Swagger file.
+- `projects/<spec-path>/`: one folder per ARM TypeSpec project.
+  - `typespec/`: the complete project source, excluding checked-in generated
+    Swagger and temporary/build output.
+  - `swagger/`: only the newest emitted API version by date, regardless of
+    stable or preview status, together with that version's examples.
+  - `raw/`: untouched AutoRest stdout (`.jsonl`) and stderr for that Swagger.
+- `common-types/resource-management/`: the commit's ARM common-types files, so
+  emitted `$ref`s remain portable with the dataset without duplicating common
+  types under every project.
 - `validator-results.json`: warning/error/fatal messages grouped by validator
   rule, including the source project, Swagger file, message and JSON path.
 

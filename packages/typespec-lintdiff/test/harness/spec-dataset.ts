@@ -12,13 +12,14 @@
 
 import { execFile, execFileSync } from "child_process";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import { pathToFileURL } from "url";
 import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
 const MAX_BUFFER = 64 * 1024 * 1024;
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 interface Config {
   specsRepo: string;
@@ -37,12 +38,14 @@ interface ArmProject {
 }
 
 interface EmittedSwagger {
-  datasetPath: string;
   absolutePath: string;
+  apiVersion: string;
 }
 
 interface ProjectRecord {
   sourcePath: string;
+  typespecPath: string;
+  apiVersion?: string;
   compileStatus: "success" | "failed";
   compileDurationMs: number;
   compileError?: string;
@@ -233,6 +236,11 @@ function tryReuseDataset(config: Config): boolean {
   if (!fs.existsSync(path.resolve(datasetRoot, meta.commonTypesPath))) {
     missingFiles.push(meta.commonTypesPath);
   }
+  for (const project of meta.projects) {
+    if (!fs.existsSync(path.resolve(datasetRoot, project.typespecPath))) {
+      missingFiles.push(project.typespecPath);
+    }
+  }
   if (missingFiles.length > 0) {
     throw new Error(
       `Cached dataset is incomplete; ${missingFiles.length} indexed file(s) are missing. ` +
@@ -254,7 +262,13 @@ function cleanGeneratedDataset(datasetDir: string): void {
   if (fs.existsSync(metaPath)) {
     fs.unlinkSync(metaPath);
   }
-  for (const relativePath of ["swagger", "raw"]) {
+  for (const relativePath of [
+    "projects",
+    "common-types",
+    // Schema v1 used these top-level directories.
+    "swagger",
+    "raw",
+  ]) {
     const target = path.join(datasetDir, relativePath);
     if (fs.existsSync(target)) {
       fs.rmSync(target, { recursive: true, force: true });
@@ -372,6 +386,47 @@ function buildTempConfig(project: ArmProject, outputDir: string, commonTypesDir:
   return tempConfigPath;
 }
 
+function getProjectDatasetDir(config: Config, project: ArmProject): string {
+  return path.join(config.datasetDir, "projects", project.sourcePath);
+}
+
+function copyTypeSpecProject(project: ArmProject, destination: string): void {
+  const excludedDirectories = new Set([
+    ".git",
+    "dist",
+    "node_modules",
+    "preview",
+    "stable",
+    "temp",
+    "tsp-output",
+  ]);
+
+  fs.cpSync(project.projectDir, destination, {
+    recursive: true,
+    filter: (source) => {
+      const relativePath = path.relative(project.projectDir, source);
+      if (!relativePath) {
+        return true;
+      }
+      const segments = relativePath.split(path.sep);
+      return (
+        !segments.some((segment) => excludedDirectories.has(segment)) &&
+        !path.basename(source).startsWith("tspconfig.lintdiff-dataset-")
+      );
+    },
+  });
+}
+
+export function selectLatestApiVersion(apiVersions: string[]): string | undefined {
+  return [...new Set(apiVersions)]
+    .sort((left, right) => {
+      const leftDate = left.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? "";
+      const rightDate = right.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? "";
+      return leftDate.localeCompare(rightDate) || left.localeCompare(right);
+    })
+    .at(-1);
+}
+
 function findSwaggerFiles(directory: string): EmittedSwagger[] {
   const files: EmittedSwagger[] = [];
   if (!fs.existsSync(directory)) {
@@ -386,12 +441,19 @@ function findSwaggerFiles(directory: string): EmittedSwagger[] {
           walk(absolutePath);
         }
       } else if (entry.isFile() && entry.name.endsWith(".json")) {
-        const prefix = fs.readFileSync(absolutePath, "utf8").slice(0, 300);
-        if (prefix.includes('"swagger"') || prefix.includes('"openapi"')) {
-          files.push({
-            absolutePath,
-            datasetPath: normalizeRelative(absolutePath),
-          });
+        try {
+          const document = JSON.parse(fs.readFileSync(absolutePath, "utf8"));
+          if (
+            (document.swagger || document.openapi) &&
+            typeof document.info?.version === "string"
+          ) {
+            files.push({
+              absolutePath,
+              apiVersion: document.info.version,
+            });
+          }
+        } catch {
+          // Non-OpenAPI JSON files such as examples are intentionally ignored.
         }
       }
     }
@@ -401,6 +463,52 @@ function findSwaggerFiles(directory: string): EmittedSwagger[] {
   return files;
 }
 
+function retainLatestSwagger(
+  outputDir: string,
+  swaggerFiles: EmittedSwagger[],
+): { apiVersion?: string; swaggerFiles: EmittedSwagger[] } {
+  const apiVersion = selectLatestApiVersion(swaggerFiles.map((file) => file.apiVersion));
+  if (!apiVersion) {
+    return { swaggerFiles: [] };
+  }
+
+  const selected = swaggerFiles.filter((file) => file.apiVersion === apiVersion);
+  const stagingDir = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-latest-swagger-"));
+  try {
+    const copiedRoots = new Set<string>();
+    for (const swagger of selected) {
+      const relativePath = path.relative(outputDir, swagger.absolutePath);
+      const segments = relativePath.split(path.sep);
+      const versionIndex = segments.indexOf(apiVersion);
+      const relativeRoot =
+        versionIndex === -1
+          ? path.dirname(relativePath)
+          : path.join(...segments.slice(0, versionIndex + 1));
+      if (copiedRoots.has(relativeRoot)) {
+        continue;
+      }
+      copiedRoots.add(relativeRoot);
+      const source = path.join(outputDir, relativeRoot);
+      const destination = path.join(stagingDir, relativeRoot);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.cpSync(source, destination, { recursive: true });
+    }
+
+    fs.rmSync(outputDir, { recursive: true, force: true });
+    fs.mkdirSync(outputDir, { recursive: true });
+    fs.cpSync(stagingDir, outputDir, { recursive: true });
+  } finally {
+    fs.rmSync(stagingDir, { recursive: true, force: true });
+  }
+
+  return {
+    apiVersion,
+    swaggerFiles: findSwaggerFiles(outputDir).filter(
+      (swagger) => swagger.apiVersion === apiVersion,
+    ),
+  };
+}
+
 async function compileProject(
   config: Config,
   project: ArmProject,
@@ -408,16 +516,14 @@ async function compileProject(
   status: "success" | "failed";
   durationMs: number;
   error?: string;
+  apiVersion?: string;
   swaggerFiles: EmittedSwagger[];
 }> {
-  const outputDir = path.join(config.datasetDir, "swagger", project.sourcePath);
-  const commonTypesDir = path.join(
-    config.datasetDir,
-    "swagger",
-    "specification",
-    "common-types",
-    "resource-management",
-  );
+  const projectDatasetDir = getProjectDatasetDir(config, project);
+  const typespecDir = path.join(projectDatasetDir, "typespec");
+  const outputDir = path.join(projectDatasetDir, "swagger");
+  const commonTypesDir = path.join(config.datasetDir, "common-types", "resource-management");
+  copyTypeSpecProject(project, typespecDir);
   fs.mkdirSync(outputDir, { recursive: true });
   const tempConfigPath = buildTempConfig(project, outputDir, commonTypesDir);
   const tsp = path.join(
@@ -450,18 +556,21 @@ async function compileProject(
         shell: process.platform === "win32",
       },
     );
+    const latest = retainLatestSwagger(outputDir, findSwaggerFiles(outputDir));
     return {
       status: "success",
       durationMs: Date.now() - started,
-      swaggerFiles: findSwaggerFiles(outputDir),
+      apiVersion: latest.apiVersion,
+      swaggerFiles: latest.swaggerFiles,
     };
   } catch (error: any) {
     const output = [error.stdout, error.stderr, error.message].filter(Boolean).join("\n");
+    fs.rmSync(outputDir, { recursive: true, force: true });
     return {
       status: "failed",
       durationMs: Date.now() - started,
       error: output.slice(0, 4000),
-      swaggerFiles: findSwaggerFiles(outputDir),
+      swaggerFiles: [],
     };
   } finally {
     try {
@@ -534,12 +643,16 @@ async function validateProject(
   const violations: ValidatorViolation[] = [];
   const errors: string[] = [];
   const started = Date.now();
+  const projectDatasetDir = getProjectDatasetDir(config, project);
+  const swaggerRoot = path.join(projectDatasetDir, "swagger");
+  const rawRoot = path.join(projectDatasetDir, "raw");
 
   for (const swagger of swaggerFiles) {
     const relativeSwagger = normalizeRelative(
-      path.relative(path.join(config.datasetDir, "swagger"), swagger.absolutePath),
+      path.relative(config.datasetDir, swagger.absolutePath),
     );
-    const rawBase = path.join(config.datasetDir, "raw", relativeSwagger.replace(/\.json$/i, ""));
+    const swaggerWithinProject = path.relative(swaggerRoot, swagger.absolutePath);
+    const rawBase = path.join(rawRoot, swaggerWithinProject.replace(/\.json$/i, ""));
     const stdoutPath = `${rawBase}.jsonl`;
     const stderrPath = `${rawBase}.stderr.txt`;
     fs.mkdirSync(path.dirname(stdoutPath), { recursive: true });
@@ -680,13 +793,7 @@ async function generateDataset(config: Config): Promise<void> {
       "common-types",
       "resource-management",
     );
-    const datasetCommonTypes = path.join(
-      config.datasetDir,
-      "swagger",
-      "specification",
-      "common-types",
-      "resource-management",
-    );
+    const datasetCommonTypes = path.join(config.datasetDir, "common-types", "resource-management");
     fs.mkdirSync(path.dirname(datasetCommonTypes), { recursive: true });
     fs.cpSync(sourceCommonTypes, datasetCommonTypes, { recursive: true });
 
@@ -734,6 +841,13 @@ async function generateDataset(config: Config): Promise<void> {
 
     const projectRecords: ProjectRecord[] = validated.map((result) => ({
       sourcePath: result.project.sourcePath,
+      typespecPath: normalizeRelative(
+        path.relative(
+          config.datasetDir,
+          path.join(getProjectDatasetDir(config, result.project), "typespec"),
+        ),
+      ),
+      apiVersion: result.apiVersion,
       compileStatus: result.status,
       compileDurationMs: result.durationMs,
       compileError: result.error,
@@ -759,7 +873,7 @@ async function generateDataset(config: Config): Promise<void> {
         "--openapi-type=arm --openapi-subtype=arm --use=<openapi-validator> " +
         "--input-file=<swagger>",
       readmeSuppressionsApplied: false,
-      commonTypesPath: "swagger/specification/common-types/resource-management",
+      commonTypesPath: "common-types/resource-management",
       filters: {
         serviceType: "resource-manager",
         path: config.filter,
