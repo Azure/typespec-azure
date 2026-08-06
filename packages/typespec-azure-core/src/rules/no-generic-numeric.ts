@@ -1,4 +1,4 @@
-import { Model, Scalar, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import { type Model, type Scalar, createRule, fileRef, paramMessage } from "@typespec/compiler";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([

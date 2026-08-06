@@ -1,4 +1,4 @@
-import { ExtensionKey } from "@typespec/openapi";
+import type { ExtensionKey } from "@typespec/openapi";
 
 export type Extensions = {
   [key in ExtensionKey]?: unknown;

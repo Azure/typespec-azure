@@ -1,19 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { getDoc, isVoidType } from "@typespec/compiler";
-import { HttpOperation, HttpOperationResponse } from "@typespec/http";
 import {
-  Imports,
-  OperationResponse,
-  ResponseHeaderSchema,
-  ResponseMetadata,
-  Schema,
+  getHttpOperationWithCache,
+  type SdkClient,
+} from "@azure-tools/typespec-client-generator-core";
+import { getDoc, isVoidType } from "@typespec/compiler";
+import type { HttpOperation, HttpOperationResponse } from "@typespec/http";
+import {
+  type Imports,
+  type OperationResponse,
+  type ResponseHeaderSchema,
+  type ResponseMetadata,
+  type Schema,
   SchemaContext,
 } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import {
   getBinaryType,
   getImportedModelName,

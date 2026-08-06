@@ -288,20 +288,34 @@ export function isExtensibleEnum(type: tcgc.SdkType): boolean {
 /**
  * returns the effective Go name for a tcgc item that may carry an isExactName marker.
  * when isExactName is true (set by the tsp exact() function on @clientName), the name
- * (with any provided suffix appended verbatim) is returned without built-in naming
- * canonization or first-character casing changes - exact names are honored as-authored.
- * otherwise the name (with any provided suffix appended) is canonicalized via
+ * (with any provided suffix appended verbatim) is honored as-authored apart from the
+ * first character, whose casing must still obey Go's export rules: unexported/parameter
+ * identifiers (lowerFirst, or access "internal") are lower-cased while exported ones are
+ * upper-cased. otherwise the name (with any provided suffix appended) is canonicalized via
  * naming.ensureNameCase(), with lowerFirst optionally lowercasing the first character
  * for unexported/parameter identifiers.
  */
 export function getEffectiveName(
-  src: { name: string; isExactName?: boolean },
+  src: { name: string; isExactName?: boolean; access?: tcgc.AccessFlags },
   lowerFirst?: boolean,
   suffix?: string,
 ): string {
   const name = suffix ? `${src.name}${suffix}` : src.name;
   if (src.isExactName) {
-    return name;
+    // exact names are honored as-authored, but Go's export rules still dictate
+    // the first character's casing.
+    if (lowerFirst || src.access === "internal") {
+      return naming.uncapitalize(name);
+    }
+    // NOTE: for exact names, we don't want to use naming.ensureNameCase() because it will
+    // apply additional transformations (e.g. acronym upper-casing) that would violate the
+    // "exact" contract. Go only exports identifiers that begin with an upper-case letter,
+    // so strip any leading non-letter characters (e.g. '_', digits) before upper-casing.
+    const exportable = name.replace(/^[^\p{L}]+/u, "");
+    if (exportable.length === 0) {
+      return name;
+    }
+    return exportable.charAt(0).toUpperCase() + exportable.slice(1);
   }
   return naming.ensureNameCase(name, lowerFirst);
 }

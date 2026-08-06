@@ -1,4 +1,10 @@
-import { EnumMember, Namespace, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import {
+  type EnumMember,
+  type Namespace,
+  createRule,
+  fileRef,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getVersion } from "@typespec/versioning";
 

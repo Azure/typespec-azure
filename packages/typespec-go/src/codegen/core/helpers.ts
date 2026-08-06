@@ -72,6 +72,21 @@ export function sortAscending(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+/** returns the header name using Go's canonical MIME header key casing */
+export function canonicalizeHeaderName(name: string): string {
+  if (!/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/.test(name)) {
+    return name;
+  }
+
+  let canonicalName = "";
+  let upper = true;
+  for (const char of name) {
+    canonicalName += upper ? char.toUpperCase() : char.toLowerCase();
+    upper = char === "-";
+  }
+  return canonicalName;
+}
+
 /**
  * returns the parameter's type definition with a possible '*' prefix
  *
@@ -342,13 +357,17 @@ export function formatParamValue(
         case "string":
           imports.add("strings");
           return `strings.Join(${paramName}, "${separator}")`;
-        case "time":
+        case "time": {
           imports.add("strings");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+          const elemVal = param.type.elementType.utc
+            ? `${param.name}[i].UTC()`
+            : `${param.name}[i]`;
           return emitConvertOver(
             param.name,
-            `datetime.${param.type.elementType.format}(${param.name}[i]).String()`,
+            `datetime.${param.type.elementType.format}(${elemVal}).String()`,
           );
+        }
         default:
           imports.add("fmt");
           imports.add("strings");
@@ -430,9 +449,11 @@ export function formatValue(
         default:
           throw new CodegenError("InternalError", `unhandled scalar type ${type.type}`);
       }
-    case "time":
+    case "time": {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      return `datetime.${type.format}(${star}${paramName}).String()`;
+      const timeVal = type.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
+      return `datetime.${type.format}(${timeVal}).String()`;
+    }
     default:
       return `${star}${paramName}`;
   }
@@ -683,6 +704,87 @@ export function formatCommentAsBulletItem(prefix: string, docs: go.Docs): string
   return chunks.join("\n");
 }
 
+// renders a single list item per the Go doc convention, word-wrapping the text
+// and aligning continuation lines beneath it:
+//
+//	//   - bullet item text that is wrapped
+//	//     onto aligned continuation lines
+//	//  1. numbered item text
+function formatDocListItem(item: go.DocListItem, prefix: string): string {
+  const firstLead = item.kind === "bullet" ? `${prefix}   - ` : `${prefix}  ${item.marker} `;
+  const contLead = prefix + " ".repeat(firstLead.length - prefix.length);
+  // comment() emits `${prefix} word...` lines; swap that lead for the list lead
+  // so wrapping and its width stay consistent with the rest of the comments.
+  const wrapped = comment(item.text, prefix, undefined, commentLength).split("\n");
+  return wrapped
+    .map((chunk, i) => `${i === 0 ? firstLead : contLead}${chunk.slice(prefix.length + 1)}`)
+    .join("\n");
+}
+
+// reports whether text has a non-blank line that isn't a list item, i.e. a line
+// go/doc/comment will see with zero indentation.
+function hasProseLine(text: string): boolean {
+  return text
+    .split("\n")
+    .some((line) => line.trim() !== "" && go.matchDocListItem(line) === undefined);
+}
+
+// renders doc text as Go doc comment lines, formatting bullet/numbered lists per
+// the Go doc convention. Blank source lines aren't preserved (matching comment());
+// blank comment lines are added only where Go needs them to delimit a list. Nested
+// lists aren't supported: Go has no concept of them and gofmt flattens sub-items.
+//
+// go/doc/comment strips the common leading whitespace of every non-blank line
+// before looking for lists, so a comment of nothing but list items loses its
+// indentation and degrades into a paragraph that gofmt then rewrites. One prose
+// line anywhere keeps the list intact, wherever the list sits. Lists are therefore
+// only rendered when prose exists -- in text, or already emitted by the caller
+// (hasPrecedingProse, e.g. a summary or a "Name -" lead-in). Otherwise the text
+// falls back to plain wrapped prose, which is what gofmt produces.
+function renderDocBody(text: string, prefix = "//", hasPrecedingProse = false): string {
+  const out = new Array<string>();
+  // whether a list is being accumulated; a blank source line ends it, yielding a
+  // "loose" list. afterList outlives blank lines, since prose following a list
+  // always needs a blank comment line to end that list.
+  let inList = false;
+  let afterList = false;
+  const renderLists = hasPrecedingProse || hasProseLine(text);
+  const lastIsBlank = () => out.length === 0 || out[out.length - 1] === prefix;
+
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/\s+$/, "");
+    if (line.trim() === "") {
+      inList = false;
+      continue;
+    }
+
+    const item = renderLists ? go.matchDocListItem(line) : undefined;
+    if (item) {
+      // a list must be separated from preceding prose to be recognized.
+      if (!inList && !lastIsBlank()) {
+        out.push(prefix);
+      }
+      out.push(formatDocListItem(item, prefix));
+      inList = true;
+      afterList = true;
+      continue;
+    }
+
+    if (afterList && !lastIsBlank()) {
+      out.push(prefix);
+    }
+    inList = false;
+    afterList = false;
+    out.push(comment(line.trim(), prefix, undefined, commentLength));
+  }
+
+  // drop any trailing blank comment lines.
+  while (out.length > 0 && out[out.length - 1] === prefix) {
+    out.pop();
+  }
+  return out.join("\n");
+}
+
 // conditionally returns a doc comment on an entity that requires a prefix.
 // e.g.:
 // {Prefix} - {docs.summary}
@@ -703,10 +805,10 @@ export function formatDocCommentWithPrefix(prefix: string, docs: go.Docs): strin
     if (docs.summary) {
       docComment += "//\n";
     } else {
-      // only apply the prefix to the description if there was no summary
-      description = `${prefix} - ${description}`;
+      // only apply the prefix to the description if there was no summary.
+      description = go.prefixDocWithName(prefix, description);
     }
-    docComment += `${comment(`${description}`, "//", undefined, commentLength)}\n`;
+    docComment += `${renderDocBody(description, "//", true)}\n`;
   }
 
   return docComment;
@@ -730,7 +832,7 @@ export function formatDocComment(docs: go.Docs): string {
     if (docs.summary) {
       docComment += "//\n";
     }
-    docComment += `${comment(docs.description, "//", undefined, commentLength)}\n`;
+    docComment += `${renderDocBody(docs.description, "//", !!docs.summary)}\n`;
   }
 
   return docComment;

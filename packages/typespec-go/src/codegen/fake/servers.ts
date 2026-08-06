@@ -562,7 +562,7 @@ function generateServerTransportMethods(
             content += `${indent.pop().get()}}\n`;
           } else {
             content += `${indent.get()}if val := server.GetResponse(respr).${header.fieldName}; val != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set("${header.headerName}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
+            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
             content += `${indent.pop().get()}}\n`;
           }
         }
@@ -1277,7 +1277,8 @@ function parseHeaderPathQueryParams(
             imports.add("strconv");
             content += `${indent.get()}p, parseErr := strconv.ParseInt(${paramValue}[i], 10, 64)\n`;
             content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return nil, parseErr\n${indent.pop().get()}}\n`;
-            content += `${indent.get()}${fromVar} := time.Unix(p, 0).UTC()\n`;
+            // Unix times are absolute epoch seconds; no .UTC() needed (time.Unix's Local zone is irrelevant).
+            content += `${indent.get()}${fromVar} := time.Unix(p, 0)\n`;
           } else {
             let format = "time.RFC3339Nano";
             if (elementFormat === "RFC1123" || elementFormat === "RFC7231") {
@@ -1342,7 +1343,8 @@ function parseHeaderPathQueryParams(
         content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func (v string) (time.Time, error) {\n`;
         content += `${indent.push().get()}p, parseErr := strconv.ParseInt(v, 10, 64)\n`;
         content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return time.Time{}, parseErr\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}return time.Unix(p, 0).UTC(), nil\n${indent.pop().get()}})\n`;
+        // Unix times are absolute epoch seconds; no .UTC() needed (time.Unix's Local zone is irrelevant).
+        content += `${indent.get()}return time.Unix(p, 0), nil\n${indent.pop().get()}})\n`;
         content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       }
     } else if (

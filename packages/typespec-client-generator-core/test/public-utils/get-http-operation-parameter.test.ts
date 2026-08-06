@@ -1,6 +1,10 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
+import type {
+  SdkHttpOperation,
+  SdkMethodParameter,
+  SdkServiceMethod,
+} from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
 import {
   createClientCustomizationInput,

@@ -3,7 +3,7 @@
 # Spec selection for @azure-tools/typespec-java (opt-in), for the shared
 # http-specs / azure-http-specs specs. See Azure/typespec-azure#4997.
 # Options are @azure-tools/typespec-java emitter options (without the prefix).
-# Local ./tsp/*.tsp fixtures are handled separately in Generate.ps1.
+# Local ./tsp/*.tsp fixtures are handled separately in eng/scripts/generate.ts.
 
 specs:
   authentication/api-key: true
@@ -85,6 +85,7 @@ specs:
   payload/json-merge-patch: true
   payload/media-type: true
   payload/multipart: true
+  payload/pageable: true
   payload/xml: true
   resiliency/srv-driven/main.tsp: { options: { advanced-versioning: true } }
   resiliency/srv-driven/old.tsp: { options: { namespace: resiliency.servicedriven.v1, advanced-versioning: true } }
@@ -129,6 +130,3 @@ specs:
   versioning/renamedFrom: true
   versioning/returnTypeChangedFrom: true
   versioning/typeChangedFrom: true
-
-  # Disabled: nested pageItems/nextLink/continuationToken not supported
-  payload/pageable: false

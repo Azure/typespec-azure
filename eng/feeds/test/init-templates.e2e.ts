@@ -1,6 +1,6 @@
 import { NodeHost, resolvePath } from "@typespec/compiler";
 import { ok } from "assert";
-import { SpawnOptions, spawn } from "child_process";
+import { type SpawnOptions, spawn } from "child_process";
 import { mkdir, readFile, rm } from "fs/promises";
 import { resolve } from "path/posix";
 import { beforeAll, describe, it } from "vitest";

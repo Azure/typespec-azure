@@ -1,10 +1,10 @@
 import {
-  EmitTypeOptions,
+  type EmitTypeOptions,
   getTypeExpression,
   normalizeModelPropertyName,
 } from "./get-type-expression.js";
 
-import {
+import type {
   SdkModelPropertyType,
   SdkModelType,
   SdkServiceResponseHeader,
@@ -12,7 +12,7 @@ import {
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { MultipartHelpers } from "../static-helpers-metadata.js";
 import { shouldEmitInline } from "./utils.js";
 

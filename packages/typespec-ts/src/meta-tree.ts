@@ -1,5 +1,5 @@
-import { Type } from "@typespec/compiler";
-import { Schema } from "./interfaces.js";
+import type { Type } from "@typespec/compiler";
+import type { Schema } from "./interfaces.js";
 
 export interface ClientTypeMetadata {
   clientType: Schema;

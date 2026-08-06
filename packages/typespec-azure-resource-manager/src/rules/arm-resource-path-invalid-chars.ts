@@ -1,4 +1,10 @@
-import { Model, ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type ModelProperty,
+  createRule,
+  fileRef,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getSegment } from "@typespec/rest";
 import { getDecoratorParam, isInternalTypeSpec, isResource, isValidKey } from "./utils.js";
