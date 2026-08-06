@@ -305,7 +305,7 @@ Do the following to publish a new release:
    main branch (both typespec-azure and core should point to main).
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-   1. In your fork of the core (typespec) repo, run `pnpm exec chronus changelog --policy typespec > out.md`.
+   1. In your fork of the core (typespec) repo, run `pnpm exec chronus ai-release-notes --policy typespec-stable --policy typespec-preview > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
