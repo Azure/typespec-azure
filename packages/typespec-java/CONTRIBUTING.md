@@ -20,17 +20,17 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
 the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
-at build time by `Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
-built by `Build-Generator.ps1` from a patched copy of `core/packages/http-client-java/generator`
+at build time by `eng/scripts/copy-sources.ts` (excluding `options.ts`). The Java `emitter.jar` is
+built by `eng/scripts/build-generator.ts` from a patched copy of `core/packages/http-client-java/generator`
 (see below) and staged into `generator/http-client-generator/target/`.
 
 ### Azure customization patch
 
-`Copy-Sources.ps1` copies the Java generator sources out of the `core/` submodule into this
+`eng/scripts/copy-sources.ts` copies the Java generator sources out of the `core/` submodule into this
 package's `./generator` folder and applies `core.patch` to that **copy** — never to `core/` itself.
 The patch swaps the unbranded customization engine in `http-client-generator-core` for Azure's
 `com.azure.tools:azure-autorest-customization` (resolved from Maven Central), so the
-`customization-class` emitter option runs against the Azure customization base. `Build-Generator.ps1`
+`customization-class` emitter option runs against the Azure customization base. `eng/scripts/build-generator.ts`
 then builds `emitter.jar` from the patched `./generator`. Because the patch is only ever applied to
 the copy, the `core/` submodule working tree stays clean. When the `core/` submodule is bumped,
 refresh `core.patch` if its context no longer applies.
@@ -48,7 +48,7 @@ pnpm run-all --filter "@azure-tools/typespec-java..." build
 
 ### Pinning the core commit (`core-commit.json`)
 
-`Copy-Sources.ps1` reads the emitter/generator sources from the `core/` submodule's current checkout.
+`eng/scripts/copy-sources.ts` reads the emitter/generator sources from the `core/` submodule's current checkout.
 The optional `core-commit.json` pins a specific upstream `core` commit to read from instead:
 
 ```json
@@ -68,7 +68,7 @@ If `pnpm turbo ...` fails with `'turbo' is not recognized as an internal or exte
 after `pnpm install`, the local install tree is missing Turbo's binary shim. From the repo root,
 force pnpm to refresh the local install state and rerun the command:
 
-```powershell
+```bash
 pnpm install --force
 pnpm run-all --filter "@azure-tools/typespec-java..." build
 ```
@@ -95,7 +95,7 @@ Attach a debugger to port 9229 and set breakpoints in `src/emitter.ts`,
 TypeScript passes the code model and emitter options to Java through the generated
 `emitter-tests/tsp-output/code-model.yaml` file. To debug the Java generator directly:
 
-1. Build the package so `Copy-Sources.ps1` creates the patched generator copy under `generator/`.
+1. Build the package so `eng/scripts/copy-sources.ts` creates the patched generator copy under `generator/`.
 2. Update `DEFAULT_OUTPUT_DIR` in
    `generator/http-client-generator/src/main/java/com/microsoft/typespec/http/client/generator/Main.java`
    to the directory containing the `code-model.yaml` to debug.
@@ -134,7 +134,7 @@ Pulls the fix in from core; **no version bump**. Example:
    `sha` in [`core-commit.json`](./core-commit.json) to the target microsoft/typespec commit
    (e.g. the HEAD of core `main`). Build and sync scripts transiently check this commit out without
    moving the submodule pointer.
-2. **Sync tests from core.** Run `pwsh ./SyncTests.ps1` in [`emitter-tests`](./emitter-tests): it
+2. **Sync tests from core.** Run `pnpm sync-tests`: it
    copies the tests/specs from the pinned core commit and aligns `emitter-tests/package.json`.
 3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
 
@@ -150,7 +150,7 @@ Bumps the version and publishes, after Part A merges. Example:
 `hotfix-release` skill (creates the `publish/hotfix/<name>-<sprint>` branch off `release/<sprint>`
 and runs `pnpm chronus version --ignore-policies`, consuming the changeset from Part A). The `core`
 submodule stays unchanged. The bump must also be reflected in `emitter-tests/package.json` (its
-`version` and the `*.tgz` dependency) — rerun `pwsh ./SyncTests.ps1` or update it manually.
+`version` and the `*.tgz` dependency) — rerun `pnpm sync-tests` or update it manually.
 
 Open the PR against `release/<sprint>`. After it merges:
 
