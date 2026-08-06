@@ -1,4 +1,9 @@
-import type { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  FunctionContext,
+  ModelProperty,
+  Operation,
+  Type,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { EXACT_NAME_PREFIX } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -14,7 +19,9 @@ function cloneOperation(
 ): Operation {
   const newOp = tk.operation.create({
     name: operation.name,
-    parameters: options.parameters ?? [...operation.parameters.properties.values()],
+    parameters: options.parameters ?? [
+      ...operation.parameters.properties.values(),
+    ],
     returnType: options.returnType ?? operation.returnType,
   });
 
@@ -32,7 +39,10 @@ function cloneOperation(
 }
 
 // Helper function to clone a model property
-function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): ModelProperty {
+function cloneModelProperty(
+  tk: ReturnType<typeof $>,
+  prop: ModelProperty,
+): ModelProperty {
   const clonedProp = tk.modelProperty.create({
     name: prop.name,
     type: prop.type,
@@ -241,6 +251,27 @@ export function reorderParameters(
 }
 
 /**
+ * Replace the method response type of an operation.
+ *
+ * The operation's HTTP response metadata is preserved; only the client method
+ * return type is changed when the operation is used with `@override`.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @param response The replacement method response type
+ * @returns A new operation with the response type replaced
+ */
+export function replaceResponse(
+  context: FunctionContext,
+  operation: Operation,
+  response: Type,
+): Operation {
+  return cloneOperation($(context.program), operation, {
+    returnType: response,
+  });
+}
+
+/**
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations.
  *
@@ -269,7 +300,10 @@ export function hasExactNameMarker(name: string): boolean {
  * @param name The name to normalize
  * @returns An object with the clean name and whether it was marked as exact
  */
-export function normalizeExactName(name: string): { name: string; isExactName: boolean } {
+export function normalizeExactName(name: string): {
+  name: string;
+  isExactName: boolean;
+} {
   if (name.startsWith(EXACT_NAME_PREFIX)) {
     return { name: name.slice(EXACT_NAME_PREFIX.length), isExactName: true };
   }

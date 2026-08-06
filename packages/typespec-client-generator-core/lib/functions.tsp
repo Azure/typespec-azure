@@ -131,6 +131,27 @@ extern fn reorderParameters(
 ): Reflection.Operation;
 
 /**
+ * Replace the method response type of an operation.
+ * This preserves the HTTP response metadata and only changes the return type
+ * of the generated client method when used with `@@override`.
+ *
+ * @param operation The operation to transform.
+ * @param response The replacement method response type.
+ * @returns A new operation with the response type replaced.
+ *
+ * @example Replace a response with void
+ * ```typespec
+ * alias DeleteResponse = replaceResponse(MyService.delete, void);
+ * @@override(MyService.delete, DeleteResponse);
+ * ```
+ */
+#suppress "experimental-feature" "replaceResponse uses extern fn which is experimental but provides essential response transformation functionality"
+extern fn replaceResponse(
+  operation: Reflection.Operation,
+  response: unknown
+): Reflection.Operation;
+
+/**
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *

@@ -38,6 +38,7 @@ import {
   exact,
   removeParameter,
   reorderParameters,
+  replaceResponse,
   replaceParameter,
 } from "./functions.js";
 
@@ -87,10 +88,16 @@ export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
   // Note: The generated AzureClientGeneratorCoreFunctions type simplifies function signatures.
   // The actual implementation has the full parameter signature required by TypeSpec.
   "Azure.ClientGenerator.Core": {
-    replaceParameter: replaceParameter as AzureClientGeneratorCoreFunctions["replaceParameter"],
-    removeParameter: removeParameter as AzureClientGeneratorCoreFunctions["removeParameter"],
-    addParameter: addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
-    reorderParameters: reorderParameters as AzureClientGeneratorCoreFunctions["reorderParameters"],
+    replaceParameter:
+      replaceParameter as AzureClientGeneratorCoreFunctions["replaceParameter"],
+    removeParameter:
+      removeParameter as AzureClientGeneratorCoreFunctions["removeParameter"],
+    addParameter:
+      addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
+    reorderParameters:
+      reorderParameters as AzureClientGeneratorCoreFunctions["reorderParameters"],
+    replaceResponse:
+      replaceResponse as AzureClientGeneratorCoreFunctions["replaceResponse"],
     exact: exact as AzureClientGeneratorCoreFunctions["exact"],
   },
 };
