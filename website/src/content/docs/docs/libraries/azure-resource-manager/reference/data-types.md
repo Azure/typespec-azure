@@ -631,7 +631,7 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `BillingDataProperty` {#Azure.ResourceManager.BillingDataProperty}
 
-Standard resource billing data model to represent the resource's current billing state.
+Standard resource billing data property to represent the resource's current billing state.
 Spread this model directly into your resource property model when modeling e.g. prepaid resources.
 
 ```typespec
