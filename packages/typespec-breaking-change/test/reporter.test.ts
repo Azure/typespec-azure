@@ -4,7 +4,7 @@ import {
   formatGithubReport,
   formatJsonReport,
 } from "../src/index.js";
-import { renderMarkdownSummary } from "../src/reporter-markdown.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
 import { describe, expect, it } from "vitest";
 
 function createLocation(path: string, line: number) {

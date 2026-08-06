@@ -39,7 +39,7 @@ npm link @azure-tools/typespec-breaking-change
 **Alternative (recommended for demo)**: Run directly from the typespec-azure worktree:
 ```bash
 cd /path/to/typespec-azure/packages/typespec-breaking-change
-node dist/src/cli.js /path/to/azure-rest-api-specs/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet/main.tsp
+node dist/src/cli/cli.js /path/to/azure-rest-api-specs/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet/main.tsp
 ```
 
 ### Step 2: Baseline run (no changes — shows tool works)
@@ -169,7 +169,7 @@ typespec-breaking-change \
 If the fork isn't ready, all demos can run from the local environment:
 ```bash
 cd typespec-azure/packages/typespec-breaking-change
-node dist/src/cli.js C:/Users/markcowl/session2/azure-rest-api-specs/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet/main.tsp --json-output demo.json --markdown-output demo.md
+node dist/src/cli/cli.js C:/Users/markcowl/session2/azure-rest-api-specs/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet/main.tsp --json-output demo.json --markdown-output demo.md
 ```
 
 This already works today and produces the same output.

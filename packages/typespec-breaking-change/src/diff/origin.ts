@@ -10,7 +10,7 @@ import {
   type Union,
   type UnionVariant,
 } from "@typespec/compiler";
-import type { OriginDeclaration } from "./types.js";
+import type { OriginDeclaration } from "../types.js";
 
 /**
  * Resolve the origin declaration for a type encountered during diffing.

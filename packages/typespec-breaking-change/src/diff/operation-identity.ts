@@ -1,6 +1,6 @@
 import type { Namespace, Operation, Program } from "@typespec/compiler";
 import { listHttpOperationsIn, type HttpOperation } from "@typespec/http";
-import type { OperationIdentity } from "./types.js";
+import type { OperationIdentity } from "../types.js";
 
 /**
  * All resolved HTTP operations in a versioned namespace,

@@ -1,8 +1,8 @@
 import type { SourceLocation } from "@typespec/compiler";
-import type { AnalysisResult, Finding } from "./types.js";
-import { isOperationIdentity } from "./types.js";
-import { formatSuppressionHint } from "./suppression-guidance.js";
-import { resolveFindingLocation } from "./resolve-location.js";
+import type { AnalysisResult, Finding } from "../types.js";
+import { isOperationIdentity } from "../types.js";
+import { formatSuppressionHint } from "../suppression/suppression-guidance.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 const SUMMARY_SEPARATOR = "─────────────────────────────";
 
@@ -50,6 +50,7 @@ function shouldIncludeFinding(finding: Finding, options: ConsoleReporterOptions)
 }
 
 function formatFinding(finding: Finding): string {
+  const resolvedLocation = resolveFindingLocation(finding);
   const lines = [`${getSeverityLabel(finding)}  ${finding.diff.kind}`, `  ${finding.diff.message}`];
 
   if (isOperationIdentity(finding.diff.identity)) {
@@ -60,7 +61,7 @@ function formatFinding(finding: Finding): string {
 
   lines.push(`  Element: ${finding.diff.identity.element}`);
   lines.push(`  Phase: ${formatVersionPair(finding)}`);
-  lines.push(`  Location: ${formatLocation(resolveFindingLocation(finding))}`);
+  lines.push(`  Location: ${formatLocation(resolvedLocation?.location)}`);
 
   if (finding.suppressed && finding.suppressionReason) {
     lines.push(`  Reason: ${finding.suppressionReason}`);

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { parseArgs, formatResult, main, type CliOptions } from "../src/cli.js";
-import * as compileModule from "../src/compile.js";
-import * as orchestratorModule from "../src/orchestrator.js";
+import { parseArgs, formatResult, main, type CliOptions } from "../src/cli/cli.js";
+import * as compileModule from "../src/cli/compile.js";
+import * as orchestratorModule from "../src/pipeline/orchestrator.js";
 import type { AnalysisResult, Finding } from "../src/types.js";
 
 function createSummary(overrides: Partial<AnalysisResult["summary"]> = {}): AnalysisResult["summary"] {

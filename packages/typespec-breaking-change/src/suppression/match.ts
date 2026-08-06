@@ -1,5 +1,5 @@
-import type { OperationIdentity } from "./types.js";
-import type { ResolvedOperation, OperationIdentityMap } from "./operation-identity.js";
+import type { OperationIdentity } from "../types.js";
+import type { ResolvedOperation, OperationIdentityMap } from "../diff/operation-identity.js";
 
 /**
  * Result of matching base operations to head operations.

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { computeDiffs } from "../src/diff-engine.js";
-import { resolveOrigin } from "../src/origin.js";
-import { applySuppressions } from "../src/suppression.js";
-import { classifyDiffs } from "../src/policy.js";
+import { computeDiffs } from "../src/diff/diff-engine.js";
+import { resolveOrigin } from "../src/diff/origin.js";
+import { applySuppressions } from "../src/suppression/suppression.js";
+import { classifyDiffs } from "../src/pipeline/policy.js";
 import type { VersionedView } from "../src/types.js";
-import { createVersionedView, enumerateVersions } from "../src/versions.js";
+import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
 import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 // ────────────────────────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@ export interface CompileOptions {
 /** Resolve the path to this package's lib/main.tsp for auto-injection. */
 function getLibraryPath(): string {
   const thisFile = fileURLToPath(import.meta.url);
-  return resolve(dirname(thisFile), "..", "lib", "main.tsp");
+  return resolve(dirname(thisFile), "..", "..", "lib", "main.tsp");
 }
 
 /**

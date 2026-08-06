@@ -1,35 +1,46 @@
-import { getSourceLocation, type Model, type ModelProperty, type Namespace, type Program, type SourceLocation, type Type } from "@typespec/compiler";
-import type { Finding } from "./types.js";
+import {
+  getSourceLocation,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Program,
+  type SourceLocation,
+  type Type,
+} from "@typespec/compiler";
+import type { Finding, ResolvedLocation, SourceTraceLevel } from "../types.js";
 
 /**
  * Resolve the source location for a finding, using a cascading fallback chain
  * that guarantees a location is always returned when possible.
  *
  * Fallback chain (in priority order):
- * 1. Origin source location (most specific — points to named type/property declaration)
- * 2. Direct source location on the diff (headSourceLocation or baseSourceLocation)
- * 3. Parent model source location (when property type is Intrinsic or has no location)
- * 4. Operation declaration source location (always available for operation-relative diffs)
+ * 1. Direct source location on the diff (headSourceLocation)
+ * 2. Origin source location (named type/property declaration)
+ * 3. Base source location
+ * 4. Parent model/type fallback
+ * 5. Operation declaration source location
+ * 6. Service namespace source location + element path
  *
- * This function should never return undefined for operation-relative diffs.
+ * This function should never return undefined for operation-relative diffs
+ * when either the operation or service namespace source can be resolved.
  */
-export function resolveFindingLocation(finding: Finding): SourceLocation | undefined {
+export function resolveFindingLocation(finding: Finding): ResolvedLocation | undefined {
   const diff = finding.diff;
 
   // 1. Head source location (highest priority — set by resolveHeadSourceLocations
   // for cross-compilation findings, or by the diff engine for same-program findings)
   if (diff.headSourceLocation && isValidSourceLocation(diff.headSourceLocation)) {
-    return diff.headSourceLocation;
+    return resolvedLocation(diff.headSourceLocation, "direct");
   }
 
   // 2. Origin source location (property/type declaration in user code)
   if (diff.origin?.sourceLocation && isValidSourceLocation(diff.origin.sourceLocation)) {
-    return diff.origin.sourceLocation;
+    return resolvedLocation(diff.origin.sourceLocation, "origin");
   }
 
   // 3. Base source location fallback
   if (diff.baseSourceLocation && isValidSourceLocation(diff.baseSourceLocation)) {
-    return diff.baseSourceLocation;
+    return resolvedLocation(diff.baseSourceLocation, "base");
   }
 
   // 3. Parent model fallback — when type exists but has no useful location
@@ -37,16 +48,33 @@ export function resolveFindingLocation(finding: Finding): SourceLocation | undef
   if (type) {
     const modelLoc = resolveTypeLocationWithModelFallback(type);
     if (modelLoc && isValidSourceLocation(modelLoc)) {
-      return modelLoc;
+      return resolvedLocation(modelLoc, "parentModel");
     }
   }
 
-  // 4. Operation declaration source location (final fallback)
+  // 5. Operation declaration source location fallback
   if (diff.operationSourceLocation && isValidSourceLocation(diff.operationSourceLocation)) {
-    return diff.operationSourceLocation;
+    return resolvedLocation(diff.operationSourceLocation, "operation");
+  }
+
+  // 6. Service namespace fallback — include element path for disambiguation
+  const namespaceLoc = resolveNamespaceLocation(finding);
+  if (namespaceLoc && isValidSourceLocation(namespaceLoc)) {
+    return {
+      location: namespaceLoc,
+      sourceTraceLevel: "namespace",
+      elementPath: diff.identity.element,
+    };
   }
 
   return undefined;
+}
+
+function resolvedLocation(
+  location: SourceLocation,
+  sourceTraceLevel: SourceTraceLevel,
+): ResolvedLocation {
+  return { location, sourceTraceLevel };
 }
 
 /**
@@ -125,6 +153,14 @@ function safeGetSourceLocation(type: Type): SourceLocation | undefined {
   } catch {
     return undefined;
   }
+}
+
+function resolveNamespaceLocation(finding: Finding): SourceLocation | undefined {
+  if (!finding.serviceNamespace) {
+    return undefined;
+  }
+
+  return safeGetSourceLocation(finding.serviceNamespace);
 }
 
 /**

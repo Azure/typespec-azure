@@ -3,16 +3,16 @@ import {
   type CanonicalizationResult,
 } from "./canonicalize.js";
 import { diffOperations } from "./diff-operations.js";
-import type { DiffKind } from "./diff-kind.js";
+import type { DiffKind } from "../diff-kind.js";
 import type {
   ApiDiff,
   OperationDiffIdentity,
   OperationIdentity,
   VersionedView,
-} from "./types.js";
+} from "../types.js";
 
 import { getSourceLocation, type SourceLocation } from "@typespec/compiler";
-import { isOperationIdentity } from "./types.js";
+import { isOperationIdentity } from "../types.js";
 
 /**
  * Result of computing diffs between two versioned views.

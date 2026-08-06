@@ -581,7 +581,7 @@ Options:
 
 ### Exit codes
 
-Actual CLI behavior in `src/cli.ts` is:
+Actual CLI behavior in `src/cli/cli.ts` is:
 
 | Exit code | Meaning |
 |---|---|
@@ -650,7 +650,7 @@ If no source location can be resolved, the CLI omits `file=` and `line=`.
 
 ### Azure DevOps
 
-There is currently **no Azure DevOps-specific annotation emitter** in `src/cli.ts`. The implemented annotation integration is GitHub Actions workflow commands only.
+There is currently **no Azure DevOps-specific annotation emitter** in `src/cli/cli.ts`. The implemented annotation integration is GitHub Actions workflow commands only.
 
 ## 6. Programmatic API
 
@@ -741,4 +741,4 @@ const markdownText = renderMarkdownSummary(result, {
 
 ### CLI helper API
 
-If you want CLI-equivalent formatting selection in-process, `formatResult(result, cliOptions)` from `src/cli.ts` dispatches between console, JSON, and GitHub reporter output. File writing and exit code handling are implemented by `main()`, not by the reporter functions.
+If you want CLI-equivalent formatting selection in-process, `formatResult(result, cliOptions)` from `src/cli/cli.ts` dispatches between console, JSON, and GitHub reporter output. File writing and exit code handling are implemented by `main()`, not by the reporter functions.

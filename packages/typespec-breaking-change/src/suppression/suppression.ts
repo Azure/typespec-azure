@@ -5,8 +5,8 @@ import {
   scanAllUnversionedSuppressions,
   type ResolvedSuppression,
 } from "./decorators.js";
-import { isOperationIdentity } from "./types.js";
-import type { Finding, OperationDiffIdentity } from "./types.js";
+import { isOperationIdentity } from "../types.js";
+import type { Finding, OperationDiffIdentity } from "../types.js";
 
 /**
  * Scan the head program's unversioned suppression state map for Phase A

@@ -1,7 +1,7 @@
 import type { Diagnostic, DiagnosticTarget, Program } from "@typespec/compiler";
 import { createApproveBreakingChangeCodeFix } from "./codefixes.js";
-import { $lib } from "./lib.js";
-import type { AnalysisResult, Finding } from "./types.js";
+import { $lib } from "../lib.js";
+import type { AnalysisResult, Finding } from "../types.js";
 
 /**
  * Emit breaking change findings as TypeSpec diagnostics on the program.

@@ -1,6 +1,6 @@
 import type { DecoratorContext, Program, Type } from "@typespec/compiler";
-import type { DiffKind } from "./diff-kind.js";
-import { BreakingChangeStateKeys, reportDiagnostic } from "./lib.js";
+import type { DiffKind } from "../diff-kind.js";
+import { BreakingChangeStateKeys, reportDiagnostic } from "../lib.js";
 
 const validDiffKinds = new Set<DiffKind>([
   "ApiVersionRemoved",

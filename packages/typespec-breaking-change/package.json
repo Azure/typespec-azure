@@ -20,7 +20,7 @@
     "azure"
   ],
   "bin": {
-    "typespec-breaking-change": "./dist/src/cli.js"
+    "typespec-breaking-change": "./dist/src/cli/cli.js"
   },
   "exports": {
     ".": {

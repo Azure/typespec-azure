@@ -7,18 +7,18 @@ describe("CLI main module", () => {
   });
 
   it("returns exit code 2 when analysis fails", { timeout: 30000 }, async () => {
-    vi.doMock("../src/compile.js", () => ({
+    vi.doMock("../src/cli/compile.js", () => ({
       compileService: vi.fn(async () => {
         throw new Error("boom");
       }),
     }));
-    vi.doMock("../src/orchestrator.js", () => ({
+    vi.doMock("../src/pipeline/orchestrator.js", () => ({
       analyzeBaseAndHead: vi.fn(),
       analyzeProgram: vi.fn(),
     }));
 
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const { main } = await import("../src/cli.js");
+    const { main } = await import("../src/cli/cli.js");
 
     const code = await main(["head.tsp"]);
 
@@ -27,18 +27,18 @@ describe("CLI main module", () => {
   });
 
   it("formats non-Error failures in the catch path", async () => {
-    vi.doMock("../src/compile.js", () => ({
+    vi.doMock("../src/cli/compile.js", () => ({
       compileService: vi.fn(async () => {
         throw "boom";
       }),
     }));
-    vi.doMock("../src/orchestrator.js", () => ({
+    vi.doMock("../src/pipeline/orchestrator.js", () => ({
       analyzeBaseAndHead: vi.fn(),
       analyzeProgram: vi.fn(),
     }));
 
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const { main } = await import("../src/cli.js");
+    const { main } = await import("../src/cli/cli.js");
 
     const code = await main(["head.tsp"]);
 
@@ -47,10 +47,10 @@ describe("CLI main module", () => {
   });
 
   it("runs main when the module is invoked directly", async () => {
-    vi.doMock("../src/compile.js", () => ({
+    vi.doMock("../src/cli/compile.js", () => ({
       compileService: vi.fn(async (path: string) => ({ path })),
     }));
-    vi.doMock("../src/orchestrator.js", () => ({
+    vi.doMock("../src/pipeline/orchestrator.js", () => ({
       analyzeBaseAndHead: vi.fn(),
       analyzeProgram: vi.fn(() => ({
         findings: [],
@@ -82,7 +82,7 @@ describe("CLI main module", () => {
       const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as typeof process.exit);
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-      await import("../src/cli.js");
+      await import("../src/cli/cli.js");
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(exitSpy).toHaveBeenCalledWith(0);

@@ -6,7 +6,7 @@ import {
 } from "@typespec/http-canonicalization";
 import { listHttpOperationsIn, type HttpOperation } from "@typespec/http";
 import { getOperationIdentity, identityKey } from "./operation-identity.js";
-import type { OperationIdentity } from "./types.js";
+import type { OperationIdentity } from "../types.js";
 
 /**
  * A canonicalized operation with its wire identity.

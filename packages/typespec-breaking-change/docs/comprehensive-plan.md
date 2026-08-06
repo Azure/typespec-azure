@@ -59,7 +59,7 @@ These are answered by design documents, prototype evidence, or both. Items marke
 ### A8. Suppression Mechanism: Decorators ✅
 
 **Answer:** The design resolves this as custom decorators (`@approvedBreakingChange`, `@approvedUnversionedChange`). The entire suppression system (design overview §6, 500+ lines) is built on the decorator model with direct/parent placement, `path:` targeting, `since:` version scoping, stale approval detection, and new/existing suppression comparison.
-**Evidence:** Design overview §6.1-6.6, implemented in `src/decorators.ts`, `src/suppression.ts`, `lib/decorators.tsp`.
+**Evidence:** Design overview §6.1-6.6, implemented in `src/suppression/decorators.ts`, `src/suppression/suppression.ts`, `lib/decorators.tsp`.
 **Residual open question:** Which package hosts the decorators? See B1.
 
 ### A9. New vs Existing Suppression Classification ✅ (NOT YET IMPLEMENTED)

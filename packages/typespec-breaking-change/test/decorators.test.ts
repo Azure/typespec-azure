@@ -15,7 +15,7 @@ import {
   findUnversionedSuppressions,
   getSuppressions,
   getUnversionedSuppressions,
-} from "../src/decorators.js";
+} from "../src/suppression/decorators.js";
 import { Tester } from "./test-host.js";
 
 describe("suppression decorators", () => {

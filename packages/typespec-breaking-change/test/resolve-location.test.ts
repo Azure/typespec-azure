@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { computeDiffs } from "../src/diff-engine.js";
-import { analyzeBaseAndHead, analyzeProgram } from "../src/orchestrator.js";
-import { resolveFindingLocation } from "../src/resolve-location.js";
+import { computeDiffs } from "../src/diff/diff-engine.js";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
+import { resolveFindingLocation as resolveResolvedFindingLocation } from "../src/pipeline/resolve-location.js";
 import type { Finding, VersionedView } from "../src/types.js";
-import { createVersionedView, enumerateVersions } from "../src/versions.js";
+import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
 import { Tester } from "./test-host.js";
+
+const resolveFindingLocation = (finding: Finding) =>
+  resolveResolvedFindingLocation(finding)?.location;
 
 describe("resolveFindingLocation", () => {
   describe("fallback chain guarantees", () => {
@@ -275,6 +278,182 @@ describe("resolveFindingLocation", () => {
       );
       const location = resolveFindingLocation(finding);
       expect(location).toBeUndefined();
+    });
+
+    it("reports direct sourceTraceLevel when headSourceLocation exists", () => {
+      const fakeLoc = { file: { path: "/user/direct.tsp", text: "model Foo {}\n" }, pos: 0, end: 5 };
+      const finding = makeFinding(
+        {
+          kind: "RequestPropertyAdded",
+          identity: { operation: { method: "GET", path: "/foo" }, component: "request", element: "body.x" },
+          message: "test",
+          headSourceLocation: fakeLoc,
+        },
+        {} as any,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toEqual(fakeLoc);
+      expect(resolved?.sourceTraceLevel).toBe("direct");
+    });
+
+    it("reports origin sourceTraceLevel when only origin sourceLocation exists", () => {
+      const fakeLoc = { file: { path: "/user/origin.tsp", text: "model Foo { x: string; }\n" }, pos: 0, end: 5 };
+      const finding = makeFinding(
+        {
+          kind: "RequestPropertyAdded",
+          identity: { operation: { method: "GET", path: "/foo" }, component: "request", element: "body.x" },
+          message: "test",
+          origin: { declarationPath: "Foo.x", type: {} as any, sourceLocation: fakeLoc },
+        },
+        {} as any,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toEqual(fakeLoc);
+      expect(resolved?.sourceTraceLevel).toBe("origin");
+    });
+
+    it("reports base sourceTraceLevel when only baseSourceLocation exists", () => {
+      const fakeLoc = { file: { path: "/user/base.tsp", text: "model Foo { x: string; }\n" }, pos: 0, end: 5 };
+      const finding = makeFinding(
+        {
+          kind: "RequestPropertyRemoved",
+          identity: { operation: { method: "GET", path: "/foo" }, component: "request", element: "body.x" },
+          message: "test",
+          baseSourceLocation: fakeLoc,
+        },
+        {} as any,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toEqual(fakeLoc);
+      expect(resolved?.sourceTraceLevel).toBe("base");
+    });
+
+    it("reports parentModel sourceTraceLevel when only the parent model is available", async () => {
+      const { headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+        }
+
+        @route("/widgets")
+        @get
+        op listWidgets(): Widget;
+      `);
+
+      const widget = headView.versionedNamespace.models.get("Widget");
+      const prop = widget?.properties.get("name");
+      expect(widget).toBeDefined();
+      expect(prop).toBeDefined();
+
+      const finding = makeFinding(
+        {
+          kind: "RequestPropertyAdded",
+          identity: { operation: { method: "GET", path: "/widgets" }, component: "request", element: "body.name" },
+          message: "test",
+          headType: { ...prop, node: undefined, model: widget } as any,
+        },
+        headView,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toBeDefined();
+      expect(resolved?.location.file.text).toContain("model Widget");
+      expect(resolved?.sourceTraceLevel).toBe("parentModel");
+    });
+
+    it("reports operation sourceTraceLevel when only operationSourceLocation exists", () => {
+      const fakeLoc = { file: { path: "/user/op.tsp", text: "op getFoo(): void;\n" }, pos: 0, end: 2 };
+      const finding = makeFinding(
+        {
+          kind: "OperationAdded",
+          identity: { operation: { method: "GET", path: "/foo" }, component: "request", element: "" },
+          message: "test",
+          operationSourceLocation: fakeLoc,
+        },
+        {} as any,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toEqual(fakeLoc);
+      expect(resolved?.sourceTraceLevel).toBe("operation");
+    });
+
+    it("reports namespace sourceTraceLevel when only the service namespace is available", async () => {
+      const { headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+        }
+
+        @route("/widgets")
+        @get
+        op listWidgets(): Widget;
+      `);
+
+      const finding = makeFinding(
+        {
+          kind: "AuthSchemeRemoved",
+          identity: { element: "authSchemes.Bearer" },
+          message: "test",
+        },
+        headView,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.location).toBeDefined();
+      expect(resolved?.location.file.text).toContain("namespace TestService");
+      expect(resolved?.sourceTraceLevel).toBe("namespace");
+    });
+
+    it("includes the element path in namespace-level resolved locations", async () => {
+      const { headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+        }
+
+        @route("/widgets")
+        @get
+        op listWidgets(): Widget;
+      `);
+
+      const finding = makeFinding(
+        {
+          kind: "AuthSchemeRemoved",
+          identity: { element: "authSchemes.Bearer" },
+          message: "test",
+        },
+        headView,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+
+      expect(resolved?.sourceTraceLevel).toBe("namespace");
+      expect(resolved?.elementPath).toBe("authSchemes.Bearer");
     });
 
     it("uses headSourceLocation when origin is absent", () => {
@@ -699,6 +878,7 @@ function makeFinding(diff: any, view: VersionedView): Finding {
     rule: "test",
     phase: "cross-version",
     suppressed: false,
+    serviceNamespace: view.versionedNamespace,
     versionPair: { baseVersion: "2024-01-01", headVersion: "2025-01-01", phase: "cross-version" },
   };
 }

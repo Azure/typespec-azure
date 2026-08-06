@@ -226,7 +226,10 @@ function analyzePair(
   timing.diffEngineMs += Date.now() - diffStart;
 
   const classifyStart = Date.now();
-  const findings = classifyDiffs(diffs, versionPair.phase, versionPair);
+  const findings = classifyDiffs(diffs, versionPair.phase, versionPair).map((finding) => ({
+    ...finding,
+    serviceNamespace: headView.versionedNamespace ?? baseView.versionedNamespace,
+  }));
   timing.classifyMs += Date.now() - classifyStart;
 
   return findings;

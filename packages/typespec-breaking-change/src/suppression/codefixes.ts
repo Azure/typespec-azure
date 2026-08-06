@@ -1,5 +1,5 @@
 import { createAddDecoratorCodeFix, type CodeFix, type DiagnosticTarget, type Type } from "@typespec/compiler";
-import type { Finding } from "./types.js";
+import type { Finding } from "../types.js";
 
 /**
  * Create a codefix that adds @approvedBreakingChange decorator to suppress a finding.

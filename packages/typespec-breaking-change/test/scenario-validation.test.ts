@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { compile, NodeHost } from "@typespec/compiler";
-import { analyzeProgram, analyzeBaseAndHead } from "../src/orchestrator.js";
+import { analyzeProgram, analyzeBaseAndHead } from "../src/pipeline/orchestrator.js";
 import { resolve } from "path";
 import { existsSync } from "fs";
 import { fileURLToPath } from "url";

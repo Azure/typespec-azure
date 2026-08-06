@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { diffOperations } from "../src/diff-operations.js";
-import { computeDiffs } from "../src/diff-engine.js";
-import { compareTypes } from "../src/diff-types.js";
+import { diffOperations } from "../src/diff/diff-operations.js";
+import { computeDiffs } from "../src/diff/diff-engine.js";
+import { compareTypes } from "../src/diff/diff-types.js";
 import type { ApiDiff, VersionedView } from "../src/types.js";
-import { createVersionedView, enumerateVersions } from "../src/versions.js";
+import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
 import { Tester } from "./test-host.js";
 
 describe("computeDiffs", () => {

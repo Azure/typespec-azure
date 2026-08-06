@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { createApproveBreakingChangeCodeFix } from "../src/codefixes.js";
-import { emitFindingDiagnostics } from "../src/diagnostics.js";
-import { analyzeProgram } from "../src/orchestrator.js";
+import { createApproveBreakingChangeCodeFix } from "../src/suppression/codefixes.js";
+import { emitFindingDiagnostics } from "../src/suppression/diagnostics.js";
+import { analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { Tester } from "./test-host.js";
 import type { Finding } from "../src/types.js";
 

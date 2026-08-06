@@ -2,10 +2,10 @@ export {
   canonicalizeOperations,
   type CanonicalizationResult,
   type CanonicalizedOperation,
-} from "./canonicalize.js";
-export { formatResult, main, parseArgs, type CliOptions } from "./cli.js";
-export { createApproveBreakingChangeCodeFix } from "./codefixes.js";
-export { compileService, type CompileOptions } from "./compile.js";
+} from "./diff/canonicalize.js";
+export { formatResult, main, parseArgs, type CliOptions } from "./cli/cli.js";
+export { createApproveBreakingChangeCodeFix } from "./suppression/codefixes.js";
+export { compileService, type CompileOptions } from "./cli/compile.js";
 export {
   $approvedBreakingChange,
   $approvedUnversionedChange,
@@ -15,14 +15,14 @@ export {
   getUnversionedSuppressions,
   type ResolvedSuppression,
   type SuppressionMetadata,
-} from "./decorators.js";
-export { emitFindingDiagnostics } from "./diagnostics.js";
-export * from "./diff-engine.js";
+} from "./suppression/decorators.js";
+export { emitFindingDiagnostics } from "./suppression/diagnostics.js";
+export * from "./diff/diff-engine.js";
 export type { DiffKind } from "./diff-kind.js";
-export * from "./diff-operations.js";
-export * from "./diff-types.js";
+export * from "./diff/diff-operations.js";
+export * from "./diff/diff-types.js";
 export { $lib, BreakingChangeStateKeys } from "./lib.js";
-export { matchOperations, type MatchedOperation, type OperationMatchResult } from "./match.js";
+export { matchOperations, type MatchedOperation, type OperationMatchResult } from "./suppression/match.js";
 export {
   getOperationIdentity,
   identityKey,
@@ -30,17 +30,17 @@ export {
   resolveOperationIdentities,
   type OperationIdentityMap,
   type ResolvedOperation,
-} from "./operation-identity.js";
-export { resolveOrigin } from "./origin.js";
-export * from "./orchestrator.js";
-export * from "./policy.js";
-export { resolveFindingLocation } from "./resolve-location.js";
-export * from "./reporter-console.js";
-export * from "./reporter-github.js";
-export * from "./reporter-json.js";
-export * from "./reporter-markdown.js";
-export * from "./suppression-guidance.js";
-export * from "./suppression.js";
+} from "./diff/operation-identity.js";
+export { resolveOrigin } from "./diff/origin.js";
+export * from "./pipeline/orchestrator.js";
+export * from "./pipeline/policy.js";
+export { resolveFindingLocation } from "./pipeline/resolve-location.js";
+export * from "./reporting/reporter-console.js";
+export * from "./reporting/reporter-github.js";
+export * from "./reporting/reporter-json.js";
+export * from "./reporting/reporter-markdown.js";
+export * from "./suppression/suppression-guidance.js";
+export * from "./suppression/suppression.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {
   AnalysisResult,
@@ -54,7 +54,9 @@ export type {
   OperationDiffIdentity,
   OperationIdentity,
   OriginDeclaration,
+  ResolvedLocation,
   ServiceDiffIdentity,
+  SourceTraceLevel,
   TimingInfo,
   VersionComparisonSummary,
   VersionPair,
@@ -69,4 +71,4 @@ export {
   enumerateVersions,
   type ServiceVersionInfo,
   type VersionClassifier,
-} from "./versions.js";
+} from "./pipeline/versions.js";

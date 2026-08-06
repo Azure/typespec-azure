@@ -1,4 +1,4 @@
-import { $approvedBreakingChange, $approvedUnversionedChange } from "./decorators.js";
+import { $approvedBreakingChange, $approvedUnversionedChange } from "./suppression/decorators.js";
 
 export { $lib } from "./lib.js";
 

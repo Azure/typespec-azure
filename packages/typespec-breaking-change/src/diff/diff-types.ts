@@ -11,9 +11,9 @@ import {
   type UnionVariant,
 } from "@typespec/compiler";
 import type { HttpCanonicalization } from "@typespec/http-canonicalization";
-import type { DiffKind } from "./diff-kind.js";
+import type { DiffKind } from "../diff-kind.js";
 import { resolveOrigin } from "./origin.js";
-import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "./types.js";
+import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
 
 export interface DiffContext {
   operation: OperationIdentity;

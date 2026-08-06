@@ -3,7 +3,7 @@
 This reference is organized around the tool's two comparison phases.
 
 - **Phase A (`same-version`)** compares two separate compilations of the **same** api-version. Any diff here is a likely projection or modeling bug, not a "breaking vs. safe" change classification.
-- **Phase B (`cross-version`)** compares a newer api-version to the previous stable api-version. **Only Phase B uses the breaking (`error`) vs. safe (`ignore`) classification from `src/policy.ts`.**
+- **Phase B (`cross-version`)** compares a newer api-version to the previous stable api-version. **Only Phase B uses the breaking (`error`) vs. safe (`ignore`) classification from `src/pipeline/policy.ts`.**
 
 ## Phase B summary table
 

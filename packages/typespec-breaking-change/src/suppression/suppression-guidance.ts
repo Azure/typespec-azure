@@ -1,6 +1,7 @@
 import type { SourceLocation } from "@typespec/compiler";
-import type { Finding, OriginDeclaration } from "./types.js";
-import { isOperationIdentity } from "./types.js";
+import type { Finding, OriginDeclaration } from "../types.js";
+import { isOperationIdentity } from "../types.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 /**
  * Suppression guidance for a finding — tells the user exactly how to suppress
@@ -78,8 +79,8 @@ function getTargetFile(finding: Finding): string | undefined {
   if (finding.diff.origin?.sourceLocation) {
     return finding.diff.origin.sourceLocation.file.path;
   }
-  const loc = finding.diff.headSourceLocation ?? finding.diff.baseSourceLocation;
-  return loc?.file.path;
+
+  return resolveFindingLocation(finding)?.location.file.path;
 }
 
 /**

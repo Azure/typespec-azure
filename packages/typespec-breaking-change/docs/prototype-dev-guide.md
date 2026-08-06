@@ -53,9 +53,9 @@ cd packages/typespec-breaking-change
 npx tsc -p tsconfig.build.json
 
 # 2. Copy built JS to specs fork
-# Source: dist/src/*.js
+# Source: dist/src/**/*
 # Destination: eng/tools/typespec-breaking-change/src/ in the specs repo
-cp dist/src/*.js /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-change/src/
+cp -r dist/src/* /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-change/src/
 
 # 3. Also copy updated .tsp and package.json if changed
 cp lib/decorators.tsp /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-change/lib/
@@ -109,7 +109,7 @@ git worktree add ../azure-rest-api-specs-base main
 
 # Run the tool comparing base vs PR branch
 cd packages/typespec-breaking-change
-node dist/src/cli.js \
+node dist/src/cli/cli.js \
   --base /path/to/azure-rest-api-specs-base/specification/contosowidgetmanager/Contoso.Management \
   --head /path/to/azure-rest-api-specs/specification/contosowidgetmanager/Contoso.Management \
   --format console

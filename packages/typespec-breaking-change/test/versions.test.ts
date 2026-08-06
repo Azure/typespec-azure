@@ -8,7 +8,7 @@ import {
   buildPhaseBPairs,
   enumerateVersions,
   createVersionedView,
-} from "../src/versions.js";
+} from "../src/pipeline/versions.js";
 import { Tester } from "./test-host.js";
 
 describe("version enumeration", () => {

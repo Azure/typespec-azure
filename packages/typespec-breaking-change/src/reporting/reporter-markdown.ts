@@ -1,8 +1,8 @@
 import type { SourceLocation } from "@typespec/compiler";
-import type { AnalysisResult, Finding } from "./types.js";
-import { isOperationIdentity } from "./types.js";
-import { formatSuppressionDiff, formatSuppressionHint } from "./suppression-guidance.js";
-import { resolveFindingLocation } from "./resolve-location.js";
+import type { AnalysisResult, Finding } from "../types.js";
+import { isOperationIdentity } from "../types.js";
+import { formatSuppressionDiff, formatSuppressionHint } from "../suppression/suppression-guidance.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 export interface MarkdownReportOptions {
   /** Base revision/path label. */
@@ -208,8 +208,8 @@ function fmtKindLink(kind: string, phase: string | undefined, options?: Markdown
 /** Format the identity as a link to the source file, or plain text if no link available. */
 function fmtIdentityLink(finding: Finding, options?: MarkdownReportOptions): string {
   const element = finding.diff.identity.element;
-  const location = resolveFindingLocation(finding);
-  const url = buildSourceUrl(location, options);
+  const resolvedLocation = resolveFindingLocation(finding);
+  const url = buildSourceUrl(resolvedLocation?.location, options);
 
   if (url) {
     return `[\`${esc(element)}\`](${url})`;

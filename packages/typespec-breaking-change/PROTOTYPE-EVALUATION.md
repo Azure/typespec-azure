@@ -19,10 +19,10 @@ The prototype was built across 9 phases in `packages/typespec-breaking-change/` 
 **Evidence**:
 - `@typespec/versioning` mutators + `@typespec/http-canonicalization` produce stable,
   structurally comparable output across api-versions.
-- `createVersionedView()` in `src/versions.ts` applies version mutators to produce
+- `createVersionedView()` in `src/pipeline/versions.ts` applies version mutators to produce
   namespace-scoped projections. These projections are structurally independent and
   can be compared pairwise.
-- `canonicalizeOperations()` in `src/canonicalize.ts` uses `HttpCanonicalizer` to
+- `canonicalizeOperations()` in `src/diff/canonicalize.ts` uses `HttpCanonicalizer` to
   produce `OperationHttpCanonicalization` objects with resolved wire types.
 - **Real-world validation**: Network spec (739 operations, 2 versions) and AppConfiguration
   spec (29 operations, 3 versions) both produce correct canonical output.
@@ -60,7 +60,7 @@ TypeSpec source is structured.
 **Status**: ✅ Answered — Yes, with caveats
 
 **Evidence**:
-- `resolveOrigin()` in `src/origin.ts` traces diffs back to named TypeSpec declarations
+- `resolveOrigin()` in `src/diff/origin.ts` traces diffs back to named TypeSpec declarations
   by following `sourceProperty` chains (for spreads/intersections), climbing anonymous
   model hierarchies, and resolving union variants to parent unions.
 - **Real-world validation**: On AppConfiguration spec, 7/10 findings have origin
@@ -134,7 +134,7 @@ The dedup groups by `{origin, DiffKind}` where DiffKind already encodes directio
 **Status**: ✅ Answered — Yes
 
 **Evidence**:
-- `matchesPath()` in `src/suppression.ts` performs suffix matching: a suppression
+- `matchesPath()` in `src/suppression/suppression.ts` performs suffix matching: a suppression
   with `path: "properties.legacyField"` matches any finding whose element path ends
   with that suffix.
 - `collectSuppressions()` checks both the wire type AND the origin type for
@@ -155,12 +155,12 @@ at the diff point is a copy created by the canonicalizer.
 **Status**: ✅ Answered — Yes, with three format options
 
 **Evidence**:
-- **Console reporter** (`src/reporter-console.ts`): Human-readable terminal output with
+- **Console reporter** (`src/reporting/reporter-console.ts`): Human-readable terminal output with
   severity labels, operation context, version pairs, and suppression guidance.
   Example: `@approvedBreakingChange("your reason here", "ResponsePropertyRemoved")`
-- **JSON reporter** (`src/reporter-json.ts`): Machine-readable output with structured
+- **JSON reporter** (`src/reporting/reporter-json.ts`): Machine-readable output with structured
   findings, summary stats, and timing.
-- **GitHub reporter** (`src/reporter-github.ts`): Markdown-formatted PR comment with
+- **GitHub reporter** (`src/reporting/reporter-github.ts`): Markdown-formatted PR comment with
   a findings table and suppressed findings section.
 - The console reporter now also shows `noComparisonReason` when no comparisons were
   needed (e.g., all versions are preview).
@@ -265,7 +265,7 @@ is also tested with mocked programs.
 
 **Evidence**: `createAddDecoratorCodeFix()` from the TypeSpec compiler targets a
 `Type` node, and the compiler's codefix infrastructure handles file resolution
-internally. The codefix module (`src/codefixes.ts`) targets the origin type when
+internally. The codefix module (`src/suppression/codefixes.ts`) targets the origin type when
 available, which may be in a different file than where the breaking change is
 observed. 7 codefix tests validate this path.
 

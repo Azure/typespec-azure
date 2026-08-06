@@ -1,5 +1,5 @@
-import type { AnalysisResult, Finding } from "./types.js";
-import { isOperationIdentity } from "./types.js";
+import type { AnalysisResult, Finding } from "../types.js";
+import { isOperationIdentity } from "../types.js";
 
 export function formatGithubReport(result: AnalysisResult): string {
   const errors = result.findings.filter((finding) => finding.severity === "error" && !finding.suppressed);

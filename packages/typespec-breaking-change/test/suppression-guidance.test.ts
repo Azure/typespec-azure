@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import {
   formatSuppressionGuidance,
   formatSuppressionHint,
-} from "../src/suppression-guidance.js";
-import { formatJsonReport } from "../src/reporter-json.js";
-import { renderMarkdownSummary } from "../src/reporter-markdown.js";
-import { formatConsoleReport } from "../src/reporter-console.js";
+} from "../src/suppression/suppression-guidance.js";
+import { formatJsonReport } from "../src/reporting/reporter-json.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
+import { formatConsoleReport } from "../src/reporting/reporter-console.js";
 import type { Finding, AnalysisResult } from "../src/types.js";
 
 function makeFinding(overrides: Partial<Finding> = {}): Finding {

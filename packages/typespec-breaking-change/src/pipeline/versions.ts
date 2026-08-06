@@ -2,7 +2,7 @@ import type { Namespace, Program } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import { getVersioningMutators } from "@typespec/versioning";
 import { listServices } from "@typespec/compiler";
-import type { VersionedView, ComparisonPhase, VersionPair, ComparisonPair } from "./types.js";
+import type { VersionedView, ComparisonPhase, VersionPair, ComparisonPair } from "../types.js";
 
 /**
  * Result of enumerating versions from a compiled program.

@@ -153,6 +153,20 @@ export interface OriginDeclaration {
   sourceLocation: SourceLocation;
 }
 
+export type SourceTraceLevel =
+  | "direct"
+  | "origin"
+  | "base"
+  | "parentModel"
+  | "operation"
+  | "namespace";
+
+export interface ResolvedLocation {
+  location: SourceLocation;
+  sourceTraceLevel: SourceTraceLevel;
+  elementPath?: string;
+}
+
 /**
  * Comparison phase context.
  */
@@ -179,6 +193,9 @@ export interface Finding {
 
   /** If suppressed, the reason provided in the suppression decorator. */
   suppressionReason?: string;
+
+  /** Source service namespace for namespace-level location fallback. */
+  serviceNamespace?: Namespace;
 
   /** Version pair that produced this finding. */
   versionPair: VersionPair;

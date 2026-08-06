@@ -4,9 +4,9 @@ import {
   normalizePath,
   getOperationIdentity,
   identityKey,
-} from "../src/operation-identity.js";
-import { matchOperations } from "../src/match.js";
-import { enumerateVersions, createVersionedView } from "../src/versions.js";
+} from "../src/diff/operation-identity.js";
+import { matchOperations } from "../src/suppression/match.js";
+import { enumerateVersions, createVersionedView } from "../src/pipeline/versions.js";
 import { Tester } from "./test-host.js";
 
 describe("normalizePath", () => {

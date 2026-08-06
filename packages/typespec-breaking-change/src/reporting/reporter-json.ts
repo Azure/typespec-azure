@@ -1,8 +1,14 @@
 import type { SourceLocation } from "@typespec/compiler";
-import type { AnalysisResult, AnalysisSummary, Finding, TimingInfo } from "./types.js";
-import { isOperationIdentity } from "./types.js";
-import { formatSuppressionGuidance } from "./suppression-guidance.js";
-import { resolveFindingLocation } from "./resolve-location.js";
+import type {
+  AnalysisResult,
+  AnalysisSummary,
+  Finding,
+  SourceTraceLevel,
+  TimingInfo,
+} from "../types.js";
+import { isOperationIdentity } from "../types.js";
+import { formatSuppressionGuidance } from "../suppression/suppression-guidance.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 /**
  * Full structured JSON report — aligned with typespec-suppressions report pattern.
@@ -49,6 +55,8 @@ export interface JsonFinding {
   statusCode?: string;
   versionPair: { baseVersion: string; headVersion: string };
   location?: { file: string; line: number };
+  sourceTraceLevel?: SourceTraceLevel;
+  sourceElementPath?: string;
   /** How to suppress this finding if the breaking change is intentional. */
   suppression?: {
     decorator: string;
@@ -98,7 +106,8 @@ export function formatJsonReport(result: AnalysisResult, options?: JsonReportOpt
 }
 
 function mapFinding(finding: Finding): JsonFinding {
-  const location = resolveFindingLocation(finding);
+  const resolvedLocation = resolveFindingLocation(finding);
+  const location = resolvedLocation?.location;
   const baseFinding: JsonFinding = {
     kind: finding.diff.kind,
     severity: finding.severity,
@@ -118,6 +127,8 @@ function mapFinding(finding: Finding): JsonFinding {
           line: getLineNumber(location),
         }
       : undefined,
+    sourceTraceLevel: resolvedLocation?.sourceTraceLevel,
+    sourceElementPath: resolvedLocation?.elementPath,
   };
 
   if (isOperationIdentity(finding.diff.identity)) {

@@ -4,12 +4,12 @@ import { resolve } from "path";
 import { writeFile, mkdir } from "fs/promises";
 import { dirname } from "path";
 import { compileService } from "./compile.js";
-import { analyzeBaseAndHead, analyzeProgram, type AnalysisOptions } from "./orchestrator.js";
-import { formatConsoleReport } from "./reporter-console.js";
-import { formatGithubReport } from "./reporter-github.js";
-import { formatJsonReport, type JsonReportOptions } from "./reporter-json.js";
-import { renderMarkdownSummary, type MarkdownReportOptions } from "./reporter-markdown.js";
-import type { AnalysisResult, ComparisonPhase } from "./types.js";
+import { analyzeBaseAndHead, analyzeProgram, type AnalysisOptions } from "../pipeline/orchestrator.js";
+import { formatConsoleReport } from "../reporting/reporter-console.js";
+import { formatGithubReport } from "../reporting/reporter-github.js";
+import { formatJsonReport, type JsonReportOptions } from "../reporting/reporter-json.js";
+import { renderMarkdownSummary, type MarkdownReportOptions } from "../reporting/reporter-markdown.js";
+import type { AnalysisResult, ComparisonPhase } from "../types.js";
 
 export interface CliOptions {
   /** Path to the head TypeSpec entry point (file-to-file mode). */

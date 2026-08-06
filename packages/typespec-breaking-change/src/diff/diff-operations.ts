@@ -10,11 +10,11 @@ import type {
   ModelPropertyHttpCanonicalization,
   OperationHttpCanonicalization,
 } from "@typespec/http-canonicalization";
-import type { DiffKind } from "./diff-kind.js";
+import type { DiffKind } from "../diff-kind.js";
 import type { DiffContext } from "./diff-types.js";
 import { compareTypes } from "./diff-types.js";
 import { resolveOrigin } from "./origin.js";
-import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "./types.js";
+import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
 
 /**
  * Compare two canonicalized operations and return all structural diffs.

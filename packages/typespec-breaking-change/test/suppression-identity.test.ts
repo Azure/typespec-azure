@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeProgram } from "../src/orchestrator.js";
+import { analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { TesterWithSuppressions } from "./test-host.js";
 import type { Finding } from "../src/types.js";
 import { isOperationIdentity } from "../src/types.js";
