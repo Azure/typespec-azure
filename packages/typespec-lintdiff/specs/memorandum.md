@@ -69,6 +69,50 @@ The Fabric operations do contain API-version parameters; they are external
 common-types references. The 13 plain-object findings are therefore harness
 artifacts, not equivalent validator findings.
 
+## `ParameterDescription` comparison
+
+The same unresolved-reference problem explains another large difference:
+
+| Source            | Projects where `ParameterDescription` fired |
+| ----------------- | ------------------------------------------: |
+| ARM coverage gist |                                  445 of 450 |
+| This dataset      |                                   44 of 468 |
+
+The dataset contains 655 `ParameterDescription` diagnostics across those 44
+projects and 84 latest-version Swagger files. The gist's `Fired` value is a
+project count, so 44—not 655—is the comparable dataset number.
+
+`ParameterDescription` checks operation parameter objects for a `description`.
+When the gist harness receives an unresolved parameter:
+
+```json
+{
+  "$ref": "../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+}
+```
+
+it tests the `$ref` object itself. That object has no `description`, so the rule
+reports a violation. The referenced parameter is valid after resolution:
+
+```json
+{
+  "name": "api-version",
+  "in": "query",
+  "description": "The API version to use for this operation."
+}
+```
+
+This was reproduced on the latest Microsoft.Fabric Swagger:
+
+| Execution                                         | `ParameterDescription` findings |
+| ------------------------------------------------- | ------------------------------: |
+| Plain-object Spectral, matching the gist harness  |                              35 |
+| AutoRest + azure-validator, matching this dataset |                               0 |
+
+The gist's 445-project result is therefore dominated by referenced parameters
+being evaluated before reference resolution. The dataset's 44 projects represent
+resolved findings where emitted parameters actually lack descriptions.
+
 ## Other sources of difference
 
 ### Ruleset scope
