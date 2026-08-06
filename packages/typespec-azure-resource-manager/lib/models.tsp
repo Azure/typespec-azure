@@ -464,9 +464,8 @@ model AvailabilityZonesProperty {
  * }
  * ```
  */
-@doc("Contains a billing data property to be spread into resource property types")
 model BillingDataProperty {
-  @doc("The billing data of the resource.")
+  /** The billing data of the resource. */
   billingData: CommonTypes.BillingData;
 }
 
