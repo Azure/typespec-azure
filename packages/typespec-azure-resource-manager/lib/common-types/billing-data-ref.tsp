@@ -4,49 +4,57 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-@@armCommonDefinition(BillingData,
+@@armCommonDefinition(
+  BillingData,
   "BillingData",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingdata.json"
 );
 
-@@armCommonDefinition(BillingState,
+@@armCommonDefinition(
+  BillingState,
   "BillingState",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingstate.json"
 );
 
-@@armCommonDefinition(BillingStateReason,
+@@armCommonDefinition(
+  BillingStateReason,
   "BillingStateReason",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingstatereason.json"
 );
 
-@@armCommonDefinition(BillingSchedule,
+@@armCommonDefinition(
+  BillingSchedule,
   "BillingSchedule",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingschedule.json"
 );
 
-@@armCommonDefinition(BillingScheduleChange,
+@@armCommonDefinition(
+  BillingScheduleChange,
   "BillingScheduleChange",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingschedulechange.json"
 );
 
-@@armCommonDefinition(BillingRenewalType,
+@@armCommonDefinition(
+  BillingRenewalType,
   "BillingRenewalType",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingrenewaltype.json"
 );
 
-@@armCommonDefinition(BillingScheduleChangeEffectiveType,
+@@armCommonDefinition(
+  BillingScheduleChangeEffectiveType,
   "BillingScheduleChangeEffectiveType",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingschedulechangeeffectivetype.json"
 );
 
-@@armCommonDefinition(BillingScheduleChangeKind,
+@@armCommonDefinition(
+  BillingScheduleChangeKind,
   "BillingScheduleChangeKind",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingschedulechangekind.json"
