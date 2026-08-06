@@ -140,17 +140,21 @@ function buildExample(finding: Finding, decorator: string): string {
 export function formatSuppressionDiff(finding: Finding): string {
   const decoratorName =
     finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
+  const hasDirectHeadLocation =
+    finding.diff.headSourceTraceLevel === "direct" ||
+    (finding.diff.headSourceTraceLevel === undefined && !!finding.diff.headType);
+  const hasParentModelHeadLocation = finding.diff.headSourceTraceLevel === "parentModel";
 
   // Case 1: Property still exists in head (versioned changes, or non-removal diffs)
   // Decorator goes directly on the element.
-  if (finding.diff.headSourceLocation) {
+  if (finding.diff.headSourceLocation && hasDirectHeadLocation) {
     const decorator = `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
     return buildDiffFromLocation(finding.diff.headSourceLocation, decorator);
   }
 
-  // Case 2: Unversioned removal (Phase A) — property no longer exists in head.
+  // Case 2: Property no longer exists in head — decorate the parent model with a path.
   // Decorator must go on the parent model with path option targeting the property.
-  if (finding.phase === "same-version" && finding.diff.origin) {
+  if ((hasParentModelHeadLocation || finding.phase === "same-version") && finding.diff.origin) {
     const propertyPath = getPropertyPath(finding.diff.origin);
     const decorator = propertyPath
       ? `${decoratorName}("reason", #{ kind: "${finding.diff.kind}", path: "${propertyPath}" })`

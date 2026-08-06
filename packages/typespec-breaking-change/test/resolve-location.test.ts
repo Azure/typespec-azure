@@ -335,6 +335,45 @@ describe("resolveFindingLocation", () => {
       expect(resolved?.sourceTraceLevel).toBe("base");
     });
 
+    it("reports direct sourceTraceLevel when falling back to a type's own location", async () => {
+      const { baseView, headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @added(Versions.v2) age: int32;
+        }
+
+        @route("/widgets")
+        @post
+        op createWidget(@body widget: Widget): Widget;
+      `);
+
+      const { diffs } = computeDiffs(baseView, headView);
+      const propAdded = diffs.find((d) => d.kind === "RequestPropertyAdded");
+      expect(propAdded).toBeDefined();
+      expect(propAdded!.headType).toBeDefined();
+
+      const resolved = resolveResolvedFindingLocation(
+        makeFinding(
+          {
+            ...propAdded!,
+            origin: undefined,
+            headSourceLocation: undefined,
+            baseSourceLocation: undefined,
+          },
+          headView,
+        ),
+      );
+
+      expect(resolved?.sourceTraceLevel).toBe("direct");
+      expect(getLineAtLocation(resolved!.location)).toContain("age");
+    });
+
     it("reports parentModel sourceTraceLevel when only the parent model is available", async () => {
       const { headView } = await compileViews(`
         @versioned(Versions)
@@ -1015,6 +1054,52 @@ describe("resolveFindingLocation", () => {
       expect(getLineAtLocation(resolved!.location)).toContain("sharedField");
     });
 
+    it("type fallback through sourceProperty chain reports origin trace level", async () => {
+      const { baseView, headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Base {
+          @removed(Versions.v2)
+          sharedField?: string;
+        }
+
+        model Widget {
+          ...Base;
+          name: string;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op getWidget(@path id: string): Widget;
+      `);
+
+      const { diffs } = computeDiffs(baseView, headView);
+      const removal = diffs.find((d) => d.kind === "ResponsePropertyRemoved");
+      expect(removal).toBeDefined();
+      expect(removal!.baseType).toBeDefined();
+
+      const resolved = resolveResolvedFindingLocation(
+        makeFinding(
+          {
+            ...removal!,
+            origin: undefined,
+            headSourceLocation: undefined,
+            baseSourceLocation: undefined,
+            baseType: { ...removal!.baseType, node: undefined } as any,
+            headType: undefined,
+          },
+          headView,
+        ),
+      );
+
+      expect(resolved?.sourceTraceLevel).toBe("origin");
+      expect(getLineAtLocation(resolved!.location)).toContain("sharedField");
+    });
+
     it("visibility-filtered projected models use the AST source model name fallback", async () => {
       const { program: baseProgram } = await Tester.compile(`
         @versioned(Versions)
@@ -1060,6 +1145,88 @@ describe("resolveFindingLocation", () => {
       const resolved = resolveResolvedFindingLocation(removal!);
       expect(resolved?.sourceTraceLevel).toBe("parentModel");
       expect(getLineAtLocation(resolved!.location)).toContain("model EmployeeProperties");
+    });
+
+    it("scopes duplicate model lookup to the finding service namespace", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(WidgetVersions)
+        @service
+        namespace WidgetService {
+          enum WidgetVersions { v1: "2024-01-01" }
+
+          model Widget {
+            city: string;
+            widgetOnly: string;
+          }
+
+          @route("/widgets")
+          @get
+          op getWidget(): Widget;
+        }
+
+        @versioned(GadgetVersions)
+        @service
+        namespace GadgetService {
+          enum GadgetVersions { v1: "2024-01-01" }
+
+          model Widget {
+            city: string;
+            gadgetOnly: string;
+          }
+
+          @route("/gadgets")
+          @get
+          op getGadget(): Widget;
+        }
+      `);
+
+      const { program: headProgram } = await Tester.compile(`
+        @versioned(WidgetVersions)
+        @service
+        namespace WidgetService {
+          enum WidgetVersions { v1: "2024-01-01" }
+
+          model Widget {
+            city: string;
+            widgetOnly: string;
+          }
+
+          @route("/widgets")
+          @get
+          op getWidget(): Widget;
+        }
+
+        @versioned(GadgetVersions)
+        @service
+        namespace GadgetService {
+          enum GadgetVersions { v1: "2024-01-01" }
+
+          model Widget {
+            gadgetOnly: string;
+          }
+
+          @route("/gadgets")
+          @get
+          op getGadget(): Widget;
+        }
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+        serviceName: "GadgetService",
+      });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+
+      expect(removal).toBeDefined();
+      const resolved = resolveResolvedFindingLocation(removal!);
+      expect(resolved?.sourceTraceLevel).toBe("parentModel");
+      expect(getLineAtLocation(resolved!.location)).toContain("model Widget");
+      expect(resolved!.location.pos).toBeGreaterThan(
+        resolved!.location.file.text.indexOf("namespace GadgetService"),
+      );
+      expect(resolved!.location.pos).toBeLessThan(
+        resolved!.location.file.text.indexOf('@route("/gadgets")'),
+      );
     });
 
     it("TrackedResource-style origin gaps still fall back to the operation location", async () => {
