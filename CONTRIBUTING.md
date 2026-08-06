@@ -314,19 +314,17 @@ Do the following to publish a new release:
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
-6. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
-
-7. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
+6. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 
    - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
 
-8. Push and merge TypeSpec (core) PR.
+7. Push and merge TypeSpec (core) PR.
 
-9. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+8. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
-10. Make sure release pipeline completed and packages are on NPM.
+9. Make sure release pipeline completed and packages are on NPM.
     - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
     - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
