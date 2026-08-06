@@ -18,7 +18,7 @@ model BillingData {
    * Indicates the billing state of the resource.
    */
   @visibility(Lifecycle.Read)
-  state?: BillingState = "Pending";
+  state?: BillingState = BillingState.Pending;
 
   /**
    * Indicates reason(s) for the current billing state of the resource.
@@ -72,7 +72,7 @@ model BillingSchedule {
   /**
    * Indicates the renewal behavior of this resource.
    */
-  renewal: BillingRenewalType = "Automatic";
+  renewal: BillingRenewalType = BillingRenewalType.Automatic;
 
   /**
    * Schedules billing changes for this resource.
@@ -88,7 +88,7 @@ model BillingScheduleChange {
   /**
    * Indicates when the change is expected to become effective.
    */
-  effective: BillingScheduleChangeEffectiveType = "Renewal";
+  effective: BillingScheduleChangeEffectiveType = BillingScheduleChangeEffectiveType.Renewal;
 
   /**
    * The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.
@@ -98,7 +98,7 @@ model BillingScheduleChange {
   /**
    * The kind of change.
    */
-  kind: BillingScheduleChangeKind = "Update";
+  kind: BillingScheduleChangeKind = BillingScheduleChangeKind.Update;
 
   /**
    * The new product identifier. When not specified, the resource's product code remains unchanged.

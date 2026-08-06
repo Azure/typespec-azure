@@ -84,7 +84,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by subscription ID",
+        "description": "List Widget resources by subscription ID",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -97,7 +97,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -118,7 +118,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by resource group",
+        "description": "List Widget resources by resource group",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -134,7 +134,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -155,7 +155,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Get a WidgetResource",
+        "description": "Get a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -169,7 +169,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -179,7 +179,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -195,7 +195,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Create a WidgetResource",
+        "description": "Create a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -209,7 +209,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -220,21 +220,21 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Resource 'WidgetResource' update operation succeeded",
+            "description": "Resource 'Widget' update operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "201": {
-            "description": "Resource 'WidgetResource' create operation succeeded",
+            "description": "Resource 'Widget' create operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             },
             "headers": {
               "Azure-AsyncOperation": {
@@ -265,7 +265,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Update a WidgetResource",
+        "description": "Update a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -279,7 +279,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResourceTagsUpdate"
+              "$ref": "#/definitions/WidgetTagsUpdate"
             }
           }
         ],
@@ -298,7 +298,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -314,7 +314,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Delete a WidgetResource",
+        "description": "Delete a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
@@ -328,7 +328,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -367,6 +367,278 @@
     }
   },
   "definitions": {
+    "Azure.Core.uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Universally Unique Identifier"
+    },
+    "Azure.ResourceManager.CommonTypes.BillingData": {
+      "type": "object",
+      "description": "Billing Data",
+      "properties": {
+        "systemId": {
+          "$ref": "#/definitions/Azure.Core.uuid",
+          "description": "The system ID of the resource. Globally unique per cloud.",
+          "readOnly": true
+        },
+        "state": {
+          "type": "string",
+          "description": "Indicates the billing state of the resource.",
+          "default": "Pending",
+          "enum": [
+            "Pending",
+            "Active",
+            "Warned",
+            "Inactive"
+          ],
+          "x-ms-enum": {
+            "name": "BillingState",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Pending",
+                "value": "Pending",
+                "description": "Resource's billing has not yet started."
+              },
+              {
+                "name": "Active",
+                "value": "Active",
+                "description": "Resource's billing is activate."
+              },
+              {
+                "name": "Warned",
+                "value": "Warned",
+                "description": "Resource's billing is in a warning state."
+              },
+              {
+                "name": "Inactive",
+                "value": "Inactive",
+                "description": "Resource's billing is inactive."
+              }
+            ]
+          },
+          "readOnly": true
+        },
+        "reasons": {
+          "type": "array",
+          "description": "Indicates reason(s) for the current billing state of the resource.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.BillingStateReason"
+          },
+          "readOnly": true
+        },
+        "productCode": {
+          "$ref": "#/definitions/Azure.Core.uuid",
+          "description": "The product identifier referencing a product in the catalog."
+        },
+        "productToken": {
+          "type": "string",
+          "description": "Product token (JWT) identifying a specific version of the product.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The number of instances of the product.",
+          "default": 1
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start date indicating the beginning of the term for which the resource is committed."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End date indicating the end of the term for which the resource is committed."
+        },
+        "billingToken": {
+          "type": "string",
+          "description": "Billing token (JWT) representing additional billing context.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "schedule": {
+          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.BillingSchedule",
+          "description": "The resource's billing schedule."
+        }
+      },
+      "required": [
+        "productCode",
+        "quantity"
+      ]
+    },
+    "Azure.ResourceManager.CommonTypes.BillingSchedule": {
+      "type": "object",
+      "description": "Billing schedule.",
+      "properties": {
+        "renewal": {
+          "type": "string",
+          "description": "Indicates the renewal behavior of this resource.",
+          "default": "Automatic",
+          "enum": [
+            "Automatic",
+            "None"
+          ],
+          "x-ms-enum": {
+            "name": "BillingRenewalType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Automatic",
+                "value": "Automatic",
+                "description": "Automatically renew the product when its term ends."
+              },
+              {
+                "name": "None",
+                "value": "None",
+                "description": "Don't automatically renew the product."
+              }
+            ]
+          }
+        },
+        "changes": {
+          "type": "array",
+          "description": "Schedules billing changes for this resource.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.BillingScheduleChange"
+          }
+        }
+      },
+      "required": [
+        "renewal"
+      ]
+    },
+    "Azure.ResourceManager.CommonTypes.BillingScheduleChange": {
+      "type": "object",
+      "description": "Billing schedule change.",
+      "properties": {
+        "effective": {
+          "type": "string",
+          "description": "Indicates when the change is expected to become effective.",
+          "default": "Renewal",
+          "enum": [
+            "AbsoluteDate",
+            "Renewal"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeEffectiveType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "AbsoluteDate",
+                "value": "AbsoluteDate",
+                "description": "At a specified date."
+              },
+              {
+                "name": "Renewal",
+                "value": "Renewal",
+                "description": "At time of term renewal."
+              }
+            ]
+          }
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The kind of change.",
+          "default": "Update",
+          "enum": [
+            "Update",
+            "Cancel"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeKind",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Update",
+                "value": "Update",
+                "description": "Update the resource."
+              },
+              {
+                "name": "Cancel",
+                "value": "Cancel",
+                "description": "Cancel the resource."
+              }
+            ]
+          }
+        },
+        "productCode": {
+          "$ref": "#/definitions/Azure.Core.uuid",
+          "description": "The new product identifier. When not specified, the resource's product code remains unchanged."
+        },
+        "productToken": {
+          "type": "string",
+          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The new number of instances of the product. When not specified, the resource's quantity remains unchanged."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the\nproduct's term duration."
+        },
+        "billingToken": {
+          "type": "string",
+          "description": "Billing token (JWT) representing additional billing context.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "effective",
+        "kind"
+      ]
+    },
+    "Azure.ResourceManager.CommonTypes.BillingStateReason": {
+      "type": "string",
+      "description": "Billing state reason.",
+      "enum": [
+        "Suspended",
+        "Canceled",
+        "Expired"
+      ],
+      "x-ms-enum": {
+        "name": "BillingStateReason",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Suspended",
+            "value": "Suspended",
+            "description": "Resource's billing has been suspended by Microsoft."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource has been canceled by the customer."
+          },
+          {
+            "name": "Expired",
+            "value": "Expired",
+            "description": "Resource's billing has expired."
+          }
+        ]
+      }
+    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -398,12 +670,12 @@
       },
       "readOnly": true
     },
-    "WidgetResource": {
+    "Widget": {
       "type": "object",
-      "description": "Widget Resource",
+      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/WidgetResourceProperties",
+          "$ref": "#/definitions/WidgetProperties",
           "description": "The resource-specific properties for this resource."
         }
       },
@@ -413,15 +685,15 @@
         }
       ]
     },
-    "WidgetResourceListResult": {
+    "WidgetListResult": {
       "type": "object",
-      "description": "The response of a WidgetResource list operation.",
+      "description": "The response of a Widget list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The WidgetResource items on this page",
+          "description": "The Widget items on this page",
           "items": {
-            "$ref": "#/definitions/WidgetResource"
+            "$ref": "#/definitions/Widget"
           }
         },
         "nextLink": {
@@ -434,9 +706,9 @@
         "value"
       ]
     },
-    "WidgetResourceProperties": {
+    "WidgetProperties": {
       "type": "object",
-      "description": "Widget Resource Properties.",
+      "description": "Widget resource properties.",
       "properties": {
         "color": {
           "type": "string",
@@ -452,7 +724,7 @@
           "readOnly": true
         },
         "billingData": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/billingdata.json#/definitions/BillingData",
+          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.BillingData",
           "description": "The billing data of the resource."
         }
       },
@@ -461,9 +733,9 @@
         "billingData"
       ]
     },
-    "WidgetResourceTagsUpdate": {
+    "WidgetTagsUpdate": {
       "type": "object",
-      "description": "The type used for updating tags in WidgetResource resources.",
+      "description": "The type used for updating tags in Widget resources.",
       "properties": {
         "tags": {
           "type": "object",
