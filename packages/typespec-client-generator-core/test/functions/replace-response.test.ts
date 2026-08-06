@@ -84,6 +84,33 @@ it("replaces a response with bytes", async () => {
   strictEqual(method.operation.responses[0].type?.kind, "model");
 });
 
+it("removes pageable behavior when overriding a list operation with bytes", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BlobPage {
+      @pageItems
+      items: string[];
+    }
+
+    @get
+    @list
+    op listBlobs(): BlobPage;
+
+    @route("/bytes")
+    op listBlobsAsBytes(): bytes;
+    @@override(TestService.listBlobs, TestService.listBlobsAsBytes, "rust");
+  `);
+
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-rust",
+  });
+  const method = getServiceMethodOfClient(context.sdkPackage);
+
+  strictEqual(method.kind, "basic");
+  ok(method.response.type);
+  strictEqual(method.response.type.kind, "bytes");
+  strictEqual(method.operation.responses[0].type?.kind, "model");
+});
+
 it("composes response replacement with other operation transformations", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
