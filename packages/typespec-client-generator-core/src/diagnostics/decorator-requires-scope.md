@@ -54,7 +54,7 @@ model Widget {}
 
 ## Suppression
 
-Suppress this warning only if the decorator is intentionally applied without a language scope:
+Suppress this warning only if the decorator is intentionally shared by all emitters rather than scoped to one language.
 
 ```typespec
 #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "intentionally global"
