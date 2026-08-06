@@ -80,7 +80,9 @@ describe("orchestrator", () => {
     `);
 
     const result = analyzeProgram(program);
-    const finding = result.findings.find((candidate) => candidate.diff.kind === "ResourcePropertyRemoved");
+    const finding = result.findings.find(
+      (candidate) => candidate.diff.kind === "ResourcePropertyRemoved",
+    );
 
     expect(finding).toBeDefined();
     expect(finding).toEqual(
@@ -122,14 +124,16 @@ describe("orchestrator", () => {
     // The v1→v2 comparison has headVersion="2025-01-01" which is < since="2026-01-01"
     // So the suppression should NOT match for that pair
     const finding = result.findings.find(
-      (f) => f.diff.kind === "ResourcePropertyRemoved" && f.versionPair.headVersion === "2025-01-01",
+      (f) =>
+        f.diff.kind === "ResourcePropertyRemoved" && f.versionPair.headVersion === "2025-01-01",
     );
     expect(finding).toBeDefined();
     expect(finding!.suppressed).toBe(false);
 
     // The v2→v3 pair would have headVersion="2026-01-01" which is >= since
     const findingV3 = result.findings.find(
-      (f) => f.diff.kind === "ResourcePropertyRemoved" && f.versionPair.headVersion === "2026-01-01",
+      (f) =>
+        f.diff.kind === "ResourcePropertyRemoved" && f.versionPair.headVersion === "2026-01-01",
     );
     // If there's a v3 finding, it should be suppressed
     if (findingV3) {
@@ -446,7 +450,8 @@ describe("orchestrator", () => {
       applySuppressions: vi.fn((findings: unknown[]) => findings),
     }));
 
-    const { analyzeBaseAndHead: mockedAnalyzeBaseAndHead } = await import("../src/pipeline/orchestrator.js");
+    const { analyzeBaseAndHead: mockedAnalyzeBaseAndHead } =
+      await import("../src/pipeline/orchestrator.js");
     const baseProgram = {};
     const headProgram = {};
 
@@ -586,7 +591,8 @@ describe("orchestrator", () => {
 
       // "city" should produce exactly ONE finding per kind, not one per operation
       const resourceRemoved = result.findings.filter(
-        (f) => f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("city"),
+        (f) =>
+          f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("city"),
       );
       expect(resourceRemoved).toHaveLength(1);
 
@@ -632,7 +638,8 @@ describe("orchestrator", () => {
       // Despite 5 operations, "legacy" should produce exactly 1 ResourcePropertyRemoved
       // (merged from Request + Response, then deduped across operations)
       const resourceRemoved = result.findings.filter(
-        (f) => f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("legacy"),
+        (f) =>
+          f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("legacy"),
       );
       expect(resourceRemoved).toHaveLength(1);
     });
@@ -666,7 +673,8 @@ describe("orchestrator", () => {
 
       // Type change on "age" should produce exactly 1 merged Resource finding
       const resourceTypeChanged = result.findings.filter(
-        (f) => f.diff.kind === "ResourcePropertyTypeChanged" && f.diff.identity.element.includes("age"),
+        (f) =>
+          f.diff.kind === "ResourcePropertyTypeChanged" && f.diff.identity.element.includes("age"),
       );
       expect(resourceTypeChanged).toHaveLength(1);
 
@@ -709,7 +717,9 @@ describe("orchestrator", () => {
       // Should have one ResourcePropertyRemoved (merged from Request + Response)
       const kinds = new Set(legacyFindings.map((f) => f.diff.kind));
       expect(kinds.has("ResourcePropertyRemoved")).toBe(true);
-      expect(legacyFindings.filter((f) => f.diff.kind === "ResourcePropertyRemoved")).toHaveLength(1);
+      expect(legacyFindings.filter((f) => f.diff.kind === "ResourcePropertyRemoved")).toHaveLength(
+        1,
+      );
     });
 
     // Scenario 5: Deeply nested models (Model → SubModel → SubSubModel → property)
@@ -746,8 +756,7 @@ describe("orchestrator", () => {
 
       const removed = result.findings.filter(
         (f) =>
-          f.diff.kind === "ResourcePropertyRemoved" &&
-          f.diff.identity.element.includes("obsolete"),
+          f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("obsolete"),
       );
 
       // Exactly 1 Resource finding (merged from Request + Response) despite 2-level nesting
@@ -783,7 +792,9 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const resourceRemoved = result.findings.filter((f) => f.diff.kind === "ResourcePropertyRemoved");
+      const resourceRemoved = result.findings.filter(
+        (f) => f.diff.kind === "ResourcePropertyRemoved",
+      );
 
       const elements = resourceRemoved.map((f) => f.diff.identity.element);
       expect(elements.some((e) => e.includes("city"))).toBe(true);
@@ -851,9 +862,7 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const cityFindings = result.findings.filter((f) =>
-        f.diff.identity.element.includes("city"),
-      );
+      const cityFindings = result.findings.filter((f) => f.diff.identity.element.includes("city"));
 
       expect(cityFindings.length).toBeGreaterThan(0);
       for (const f of cityFindings) {
@@ -861,9 +870,7 @@ describe("orchestrator", () => {
       }
 
       // No unsuppressed errors at all
-      const unsuppressed = result.findings.filter(
-        (f) => f.severity === "error" && !f.suppressed,
-      );
+      const unsuppressed = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
       expect(unsuppressed).toHaveLength(0);
     });
 
@@ -897,9 +904,7 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const cityFindings = result.findings.filter((f) =>
-        f.diff.identity.element.includes("city"),
-      );
+      const cityFindings = result.findings.filter((f) => f.diff.identity.element.includes("city"));
 
       expect(cityFindings.length).toBeGreaterThan(0);
       for (const f of cityFindings) {
@@ -936,10 +941,12 @@ describe("orchestrator", () => {
 
       // Different properties in different models — should NOT merge
       const requestRemoved = result.findings.filter(
-        (f) => f.diff.kind === "RequestPropertyRemoved" && f.diff.identity.element.includes("legacy"),
+        (f) =>
+          f.diff.kind === "RequestPropertyRemoved" && f.diff.identity.element.includes("legacy"),
       );
       const responseRemoved = result.findings.filter(
-        (f) => f.diff.kind === "ResponsePropertyRemoved" && f.diff.identity.element.includes("oldField"),
+        (f) =>
+          f.diff.kind === "ResponsePropertyRemoved" && f.diff.identity.element.includes("oldField"),
       );
 
       expect(requestRemoved).toHaveLength(1);
@@ -974,9 +981,7 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const cityFindings = result.findings.filter((f) =>
-        f.diff.identity.element.includes("city"),
-      );
+      const cityFindings = result.findings.filter((f) => f.diff.identity.element.includes("city"));
 
       expect(cityFindings.length).toBeGreaterThan(0);
       // All should be suppressed — ResourcePropertyRemoved matches the merged finding
@@ -984,6 +989,290 @@ describe("orchestrator", () => {
         expect(f.suppressed).toBe(true);
         expect(f.diff.kind).toBe("ResourcePropertyRemoved");
       }
+    });
+
+    describe("Resource merge + suppression across diff kinds", () => {
+      async function analyzeSuppressed(spec: string) {
+        const { program } = await TesterWithSuppressions.compile(spec);
+        return analyzeProgram(program, { phase: "cross-version" });
+      }
+
+      it("suppresses merged ResourcePropertyRemoved findings", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("legacy removed", #{ kind: "ResourcePropertyRemoved" })
+            @removed(Versions.v2)
+            legacy?: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const legacyFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+
+        expect(legacyFindings).toHaveLength(1);
+        expect(legacyFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
+        expect(legacyFindings[0].suppressed).toBe(true);
+      });
+
+      it("suppresses merged ResourcePropertyTypeChanged findings", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("count changed", #{ kind: "ResourcePropertyTypeChanged" })
+            @typeChangedFrom(Versions.v2, string)
+            count: int32;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const countFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("count"),
+        );
+
+        expect(countFindings).toHaveLength(1);
+        expect(countFindings[0].diff.kind).toBe("ResourcePropertyTypeChanged");
+        expect(countFindings[0].suppressed).toBe(true);
+      });
+
+      it("suppresses merged ResourcePropertyMadeOptional findings", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("status relaxed", #{ kind: "ResourcePropertyMadeOptional" })
+            @madeOptional(Versions.v2)
+            status?: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const statusFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("status"),
+        );
+
+        expect(statusFindings).toHaveLength(1);
+        expect(statusFindings[0].diff.kind).toBe("ResourcePropertyMadeOptional");
+        expect(statusFindings[0].suppressed).toBe(true);
+      });
+
+      it("suppresses merged ResourcePropertyMadeRequired findings", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("sku required", #{ kind: "ResourcePropertyMadeRequired" })
+            @madeRequired(Versions.v2)
+            sku: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const skuFindings = result.findings.filter((f) => f.diff.identity.element.includes("sku"));
+
+        expect(skuFindings).toHaveLength(1);
+        expect(skuFindings[0].diff.kind).toBe("ResourcePropertyMadeRequired");
+        expect(skuFindings[0].suppressed).toBe(true);
+      });
+
+      it("suppresses mixed merged resource kinds independently", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("legacy removed", #{ kind: "ResourcePropertyRemoved" })
+            @removed(Versions.v2)
+            legacy?: string;
+
+            @approvedBreakingChange("count changed", #{ kind: "ResourcePropertyTypeChanged" })
+            @typeChangedFrom(Versions.v2, string)
+            count: int32;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const legacyFinding = result.findings.find((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+        const countFinding = result.findings.find((f) => f.diff.identity.element.includes("count"));
+
+        expect(legacyFinding?.diff.kind).toBe("ResourcePropertyRemoved");
+        expect(legacyFinding?.suppressed).toBe(true);
+        expect(countFinding?.diff.kind).toBe("ResourcePropertyTypeChanged");
+        expect(countFinding?.suppressed).toBe(true);
+      });
+
+      it("suppresses request-only kinds without merging", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model CreateWidgetRequest {
+            name: string;
+            @approvedBreakingChange("legacy removed", #{ kind: "RequestPropertyRemoved" })
+            @removed(Versions.v2)
+            legacy?: string;
+          }
+
+          @route("/widgets")
+          @post op createWidget(@body body: CreateWidgetRequest): void;
+        `);
+
+        const legacyFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+
+        expect(legacyFindings).toHaveLength(1);
+        expect(legacyFindings[0].diff.kind).toBe("RequestPropertyRemoved");
+        expect(legacyFindings[0].suppressed).toBe(true);
+      });
+
+      it("suppresses response-only kinds without merging", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("legacy removed", #{ kind: "ResponsePropertyRemoved" })
+            @removed(Versions.v2)
+            legacy?: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+        `);
+
+        const legacyFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+
+        expect(legacyFindings).toHaveLength(1);
+        expect(legacyFindings[0].diff.kind).toBe("ResponsePropertyRemoved");
+        expect(legacyFindings[0].suppressed).toBe(true);
+      });
+
+      it("does not suppress merged resource findings when the decorator kind is wrong", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("wrong kind", #{ kind: "ResourcePropertyTypeChanged" })
+            @removed(Versions.v2)
+            legacy?: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const legacyFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+
+        expect(legacyFindings).toHaveLength(1);
+        expect(legacyFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
+        expect(legacyFindings[0].suppressed).toBe(false);
+      });
+
+      it("supports Request/Response suppression kind aliases for merged resource findings", async () => {
+        const result = await analyzeSuppressed(`
+          @versioned(Versions)
+          @service
+          namespace TestService;
+
+          enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+          model Widget {
+            name: string;
+            @approvedBreakingChange("legacy removed", #{ kind: "RequestPropertyRemoved" })
+            @removed(Versions.v2)
+            legacy?: string;
+          }
+
+          @route("/widgets/{name}")
+          @get op getWidget(@path name: string): Widget;
+
+          @route("/widgets/{name}")
+          @put op createWidget(@path name: string, @body body: Widget): Widget;
+        `);
+
+        const legacyFindings = result.findings.filter((f) =>
+          f.diff.identity.element.includes("legacy"),
+        );
+
+        expect(legacyFindings).toHaveLength(1);
+        expect(legacyFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
+        expect(legacyFindings[0].suppressed).toBe(true);
+      });
     });
 
     // Scenario 12: Source link resolution for spread models (TrackedResource pattern)
@@ -1056,7 +1345,9 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+      const legacyFindings = result.findings.filter((f) =>
+        f.diff.identity.element.includes("legacy"),
+      );
 
       expect(legacyFindings).toHaveLength(1);
       expect(legacyFindings[0].diff.kind).toBe("RequestPropertyRemoved");
@@ -1082,7 +1373,9 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+      const legacyFindings = result.findings.filter((f) =>
+        f.diff.identity.element.includes("legacy"),
+      );
 
       expect(legacyFindings).toHaveLength(1);
       expect(legacyFindings[0].diff.kind).toBe("ResponsePropertyRemoved");
@@ -1113,11 +1406,15 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const timeoutFindings = result.findings.filter((f) => f.diff.identity.element.includes("timeout"));
+      const timeoutFindings = result.findings.filter((f) =>
+        f.diff.identity.element.includes("timeout"),
+      );
 
       expect(timeoutFindings).toHaveLength(1);
       expect(timeoutFindings[0].diff.kind).toBe("ResourcePropertyRemoved");
-      expect(timeoutFindings[0].diff.identity.element).toBe("body.properties.config.properties.timeout");
+      expect(timeoutFindings[0].diff.identity.element).toBe(
+        "body.properties.config.properties.timeout",
+      );
     });
 
     it("merges GET, PUT, and PATCH findings into a single ResourcePropertyRemoved", async () => {
@@ -1147,7 +1444,9 @@ describe("orchestrator", () => {
       `);
 
       const result = analyzeProgram(program);
-      const legacyFindings = result.findings.filter((f) => f.diff.identity.element.includes("legacy"));
+      const legacyFindings = result.findings.filter((f) =>
+        f.diff.identity.element.includes("legacy"),
+      );
 
       expect(legacyFindings).toHaveLength(1);
       expect(legacyFindings[0].diff.kind).toBe("ResourcePropertyRemoved");

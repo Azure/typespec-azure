@@ -1,7 +1,5 @@
 import type { Namespace, Program } from "@typespec/compiler";
 import { computeDiffs } from "../diff/diff-engine.js";
-import { classifyDiffs } from "./policy.js";
-import { resolveHeadSourceLocations } from "./resolve-location.js";
 import { applySuppressions } from "../suppression/suppression.js";
 import type {
   AnalysisResult,
@@ -12,6 +10,8 @@ import type {
   VersionComparisonSummary,
   VersionPair,
 } from "../types.js";
+import { classifyDiffs } from "./policy.js";
+import { resolveHeadSourceLocations } from "./resolve-location.js";
 import {
   buildPhaseAPairs,
   buildPhaseBPairs,
@@ -51,7 +51,9 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     if (service.versions.some((v) => defaultVersionClassifier(v) === "stable")) {
       hasStableVersion = true;
     }
-    options?.log?.(`Analyzing service: ${service.service.name} (${service.versions.length} versions)`);
+    options?.log?.(
+      `Analyzing service: ${service.service.name} (${service.versions.length} versions)`,
+    );
 
     if (options?.phase === "same-version") {
       continue;
@@ -95,7 +97,13 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
 
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options, hasStableVersion);
+  const summary = buildSummary(
+    servicesAnalyzed,
+    comparisonsPerformed,
+    versionComparisons,
+    options,
+    hasStableVersion,
+  );
   return { findings, timing, summary };
 }
 
@@ -126,8 +134,12 @@ export function analyzeBaseAndHead(
     if (headService.versions.some((v) => defaultVersionClassifier(v) === "stable")) {
       hasStableVersion = true;
     }
-    options?.log?.(`Analyzing service: ${headService.service.name} (${headService.versions.length} versions)`);
-    const baseService = baseServices.find((candidate) => candidate.service.name === headService.service.name);
+    options?.log?.(
+      `Analyzing service: ${headService.service.name} (${headService.versions.length} versions)`,
+    );
+    const baseService = baseServices.find(
+      (candidate) => candidate.service.name === headService.service.name,
+    );
     const changedVersions: string[] = [];
 
     if (!options?.phase || options.phase === "same-version") {
@@ -141,8 +153,18 @@ export function analyzeBaseAndHead(
           continue;
         }
 
-        const baseView = timeVersionedView(baseProgram, baseService.service, pair.baseVersion, timing);
-        const headView = timeVersionedView(headProgram, headService.service, pair.headVersion, timing);
+        const baseView = timeVersionedView(
+          baseProgram,
+          baseService.service,
+          pair.baseVersion,
+          timing,
+        );
+        const headView = timeVersionedView(
+          headProgram,
+          headService.service,
+          pair.headVersion,
+          timing,
+        );
         const findings = analyzePair(baseView, headView, pair, timing);
         versionComparisons.push({
           serviceName: headService.service.name,
@@ -175,8 +197,18 @@ export function analyzeBaseAndHead(
 
         comparisonsPerformed += phaseBPairs.length;
         for (const pair of phaseBPairs) {
-          const baseView = timeVersionedView(headProgram, headService.service, pair.baseVersion, timing);
-          const headView = timeVersionedView(headProgram, headService.service, pair.headVersion, timing);
+          const baseView = timeVersionedView(
+            headProgram,
+            headService.service,
+            pair.baseVersion,
+            timing,
+          );
+          const headView = timeVersionedView(
+            headProgram,
+            headService.service,
+            pair.headVersion,
+            timing,
+          );
           const findings = analyzePair(baseView, headView, pair, timing);
           allFindings.push(...findings);
           versionComparisons.push({
@@ -213,7 +245,13 @@ export function analyzeBaseAndHead(
 
   timing.totalMs = Date.now() - totalStart;
 
-  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, versionComparisons, options, hasStableVersion);
+  const summary = buildSummary(
+    servicesAnalyzed,
+    comparisonsPerformed,
+    versionComparisons,
+    options,
+    hasStableVersion,
+  );
   return { findings, timing, summary };
 }
 
@@ -301,7 +339,9 @@ function buildSummary(
 }
 
 function formatComparisonResult(findingCount: number): string {
-  return findingCount === 0 ? "no changes" : `${findingCount} finding${findingCount === 1 ? "" : "s"}`;
+  return findingCount === 0
+    ? "no changes"
+    : `${findingCount} finding${findingCount === 1 ? "" : "s"}`;
 }
 
 /**
@@ -411,9 +451,12 @@ function mergeRequestResponseToResource(findings: Finding[]): Finding[] {
         // Mark both as consumed, emit a Resource finding
         consumed.add(f);
         consumed.add(match);
+        const mergedKind = REQUEST_RESPONSE_PAIRS[suffix] as any;
         const merged: Finding = {
           ...f,
-          diff: { ...f.diff, kind: REQUEST_RESPONSE_PAIRS[suffix] as any },
+          diff: { ...f.diff, kind: mergedKind },
+          severity: "error",
+          rule: "resource-contract-change",
         };
         result.push(merged);
       }
@@ -444,7 +487,8 @@ function buildMergeKey(f: Finding, suffix: string): string | undefined {
 
 function getMergeIdentityKey(f: Finding): string {
   const sourceType = f.diff.headType ?? f.diff.baseType;
-  const mergeIdentity = sourceType && (sourceType as any).node ? (sourceType as any).node : sourceType;
+  const mergeIdentity =
+    sourceType && (sourceType as any).node ? (sourceType as any).node : sourceType;
 
   if (mergeIdentity && typeof mergeIdentity === "object") {
     let id = mergeIdentityIds.get(mergeIdentity);
