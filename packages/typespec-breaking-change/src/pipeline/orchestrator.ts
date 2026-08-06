@@ -84,6 +84,10 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   const dedupedFindings = deduplicateBySourceType(allFindings);
   timing.classifyMs += Date.now() - dedupStart;
 
+  // Resolve head source locations before merge so merged Resource findings
+  // preserve whether the head source traced to the property itself or parent model.
+  resolveHeadSourceLocations(dedupedFindings, program);
+
   const merged = mergeRequestResponseToResource(dedupedFindings);
   const deduped = collapsePhaseADuplicates(merged);
 

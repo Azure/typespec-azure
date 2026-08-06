@@ -30,7 +30,7 @@ export function resolveFindingLocation(finding: Finding): ResolvedLocation | und
   // 1. Head source location (highest priority — set by resolveHeadSourceLocations
   // for cross-compilation findings, or by the diff engine for same-program findings)
   if (diff.headSourceLocation && isValidSourceLocation(diff.headSourceLocation)) {
-    return resolvedLocation(diff.headSourceLocation, "direct");
+    return resolvedLocation(diff.headSourceLocation, diff.headSourceTraceLevel ?? "direct");
   }
 
   // 2. Origin source location (property/type declaration in user code)
@@ -201,6 +201,7 @@ export function resolveHeadSourceLocations(findings: Finding[], headProgram: Pro
       const loc = safeGetSourceLocation(headProp);
       if (loc && isValidSourceLocation(loc)) {
         diff.headSourceLocation = loc;
+        diff.headSourceTraceLevel = "direct";
         continue;
       }
     }
@@ -209,6 +210,7 @@ export function resolveHeadSourceLocations(findings: Finding[], headProgram: Pro
     const modelLoc = safeGetSourceLocation(headModel);
     if (modelLoc && isValidSourceLocation(modelLoc)) {
       diff.headSourceLocation = modelLoc;
+      diff.headSourceTraceLevel = "parentModel";
     }
   }
 }

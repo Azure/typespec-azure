@@ -1,10 +1,11 @@
+import { getSourceLocation } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
 import { computeDiffs } from "../src/diff/diff-engine.js";
 import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { resolveFindingLocation as resolveResolvedFindingLocation } from "../src/pipeline/resolve-location.js";
 import type { Finding, VersionedView } from "../src/types.js";
 import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
-import { Tester } from "./test-host.js";
+import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 const resolveFindingLocation = (finding: Finding) =>
   resolveResolvedFindingLocation(finding)?.location;
@@ -782,8 +783,10 @@ describe("resolveFindingLocation", () => {
       const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
       expect(removal).toBeDefined();
 
-      const location = resolveFindingLocation(removal!);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      const location = resolved?.location;
       expect(location).toBeDefined();
+      expect(resolved?.sourceTraceLevel).toBe("parentModel");
       // Location should be from HEAD source (which doesn't contain "city")
       const fileText = location!.file.text;
       expect(fileText).toContain("model Widget");
@@ -812,12 +815,13 @@ describe("resolveFindingLocation", () => {
       const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
       expect(removal).toBeDefined();
 
-      const location = resolveFindingLocation(removal!);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      const location = resolved?.location;
       expect(location).toBeDefined();
+      expect(resolved?.sourceTraceLevel).toBe("direct");
       // Should point to the city property itself since it exists in head source
       // (same program — baseSourceLocation IS head source)
-      const fileText = location!.file.text;
-      expect(fileText).toContain("city");
+      expect(getLineAtLocation(location!)).toContain("city");
     });
 
     it("Phase A: property with @added(v2) in head → links to property in HEAD (exists in head source)", async () => {
@@ -858,13 +862,342 @@ describe("resolveFindingLocation", () => {
       const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
       expect(removal).toBeDefined();
 
-      const location = resolveFindingLocation(removal!);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      const location = resolved?.location;
       expect(location).toBeDefined();
+      expect(resolved?.sourceTraceLevel).toBe("direct");
       // Should point to the city property itself in HEAD source
       // (property exists in head, just projected out of v1 via @added(v2))
       const fileText = location!.file.text;
-      expect(fileText).toContain("city");
+      expect(getLineAtLocation(location!)).toContain("city");
       expect(fileText).toContain("@added");
+    });
+  });
+
+  describe("demo PR and edge-case coverage", () => {
+    it("PR #2: Phase B unsuppressed @removed resolves directly to the head property", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @removed(Versions.v2)
+          city?: string;
+        }
+
+        @route("/widgets")
+        @get
+        op listWidgets(): Widget[];
+      `);
+
+      const result = analyzeProgram(program, { phase: "cross-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+
+      expect(removal).toBeDefined();
+      expect(removal?.suppressed).toBe(false);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      expect(resolved?.sourceTraceLevel).toBe("direct");
+      expect(getLineAtLocation(resolved!.location)).toContain("city");
+    });
+
+    it("PR #3: Phase B suppressed findings still resolve directly to the head property", async () => {
+      const { program } = await TesterWithSuppressions.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Widget {
+          name: string;
+          @approvedBreakingChange("city removed", #{ kind: "ResourcePropertyRemoved" })
+          @removed(Versions.v2)
+          city?: string;
+        }
+
+        @route("/widgets")
+        @put
+        op createWidget(@body widget: Widget): Widget;
+      `);
+
+      const result = analyzeProgram(program, { phase: "cross-version" });
+      const removal = result.findings.find(
+        (f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"),
+      );
+
+      expect(removal).toBeDefined();
+      expect(removal?.suppressed).toBe(true);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      expect(resolved?.sourceTraceLevel).toBe("direct");
+      expect(getLineAtLocation(resolved!.location)).toContain("city");
+    });
+
+    it("PR #5: Phase A suppressed cross-compilation removals resolve to the parent model in head", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Widget {
+          name: string;
+          city: string;
+        }
+
+        @route("/widgets")
+        @put
+        op createWidget(@body widget: Widget): Widget;
+      `);
+
+      const { program: headProgram } = await TesterWithSuppressions.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        @approvedUnversionedChange("city removed", #{ kind: "ResourcePropertyRemoved", path: "city" })
+        model Widget {
+          name: string;
+        }
+
+        @route("/widgets")
+        @put
+        op createWidget(@body widget: Widget): Widget;
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, { phase: "same-version" });
+      const removal = result.findings.find(
+        (f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"),
+      );
+
+      expect(removal).toBeDefined();
+      expect(removal?.suppressed).toBe(true);
+      const resolved = resolveResolvedFindingLocation(removal!);
+      expect(resolved?.sourceTraceLevel).toBe("parentModel");
+      expect(getLineAtLocation(resolved!.location)).toContain("model Widget");
+    });
+
+    it("spread-model removals trace back through sourceProperty as origin", async () => {
+      const { baseView, headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Base {
+          @removed(Versions.v2)
+          sharedField?: string;
+        }
+
+        model Widget {
+          ...Base;
+          name: string;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op getWidget(@path id: string): Widget;
+      `);
+
+      const { diffs } = computeDiffs(baseView, headView);
+      const removal = diffs.find((d) => d.kind === "ResponsePropertyRemoved");
+
+      expect(removal?.origin?.declarationPath).toContain("Base.sharedField");
+      const resolved = resolveResolvedFindingLocation(makeFinding(removal!, headView));
+      expect(resolved?.sourceTraceLevel).toBe("origin");
+      expect(getLineAtLocation(resolved!.location)).toContain("sharedField");
+    });
+
+    it("visibility-filtered projected models use the AST source model name fallback", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Resource<T> { name: string; properties: T; }
+
+        model EmployeeProperties {
+          department: string;
+          city?: string;
+        }
+
+        @route("/employees/{name}")
+        @put
+        op createEmployee(@path name: string, @body body: Resource<EmployeeProperties>): Resource<EmployeeProperties>;
+      `);
+
+      const { program: headProgram } = await Tester.compile(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01" }
+
+        model Resource<T> { name: string; properties: T; }
+
+        model EmployeeProperties {
+          department: string;
+        }
+
+        @route("/employees/{name}")
+        @put
+        op createEmployee(@path name: string, @body body: Resource<EmployeeProperties>): Resource<EmployeeProperties>;
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, { phase: "same-version" });
+      const removal = result.findings.find((f) => f.diff.kind.includes("PropertyRemoved"));
+
+      expect(removal).toBeDefined();
+      const resolved = resolveResolvedFindingLocation(removal!);
+      expect(resolved?.sourceTraceLevel).toBe("parentModel");
+      expect(getLineAtLocation(resolved!.location)).toContain("model EmployeeProperties");
+    });
+
+    it("TrackedResource-style origin gaps still fall back to the operation location", async () => {
+      const { baseView, headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        model Resource<T> { name: string; properties: T; }
+
+        model EmployeeProperties {
+          name: string;
+          @removed(Versions.v2)
+          legacy?: string;
+        }
+
+        @route("/employees/{name}")
+        @put
+        op createEmployee(@path name: string, @body body: Resource<EmployeeProperties>): Resource<EmployeeProperties>;
+      `);
+
+      const { diffs } = computeDiffs(baseView, headView);
+      const removal = diffs.find((d) => d.kind.includes("PropertyRemoved"));
+
+      expect(removal).toBeDefined();
+      const finding = makeFinding(
+        {
+          ...removal,
+          origin: undefined,
+          headSourceLocation: undefined,
+          headSourceTraceLevel: undefined,
+          baseSourceLocation: undefined,
+          headType: undefined,
+          baseType: undefined,
+        },
+        headView,
+      );
+
+      const resolved = resolveResolvedFindingLocation(finding);
+      expect(resolved?.sourceTraceLevel).toBe("operation");
+      expect(getLineAtLocation(resolved!.location)).toContain("op createEmployee");
+    });
+
+    it("service-level diffs fall back to the service namespace", async () => {
+      const { headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+        model Widget { name: string; }
+        op getWidget(): Widget;
+      `);
+
+      const resolved = resolveResolvedFindingLocation(
+        makeFinding(
+          {
+            kind: "ApiVersionRemoved",
+            identity: { element: "versions.2024-01-01" },
+            message: "test",
+          },
+          headView,
+        ),
+      );
+
+      expect(resolved?.sourceTraceLevel).toBe("namespace");
+      expect(getLineAtLocation(resolved!.location)).toContain("namespace TestService");
+    });
+
+    it("inline anonymous model properties can fall back to the operation declaration", async () => {
+      const { headView } = await compileViews(`
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        @route("/widgets")
+        @put
+        op createWidget(@body body: { name: string; }): { name: string; };
+      `);
+
+      const operationLocation = findOperationLocation(headView, "createWidget");
+      const resolved = resolveResolvedFindingLocation(
+        makeFinding(
+          {
+            kind: "RequestPropertyRemoved",
+            identity: {
+              operation: { method: "PUT", path: "/widgets", name: "createWidget" },
+              component: "request",
+              element: "body.inline",
+            },
+            message: "test",
+            operationSourceLocation: operationLocation,
+          },
+          headView,
+        ),
+      );
+
+      expect(resolved?.sourceTraceLevel).toBe("operation");
+      expect(getLineAtLocation(resolved!.location)).toContain("op createWidget");
+    });
+
+    it("namespace fallback chooses the correct service when multiple services exist", async () => {
+      const { program } = await Tester.compile(`
+        @versioned(WidgetVersions)
+        @service
+        namespace WidgetService {
+          enum WidgetVersions { v1: "2024-01-01", v2: "2025-01-01" }
+          model Widget { name: string; }
+          op getWidget(): Widget;
+        }
+
+        @versioned(GadgetVersions)
+        @service
+        namespace GadgetService {
+          enum GadgetVersions { v1: "2024-06-01", v2: "2025-06-01" }
+          model Gadget { id: string; }
+          op getGadget(): Gadget;
+        }
+      `);
+
+      const gadgetView = createViewForService(program, "GadgetService", "2025-06-01");
+      const resolved = resolveResolvedFindingLocation(
+        makeFinding(
+          {
+            kind: "ApiVersionRemoved",
+            identity: { element: "versions.2024-06-01" },
+            message: "test",
+          },
+          gadgetView,
+        ),
+      );
+
+      expect(resolved?.sourceTraceLevel).toBe("namespace");
+      expect(getLineAtLocation(resolved!.location)).toContain("namespace GadgetService");
     });
   });
 });
@@ -893,4 +1226,26 @@ async function compileViews(spec: string): Promise<{ baseView: VersionedView; he
     baseView: createVersionedView(program, service.service, service.versions[0]),
     headView: createVersionedView(program, service.service, service.versions[1]),
   };
+}
+
+function getLineAtLocation(location: { file: { text: string }; pos: number }): string {
+  const text = location.file.text;
+  const lineStart = text.lastIndexOf("\n", location.pos - 1) + 1;
+  let lineEnd = text.indexOf("\n", location.pos);
+  if (lineEnd === -1) {
+    lineEnd = text.length;
+  }
+  return text.substring(lineStart, lineEnd).trim();
+}
+
+function createViewForService(program: any, serviceName: string, version: string): VersionedView {
+  const service = enumerateVersions(program).find((entry) => entry.service.name === serviceName);
+  expect(service).toBeDefined();
+  return createVersionedView(program, service!.service, version);
+}
+
+function findOperationLocation(view: VersionedView, operationName: string) {
+  const operation = view.versionedNamespace.operations.get(operationName);
+  expect(operation).toBeDefined();
+  return operation ? getSourceLocation(operation, { locateId: true }) ?? getSourceLocation(operation) : undefined;
 }
