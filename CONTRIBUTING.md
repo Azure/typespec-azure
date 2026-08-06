@@ -301,8 +301,8 @@ Do the following to publish a new release:
 
 2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
 
-3. Make sure your working copy is clean and you are up-to-date and on the
-   main branch (both typespec-azure and core should point to main).
+3. Make sure your working copy is clean and you are up-to-date and core submodules are both up to date with `upstream/main`.
+      1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
    1. In your fork of the core (typespec) repo, run `pnpm exec chronus ai-release-notes --policy typespec-stable --policy typespec-preview > out.md`.
@@ -314,24 +314,19 @@ Do the following to publish a new release:
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
-6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
-   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
+6. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
 
-7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
-
-8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
-
-9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
+7. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 
    - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
 
-10. Push and merge TypeSpec (core) PR.
+8. Push and merge TypeSpec (core) PR.
 
-11. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+9. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
-12. Make sure release pipeline completed and packages are on NPM.
+10. Make sure release pipeline completed and packages are on NPM.
     - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
     - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
