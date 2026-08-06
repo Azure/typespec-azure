@@ -3,7 +3,7 @@ import { execa } from "execa";
 import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getCoreSourceRoot, removeCoreSourceRoot } from "./core-source.ts";
+import { getCoreSourceRoot, removeCoreSourceRoot } from "./core-commit.ts";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const repoRoot = resolve(packageRoot, "../..");

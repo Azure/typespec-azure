@@ -3,7 +3,7 @@ import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { getCoreSourceRoot, removeCoreSourceRoot } from "./core-source.ts";
+import { getCoreSourceRoot, removeCoreSourceRoot } from "./core-commit.ts";
 
 describe("core source", () => {
   const tempDirectories: string[] = [];
