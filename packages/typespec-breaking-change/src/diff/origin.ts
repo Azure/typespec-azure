@@ -60,8 +60,17 @@ export function resolveOrigin(type?: Type): OriginDeclaration | undefined {
 function resolveModelPropertyOrigin(prop: ModelProperty): OriginDeclaration | undefined {
   // Follow sourceProperty chain to the original
   const original = followSourcePropertyChain(prop);
+  const templateSource = traceToTemplateSourceProperty(original);
 
   // Check if the original property lives on a named model
+  if (templateSource?.model && isNamedDeclaration(templateSource.model)) {
+    return {
+      declarationPath: buildDeclarationPath(templateSource.model, templateSource.name),
+      type: templateSource,
+      sourceLocation: safeGetSourceLocation(templateSource),
+    };
+  }
+
   if (original.model && isNamedDeclaration(original.model)) {
     // If the model looks like a visibility-filtered copy (e.g., EmployeePropertiesCreateOrUpdate),
     // trace back to the canonical model via AST node identity on the property.
@@ -102,6 +111,74 @@ function traceToCanonicalProperty(prop: ModelProperty): ModelProperty | undefine
       }
     }
   }
+  return undefined;
+}
+
+/**
+ * Trace a property through template instantiation metadata when sourceProperty
+ * is absent. The compiler attaches templateMapper/sourceModels to instantiated
+ * models, but does not always backfill sourceProperty on copied properties.
+ */
+function traceToTemplateSourceProperty(prop: ModelProperty): ModelProperty | undefined {
+  return (
+    traceToTemplateSourceModel(prop.model, prop.name, new Set<Model>()) ??
+    traceToTemplateArgumentProperty(prop.model, prop.name, new Set<Model>())
+  );
+}
+
+function traceToTemplateSourceModel(
+  model: Model | undefined,
+  propertyName: string,
+  seen: Set<Model>,
+): ModelProperty | undefined {
+  if (!model || seen.has(model)) return undefined;
+  seen.add(model);
+
+  for (const source of model.sourceModels ?? []) {
+    const sourceModel = source.model;
+    if (!sourceModel) continue;
+
+    const direct = sourceModel.properties.get(propertyName);
+    if (direct) {
+      return followSourcePropertyChain(direct);
+    }
+
+    const nested =
+      traceToTemplateSourceModel(sourceModel, propertyName, seen) ??
+      traceToTemplateArgumentProperty(sourceModel, propertyName, seen);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return undefined;
+}
+
+function traceToTemplateArgumentProperty(
+  model: Model | undefined,
+  propertyName: string,
+  seen: Set<Model>,
+): ModelProperty | undefined {
+  const args = ((model as any)?.templateMapper?.args ?? []) as Type[];
+  if (!args) return undefined;
+
+  for (const arg of args) {
+    if (arg.kind !== "Model" || seen.has(arg)) continue;
+    seen.add(arg);
+
+    const direct = arg.properties.get(propertyName);
+    if (direct) {
+      return followSourcePropertyChain(direct);
+    }
+
+    const nested =
+      traceToTemplateSourceModel(arg, propertyName, seen) ??
+      traceToTemplateArgumentProperty(arg, propertyName, seen);
+    if (nested) {
+      return nested;
+    }
+  }
+
   return undefined;
 }
 

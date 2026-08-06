@@ -172,7 +172,7 @@ describe("integration: large ARM spec (Network, 739 operations)", () => {
     });
   }, 120_000);
 
-  it("origin resolution achieves >50% coverage on large spec", async () => {
+  it("origin resolution achieves >90% coverage on large spec", async () => {
     const prog = await getProgram();
     const result = analyzeProgram(prog);
 
@@ -181,7 +181,7 @@ describe("integration: large ARM spec (Network, 739 operations)", () => {
     const pct = total > 0 ? (withOrigin / total) * 100 : 100;
 
     console.log(`  Origin coverage: ${withOrigin}/${total} (${Math.round(pct)}%)`);
-    expect(pct).toBeGreaterThanOrEqual(50);
+    expect(pct).toBeGreaterThanOrEqual(90);
   }, 120_000);
 
   it("deduplication reduces finding count", async () => {
