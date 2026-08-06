@@ -1,0 +1,341 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Common types",
+    "version": "6.0"
+  },
+  "paths": {},
+  "definitions": {
+    "BillingData": {
+      "type": "object",
+      "description": "Billing Data",
+      "properties": {
+        "systemId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Universally Unique Identifier",
+          "readOnly": true
+        },
+        "state": {
+          "type": "string",
+          "default": "Pending",
+          "enum": [
+            "Pending",
+            "Active",
+            "Warned",
+            "Inactive"
+          ],
+          "x-ms-enum": {
+            "name": "BillingState",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Pending",
+                "value": "Pending"
+              },
+              {
+                "name": "Active",
+                "value": "Active"
+              },
+              {
+                "name": "Warned",
+                "value": "Warned"
+              },
+              {
+                "name": "Inactive",
+                "value": "Inactive"
+              }
+            ]
+          },
+          "readOnly": true
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BillingStateReason"
+          },
+          "readOnly": true
+        },
+        "productCode": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Universally Unique Identifier"
+        },
+        "productToken": {
+          "type": "string",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "default": 1
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "billingToken": {
+          "type": "string",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "schedule": {
+          "$ref": "#/definitions/BillingSchedule"
+        }
+      },
+      "required": [
+        "productCode",
+        "quantity"
+      ]
+    },
+    "BillingRenewalType": {
+      "type": "string",
+      "enum": [
+        "Automatic",
+        "None"
+      ],
+      "x-ms-enum": {
+        "name": "BillingRenewalType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Automatic",
+            "value": "Automatic"
+          },
+          {
+            "name": "None",
+            "value": "None"
+          }
+        ]
+      }
+    },
+    "BillingSchedule": {
+      "type": "object",
+      "properties": {
+        "renewal": {
+          "type": "string",
+          "default": "Automatic",
+          "enum": [
+            "Automatic",
+            "None"
+          ],
+          "x-ms-enum": {
+            "name": "BillingRenewalType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Automatic",
+                "value": "Automatic"
+              },
+              {
+                "name": "None",
+                "value": "None"
+              }
+            ]
+          }
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BillingScheduleChange"
+          }
+        }
+      },
+      "required": [
+        "renewal"
+      ]
+    },
+    "BillingScheduleChange": {
+      "type": "object",
+      "properties": {
+        "effective": {
+          "type": "string",
+          "default": "Renewal",
+          "enum": [
+            "AbsoluteDate",
+            "Renewal"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeEffectiveType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "AbsoluteDate",
+                "value": "AbsoluteDate"
+              },
+              {
+                "name": "Renewal",
+                "value": "Renewal"
+              }
+            ]
+          }
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "kind": {
+          "type": "string",
+          "default": "Update",
+          "enum": [
+            "Update",
+            "Cancel"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeKind",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Update",
+                "value": "Update"
+              },
+              {
+                "name": "Cancel",
+                "value": "Cancel"
+              }
+            ]
+          }
+        },
+        "productCode": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Universally Unique Identifier"
+        },
+        "productToken": {
+          "type": "string",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "billingToken": {
+          "type": "string",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "effective",
+        "kind"
+      ]
+    },
+    "BillingScheduleChangeEffectiveType": {
+      "type": "string",
+      "enum": [
+        "AbsoluteDate",
+        "Renewal"
+      ],
+      "x-ms-enum": {
+        "name": "BillingScheduleChangeEffectiveType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "AbsoluteDate",
+            "value": "AbsoluteDate"
+          },
+          {
+            "name": "Renewal",
+            "value": "Renewal"
+          }
+        ]
+      }
+    },
+    "BillingScheduleChangeKind": {
+      "type": "string",
+      "enum": [
+        "Update",
+        "Cancel"
+      ],
+      "x-ms-enum": {
+        "name": "BillingScheduleChangeKind",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Update",
+            "value": "Update"
+          },
+          {
+            "name": "Cancel",
+            "value": "Cancel"
+          }
+        ]
+      }
+    },
+    "BillingState": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Active",
+        "Warned",
+        "Inactive"
+      ],
+      "x-ms-enum": {
+        "name": "BillingState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Pending",
+            "value": "Pending"
+          },
+          {
+            "name": "Active",
+            "value": "Active"
+          },
+          {
+            "name": "Warned",
+            "value": "Warned"
+          },
+          {
+            "name": "Inactive",
+            "value": "Inactive"
+          }
+        ]
+      }
+    },
+    "BillingStateReason": {
+      "type": "string",
+      "enum": [
+        "Suspended",
+        "Canceled",
+        "Expired"
+      ],
+      "x-ms-enum": {
+        "name": "BillingStateReason",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Suspended",
+            "value": "Suspended"
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled"
+          },
+          {
+            "name": "Expired",
+            "value": "Expired"
+          }
+        ]
+      }
+    }
+  }
+}

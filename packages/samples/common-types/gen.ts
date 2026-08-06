@@ -20,6 +20,7 @@ await emitCommonTypesSwagger("managed-identity-with-delegation");
 await emitCommonTypesSwagger("mobo");
 await emitCommonTypesSwagger("network-security-perimeter");
 await emitCommonTypesSwagger("private-links");
+await emitCommonTypesSwagger("billing-data");
 await emitCommonTypesSwagger("types");
 
 function log(...args: any[]) {
