@@ -16,7 +16,9 @@ using Azure.Core;
 @doc("An example of using BillingData a resource type.")
 namespace Microsoft.UpdateTests;
 
+/** UpdateTests API versions */
 enum Versions {
+  /** 2023-03-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   `2023-03-01-preview`,
 }

@@ -4,6 +4,9 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
+/**
+ * The billing properties of this resource.
+ */
 @@armCommonDefinition(
   BillingData,
   "BillingData",
@@ -11,6 +14,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingdata.json"
 );
 
+/**
+ * The billing state of this resource.
+ */
 @@armCommonDefinition(
   BillingState,
   "BillingState",
@@ -18,6 +24,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingstate.json"
 );
 
+/**
+ * The billing state reason of this resource.
+ */
 @@armCommonDefinition(
   BillingStateReason,
   "BillingStateReason",
@@ -25,6 +34,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingstatereason.json"
 );
 
+/**
+ * The billing schedule of this resource.
+ */
 @@armCommonDefinition(
   BillingSchedule,
   "BillingSchedule",
@@ -32,6 +44,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingschedule.json"
 );
 
+/**
+ * A billing schedule change.
+ */
 @@armCommonDefinition(
   BillingScheduleChange,
   "BillingScheduleChange",
@@ -39,6 +54,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingschedulechange.json"
 );
 
+/**
+ * A billing renewal type.
+ */
 @@armCommonDefinition(
   BillingRenewalType,
   "BillingRenewalType",
@@ -46,6 +64,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingrenewaltype.json"
 );
 
+/**
+ * When a scheduled change is expected to become effective.
+ */
 @@armCommonDefinition(
   BillingScheduleChangeEffectiveType,
   "BillingScheduleChangeEffectiveType",
@@ -53,6 +74,9 @@ namespace Azure.ResourceManager.CommonTypes;
   "billingschedulechangeeffectivetype.json"
 );
 
+/**
+ * When a scheduled change is expected to become effective.
+ */
 @@armCommonDefinition(
   BillingScheduleChangeKind,
   "BillingScheduleChangeKind",
