@@ -1,0 +1,2112 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "LroPatch202",
+  "count": 60,
+  "levels": {
+    "error": 60
+  },
+  "results": [
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "swaggerFile": "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/swagger/preview/2025-08-01-preview/appconfiguration.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppConfiguration/configurationStores/{configStoreName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppConfiguration/configurationStores/{configStoreName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 631,
+            "column": 20
+          },
+          "end": {
+            "line": 658,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/communication/Communication.Management",
+      "swaggerFile": "projects/specification/communication/Communication.Management/swagger/resource-manager/Microsoft.Communication/stable/2026-03-18/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Communication/emailServices/{emailServiceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Communication/emailServices/{emailServiceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1210,
+            "column": 20
+          },
+          "end": {
+            "line": 1237,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/communication/Communication.Management",
+      "swaggerFile": "projects/specification/communication/Communication.Management/swagger/resource-manager/Microsoft.Communication/stable/2026-03-18/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Communication/emailServices/{emailServiceName}/domains/{domainName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Communication/emailServices/{emailServiceName}/domains/{domainName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1564,
+            "column": 20
+          },
+          "end": {
+            "line": 1591,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/hostGroups/{hostGroupName}/hosts/{hostName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/hostGroups/{hostGroupName}/hosts/{hostName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3708,
+            "column": 20
+          },
+          "end": {
+            "line": 3729,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 4238,
+            "column": 20
+          },
+          "end": {
+            "line": 4265,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 6180,
+            "column": 20
+          },
+          "end": {
+            "line": 6201,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/extensions/{vmssExtensionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/extensions/{vmssExtensionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 6871,
+            "column": 20
+          },
+          "end": {
+            "line": 6898,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/extensions/{vmExtensionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/extensions/{vmExtensionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 9169,
+            "column": 20
+          },
+          "end": {
+            "line": 9190,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/runCommands/{runCommandName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/runCommands/{runCommandName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 10184,
+            "column": 20
+          },
+          "end": {
+            "line": 10205,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 10859,
+            "column": 20
+          },
+          "end": {
+            "line": 10880,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 11575,
+            "column": 20
+          },
+          "end": {
+            "line": 11596,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommands/{runCommandName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommands/{runCommandName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 12682,
+            "column": 20
+          },
+          "end": {
+            "line": 12703,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1323,
+            "column": 20
+          },
+          "end": {
+            "line": 1344,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1667,
+            "column": 20
+          },
+          "end": {
+            "line": 1688,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}/versions/{galleryApplicationVersionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}/versions/{galleryApplicationVersionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 2074,
+            "column": 20
+          },
+          "end": {
+            "line": 2095,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/images/{galleryImageName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/images/{galleryImageName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 2432,
+            "column": 20
+          },
+          "end": {
+            "line": 2453,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/images/{galleryImageName}/versions/{galleryImageVersionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/images/{galleryImageName}/versions/{galleryImageVersionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 2884,
+            "column": 20
+          },
+          "end": {
+            "line": 2905,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/inVMAccessControlProfiles/{inVMAccessControlProfileName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/inVMAccessControlProfiles/{inVMAccessControlProfileName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3231,
+            "column": 20
+          },
+          "end": {
+            "line": 3252,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/inVMAccessControlProfiles/{inVMAccessControlProfileName}/versions/{inVMAccessControlProfileVersionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/inVMAccessControlProfiles/{inVMAccessControlProfileName}/versions/{inVMAccessControlProfileVersionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3589,
+            "column": 20
+          },
+          "end": {
+            "line": 3610,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "swaggerFile": "projects/specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger/swagger/preview/2026-05-22-preview/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers/{ledgerName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers/{ledgerName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 20
+          },
+          "end": {
+            "line": 398,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 428,
+            "column": 20
+          },
+          "end": {
+            "line": 455,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/cacheRules/{cacheRuleName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/cacheRules/{cacheRuleName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 786,
+            "column": 20
+          },
+          "end": {
+            "line": 813,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/connectedRegistries/{connectedRegistryName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/connectedRegistries/{connectedRegistryName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1152,
+            "column": 20
+          },
+          "end": {
+            "line": 1179,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/credentialSets/{credentialSetName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/credentialSets/{credentialSetName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1647,
+            "column": 20
+          },
+          "end": {
+            "line": 1674,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 4248,
+            "column": 20
+          },
+          "end": {
+            "line": 4275,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/scopeMaps/{scopeMapName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/scopeMaps/{scopeMapName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 4610,
+            "column": 20
+          },
+          "end": {
+            "line": 4637,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/tokens/{tokenName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/tokens/{tokenName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 4972,
+            "column": 20
+          },
+          "end": {
+            "line": 4999,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 5334,
+            "column": 20
+          },
+          "end": {
+            "line": 5361,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks/swagger/preview/2025-03-01-preview/containerregistry_build.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/agentPools/{agentPoolName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/agentPools/{agentPoolName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 300,
+            "column": 20
+          },
+          "end": {
+            "line": 327,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks/swagger/preview/2025-03-01-preview/containerregistry_build.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1132,
+            "column": 20
+          },
+          "end": {
+            "line": 1159,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 2611,
+            "column": 20
+          },
+          "end": {
+            "line": 2627,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 550,
+            "column": 20
+          },
+          "end": {
+            "line": 577,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/sqlMigrationServices/{sqlMigrationServiceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/sqlMigrationServices/{sqlMigrationServiceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3309,
+            "column": 20
+          },
+          "end": {
+            "line": 3343,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 380,
+            "column": 20
+          },
+          "end": {
+            "line": 396,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.EventGrid/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.EventGrid/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 350,
+            "column": 20
+          },
+          "end": {
+            "line": 366,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 2797,
+            "column": 20
+          },
+          "end": {
+            "line": 2821,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3142,
+            "column": 20
+          },
+          "end": {
+            "line": 3158,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/topics/{topicName}/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/topics/{topicName}/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 3982,
+            "column": 20
+          },
+          "end": {
+            "line": 4003,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerConfigurations/default",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerConfigurations/default",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 7760,
+            "column": 20
+          },
+          "end": {
+            "line": 7783,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerNamespaces/{partnerNamespaceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerNamespaces/{partnerNamespaceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 8561,
+            "column": 20
+          },
+          "end": {
+            "line": 8585,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerRegistrations/{partnerRegistrationName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerRegistrations/{partnerRegistrationName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 9349,
+            "column": 20
+          },
+          "end": {
+            "line": 9373,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerTopics/{partnerTopicName}/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerTopics/{partnerTopicName}/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 10073,
+            "column": 20
+          },
+          "end": {
+            "line": 10094,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/systemTopics/{systemTopicName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/systemTopics/{systemTopicName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 10502,
+            "column": 20
+          },
+          "end": {
+            "line": 10529,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/systemTopics/{systemTopicName}/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/systemTopics/{systemTopicName}/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 10844,
+            "column": 20
+          },
+          "end": {
+            "line": 10865,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 11332,
+            "column": 20
+          },
+          "end": {
+            "line": 11356,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}/eventSubscriptions/{eventSubscriptionName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}/eventSubscriptions/{eventSubscriptionName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 11674,
+            "column": 20
+          },
+          "end": {
+            "line": 11695,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
+      "swaggerFile": "projects/specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations/swagger/preview/2021-08-31-preview/customlocations.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ExtendedLocation/customLocations/{resourceName}/resourceSyncRules/{childResourceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ExtendedLocation/customLocations/{resourceName}/resourceSyncRules/{childResourceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 783,
+            "column": 20
+          },
+          "end": {
+            "line": 804,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/{policyName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/{policyName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 530,
+            "column": 20
+          },
+          "end": {
+            "line": 551,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot",
+      "swaggerFile": "projects/specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot/swagger/stable/2025-11-01/healthbot.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthBot/healthBots/{botName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthBot/healthBots/{botName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 329,
+            "column": 20
+          },
+          "end": {
+            "line": 356,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/services/{resourceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/services/{resourceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 496,
+            "column": 20
+          },
+          "end": {
+            "line": 517,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/licenses/{licenseName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/licenses/{licenseName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1425,
+            "column": 20
+          },
+          "end": {
+            "line": 1446,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 433,
+            "column": 20
+          },
+          "end": {
+            "line": 452,
+            "column": 137
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 7504,
+            "column": 20
+          },
+          "end": {
+            "line": 7525,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters",
+      "swaggerFile": "projects/specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters/swagger/stable/2025-07-25/redhatopenshift.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/openShiftClusters/{resourceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/openShiftClusters/{resourceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 517,
+            "column": 20
+          },
+          "end": {
+            "line": 544,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota/swagger/stable/2020-10-25/quota.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Capacity/resourceProviders/{providerId}/locations/{location}/serviceLimits/{resourceName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Capacity/resourceProviders/{providerId}/locations/{location}/serviceLimits/{resourceName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 310,
+            "column": 20
+          },
+          "end": {
+            "line": 337,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "swaggerFile": "projects/specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker/swagger/preview/2024-07-01-preview/servicelinker.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.ServiceLinker/linkers/{linkerName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.ServiceLinker/linkers/{linkerName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 587,
+            "column": 20
+          },
+          "end": {
+            "line": 609,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachineGroups/{sqlVirtualMachineGroupName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachineGroups/{sqlVirtualMachineGroupName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 364,
+            "column": 20
+          },
+          "end": {
+            "line": 380,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 996,
+            "column": 20
+          },
+          "end": {
+            "line": 1012,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 593,
+            "column": 20
+          },
+          "end": {
+            "line": 620,
+            "column": 124
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroPatch202",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The async patch operation should return 202.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/clusters/{clusterName}",
+        "patch",
+        "responses"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/clusters/{clusterName}",
+          "patch",
+          "responses"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-06, RPC-Async-V1-08",
+        "range": {
+          "start": {
+            "line": 1715,
+            "column": 20
+          },
+          "end": {
+            "line": 1742,
+            "column": 124
+          }
+        }
+      }
+    }
+  ]
+}

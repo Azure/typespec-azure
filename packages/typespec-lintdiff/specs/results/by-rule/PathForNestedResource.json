@@ -1,0 +1,3236 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PathForNestedResource",
+  "count": 104,
+  "levels": {
+    "error": 104
+  },
+  "results": [
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/delegation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/delegation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 25401,
+            "column": 155
+          },
+          "end": {
+            "line": 25628,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signin"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signin"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 25683,
+            "column": 151
+          },
+          "end": {
+            "line": 25910,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signup"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signup"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 25915,
+            "column": 151
+          },
+          "end": {
+            "line": 26142,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byApi"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byApi"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 29960,
+            "column": 143
+          },
+          "end": {
+            "line": 30040,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byGeo"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byGeo"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30044,
+            "column": 143
+          },
+          "end": {
+            "line": 30117,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byOperation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byOperation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30121,
+            "column": 149
+          },
+          "end": {
+            "line": 30201,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byProduct"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byProduct"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30205,
+            "column": 147
+          },
+          "end": {
+            "line": 30285,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byRequest"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byRequest"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30289,
+            "column": 147
+          },
+          "end": {
+            "line": 30362,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/bySubscription"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/bySubscription"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30366,
+            "column": 152
+          },
+          "end": {
+            "line": 30446,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byTime"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byTime"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30450,
+            "column": 144
+          },
+          "end": {
+            "line": 30538,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byUser"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byUser"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 30542,
+            "column": 144
+          },
+          "end": {
+            "line": 30622,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems/swagger/stable/2015-05-01/analyticsItems_API.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 43,
+            "column": 140
+          },
+          "end": {
+            "line": 186,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems/swagger/stable/2015-05-01/analyticsItems_API.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}/item"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}/item"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 191,
+            "column": 145
+          },
+          "end": {
+            "line": 415,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 6691,
+            "column": 184
+          },
+          "end": {
+            "line": 6831,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 6834,
+            "column": 184
+          },
+          "end": {
+            "line": 6950,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Bulkactions/swagger/preview/2026-07-06-preview/Bulkactions.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/bulkCreateCustom/asyncOperations/{asyncOperationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/bulkCreateCustom/asyncOperations/{asyncOperationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 231,
+            "column": 139
+          },
+          "end": {
+            "line": 279,
+            "column": 93
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Bulkactions/swagger/preview/2026-07-06-preview/Bulkactions.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/launchBulkInstancesOperations/asyncOperations/{asyncOperationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/launchBulkInstancesOperations/asyncOperations/{asyncOperationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 334,
+            "column": 152
+          },
+          "end": {
+            "line": 382,
+            "column": 100
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/rollingUpgrades/latest"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/rollingUpgrades/latest"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 8033,
+            "column": 165
+          },
+          "end": {
+            "line": 8077,
+            "column": 130
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Recommender",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Recommender/swagger/preview/2026-05-05-preview/RecommenderRP.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/placementScores/spot"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/placementScores/spot"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 92,
+            "column": 108
+          },
+          "end": {
+            "line": 126,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Recommender",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Recommender/swagger/preview/2026-05-05-preview/RecommenderRP.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/skuMixPlacementScores/recommendations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/skuMixPlacementScores/recommendations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 179,
+            "column": 125
+          },
+          "end": {
+            "line": 213,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/percentile/metrics"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/percentile/metrics"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 12421,
+            "column": 154
+          },
+          "end": {
+            "line": 12473,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/targetRegion/{targetRegion}/percentile/metrics"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/targetRegion/{targetRegion}/percentile/metrics"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 18192,
+            "column": 182
+          },
+          "end": {
+            "line": 18251,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "swaggerFile": "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/swagger/preview/2026-04-01-preview/dataprotection.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/backupVaults/{vaultName}/backupJobs/operations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/backupVaults/{vaultName}/backupJobs/operations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 2318,
+            "column": 169
+          },
+          "end": {
+            "line": 2369,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "swaggerFile": "projects/specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter/swagger/preview/2026-01-01-preview/DevCenterRP.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevCenter/networkConnections/{networkConnectionName}/healthChecks/latest"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevCenter/networkConnections/{networkConnectionName}/healthChecks/latest"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 5060,
+            "column": 166
+          },
+          "end": {
+            "line": 5104,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 441,
+            "column": 134
+          },
+          "end": {
+            "line": 560,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 564,
+            "column": 158
+          },
+          "end": {
+            "line": 1064,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/executeScriptActions/azureasyncoperations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/executeScriptActions/azureasyncoperations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 1361,
+            "column": 182
+          },
+          "end": {
+            "line": 1409,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 1671,
+            "column": 150
+          },
+          "end": {
+            "line": 1844,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 1847,
+            "column": 155
+          },
+          "end": {
+            "line": 2020,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 2023,
+            "column": 155
+          },
+          "end": {
+            "line": 2196,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/restartHosts/azureasyncoperations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/restartHosts/azureasyncoperations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 2719,
+            "column": 174
+          },
+          "end": {
+            "line": 2767,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/privateLinkScopes/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/privateLinkScopes/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 2868,
+            "column": 156
+          },
+          "end": {
+            "line": 2909,
+            "column": 96
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting",
+      "swaggerFile": "projects/specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting/swagger/preview/2024-12-01-preview/loadtestservice.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LoadTestService/loadTests/{loadTestName}/limits/maxMonthlyVirtualUserHours"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LoadTestService/loadTests/{loadTestName}/limits/maxMonthlyVirtualUserHours"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 1045,
+            "column": 168
+          },
+          "end": {
+            "line": 1086,
+            "column": 91
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/applicationGatewayWafDynamicManifests/dafault"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 448,
+            "column": 133
+          },
+          "end": {
+            "line": 483,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
+      "swaggerFile": "projects/specification/privatedns/resource-manager/Microsoft.Network/PrivateDns/swagger/stable/2024-06-01/privatedns.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 446,
+            "column": 148
+          },
+          "end": {
+            "line": 545,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
+      "swaggerFile": "projects/specification/privatedns/resource-manager/Microsoft.Network/PrivateDns/swagger/stable/2024-06-01/privatedns.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}/{relativeRecordSetName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}/{relativeRecordSetName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 549,
+            "column": 172
+          },
+          "end": {
+            "line": 963,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/extendedInformation/vaultExtendedInfo"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/extendedInformation/vaultExtendedInfo"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 871,
+            "column": 167
+          },
+          "end": {
+            "line": 1018,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 2075,
+            "column": 184
+          },
+          "end": {
+            "line": 2166,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs/operationResults/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs/operationResults/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 4486,
+            "column": 171
+          },
+          "end": {
+            "line": 4540,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 6187,
+            "column": 154
+          },
+          "end": {
+            "line": 6346,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 6351,
+            "column": 168
+          },
+          "end": {
+            "line": 6495,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI/swagger/preview/2026-04-01-preview/security-SqlVulnerabilityAssessments.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.Security/sqlVulnerabilityAssessments/default/scans/scanOperationResults/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.Security/sqlVulnerabilityAssessments/default/scans/scanOperationResults/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 998,
+            "column": 126
+          },
+          "end": {
+            "line": 1061,
+            "column": 115
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseAutomaticTuning.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/automaticTuning/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/automaticTuning/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 167
+          },
+          "end": {
+            "line": 158,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/maintenanceWindowOptions.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindowOptions/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindowOptions/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 176
+          },
+          "end": {
+            "line": 102,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/maintenanceWindows.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 170
+          },
+          "end": {
+            "line": 166,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverAutomaticTuning.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/automaticTuning/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/automaticTuning/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 142
+          },
+          "end": {
+            "line": 144,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/sqlAgent.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/sqlAgent/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/sqlAgent/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 153
+          },
+          "end": {
+            "line": 141,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 592,
+            "column": 168
+          },
+          "end": {
+            "line": 890,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/capacities/compute"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/capacities/compute"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 3019,
+            "column": 143
+          },
+          "end": {
+            "line": 3065,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/capacities/virtualip"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/capacities/virtualip"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 3069,
+            "column": 145
+          },
+          "end": {
+            "line": 3111,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 3192,
+            "column": 155
+          },
+          "end": {
+            "line": 3335,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/networking"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/networking"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 3340,
+            "column": 150
+          },
+          "end": {
+            "line": 3436,
+            "column": 93
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionPlanLimits/limit"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionPlanLimits/limit"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 6729,
+            "column": 149
+          },
+          "end": {
+            "line": 6765,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/ftp"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/ftp"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 8590,
+            "column": 149
+          },
+          "end": {
+            "line": 8686,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/scm"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/scm"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 8691,
+            "column": 149
+          },
+          "end": {
+            "line": 8787,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9135,
+            "column": 129
+          },
+          "end": {
+            "line": 9186,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9238,
+            "column": 130
+          },
+          "end": {
+            "line": 9289,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettingsV2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettingsV2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9341,
+            "column": 132
+          },
+          "end": {
+            "line": 9437,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9489,
+            "column": 138
+          },
+          "end": {
+            "line": 9540,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9587,
+            "column": 124
+          },
+          "end": {
+            "line": 9669,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 9914,
+            "column": 135
+          },
+          "end": {
+            "line": 9959,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 10007,
+            "column": 122
+          },
+          "end": {
+            "line": 10092,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 10098,
+            "column": 126
+          },
+          "end": {
+            "line": 10143,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 10244,
+            "column": 130
+          },
+          "end": {
+            "line": 10289,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 10337,
+            "column": 133
+          },
+          "end": {
+            "line": 10422,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 10428,
+            "column": 121
+          },
+          "end": {
+            "line": 10572,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 12453,
+            "column": 130
+          },
+          "end": {
+            "line": 12561,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 12610,
+            "column": 131
+          },
+          "end": {
+            "line": 12682,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 15961,
+            "column": 153
+          },
+          "end": {
+            "line": 16083,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/migratemysql/status"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/migratemysql/status"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 16879,
+            "column": 130
+          },
+          "end": {
+            "line": 16915,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkConfig/virtualNetwork"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkConfig/virtualNetwork"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 16921,
+            "column": 139
+          },
+          "end": {
+            "line": 17096,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTrace/operationresults/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTrace/operationresults/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 17306,
+            "column": 154
+          },
+          "end": {
+            "line": 17367,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateAccess/virtualNetworks"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateAccess/virtualNetworks"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 18083,
+            "column": 140
+          },
+          "end": {
+            "line": 18168,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/ftp"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/ftp"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 21088,
+            "column": 162
+          },
+          "end": {
+            "line": 21196,
+            "column": 96
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/scm"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/scm"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 21201,
+            "column": 162
+          },
+          "end": {
+            "line": 21309,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 21694,
+            "column": 142
+          },
+          "end": {
+            "line": 21746,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 21801,
+            "column": 143
+          },
+          "end": {
+            "line": 21853,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettingsV2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettingsV2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 21908,
+            "column": 145
+          },
+          "end": {
+            "line": 22007,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/azurestorageaccounts"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/azurestorageaccounts"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22062,
+            "column": 151
+          },
+          "end": {
+            "line": 22114,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/backup"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/backup"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22169,
+            "column": 137
+          },
+          "end": {
+            "line": 22265,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22541,
+            "column": 148
+          },
+          "end": {
+            "line": 22593,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22648,
+            "column": 135
+          },
+          "end": {
+            "line": 22747,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22753,
+            "column": 139
+          },
+          "end": {
+            "line": 22805,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 22920,
+            "column": 143
+          },
+          "end": {
+            "line": 22972,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 23027,
+            "column": 134
+          },
+          "end": {
+            "line": 23182,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 25298,
+            "column": 143
+          },
+          "end": {
+            "line": 25420,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/migratemysql/status"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/migratemysql/status"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 28119,
+            "column": 143
+          },
+          "end": {
+            "line": 28162,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkConfig/virtualNetwork"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkConfig/virtualNetwork"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 28168,
+            "column": 152
+          },
+          "end": {
+            "line": 28371,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTrace/operationresults/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTrace/operationresults/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 28501,
+            "column": 167
+          },
+          "end": {
+            "line": 28569,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateAccess/virtualNetworks"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateAccess/virtualNetworks"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 29376,
+            "column": 153
+          },
+          "end": {
+            "line": 29475,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 31688,
+            "column": 142
+          },
+          "end": {
+            "line": 31963,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 33663,
+            "column": 129
+          },
+          "end": {
+            "line": 33910,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/appsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/appsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 36094,
+            "column": 160
+          },
+          "end": {
+            "line": 36153,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/functionappsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/functionappsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 36158,
+            "column": 168
+          },
+          "end": {
+            "line": 36217,
+            "column": 86
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/appsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/appsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 37529,
+            "column": 135
+          },
+          "end": {
+            "line": 37580,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForNestedResource",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The path for nested resource doest not meet the valid resource pattern. There is one exception for extension resources with fully qualified path and the author can go ahead and suppress the error(look at https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md#pathfornestedresource for more details)",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/functionappsettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/functionappsettings"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-06",
+        "range": {
+          "start": {
+            "line": 37585,
+            "column": 143
+          },
+          "end": {
+            "line": 37636,
+            "column": 81
+          }
+        }
+      }
+    }
+  ]
+}

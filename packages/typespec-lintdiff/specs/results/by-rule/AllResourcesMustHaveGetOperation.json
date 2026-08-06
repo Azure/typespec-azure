@@ -1,0 +1,702 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "AllResourcesMustHaveGetOperation",
+  "count": 23,
+  "levels": {
+    "warning": 23
+  },
+  "results": [
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The resource \"ConfigData\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "ConfigData"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConfigData"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1681,
+            "column": 19
+          },
+          "end": {
+            "line": 1696,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The resource \"RecipientEmailContract\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "RecipientEmailContract"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecipientEmailContract"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 62671,
+            "column": 31
+          },
+          "end": {
+            "line": 62686,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The resource \"RecipientUserContract\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "RecipientUserContract"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecipientUserContract"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 62719,
+            "column": 30
+          },
+          "end": {
+            "line": 62734,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The resource \"SourceControlSyncJob\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "SourceControlSyncJob"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SourceControlSyncJob"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 16483,
+            "column": 29
+          },
+          "end": {
+            "line": 16508,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
+      "swaggerFile": "projects/specification/confluent/resource-manager/Microsoft.Confluent/Confluent/swagger/preview/2026-06-02-preview/confluent.json",
+      "message": "The resource \"ConfluentAgreementResource\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "ConfluentAgreementResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConfluentAgreementResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4307,
+            "column": 35
+          },
+          "end": {
+            "line": 4337,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "The resource \"DatadogAgreementResource\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "DatadogAgreementResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DatadogAgreementResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2296,
+            "column": 33
+          },
+          "end": {
+            "line": 2324,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The resource \"VaultAccessPolicyParameters\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "VaultAccessPolicyParameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultAccessPolicyParameters"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5818,
+            "column": 36
+          },
+          "end": {
+            "line": 5850,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "swaggerFile": "projects/specification/providerhub/ProviderHub.Management/swagger/resource-manager/Microsoft.ProviderHub/stable/2024-09-01/providerhub.json",
+      "message": "The resource \"OperationsPutContent\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "OperationsPutContent"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "OperationsPutContent"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6329,
+            "column": 29
+          },
+          "end": {
+            "line": 6342,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The resource \"VaultCertificateResponse\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "VaultCertificateResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultCertificateResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3329,
+            "column": 33
+          },
+          "end": {
+            "line": 3353,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The resource \"TagDetails\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "TagDetails"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "TagDetails"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3409,
+            "column": 19
+          },
+          "end": {
+            "line": 3434,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The resource \"TagValue\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "TagValue"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "TagValue"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3435,
+            "column": 17
+          },
+          "end": {
+            "line": 3453,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseExtensions.json",
+      "message": "The resource \"ImportExportExtensionsOperationResult\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "ImportExportExtensionsOperationResult"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ImportExportExtensionsOperationResult"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 383,
+            "column": 46
+          },
+          "end": {
+            "line": 398,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingRules.json",
+      "message": "The resource \"DataMaskingRule\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "DataMaskingRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 239,
+            "column": 24
+          },
+          "end": {
+            "line": 264,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"VnetRoute\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "VnetRoute"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VnetRoute"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 57091,
+            "column": 18
+          },
+          "end": {
+            "line": 57110,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"StringDictionary\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "StringDictionary"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StringDictionary"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 55961,
+            "column": 25
+          },
+          "end": {
+            "line": 55979,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"SiteAuthSettings\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "SiteAuthSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SiteAuthSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 51914,
+            "column": 25
+          },
+          "end": {
+            "line": 51929,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"AzureStoragePropertyDictionaryResource\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "AzureStoragePropertyDictionaryResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AzureStoragePropertyDictionaryResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 41560,
+            "column": 47
+          },
+          "end": {
+            "line": 41578,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"BackupRequest\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "BackupRequest"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BackupRequest"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 41799,
+            "column": 22
+          },
+          "end": {
+            "line": 41814,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"ConnectionStringDictionary\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "ConnectionStringDictionary"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConnectionStringDictionary"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 42573,
+            "column": 35
+          },
+          "end": {
+            "line": 42591,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"PushSettings\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "PushSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PushSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 50205,
+            "column": 21
+          },
+          "end": {
+            "line": 50220,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"KeyInfo\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "KeyInfo"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "KeyInfo"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 47215,
+            "column": 16
+          },
+          "end": {
+            "line": 47228,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"StorageMigrationResponse\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "StorageMigrationResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StorageMigrationResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 55870,
+            "column": 33
+          },
+          "end": {
+            "line": 55885,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllResourcesMustHaveGetOperation",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource \"StaticSiteUserARMResource\" does not have get operation, please add it.",
+      "path": [
+        "definitions",
+        "StaticSiteUserARMResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StaticSiteUserARMResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 55336,
+            "column": 34
+          },
+          "end": {
+            "line": 55351,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

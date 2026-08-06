@@ -1,0 +1,1345 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PathContainsResourceGroup",
+  "count": 43,
+  "levels": {
+    "error": 43
+  },
+  "results": [
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1310,
+            "column": 112
+          },
+          "end": {
+            "line": 1350,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations/{configurationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations/{configurationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1354,
+            "column": 132
+          },
+          "end": {
+            "line": 1419,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 740,
+            "column": 108
+          },
+          "end": {
+            "line": 785,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 789,
+            "column": 122
+          },
+          "end": {
+            "line": 1090,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1207,
+            "column": 131
+          },
+          "end": {
+            "line": 1259,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1263,
+            "column": 145
+          },
+          "end": {
+            "line": 1523,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/files"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/files"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1528,
+            "column": 151
+          },
+          "end": {
+            "line": 1587,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/files/{fileName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/files/{fileName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 1591,
+            "column": 162
+          },
+          "end": {
+            "line": 1872,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 2011,
+            "column": 151
+          },
+          "end": {
+            "line": 2077,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 2081,
+            "column": 162
+          },
+          "end": {
+            "line": 2376,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/serviceTasks"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/serviceTasks"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 2524,
+            "column": 135
+          },
+          "end": {
+            "line": 2583,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/serviceTasks/{taskName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/serviceTasks/{taskName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 2587,
+            "column": 146
+          },
+          "end": {
+            "line": 2854,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/skus"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/skus"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 2919,
+            "column": 127
+          },
+          "end": {
+            "line": 2971,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13631,
+            "column": 168
+          },
+          "end": {
+            "line": 13675,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceGroup",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path for resource group scoped CRUD methods does not contain a resourceGroupName parameter.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-02",
+        "range": {
+          "start": {
+            "line": 13680,
+            "column": 188
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

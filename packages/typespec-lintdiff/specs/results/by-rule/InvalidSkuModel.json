@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "InvalidSkuModel",
+  "count": 7,
+  "levels": {
+    "warning": 7
+  },
+  "results": [
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 20343,
+            "column": 10
+          },
+          "end": {
+            "line": 20355,
+            "column": 120
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "swaggerFile": "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/swagger/stable/2025-07-01/databox.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5069,
+            "column": 10
+          },
+          "end": {
+            "line": 5091,
+            "column": 14
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/swagger/stable/2025-05-01/openapi.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 732,
+            "column": 10
+          },
+          "end": {
+            "line": 743,
+            "column": 120
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3363,
+            "column": 10
+          },
+          "end": {
+            "line": 3390,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-01-01-preview/signalr.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4344,
+            "column": 10
+          },
+          "end": {
+            "line": 4361,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3274,
+            "column": 10
+          },
+          "end": {
+            "line": 3305,
+            "column": 14
+          }
+        }
+      }
+    },
+    {
+      "rule": "InvalidSkuModel",
+      "level": "warning",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-12-01-preview/webpubsub.json",
+      "message": "A Sku model must have 'name' property. It can also have 'tier', 'size', 'family', 'capacity' as optional properties.",
+      "path": [
+        "definitions",
+        "Sku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Sku"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4684,
+            "column": 10
+          },
+          "end": {
+            "line": 4701,
+            "column": 26
+          }
+        }
+      }
+    }
+  ]
+}

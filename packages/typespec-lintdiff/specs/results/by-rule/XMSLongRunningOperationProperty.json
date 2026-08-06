@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "XMSLongRunningOperationProperty",
+  "count": 6,
+  "levels": {
+    "error": 6
+  },
+  "results": [
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/generateRecommendations",
+        "post",
+        "responses",
+        "202",
+        "headers",
+        "Location"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/generateRecommendations",
+          "post",
+          "responses",
+          "202",
+          "headers",
+          "Location"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 886,
+            "column": 25
+          },
+          "end": {
+            "line": 888,
+            "column": 103
+          }
+        }
+      }
+    },
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "swaggerFile": "projects/specification/help/resource-manager/Microsoft.Help/Help/swagger/preview/2024-03-01-preview/help.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/continue",
+        "post",
+        "responses",
+        "204",
+        "headers",
+        "location"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/continue",
+          "post",
+          "responses",
+          "204",
+          "headers",
+          "location"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 795,
+            "column": 25
+          },
+          "end": {
+            "line": 796,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "swaggerFile": "projects/specification/help/resource-manager/Microsoft.Help/Help/swagger/preview/2024-03-01-preview/help.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/end",
+        "post",
+        "responses",
+        "204",
+        "headers",
+        "location"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/end",
+          "post",
+          "responses",
+          "204",
+          "headers",
+          "location"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 848,
+            "column": 25
+          },
+          "end": {
+            "line": 849,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "swaggerFile": "projects/specification/help/resource-manager/Microsoft.Help/Help/swagger/preview/2024-03-01-preview/help.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/restart",
+        "post",
+        "responses",
+        "200",
+        "headers",
+        "location"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Help/troubleshooters/{troubleshooterName}/restart",
+          "post",
+          "responses",
+          "200",
+          "headers",
+          "location"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 904,
+            "column": 25
+          },
+          "end": {
+            "line": 905,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put",
+        "responses",
+        "200",
+        "headers",
+        "Azure-AsyncOperation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put",
+          "responses",
+          "200",
+          "headers",
+          "Azure-AsyncOperation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 1334,
+            "column": 37
+          },
+          "end": {
+            "line": 1336,
+            "column": 192
+          }
+        }
+      }
+    },
+    {
+      "rule": "XMSLongRunningOperationProperty",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put",
+        "responses",
+        "200",
+        "headers",
+        "Azure-AsyncOperation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put",
+          "responses",
+          "200",
+          "headers",
+          "Azure-AsyncOperation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-15",
+        "range": {
+          "start": {
+            "line": 2321,
+            "column": 37
+          },
+          "end": {
+            "line": 2323,
+            "column": 192
+          }
+        }
+      }
+    }
+  ]
+}

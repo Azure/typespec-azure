@@ -1,0 +1,3432 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "AllTrackedResourcesMustHaveDelete",
+  "count": 114,
+  "levels": {
+    "error": 114
+  },
+  "results": [
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+      "message": "The resource AttestationProvider does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "AttestationProvider"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AttestationProvider"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 693,
+            "column": 28
+          },
+          "end": {
+            "line": 708,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The resource Reservation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Reservation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Reservation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 21304,
+            "column": 20
+          },
+          "end": {
+            "line": 21342,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The resource ReservationOrderAliasResponse does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ReservationOrderAliasResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationOrderAliasResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 8833,
+            "column": 38
+          },
+          "end": {
+            "line": 8859,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The resource VirtualMachineExtensionImage does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "VirtualMachineExtensionImage"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VirtualMachineExtensionImage"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 20088,
+            "column": 37
+          },
+          "end": {
+            "line": 20103,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The resource RollingUpgradeStatusInfo does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RollingUpgradeStatusInfo"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeStatusInfo"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18222,
+            "column": 33
+          },
+          "end": {
+            "line": 18237,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "The resource ReservationRecommendationDetailsModel does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ReservationRecommendationDetailsModel"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationRecommendationDetailsModel"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5985,
+            "column": 46
+          },
+          "end": {
+            "line": 6021,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The resource RestorableDatabaseAccountGetResult does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RestorableDatabaseAccountGetResult"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RestorableDatabaseAccountGetResult"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 30026,
+            "column": 43
+          },
+          "end": {
+            "line": 30045,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The resource ThroughputSettingsGetResults does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ThroughputSettingsGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ThroughputSettingsGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 33474,
+            "column": 37
+          },
+          "end": {
+            "line": 33509,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "The resource Factory does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Factory"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Factory"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 16158,
+            "column": 16
+          },
+          "end": {
+            "line": 16198,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The resource ArmTemplate does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ArmTemplate"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmTemplate"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9192,
+            "column": 20
+          },
+          "end": {
+            "line": 9225,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The resource Artifact does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Artifact"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Artifact"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9329,
+            "column": 17
+          },
+          "end": {
+            "line": 9362,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The resource LabCost does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "LabCost"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LabCost"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11178,
+            "column": 16
+          },
+          "end": {
+            "line": 11211,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "The resource NetworkRuleSet does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkRuleSet"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkRuleSet"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6534,
+            "column": 23
+          },
+          "end": {
+            "line": 6554,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "The resource NetworkSecurityPerimeterConfiguration does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkSecurityPerimeterConfiguration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkSecurityPerimeterConfiguration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6650,
+            "column": 46
+          },
+          "end": {
+            "line": 6670,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "The resource LatencyScorecard does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "LatencyScorecard"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LatencyScorecard"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4388,
+            "column": 25
+          },
+          "end": {
+            "line": 4403,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "The resource Timeseries does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Timeseries"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Timeseries"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6576,
+            "column": 19
+          },
+          "end": {
+            "line": 6591,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource License does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "License"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "License"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5331,
+            "column": 16
+          },
+          "end": {
+            "line": 5346,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The resource Key does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Key"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Key"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3505,
+            "column": 12
+          },
+          "end": {
+            "line": 3536,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The resource Secret does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Secret"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Secret"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5343,
+            "column": 15
+          },
+          "end": {
+            "line": 5373,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The resource VaultAccessPolicyParameters does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "VaultAccessPolicyParameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultAccessPolicyParameters"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5818,
+            "column": 36
+          },
+          "end": {
+            "line": 5850,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The resource MaintenanceConfiguration does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "MaintenanceConfiguration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MaintenanceConfiguration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2589,
+            "column": 33
+          },
+          "end": {
+            "line": 2615,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "The resource ServiceDiagnosticSettingsResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ServiceDiagnosticSettingsResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ServiceDiagnosticSettingsResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 297,
+            "column": 42
+          },
+          "end": {
+            "line": 330,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "The resource SystemAssignedIdentity does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "SystemAssignedIdentity"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SystemAssignedIdentity"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 955,
+            "column": 31
+          },
+          "end": {
+            "line": 992,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 46
+          },
+          "end": {
+            "line": 1667,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 34
+          },
+          "end": {
+            "line": 6481,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 36
+          },
+          "end": {
+            "line": 5709,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 35
+          },
+          "end": {
+            "line": 17483,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource ApplicationGatewayAvailableSslOptions does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource ExpressRoutePortsLocation does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRoutePortsLocation"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRoutePortsLocation"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6465,
+            "column": 32
+          },
+          "end": {
+            "line": 6481,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource ExpressRouteCrossConnection does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExpressRouteCrossConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExpressRouteCrossConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5689,
+            "column": 34
+          },
+          "end": {
+            "line": 5709,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The resource NetworkVirtualApplianceSku does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkVirtualApplianceSku"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkVirtualApplianceSku"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17462,
+            "column": 33
+          },
+          "end": {
+            "line": 17483,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Vmss/swagger/stable/2018-10-01/vmssNetwork.json",
+      "message": "The resource NetworkInterface does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkInterface"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkInterface"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2367,
+            "column": 25
+          },
+          "end": {
+            "line": 2391,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Vmss/swagger/stable/2018-10-01/vmssNetwork.json",
+      "message": "The resource PublicIPAddress does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3768,
+            "column": 24
+          },
+          "end": {
+            "line": 3803,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "The resource LogAnalyticsQueryPack does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "LogAnalyticsQueryPack"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LogAnalyticsQueryPack"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6419,
+            "column": 30
+          },
+          "end": {
+            "line": 6437,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource ProtectedItemResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ProtectedItemResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectedItemResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14542,
+            "column": 30
+          },
+          "end": {
+            "line": 14575,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource RecoveryPointResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RecoveryPointResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecoveryPointResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15278,
+            "column": 30
+          },
+          "end": {
+            "line": 15311,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource JobResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "JobResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "JobResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12819,
+            "column": 20
+          },
+          "end": {
+            "line": 12852,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource BackupResourceEncryptionConfigExtendedResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "BackupResourceEncryptionConfigExtendedResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BackupResourceEncryptionConfigExtendedResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9961,
+            "column": 55
+          },
+          "end": {
+            "line": 9994,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource BackupEngineBaseResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "BackupEngineBaseResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BackupEngineBaseResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9473,
+            "column": 33
+          },
+          "end": {
+            "line": 9506,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource BackupResourceVaultConfigResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "BackupResourceVaultConfigResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BackupResourceVaultConfigResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10071,
+            "column": 42
+          },
+          "end": {
+            "line": 10104,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The resource BackupResourceConfigResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "BackupResourceConfigResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BackupResourceConfigResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9886,
+            "column": 37
+          },
+          "end": {
+            "line": 9919,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource Alert does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Alert"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Alert"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 13615,
+            "column": 14
+          },
+          "end": {
+            "line": 13633,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource Event does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Event"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Event"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15484,
+            "column": 14
+          },
+          "end": {
+            "line": 15502,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource LogicalNetwork does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "LogicalNetwork"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LogicalNetwork"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 22720,
+            "column": 23
+          },
+          "end": {
+            "line": 22738,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource Network does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Network"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Network"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23569,
+            "column": 16
+          },
+          "end": {
+            "line": 23587,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource ProtectionContainer does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ProtectionContainer"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectionContainer"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 24579,
+            "column": 28
+          },
+          "end": {
+            "line": 24597,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource MigrationRecoveryPoint does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "MigrationRecoveryPoint"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MigrationRecoveryPoint"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23243,
+            "column": 31
+          },
+          "end": {
+            "line": 23261,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource ProtectableItem does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ProtectableItem"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectableItem"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 24499,
+            "column": 24
+          },
+          "end": {
+            "line": 24517,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource RecoveryPoint does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RecoveryPoint"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecoveryPoint"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 25842,
+            "column": 22
+          },
+          "end": {
+            "line": 25860,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource StorageClassification does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "StorageClassification"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StorageClassification"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 27769,
+            "column": 30
+          },
+          "end": {
+            "line": 27787,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource Job does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Job"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Job"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 22372,
+            "column": 12
+          },
+          "end": {
+            "line": 22390,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource ReplicationProtectionIntent does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ReplicationProtectionIntent"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReplicationProtectionIntent"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 26907,
+            "column": 36
+          },
+          "end": {
+            "line": 26925,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource SupportedOperatingSystems does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "SupportedOperatingSystems"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SupportedOperatingSystems"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 27961,
+            "column": 34
+          },
+          "end": {
+            "line": 27979,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource VaultHealthDetails does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "VaultHealthDetails"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultHealthDetails"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 30524,
+            "column": 27
+          },
+          "end": {
+            "line": 30542,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The resource VaultSetting does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "VaultSetting"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultSetting"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 30568,
+            "column": 21
+          },
+          "end": {
+            "line": 30586,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "The resource ReservationResponse does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ReservationResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3547,
+            "column": 28
+          },
+          "end": {
+            "line": 3587,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "The resource availabilityStatus does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "availabilityStatus"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "availabilityStatus"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2309,
+            "column": 27
+          },
+          "end": {
+            "line": 2323,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "The resource ExternalSecuritySolution does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ExternalSecuritySolution"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ExternalSecuritySolution"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1956,
+            "column": 33
+          },
+          "end": {
+            "line": 1983,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "The resource AllowedConnectionsResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "AllowedConnectionsResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AllowedConnectionsResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1610,
+            "column": 35
+          },
+          "end": {
+            "line": 1634,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "The resource DiscoveredSecuritySolution does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "DiscoveredSecuritySolution"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DiscoveredSecuritySolution"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1889,
+            "column": 35
+          },
+          "end": {
+            "line": 1912,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "The resource SecuritySolution does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "SecuritySolution"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SecuritySolution"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2396,
+            "column": 25
+          },
+          "end": {
+            "line": 2418,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "The resource TopologyResource does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "TopologyResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "TopologyResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2612,
+            "column": 25
+          },
+          "end": {
+            "line": 2635,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "The resource NetworkRuleSet does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkRuleSet"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkRuleSet"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5357,
+            "column": 23
+          },
+          "end": {
+            "line": 5377,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "The resource NetworkSecurityPerimeterConfiguration does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "NetworkSecurityPerimeterConfiguration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkSecurityPerimeterConfiguration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5476,
+            "column": 46
+          },
+          "end": {
+            "line": 5496,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseAdvisors.json",
+      "message": "The resource Advisor does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Advisor"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Advisor"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 145,
+            "column": 14
+          },
+          "end": {
+            "line": 170,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseRecommendedActions.json",
+      "message": "The resource RecommendedAction does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RecommendedAction"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecommendedAction"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5234,
+            "column": 24
+          },
+          "end": {
+            "line": 5259,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingPolicies.json",
+      "message": "The resource DataMaskingPolicy does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "DataMaskingPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 213,
+            "column": 26
+          },
+          "end": {
+            "line": 238,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingRules.json",
+      "message": "The resource DataMaskingRule does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "DataMaskingRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 239,
+            "column": 24
+          },
+          "end": {
+            "line": 264,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/encryptionProtectors.json",
+      "message": "The resource EncryptionProtector does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "EncryptionProtector"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "EncryptionProtector"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 349,
+            "column": 28
+          },
+          "end": {
+            "line": 374,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/geoBackupPolicies.json",
+      "message": "The resource GeoBackupPolicy does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "GeoBackupPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "GeoBackupPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 266,
+            "column": 24
+          },
+          "end": {
+            "line": 291,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/restorableDroppedDatabases.json",
+      "message": "The resource RestorableDroppedDatabase does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RestorableDroppedDatabase"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RestorableDroppedDatabase"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 168,
+            "column": 34
+          },
+          "end": {
+            "line": 202,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/restorableDroppedManagedDatabases.json",
+      "message": "The resource RestorableDroppedManagedDatabase does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RestorableDroppedManagedDatabase"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RestorableDroppedManagedDatabase"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 151,
+            "column": 41
+          },
+          "end": {
+            "line": 166,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/restorePoints.json",
+      "message": "The resource RestorePoint does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RestorePoint"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RestorePoint"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 325,
+            "column": 21
+          },
+          "end": {
+            "line": 345,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverAdvisors.json",
+      "message": "The resource Advisor does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "Advisor"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Advisor"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 145,
+            "column": 14
+          },
+          "end": {
+            "line": 170,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverConnectionPolicies.json",
+      "message": "The resource ServerConnectionPolicy does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "ServerConnectionPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ServerConnectionPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 258,
+            "column": 31
+          },
+          "end": {
+            "line": 283,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource WorkflowRunActionRepetitionDefinition does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "WorkflowRunActionRepetitionDefinition"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "WorkflowRunActionRepetitionDefinition"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 58285,
+            "column": 46
+          },
+          "end": {
+            "line": 58303,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource RequestHistory does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "RequestHistory"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RequestHistory"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 50975,
+            "column": 23
+          },
+          "end": {
+            "line": 50989,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource WorkflowVersion does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "WorkflowVersion"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "WorkflowVersion"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 59082,
+            "column": 24
+          },
+          "end": {
+            "line": 59097,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource WorkflowEnvelope does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "WorkflowEnvelope"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "WorkflowEnvelope"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 57810,
+            "column": 25
+          },
+          "end": {
+            "line": 57836,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "AllTrackedResourcesMustHaveDelete",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The resource PremierAddOn does not have a corresponding delete operation.",
+      "path": [
+        "definitions",
+        "PremierAddOn"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PremierAddOn"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 49199,
+            "column": 21
+          },
+          "end": {
+            "line": 49218,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,4859 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PatchSkuProperty",
+  "count": 131,
+  "levels": {
+    "warning": 131
+  },
+  "results": [
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "swaggerFile": "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/postgresInstances/{postgresInstanceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/postgresInstances/{postgresInstanceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1091,
+            "column": 10
+          },
+          "end": {
+            "line": 1097,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "swaggerFile": "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/sqlManagedInstances/{sqlManagedInstanceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/sqlManagedInstances/{sqlManagedInstanceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1370,
+            "column": 10
+          },
+          "end": {
+            "line": 1376,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BillingBenefits/savingsPlanOrders/{savingsPlanOrderId}/savingsPlans/{savingsPlanId}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BillingBenefits/savingsPlanOrders/{savingsPlanOrderId}/savingsPlans/{savingsPlanId}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1002,
+            "column": 10
+          },
+          "end": {
+            "line": 1008,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/conditionalCredits/{conditionalCreditName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/conditionalCredits/{conditionalCreditName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1963,
+            "column": 10
+          },
+          "end": {
+            "line": 1969,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2593,
+            "column": 10
+          },
+          "end": {
+            "line": 2599,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}/sources/{sourceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}/sources/{sourceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 3072,
+            "column": 10
+          },
+          "end": {
+            "line": 3078,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts/{discountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts/{discountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 3467,
+            "column": 10
+          },
+          "end": {
+            "line": 3473,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/freeServices/{freeServiceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/freeServices/{freeServiceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 3849,
+            "column": 10
+          },
+          "end": {
+            "line": 3855,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/maccs/{maccName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/maccs/{maccName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4190,
+            "column": 10
+          },
+          "end": {
+            "line": 4196,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/cdnWebApplicationFirewallPolicies/{policyName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/cdnWebApplicationFirewallPolicies/{policyName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 655,
+            "column": 10
+          },
+          "end": {
+            "line": 661,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1057,
+            "column": 10
+          },
+          "end": {
+            "line": 1063,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1361,
+            "column": 10
+          },
+          "end": {
+            "line": 1367,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "swaggerFile": "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/swagger/stable/2025-07-01/databox.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 503,
+            "column": 10
+          },
+          "end": {
+            "line": 509,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 402,
+            "column": 10
+          },
+          "end": {
+            "line": 408,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "swaggerFile": "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/swagger/stable/2026-01-01/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 717,
+            "column": 10
+          },
+          "end": {
+            "line": 723,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/applicationGroups/{applicationGroupName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/applicationGroups/{applicationGroupName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 888,
+            "column": 10
+          },
+          "end": {
+            "line": 894,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/hostPools/{hostPoolName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/hostPools/{hostPoolName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1771,
+            "column": 10
+          },
+          "end": {
+            "line": 1777,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/scalingPlans/{scalingPlanName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/scalingPlans/{scalingPlanName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4793,
+            "column": 10
+          },
+          "end": {
+            "line": 4799,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/workspaces/{workspaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/workspaces/{workspaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 5733,
+            "column": 10
+          },
+          "end": {
+            "line": 5739,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 370,
+            "column": 10
+          },
+          "end": {
+            "line": 376,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "swaggerFile": "projects/specification/elastic/resource-manager/Microsoft.Elastic/Elastic/swagger/stable/2025-06-01/elastic.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 440,
+            "column": 10
+          },
+          "end": {
+            "line": 446,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/{policyName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/{policyName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 520,
+            "column": 10
+          },
+          "end": {
+            "line": 526,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "swaggerFile": "projects/specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/cloudHsmClusters/{cloudHsmClusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/cloudHsmClusters/{cloudHsmClusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 440,
+            "column": 10
+          },
+          "end": {
+            "line": 446,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "swaggerFile": "projects/specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/dedicatedHSMs/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/dedicatedHSMs/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1584,
+            "column": 10
+          },
+          "end": {
+            "line": 1590,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "swaggerFile": "projects/specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/paymentHsmClusters/{paymentHsmClusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/paymentHsmClusters/{paymentHsmClusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1946,
+            "column": 10
+          },
+          "end": {
+            "line": 1952,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 423,
+            "column": 10
+          },
+          "end": {
+            "line": 429,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 5076,
+            "column": 10
+          },
+          "end": {
+            "line": 5082,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}/deployments/{deploymentName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}/deployments/{deploymentName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 5483,
+            "column": 10
+          },
+          "end": {
+            "line": 5489,
+            "column": 103
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 7494,
+            "column": 10
+          },
+          "end": {
+            "line": 7500,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/endpoints/{endpointName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/endpoints/{endpointName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 15736,
+            "column": 10
+          },
+          "end": {
+            "line": 15743,
+            "column": 40
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/onlineEndpoints/{endpointName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/onlineEndpoints/{endpointName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 19333,
+            "column": 10
+          },
+          "end": {
+            "line": 19339,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi/swagger/stable/2024-03-11/dataCollection.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/dataCollectionEndpoints/{dataCollectionEndpointName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/dataCollectionEndpoints/{dataCollectionEndpointName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 519,
+            "column": 10
+          },
+          "end": {
+            "line": 525,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi/swagger/stable/2024-03-11/dataCollection.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/dataCollectionRules/{dataCollectionRuleName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/dataCollectionRules/{dataCollectionRuleName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 827,
+            "column": 10
+          },
+          "end": {
+            "line": 833,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceGateways/{serviceGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceGateways/{serviceGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 274,
+            "column": 10
+          },
+          "end": {
+            "line": 280,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1201,
+            "column": 10
+          },
+          "end": {
+            "line": 1207,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 394,
+            "column": 10
+          },
+          "end": {
+            "line": 400,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 2285,
+            "column": 10
+          },
+          "end": {
+            "line": 2291,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 4614,
+            "column": 10
+          },
+          "end": {
+            "line": 4620,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10335,
+            "column": 10
+          },
+          "end": {
+            "line": 10341,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 10852,
+            "column": 10
+          },
+          "end": {
+            "line": 10858,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "swaggerFile": "projects/specification/peering/resource-manager/Microsoft.Peering/Peering/swagger/stable/2025-05-01/peering.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Peering/peeringServices/{peeringServiceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Peering/peeringServices/{peeringServiceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1128,
+            "column": 10
+          },
+          "end": {
+            "line": 1134,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "swaggerFile": "projects/specification/peering/resource-manager/Microsoft.Peering/Peering/swagger/stable/2025-05-01/peering.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Peering/peerings/{peeringName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Peering/peerings/{peeringName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1848,
+            "column": 10
+          },
+          "end": {
+            "line": 1854,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Purview/accounts/{accountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Purview/accounts/{accountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 671,
+            "column": 10
+          },
+          "end": {
+            "line": 677,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 760,
+            "column": 10
+          },
+          "end": {
+            "line": 766,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 797,
+            "column": 10
+          },
+          "end": {
+            "line": 803,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 670,
+            "column": 10
+          },
+          "end": {
+            "line": 676,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "x-ms-paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy&_overload=updateById",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "x-ms-paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy&_overload=updateById",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 1755,
+            "column": 10
+          },
+          "end": {
+            "line": 1761,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/amlFilesystems/{amlFilesystemName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/amlFilesystems/{amlFilesystemName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 652,
+            "column": 10
+          },
+          "end": {
+            "line": 658,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 6335,
+            "column": 10
+          },
+          "end": {
+            "line": 6341,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchSkuProperty",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'sku'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-09",
+        "range": {
+          "start": {
+            "line": 35454,
+            "column": 10
+          },
+          "end": {
+            "line": 35460,
+            "column": 61
+          }
+        }
+      }
+    }
+  ]
+}

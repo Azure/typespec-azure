@@ -1,0 +1,3127 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "GetInOperationName",
+  "count": 89,
+  "levels": {
+    "warning": 89
+  },
+  "results": [
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement/swagger/preview/2025-05-25-preview/AlertsManagement.json",
+      "message": "'GET' operation 'Alerts_MetaData' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AlertsManagement/alertsMetaData",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AlertsManagement/alertsMetaData",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1758,
+            "column": 23
+          },
+          "end": {
+            "line": 1758,
+            "column": 40
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "'GET' operation 'ProductWikis_list' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/wikis",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/wikis",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 29047,
+            "column": 23
+          },
+          "end": {
+            "line": 29047,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "'GET' operation 'Jobs_ProxyGet' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/jobs/{jobName}/detectorProperties/{apiName}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/jobs/{jobName}/detectorProperties/{apiName}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4167,
+            "column": 23
+          },
+          "end": {
+            "line": 4167,
+            "column": 38
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "'GET' operation 'JobExecution' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/jobs/{jobName}/executions/{jobExecutionName}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/jobs/{jobName}/executions/{jobExecutionName}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4391,
+            "column": 23
+          },
+          "end": {
+            "line": 4391,
+            "column": 37
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi/swagger/stable/2023-06-01/workbooks_API.json",
+      "message": "'GET' operation 'Workbooks_RevisionsList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}/revisions",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}/revisions",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 476,
+            "column": 23
+          },
+          "end": {
+            "line": 476,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi/swagger/stable/2023-06-01/workbooks_API.json",
+      "message": "'GET' operation 'Workbooks_RevisionGet' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}/revisions/{revisionId}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}/revisions/{revisionId}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 522,
+            "column": 23
+          },
+          "end": {
+            "line": 522,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "'GET' operation 'PrivateLinkResources_Automation' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/privateLinkResources",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/privateLinkResources",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5640,
+            "column": 23
+          },
+          "end": {
+            "line": 5640,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "'GET' operation 'ConditionalCredits_ScopeList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.BillingBenefits/applicableConditionalCredits",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.BillingBenefits/applicableConditionalCredits",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 103,
+            "column": 23
+          },
+          "end": {
+            "line": 103,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "'GET' operation 'Discounts_ScopeList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.BillingBenefits/applicableDiscounts",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.BillingBenefits/applicableDiscounts",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 183,
+            "column": 23
+          },
+          "end": {
+            "line": 183,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "'GET' operation 'Discounts_SubscriptionList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.BillingBenefits/discounts",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.BillingBenefits/discounts",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1648,
+            "column": 23
+          },
+          "end": {
+            "line": 1648,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "'GET' operation 'Discounts_ResourceGroupList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3263,
+            "column": 23
+          },
+          "end": {
+            "line": 3263,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Bulkactions/swagger/preview/2026-07-06-preview/Bulkactions.json",
+      "message": "'GET' operation 'VirtualMachineBulkOperations_BulkListOperationErrors' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/locations/{location}/listBulkOperationErrors",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/locations/{location}/listBulkOperationErrors",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1281,
+            "column": 23
+          },
+          "end": {
+            "line": 1281,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "'GET' operation 'VirtualMachines_InstanceView' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/instanceView",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/instanceView",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 11803,
+            "column": 23
+          },
+          "end": {
+            "line": 11803,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "'GET' operation 'CassandraClusters_Status' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}/status",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}/status",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2380,
+            "column": 23
+          },
+          "end": {
+            "line": 2380,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'GET' operation 'Dimensions_ByExternalCloudProviderType' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/dimensions",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/dimensions",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2569,
+            "column": 23
+          },
+          "end": {
+            "line": 2569,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "'GET' operation 'ChangeDataCapture_Status' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/adfcdcs/{changeDataCaptureName}/status",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/adfcdcs/{changeDataCaptureName}/status",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 938,
+            "column": 23
+          },
+          "end": {
+            "line": 938,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "'GET' operation 'MigrationServices_listMigrations' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/migrationServices/{migrationServiceName}/listMigrations",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/migrationServices/{migrationServiceName}/listMigrations",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 692,
+            "column": 23
+          },
+          "end": {
+            "line": 692,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "'GET' operation 'SqlMigrationServices_listMigrations' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/sqlMigrationServices/{sqlMigrationServiceName}/listMigrations",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataMigration/sqlMigrationServices/{sqlMigrationServiceName}/listMigrations",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3524,
+            "column": 23
+          },
+          "end": {
+            "line": 3524,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+      "swaggerFile": "projects/specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub/swagger/preview/2025-03-01-preview/openapi.json",
+      "message": "'GET' operation 'GitHubOAuthCallback' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.DevHub/locations/{location}/githuboauth/default",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.DevHub/locations/{location}/githuboauth/default",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 367,
+            "column": 23
+          },
+          "end": {
+            "line": 367,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "'GET' operation 'IotDpsResource_listValidSkus' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/skus",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/skus",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1609,
+            "column": 23
+          },
+          "end": {
+            "line": 1609,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure",
+      "swaggerFile": "projects/specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure/swagger/preview/2026-07-03-preview/devopsinfrastructure.json",
+      "message": "'GET' operation 'SubscriptionUsages_Usages' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.DevOpsInfrastructure/locations/{location}/usages",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.DevOpsInfrastructure/locations/{location}/usages",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 191,
+            "column": 23
+          },
+          "end": {
+            "line": 191,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "'GET' operation 'GuestConfigurationAssignments_SubscriptionList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 93,
+            "column": 23
+          },
+          "end": {
+            "line": 93,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "'GET' operation 'GuestConfigurationAssignments_RGList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1133,
+            "column": 23
+          },
+          "end": {
+            "line": 1133,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/swagger/preview/2024-11-01-preview/extensionTypes.json",
+      "message": "'GET' operation 'ExtensionTypes_LocationList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.KubernetesConfiguration/locations/{location}/extensionTypes",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.KubernetesConfiguration/locations/{location}/extensionTypes",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 52,
+            "column": 23
+          },
+          "end": {
+            "line": 52,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/swagger/preview/2024-11-01-preview/extensionTypes.json",
+      "message": "'GET' operation 'ExtensionTypes_LocationGet' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.KubernetesConfiguration/locations/{location}/extensionTypes/{extensionTypeName}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.KubernetesConfiguration/locations/{location}/extensionTypes/{extensionTypeName}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 130,
+            "column": 23
+          },
+          "end": {
+            "line": 130,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/swagger/preview/2024-11-01-preview/extensionTypes.json",
+      "message": "'GET' operation 'ExtensionTypes_ClusterListVersions' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensionTypes/{extensionTypeName}/versions",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensionTypes/{extensionTypeName}/versions",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 477,
+            "column": 23
+          },
+          "end": {
+            "line": 477,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/swagger/preview/2024-11-01-preview/extensionTypes.json",
+      "message": "'GET' operation 'ExtensionTypes_ClusterGetVersion' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensionTypes/{extensionTypeName}/versions/{versionNumber}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensionTypes/{extensionTypeName}/versions/{versionNumber}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 572,
+            "column": 23
+          },
+          "end": {
+            "line": 572,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "'GET' operation 'PrivateStore_AdminRequestApprovalsList' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/adminRequestApprovals",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/adminRequestApprovals",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 265,
+            "column": 23
+          },
+          "end": {
+            "line": 265,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "swaggerFile": "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "'GET' operation 'Maintenances_Read' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}/maintenances/{maintenanceName}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}/maintenances/{maintenanceName}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3481,
+            "column": 23
+          },
+          "end": {
+            "line": 3481,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "'GET' operation 'NetAppResource_QueryRegionInfo' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.NetApp/locations/{location}/regionInfo",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.NetApp/locations/{location}/regionInfo",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 514,
+            "column": 23
+          },
+          "end": {
+            "line": 514,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "'GET' operation 'Volumes_ReplicationStatus' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/replicationStatus",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/replicationStatus",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 9903,
+            "column": 23
+          },
+          "end": {
+            "line": 9903,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'SupportedSecurityProviders' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWANName}/supportedSecurityProviders",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5083,
+            "column": 23
+          },
+          "end": {
+            "line": 5083,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'ExpressRouteProviderPort' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 412,
+            "column": 23
+          },
+          "end": {
+            "line": 412,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'CheckDnsNameAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/locations/{location}/checkDnsNameAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 23
+          },
+          "end": {
+            "line": 643,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "'GET' operation 'VirtualNetworks_CheckIPAddressAvailability' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/checkIPAddressAvailability",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12090,
+            "column": 23
+          },
+          "end": {
+            "line": 12090,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "'GET' operation 'Providers_ProviderPermissions' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/providerPermissions",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/providerPermissions",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 837,
+            "column": 23
+          },
+          "end": {
+            "line": 837,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "'GET' operation 'UsageBySubscriptionSku' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Search/locations/{location}/usages/{skuName}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Search/locations/{location}/usages/{skuName}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 264,
+            "column": 23
+          },
+          "end": {
+            "line": 264,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/GovernanceAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/GovernanceAPI/swagger/preview/2022-01-01-preview/security-Governance.json",
+      "message": "'GET' operation 'GovernanceRules_OperationResults' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Security/governanceRules/{ruleId}/operationResults/{operationId}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Security/governanceRules/{ruleId}/operationResults/{operationId}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 599,
+            "column": 23
+          },
+          "end": {
+            "line": 599,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "'GET' operation 'Entities_Queries' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/entities/{entityId}/queries",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/entities/{entityId}/queries",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4086,
+            "column": 23
+          },
+          "end": {
+            "line": 4086,
+            "column": 41
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "swaggerFile": "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/swagger/stable/2022-09-01/storagesync.json",
+      "message": "'GET' operation 'LocationOperationStatus' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.StorageSync/locations/{locationName}/operations/{operationId}",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.StorageSync/locations/{locationName}/operations/{operationId}",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 168,
+            "column": 23
+          },
+          "end": {
+            "line": 168,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "swaggerFile": "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/swagger/stable/2022-09-01/storagesync.json",
+      "message": "'GET' operation 'CloudEndpoints_AfsShareMetadataCertificatePublicKeys' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints/{cloudEndpointName}/afsShareMetadataCertificatePublicKeys",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints/{cloudEndpointName}/afsShareMetadataCertificatePublicKeys",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2144,
+            "column": 23
+          },
+          "end": {
+            "line": 2144,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "swaggerFile": "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/swagger/preview/2025-11-01-preview/subscriptions.json",
+      "message": "'GET' operation 'Subscription_AcceptOwnershipStatus' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Subscription/subscriptions/{subscriptionId}/acceptOwnershipStatus",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Subscription/subscriptions/{subscriptionId}/acceptOwnershipStatus",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 528,
+            "column": 23
+          },
+          "end": {
+            "line": 528,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "'GET' operation 'WebApps_AnalyzeCustomHostname' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/analyzeCustomHostname",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/analyzeCustomHostname",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8081,
+            "column": 23
+          },
+          "end": {
+            "line": 8081,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetInOperationName",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "'GET' operation 'WebApps_AnalyzeCustomHostnameSlot' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/analyzeCustomHostname",
+        "get",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/analyzeCustomHostname",
+          "get",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 20552,
+            "column": 23
+          },
+          "end": {
+            "line": 20552,
+            "column": 58
+          }
+        }
+      }
+    }
+  ]
+}

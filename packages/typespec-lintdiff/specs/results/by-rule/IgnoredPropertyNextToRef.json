@@ -1,0 +1,3293 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "IgnoredPropertyNextToRef",
+  "count": 131,
+  "levels": {
+    "warning": 131
+  },
+  "results": [
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules/swagger/stable/2021-08-08/AlertProcessingRules.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertRuleRecommendations",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertRuleRecommendations/swagger/preview/2023-08-01-preview/AlertRuleRecommendations.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PreviewAlertRule",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PreviewAlertRule/swagger/preview/2025-07-01-preview/PreviewAlertRule.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups/swagger/stable/2023-03-01/PrometheusRuleGroups.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > GatewaySku > properties > name)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "GatewaySku",
+          "properties",
+          "name"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > MigrateToStv2Contract > properties > mode)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "MigrateToStv2Contract",
+          "properties",
+          "mode"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > OperationUpdateContract > properties > properties)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "OperationUpdateContract",
+          "properties",
+          "properties"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > ResourceSku > properties > name)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "ResourceSku",
+          "properties",
+          "name"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "swaggerFile": "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/swagger/resource-manager/Microsoft.AppComplianceAutomation/stable/2024-06-27/appcomplianceautomation.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "swaggerFile": "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/azuredependencymap/resource-manager/Microsoft.DependencyMap/DependencyMap",
+      "swaggerFile": "projects/specification/azuredependencymap/resource-manager/Microsoft.DependencyMap/DependencyMap/swagger/preview/2025-07-01-preview/dependencyMap.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EdgeDevice > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EdgeDevice",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EdgeDeviceJob > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EdgeDeviceJob",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "swaggerFile": "projects/specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/commerce/resource-manager/Microsoft.Commerce/Commerce",
+      "swaggerFile": "projects/specification/commerce/resource-manager/Microsoft.Commerce/Commerce/swagger/preview/2015-06-01-preview/commerce.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/communitytraining/resource-manager/Microsoft.Community/Community",
+      "swaggerFile": "projects/specification/communitytraining/resource-manager/Microsoft.Community/Community/swagger/stable/2023-11-01/CommunityTrainings.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Bulkactions/swagger/preview/2026-07-06-preview/Bulkactions.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > BulkActionVmExtensionProperties > properties > protectedSettingsFromKeyVault)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "BulkActionVmExtensionProperties",
+          "properties",
+          "protectedSettingsFromKeyVault"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk/swagger/stable/2026-03-02/DiskRP.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeSku",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeSku/swagger/stable/2021-07-01/skus.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "swaggerFile": "projects/specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger/swagger/preview/2026-05-22-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > BootstrapAzureConfig > properties > bootstrapToken)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "BootstrapAzureConfig",
+          "properties",
+          "bootstrapToken"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/nodecustomization",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/nodecustomization/swagger/preview/2025-09-02-preview/nodecustomization.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > NodeCustomizationScript > properties > scriptType)\n  **keys**: [ \u001b[32m'example'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "NodeCustomizationScript",
+          "properties",
+          "scriptType"
+        ],
+        "params": {
+          "keys": [
+            "example"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/preparedimagespecification",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/preparedimagespecification/swagger/preview/2026-05-02-preview/preparedimagespecification.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > PreparedImageSpecificationScript > properties > scriptType)\n  **keys**: [ \u001b[32m'example'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "PreparedImageSpecificationScript",
+          "properties",
+          "scriptType"
+        ],
+        "params": {
+          "keys": [
+            "example"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/containerstorage/resource-manager/Microsoft.ContainerStorage/ContainerStorage",
+      "swaggerFile": "projects/specification/containerstorage/resource-manager/Microsoft.ContainerStorage/ContainerStorage/swagger/preview/2023-07-01-preview/containerstorage.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > AsyncOperationStatusProperties > properties > reportUrl)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "AsyncOperationStatusProperties",
+          "properties",
+          "reportUrl"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > AsyncOperationStatusProperties > properties > secondaryReportUrl)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "AsyncOperationStatusProperties",
+          "properties",
+          "secondaryReportUrl"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Setting > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Setting",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard",
+      "swaggerFile": "projects/specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard/swagger/preview/2025-09-01-preview/grafana.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "swaggerFile": "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/swagger/stable/2025-07-01/databox.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Addon > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Addon",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Role > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Role",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Trigger > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Trigger",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "swaggerFile": "projects/specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "swaggerFile": "projects/specification/domainservices/resource-manager/Microsoft.AAD/DomainServices/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/education/resource-manager/Microsoft.Education/Education",
+      "swaggerFile": "projects/specification/education/resource-manager/Microsoft.Education/Education/swagger/preview/2021-12-01-preview/education.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+      "swaggerFile": "projects/specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan/swagger/preview/2026-04-01-preview/elasticsan.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
+      "swaggerFile": "projects/specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations/swagger/preview/2021-08-31-preview/customlocations.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
+      "swaggerFile": "projects/specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure/swagger/preview/2020-02-07-preview/hanaonazure.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot",
+      "swaggerFile": "projects/specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot/swagger/stable/2025-11-01/healthbot.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes",
+      "swaggerFile": "projects/specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes/swagger/stable/2026-05-01/connectedClusters.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder",
+      "swaggerFile": "projects/specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder/swagger/stable/2025-10-01/imagebuilder.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/impact/Impact.Management",
+      "swaggerFile": "projects/specification/impact/Impact.Management/swagger/resource-manager/Microsoft.Impact/preview/2026-01-01-preview/impact.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > InsightCustomResourceCommonParameters > properties > subscriptionId)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "InsightCustomResourceCommonParameters",
+          "properties",
+          "subscriptionId"
+        ],
+        "params": {
+          "keys": [
+            "minLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management",
+      "swaggerFile": "projects/specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management/swagger/resource-manager/Microsoft.IoTOperationsDataProcessor/preview/2023-10-04-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/iotoperationsmq/IoTOperationsMQ.Management",
+      "swaggerFile": "projects/specification/iotoperationsmq/IoTOperationsMQ.Management/swagger/resource-manager/Microsoft.IoTOperationsMQ/preview/2023-10-04-preview/iotoperationsmq.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/iotoperationsorchestrator/IoTOperationsOrchestrator.Management",
+      "swaggerFile": "projects/specification/iotoperationsorchestrator/IoTOperationsOrchestrator.Management/swagger/resource-manager/Microsoft.IoTOperationsOrchestrator/preview/2023-10-04-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > KeyProperties > properties > kty)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "KeyProperties",
+          "properties",
+          "kty"
+        ],
+        "params": {
+          "keys": [
+            "minLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > ManagedHsmKeyProperties > properties > kty)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "ManagedHsmKeyProperties",
+          "properties",
+          "kty"
+        ],
+        "params": {
+          "keys": [
+            "minLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions/swagger/stable/2025-03-01/extensions.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/swagger/preview/2024-11-01-preview/extensionTypes.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations/swagger/stable/2025-04-01/fluxconfiguration.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/swagger/preview/2026-07-01-preview/operations.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes/swagger/preview/2024-11-01-preview/privateLinkScopes.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/liftrastronomer/resource-manager/Astronomer.Astro/AstronomerAstro",
+      "swaggerFile": "projects/specification/liftrastronomer/resource-manager/Astronomer.Astro/AstronomerAstro/swagger/preview/2024-08-27-preview/astronomer.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/liftrqumulo/resource-manager/Qumulo.Storage/QumuloStorage",
+      "swaggerFile": "projects/specification/liftrqumulo/resource-manager/Qumulo.Storage/QumuloStorage/swagger/stable/2026-04-16/Qumulo.Storage.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > AccountKeyDatastoreCredentials > properties > secrets)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "AccountKeyDatastoreCredentials",
+          "properties",
+          "secrets"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > CertificateDatastoreCredentials > properties > secrets)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "CertificateDatastoreCredentials",
+          "properties",
+          "secrets"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EndpointKeys > properties > keys)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EndpointKeys",
+          "properties",
+          "keys"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EndpointPropertiesBase > properties > keys)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EndpointPropertiesBase",
+          "properties",
+          "keys"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > SasDatastoreCredentials > properties > secrets)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "SasDatastoreCredentials",
+          "properties",
+          "secrets"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > ServicePrincipalDatastoreCredentials > properties > secrets)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "ServicePrincipalDatastoreCredentials",
+          "properties",
+          "secrets"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi/swagger/stable/2015-04-01/activityLogs.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EventData > properties > resourceProviderName)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EventData",
+          "properties",
+          "resourceProviderName"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi/swagger/stable/2015-04-01/activityLogs.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > EventData > properties > resourceType)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "EventData",
+          "properties",
+          "resourceType"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud",
+      "swaggerFile": "projects/specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud/swagger/stable/2026-07-01/networkcloud.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Cluster > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Cluster",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud",
+      "swaggerFile": "projects/specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud/swagger/stable/2026-07-01/networkcloud.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > ClusterManager > properties > kind)\n  **keys**: [ \u001b[32m'pattern'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "ClusterManager",
+          "properties",
+          "kind"
+        ],
+        "params": {
+          "keys": [
+            "pattern"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector",
+      "swaggerFile": "projects/specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector/swagger/stable/2022-11-01/AzureTrafficCollector.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/newrelic/NewRelicObservability.Management",
+      "swaggerFile": "projects/specification/newrelic/NewRelicObservability.Management/swagger/resource-manager/NewRelic.Observability/preview/2025-05-01-preview/NewRelic.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > AutonomousDatabaseBaseProperties > properties > adminPassword)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "AutonomousDatabaseBaseProperties",
+          "properties",
+          "adminPassword"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > AutonomousDatabaseUpdateProperties > properties > adminPassword)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "AutonomousDatabaseUpdateProperties",
+          "properties",
+          "adminPassword"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > DbSystemBaseProperties > properties > gridImageOcid)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "DbSystemBaseProperties",
+          "properties",
+          "gridImageOcid"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > DbSystemProperties > properties > adminPassword)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "DbSystemProperties",
+          "properties",
+          "adminPassword"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > ExadbVmClusterProperties > properties > gridImageOcid)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "ExadbVmClusterProperties",
+          "properties",
+          "gridImageOcid"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > GenerateAutonomousDatabaseWalletDetails > properties > password)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "GenerateAutonomousDatabaseWalletDetails",
+          "properties",
+          "password"
+        ],
+        "params": {
+          "keys": [
+            "minLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
+      "swaggerFile": "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/swagger/stable/2025-09-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > GiMinorVersionProperties > properties > gridImageOcid)\n  **keys**: [ \u001b[32m'minLength'\u001b[39m, \u001b[32m'maxLength'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "GiMinorVersionProperties",
+          "properties",
+          "gridImageOcid"
+        ],
+        "params": {
+          "keys": [
+            "minLength",
+            "maxLength"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "swaggerFile": "projects/specification/peering/resource-manager/Microsoft.Peering/Peering/swagger/stable/2025-05-01/peering.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi/swagger/preview/2018-07-01-preview/policyTrackedResources.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "swaggerFile": "projects/specification/postgresql/DBforPostgreSQL.Management/swagger/resource-manager/Microsoft.DBforPostgreSQL/preview/2026-04-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > MigrationSecretParameters > properties > adminCredentials)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "MigrationSecretParameters",
+          "properties",
+          "adminCredentials"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "swaggerFile": "projects/specification/postgresql/DBforPostgreSQL.Management/swagger/resource-manager/Microsoft.DBforPostgreSQL/preview/2026-04-01-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > MigrationSecretParametersForPatch > properties > adminCredentials)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "MigrationSecretParametersForPatch",
+          "properties",
+          "adminCredentials"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc",
+      "swaggerFile": "projects/specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc/swagger/preview/2023-03-02-preview/postgresqlhsc.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "swaggerFile": "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/swagger/stable/2021-01-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "swaggerFile": "projects/specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform/swagger/preview/2020-10-30-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
+      "swaggerFile": "projects/specification/privatedns/resource-manager/Microsoft.Network/PrivateDns/swagger/stable/2024-06-01/privatedns.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "swaggerFile": "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/swagger/preview/2025-08-01-preview/redis.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota/swagger/stable/2020-10-25/quota.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
+      "swaggerFile": "projects/specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector/swagger/preview/2025-03-01-preview/appliances.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/swagger/stable/2023-08-01/deploymentScripts.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > SearchService > properties > sku)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "SearchService",
+          "properties",
+          "sku"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > SearchServiceUpdate > properties > sku)\n  **keys**: [ \u001b[32m'externalDocs'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "SearchServiceUpdate",
+          "properties",
+          "sku"
+        ],
+        "params": {
+          "keys": [
+            "externalDocs"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "swaggerFile": "projects/specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker/swagger/preview/2024-07-01-preview/servicelinker.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking",
+      "swaggerFile": "projects/specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking/swagger/preview/2025-03-01-preview/TrafficController.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "swaggerFile": "projects/specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere/swagger/stable/2024-04-01/azuresphere.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > CacheEncryptionSettings > properties > keyEncryptionKey)\n  **keys**: [ \u001b[32m'format'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "CacheEncryptionSettings",
+          "properties",
+          "keyEncryptionKey"
+        ],
+        "params": {
+          "keys": [
+            "format"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover",
+      "swaggerFile": "projects/specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover/swagger/stable/2026-05-01/storagemover.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    },
+    {
+      "rule": "IgnoredPropertyNextToRef",
+      "level": "warning",
+      "project": "specification/workloads/Workloads.SAPDiscoverySite.Management",
+      "swaggerFile": "projects/specification/workloads/Workloads.SAPDiscoverySite.Management/swagger/resource-manager/Microsoft.Workloads/SAPDiscoverySites/preview/2023-10-01-preview/SAPDiscoverySites.json",
+      "message": "Semantic violation: Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values (components > schemas > Resource > properties > systemData)\n  **keys**: [ \u001b[32m'type'\u001b[39m ]",
+      "path": [],
+      "details": {
+        "level": "warn",
+        "code": "IgnoredPropertyNextToRef",
+        "message": "Sibling values alongside $ref will be ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed values",
+        "path": [
+          "components",
+          "schemas",
+          "Resource",
+          "properties",
+          "systemData"
+        ],
+        "params": {
+          "keys": [
+            "type"
+          ]
+        }
+      }
+    }
+  ]
+}

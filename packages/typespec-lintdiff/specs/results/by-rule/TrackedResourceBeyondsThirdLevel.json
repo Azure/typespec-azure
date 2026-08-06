@@ -1,0 +1,1152 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "TrackedResourceBeyondsThirdLevel",
+  "count": 38,
+  "levels": {
+    "error": 38
+  },
+  "results": [
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The tracked resource VirtualMachineExtensionImage is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "VirtualMachineExtensionImage"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VirtualMachineExtensionImage"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 20088,
+            "column": 37
+          },
+          "end": {
+            "line": 20103,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The tracked resource ThroughputSettingsGetResults is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ThroughputSettingsGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ThroughputSettingsGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 33474,
+            "column": 37
+          },
+          "end": {
+            "line": 33509,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The tracked resource SqlStoredProcedureGetResults is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "SqlStoredProcedureGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SqlStoredProcedureGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 32511,
+            "column": 37
+          },
+          "end": {
+            "line": 32546,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The tracked resource SqlTriggerGetResults is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "SqlTriggerGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SqlTriggerGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 32652,
+            "column": 29
+          },
+          "end": {
+            "line": 32687,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The tracked resource SqlUserDefinedFunctionGetResults is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "SqlUserDefinedFunctionGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SqlUserDefinedFunctionGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 32801,
+            "column": 41
+          },
+          "end": {
+            "line": 32836,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The tracked resource Schedule is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "Schedule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Schedule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12655,
+            "column": 17
+          },
+          "end": {
+            "line": 12688,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "The tracked resource Snapshot is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "Snapshot"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Snapshot"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 20908,
+            "column": 17
+          },
+          "end": {
+            "line": 20934,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "The tracked resource VolumeQuotaRule is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "VolumeQuotaRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VolumeQuotaRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23134,
+            "column": 24
+          },
+          "end": {
+            "line": 23149,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 24
+          },
+          "end": {
+            "line": 18489,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18454,
+            "column": 22
+          },
+          "end": {
+            "line": 18489,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Vmss/swagger/stable/2018-10-01/vmssNetwork.json",
+      "message": "The tracked resource PublicIPAddress is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "PublicIPAddress"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PublicIPAddress"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3768,
+            "column": 24
+          },
+          "end": {
+            "line": 3803,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The tracked resource ProtectedItemResource is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ProtectedItemResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectedItemResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14542,
+            "column": 30
+          },
+          "end": {
+            "line": 14575,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The tracked resource RecoveryPointResource is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "RecoveryPointResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecoveryPointResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15278,
+            "column": 30
+          },
+          "end": {
+            "line": 15311,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The tracked resource ProtectionContainerResource is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ProtectionContainerResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectionContainerResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14675,
+            "column": 36
+          },
+          "end": {
+            "line": 14708,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource NetworkMapping is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "NetworkMapping"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkMapping"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23609,
+            "column": 23
+          },
+          "end": {
+            "line": 23627,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource MigrationItem is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "MigrationItem"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MigrationItem"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23018,
+            "column": 22
+          },
+          "end": {
+            "line": 23036,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource ProtectableItem is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ProtectableItem"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectableItem"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 24499,
+            "column": 24
+          },
+          "end": {
+            "line": 24517,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource ReplicationProtectedItem is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ReplicationProtectedItem"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReplicationProtectedItem"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 26420,
+            "column": 33
+          },
+          "end": {
+            "line": 26438,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource ProtectionContainerMapping is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "ProtectionContainerMapping"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectionContainerMapping"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 24630,
+            "column": 35
+          },
+          "end": {
+            "line": 24648,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The tracked resource StorageClassificationMapping is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "StorageClassificationMapping"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StorageClassificationMapping"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 27809,
+            "column": 37
+          },
+          "end": {
+            "line": 27827,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "The tracked resource Rule is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "Rule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Rule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6163,
+            "column": 13
+          },
+          "end": {
+            "line": 6183,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseRecommendedActions.json",
+      "message": "The tracked resource RecommendedAction is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "RecommendedAction"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecommendedAction"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5234,
+            "column": 24
+          },
+          "end": {
+            "line": 5259,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingRules.json",
+      "message": "The tracked resource DataMaskingRule is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "DataMaskingRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 239,
+            "column": 24
+          },
+          "end": {
+            "line": 264,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The tracked resource WorkflowRunActionRepetitionDefinition is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "WorkflowRunActionRepetitionDefinition"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "WorkflowRunActionRepetitionDefinition"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 58285,
+            "column": 46
+          },
+          "end": {
+            "line": 58303,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedResourceBeyondsThirdLevel",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The tracked resource WorkflowVersion is beyond third level of nesting.",
+      "path": [
+        "definitions",
+        "WorkflowVersion"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "WorkflowVersion"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 59082,
+            "column": 24
+          },
+          "end": {
+            "line": 59097,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

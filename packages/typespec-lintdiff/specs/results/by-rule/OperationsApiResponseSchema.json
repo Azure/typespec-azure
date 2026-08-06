@@ -1,0 +1,1494 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "OperationsApiResponseSchema",
+  "count": 38,
+  "levels": {
+    "error": 38
+  },
+  "results": [
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Advisor/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Advisor/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Advisor/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 436,
+            "column": 21
+          },
+          "end": {
+            "line": 437,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ApiManagement/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ApiManagement/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ApiManagement/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 372,
+            "column": 21
+          },
+          "end": {
+            "line": 373,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations/swagger/stable/2021-03-08/workbookOperations_API.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Insights/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Insights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Insights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 62,
+            "column": 21
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Attestation/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Attestation/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Attestation/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 68,
+            "column": 21
+          },
+          "end": {
+            "line": 69,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Automation/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Automation/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Automation/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 203,
+            "column": 21
+          },
+          "end": {
+            "line": 204,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Kusto/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Kusto/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Kusto/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 21
+          },
+          "end": {
+            "line": 105,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "The response schema of operations API '/providers/Microsoft.BotService/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BotService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BotService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 116,
+            "column": 21
+          },
+          "end": {
+            "line": 117,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Consumption/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Consumption/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Consumption/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2032,
+            "column": 21
+          },
+          "end": {
+            "line": 2033,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ContainerInstance/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ContainerInstance/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ContainerInstance/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 65,
+            "column": 21
+          },
+          "end": {
+            "line": 66,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ContainerService/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ContainerService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ContainerService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 119,
+            "column": 21
+          },
+          "end": {
+            "line": 120,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.DocumentDB/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DocumentDB/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DocumentDB/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 132,
+            "column": 21
+          },
+          "end": {
+            "line": 133,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "swaggerFile": "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/swagger/stable/2026-01-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Databricks/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Databricks/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Databricks/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 86,
+            "column": 21
+          },
+          "end": {
+            "line": 87,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.DataFactory/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DataFactory/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DataFactory/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 136,
+            "column": 21
+          },
+          "end": {
+            "line": 137,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Devices/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Devices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Devices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 74,
+            "column": 21
+          },
+          "end": {
+            "line": 75,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "swaggerFile": "projects/specification/domainservices/resource-manager/Microsoft.AAD/DomainServices/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.AAD/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AAD/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AAD/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 69,
+            "column": 21
+          },
+          "end": {
+            "line": 70,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "The response schema of operations API '/providers/Microsoft.GuestConfiguration/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.GuestConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.GuestConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 70,
+            "column": 21
+          },
+          "end": {
+            "line": 71,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
+      "swaggerFile": "projects/specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure/swagger/preview/2020-02-07-preview/hanaonazure.json",
+      "message": "The response schema of operations API '/providers/Microsoft.HanaOnAzure/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HanaOnAzure/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HanaOnAzure/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 62,
+            "column": 21
+          },
+          "end": {
+            "line": 63,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.HDInsight/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HDInsight/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HDInsight/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 95,
+            "column": 21
+          },
+          "end": {
+            "line": 96,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Devices/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Devices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Devices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 80,
+            "column": 21
+          },
+          "end": {
+            "line": 81,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/swagger/preview/2026-07-01-preview/operations.json",
+      "message": "The response schema of operations API '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 128,
+            "column": 21
+          },
+          "end": {
+            "line": 129,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ManagedIdentity/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ManagedIdentity/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ManagedIdentity/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 112,
+            "column": 21
+          },
+          "end": {
+            "line": 113,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "swaggerFile": "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.DBforMySQL/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DBforMySQL/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DBforMySQL/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 146,
+            "column": 21
+          },
+          "end": {
+            "line": 147,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "The response schema of operations API '/providers/Microsoft.NetApp/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.NetApp/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.NetApp/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 140,
+            "column": 21
+          },
+          "end": {
+            "line": 141,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkingOperations.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Network/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Network/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Network/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 62,
+            "column": 21
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.OperationalInsights/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.OperationalInsights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.OperationalInsights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 107,
+            "column": 21
+          },
+          "end": {
+            "line": 108,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "swaggerFile": "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/swagger/stable/2021-01-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.PowerBIDedicated/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PowerBIDedicated/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PowerBIDedicated/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 68,
+            "column": 21
+          },
+          "end": {
+            "line": 69,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Quota/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Quota/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Quota/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2364,
+            "column": 21
+          },
+          "end": {
+            "line": 2365,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.RecoveryServices/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 77,
+            "column": 21
+          },
+          "end": {
+            "line": 78,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The response schema of operations API '/providers/Microsoft.RecoveryServices/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 278,
+            "column": 21
+          },
+          "end": {
+            "line": 279,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The response schema of operations API '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 233,
+            "column": 21
+          },
+          "end": {
+            "line": 234,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters",
+      "swaggerFile": "projects/specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters/swagger/stable/2025-07-25/redhatopenshift.json",
+      "message": "The response schema of operations API '/providers/Microsoft.RedHatOpenShift/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RedHatOpenShift/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RedHatOpenShift/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 71,
+            "column": 21
+          },
+          "end": {
+            "line": 72,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "swaggerFile": "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/swagger/preview/2025-08-01-preview/redis.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Cache/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Cache/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Cache/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 83,
+            "column": 21
+          },
+          "end": {
+            "line": 84,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi",
+      "swaggerFile": "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi/swagger/stable/2024-04-01/resourcegraph.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ResourceGraph/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ResourceGraph/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ResourceGraph/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 65,
+            "column": 21
+          },
+          "end": {
+            "line": 66,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "The response schema of operations API '/providers/Microsoft.ResourceHealth/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ResourceHealth/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ResourceHealth/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 872,
+            "column": 21
+          },
+          "end": {
+            "line": 873,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/operations.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Sql/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Sql/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Sql/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 62,
+            "column": 21
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "The response schema of operations API '/providers/Microsoft.SqlVirtualMachine/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SqlVirtualMachine/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SqlVirtualMachine/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 71,
+            "column": 21
+          },
+          "end": {
+            "line": 72,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The response schema of operations API '/providers/Microsoft.Storage/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Storage/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Storage/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 134,
+            "column": 21
+          },
+          "end": {
+            "line": 135,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiResponseSchema",
+      "level": "error",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "swaggerFile": "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/swagger/stable/2022-09-01/storagesync.json",
+      "message": "The response schema of operations API '/providers/Microsoft.StorageSync/operations' does not match the ARM specification. Please standardize the schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.StorageSync/operations",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.StorageSync/operations",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 83,
+            "column": 21
+          },
+          "end": {
+            "line": 84,
+            "column": 63
+          }
+        }
+      }
+    }
+  ]
+}

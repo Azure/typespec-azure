@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "CollectionObjectPropertiesNaming",
+  "count": 3,
+  "levels": {
+    "error": 3
+  },
+  "results": [
+    {
+      "rule": "CollectionObjectPropertiesNaming",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Collection object returned by list operation 'Compute_ListNodes' with 'x-ms-pageable' extension, has no property named 'value'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/listNodes",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/listNodes",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7848,
+            "column": 21
+          },
+          "end": {
+            "line": 7849,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "CollectionObjectPropertiesNaming",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Collection object returned by list operation 'WorkflowRunActions_ListExpressionTraces' with 'x-ms-pageable' extension, has no property named 'value'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostruntime/runtime/webhooks/workflow/api/management/workflows/{workflowName}/runs/{runName}/actions/{actionName}/listExpressionTraces",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostruntime/runtime/webhooks/workflow/api/management/workflows/{workflowName}/runs/{runName}/actions/{actionName}/listExpressionTraces",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13997,
+            "column": 21
+          },
+          "end": {
+            "line": 13998,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "CollectionObjectPropertiesNaming",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Collection object returned by list operation 'WorkflowRunActionRepetitions_ListExpressionTraces' with 'x-ms-pageable' extension, has no property named 'value'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostruntime/runtime/webhooks/workflow/api/management/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions/{repetitionName}/listExpressionTraces",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostruntime/runtime/webhooks/workflow/api/management/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions/{repetitionName}/listExpressionTraces",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 14219,
+            "column": 21
+          },
+          "end": {
+            "line": 14220,
+            "column": 54
+          }
+        }
+      }
+    }
+  ]
+}

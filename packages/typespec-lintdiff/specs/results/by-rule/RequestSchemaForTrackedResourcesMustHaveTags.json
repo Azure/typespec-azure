@@ -1,0 +1,2520 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+  "count": 76,
+  "levels": {
+    "error": 76
+  },
+  "results": [
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "swaggerFile": "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/swagger/preview/2025-08-01-preview/appconfiguration.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppConfiguration/configurationStores/{configStoreName}/replicas/{replicaName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppConfiguration/configurationStores/{configStoreName}/replicas/{replicaName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1732,
+            "column": 12
+          },
+          "end": {
+            "line": 1816,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/attachedDatabaseConfigurations/{attachedDatabaseConfigurationName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/attachedDatabaseConfigurations/{attachedDatabaseConfigurationName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1019,
+            "column": 12
+          },
+          "end": {
+            "line": 1118,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1432,
+            "column": 12
+          },
+          "end": {
+            "line": 1561,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2186,
+            "column": 12
+          },
+          "end": {
+            "line": 2293,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updateSummaries/default",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updateSummaries/default",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4382,
+            "column": 12
+          },
+          "end": {
+            "line": 4431,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updates/{updateName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updates/{updateName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4733,
+            "column": 12
+          },
+          "end": {
+            "line": 4789,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "swaggerFile": "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/swagger/preview/2026-05-01-preview/hci.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updates/{updateName}/updateRuns/{updateRunName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureStackHCI/clusters/{clusterName}/updates/{updateName}/updateRuns/{updateRunName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 5119,
+            "column": 12
+          },
+          "end": {
+            "line": 5182,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 562,
+            "column": 12
+          },
+          "end": {
+            "line": 633,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "swaggerFile": "projects/specification/chaos/resource-manager/Microsoft.Chaos/Chaos/swagger/preview/2026-08-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 886,
+            "column": 12
+          },
+          "end": {
+            "line": 969,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4905,
+            "column": 12
+          },
+          "end": {
+            "line": 4988,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/extensions/{vmExtensionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/extensions/{vmExtensionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 9033,
+            "column": 12
+          },
+          "end": {
+            "line": 9120,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/exportPipelines/{exportPipelineName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/exportPipelines/{exportPipelineName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1872,
+            "column": 12
+          },
+          "end": {
+            "line": 1958,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/importPipelines/{importPipelineName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/importPipelines/{importPipelineName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2302,
+            "column": 12
+          },
+          "end": {
+            "line": 2388,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks/swagger/preview/2025-03-01-preview/containerregistry_build.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 998,
+            "column": 12
+          },
+          "end": {
+            "line": 1084,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1016,
+            "column": 12
+          },
+          "end": {
+            "line": 1109,
+            "column": 97
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/applicationGroups/{applicationGroupName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/applicationGroups/{applicationGroupName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1346,
+            "column": 12
+          },
+          "end": {
+            "line": 1407,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1576,
+            "column": 12
+          },
+          "end": {
+            "line": 1636,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1928,
+            "column": 12
+          },
+          "end": {
+            "line": 1995,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2546,
+            "column": 12
+          },
+          "end": {
+            "line": 2616,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2803,
+            "column": 12
+          },
+          "end": {
+            "line": 2872,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/consumergroups/{consumerGroupName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/consumergroups/{consumerGroupName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3229,
+            "column": 12
+          },
+          "end": {
+            "line": 3299,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/fabricShortcuts/{fabricShortcutName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/fabricShortcuts/{fabricShortcutName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3495,
+            "column": 12
+          },
+          "end": {
+            "line": 3564,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/networkRuleSets/default",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/networkRuleSets/default",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3935,
+            "column": 12
+          },
+          "end": {
+            "line": 3987,
+            "column": 90
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4282,
+            "column": 12
+          },
+          "end": {
+            "line": 4356,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/schemagroups/{schemaGroupName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/schemagroups/{schemaGroupName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4617,
+            "column": 12
+          },
+          "end": {
+            "line": 4678,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 228,
+            "column": 12
+          },
+          "end": {
+            "line": 287,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 556,
+            "column": 12
+          },
+          "end": {
+            "line": 619,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 892,
+            "column": 12
+          },
+          "end": {
+            "line": 956,
+            "column": 102
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 12
+          },
+          "end": {
+            "line": 1336,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}/fhirdestinations/{fhirDestinationName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}/fhirdestinations/{fhirDestinationName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2512,
+            "column": 12
+          },
+          "end": {
+            "line": 2622,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/accessPolicies/{operationKind}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/accessPolicies/{operationKind}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1805,
+            "column": 12
+          },
+          "end": {
+            "line": 1877,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 228,
+            "column": 12
+          },
+          "end": {
+            "line": 280,
+            "column": 93
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 738,
+            "column": 12
+          },
+          "end": {
+            "line": 828,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1131,
+            "column": 12
+          },
+          "end": {
+            "line": 1207,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1366,
+            "column": 12
+          },
+          "end": {
+            "line": 1422,
+            "column": 93
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots/{snapshotName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots/{snapshotName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 10445,
+            "column": 12
+          },
+          "end": {
+            "line": 10554,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/volumeGroups/{volumeGroupName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/volumeGroups/{volumeGroupName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 12932,
+            "column": 12
+          },
+          "end": {
+            "line": 13019,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4201,
+            "column": 12
+          },
+          "end": {
+            "line": 4281,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
+      "swaggerFile": "projects/specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus/swagger/stable/2025-11-01/swagger.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/certificates/{certificateName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/certificates/{certificateName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 770,
+            "column": 12
+          },
+          "end": {
+            "line": 852,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 172,
+            "column": 12
+          },
+          "end": {
+            "line": 242,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "swaggerFile": "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/swagger/preview/2025-08-01-preview/redis.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2031,
+            "column": 12
+          },
+          "end": {
+            "line": 2107,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1049,
+            "column": 12
+          },
+          "end": {
+            "line": 1108,
+            "column": 86
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1394,
+            "column": 12
+          },
+          "end": {
+            "line": 1453,
+            "column": 82
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1634,
+            "column": 12
+          },
+          "end": {
+            "line": 1701,
+            "column": 99
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2119,
+            "column": 12
+          },
+          "end": {
+            "line": 2192,
+            "column": 97
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2489,
+            "column": 12
+          },
+          "end": {
+            "line": 2548,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2729,
+            "column": 12
+          },
+          "end": {
+            "line": 2796,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 393,
+            "column": 12
+          },
+          "end": {
+            "line": 461,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 132,
+            "column": 12
+          },
+          "end": {
+            "line": 211,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/swagger/stable/2020-01-01/security-SecuritySolutions.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/locations/{ascLocation}/jitNetworkAccessPolicies/{jitNetworkAccessPolicyName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/locations/{ascLocation}/jitNetworkAccessPolicies/{jitNetworkAccessPolicyName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1235,
+            "column": 12
+          },
+          "end": {
+            "line": 1291,
+            "column": 99
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 622,
+            "column": 12
+          },
+          "end": {
+            "line": 685,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 984,
+            "column": 12
+          },
+          "end": {
+            "line": 1050,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations/{configName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations/{configName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 1678,
+            "column": 12
+          },
+          "end": {
+            "line": 1773,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/networkRuleSets/default",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/networkRuleSets/default",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2070,
+            "column": 12
+          },
+          "end": {
+            "line": 2121,
+            "column": 90
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2395,
+            "column": 12
+          },
+          "end": {
+            "line": 2468,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2729,
+            "column": 12
+          },
+          "end": {
+            "line": 2791,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 2982,
+            "column": 12
+          },
+          "end": {
+            "line": 3050,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3397,
+            "column": 12
+          },
+          "end": {
+            "line": 3459,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules/{authorizationRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules/{authorizationRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3650,
+            "column": 12
+          },
+          "end": {
+            "line": 3721,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4085,
+            "column": 12
+          },
+          "end": {
+            "line": 4156,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}/rules/{ruleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}/rules/{ruleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 4387,
+            "column": 12
+          },
+          "end": {
+            "line": 4470,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingPolicies.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/dataMaskingPolicies/{dataMaskingPolicyName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/dataMaskingPolicies/{dataMaskingPolicyName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 120,
+            "column": 12
+          },
+          "end": {
+            "line": 206,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingRules.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/dataMaskingPolicies/{dataMaskingPolicyName}/rules/{dataMaskingRuleName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/dataMaskingPolicies/{dataMaskingPolicyName}/rules/{dataMaskingRuleName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 133,
+            "column": 12
+          },
+          "end": {
+            "line": 232,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/encryptionProtectors.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/encryptionProtector/{encryptionProtectorName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/encryptionProtector/{encryptionProtectorName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 165,
+            "column": 12
+          },
+          "end": {
+            "line": 262,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/geoBackupPolicies.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/geoBackupPolicies/{geoBackupPolicyName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/geoBackupPolicies/{geoBackupPolicyName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 176,
+            "column": 12
+          },
+          "end": {
+            "line": 259,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverConnectionPolicies.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/connectionPolicies/{connectionPolicyName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/connectionPolicies/{connectionPolicyName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 162,
+            "column": 12
+          },
+          "end": {
+            "line": 253,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverKeys.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/keys/{keyName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/keys/{keyName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 151,
+            "column": 12
+          },
+          "end": {
+            "line": 248,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "level": "error",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "A tracked resource MUST always have tags as a top level optional property. Tracked resource does not have tags in the request schema.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}/storageTargets/{storageTargetName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}/storageTargets/{storageTargetName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-07",
+        "range": {
+          "start": {
+            "line": 3439,
+            "column": 12
+          },
+          "end": {
+            "line": 3541,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

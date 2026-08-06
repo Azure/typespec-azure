@@ -1,0 +1,750 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ParametersSchemaAsTypeObject",
+  "count": 18,
+  "levels": {
+    "error": 18
+  },
+  "results": [
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content",
+        "put",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content",
+          "put",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 6794,
+            "column": 22
+          },
+          "end": {
+            "line": 6794,
+            "column": 30
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/addPaymentTerms",
+        "post",
+        "parameters",
+        "2",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/addPaymentTerms",
+          "post",
+          "parameters",
+          "2",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 427,
+            "column": 22
+          },
+          "end": {
+            "line": 427,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/cancelPaymentTerms",
+        "post",
+        "parameters",
+        "2",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/cancelPaymentTerms",
+          "post",
+          "parameters",
+          "2",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 7841,
+            "column": 22
+          },
+          "end": {
+            "line": 7841,
+            "column": 30
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/downloadDocuments",
+        "post",
+        "parameters",
+        "2",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/downloadDocuments",
+          "post",
+          "parameters",
+          "2",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 9429,
+            "column": 22
+          },
+          "end": {
+            "line": 9429,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/validatePaymentTerms",
+        "post",
+        "parameters",
+        "2",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/validatePaymentTerms",
+          "post",
+          "parameters",
+          "2",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 12440,
+            "column": 22
+          },
+          "end": {
+            "line": 12440,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+        "post",
+        "parameters",
+        "2",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+          "post",
+          "parameters",
+          "2",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 12499,
+            "column": 22
+          },
+          "end": {
+            "line": 12499,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/raiBlocklists/{raiBlocklistName}/addRaiBlocklistItems",
+        "post",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/raiBlocklists/{raiBlocklistName}/addRaiBlocklistItems",
+          "post",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/raiBlocklists/{raiBlocklistName}/deleteRaiBlocklistItems",
+        "post",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/raiBlocklists/{raiBlocklistName}/deleteRaiBlocklistItems",
+          "post",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/restartHosts",
+        "post",
+        "parameters",
+        "4",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/restartHosts",
+          "post",
+          "parameters",
+          "4",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 2676,
+            "column": 22
+          },
+          "end": {
+            "line": 2676,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/connections/{connectionName}/raiBlocklists/{raiBlocklistName}/addRaiBlocklistItems",
+        "post",
+        "parameters",
+        "6",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/connections/{connectionName}/raiBlocklists/{raiBlocklistName}/addRaiBlocklistItems",
+          "post",
+          "parameters",
+          "6",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/customServices",
+        "post",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/customServices",
+          "post",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 7676,
+            "column": 22
+          },
+          "end": {
+            "line": 7676,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/updateDataMounts",
+        "post",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}/updateDataMounts",
+          "post",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 8187,
+            "column": 22
+          },
+          "end": {
+            "line": 8187,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/connections/{connectionName}/raiBlocklists/{raiBlocklistName}/deleteRaiBlocklistItems",
+        "post",
+        "parameters",
+        "6",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/connections/{connectionName}/raiBlocklists/{raiBlocklistName}/deleteRaiBlocklistItems",
+          "post",
+          "parameters",
+          "6",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 9475,
+            "column": 22
+          },
+          "end": {
+            "line": 9475,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}",
+        "post",
+        "parameters",
+        "3",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}",
+          "post",
+          "parameters",
+          "3",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}/offers/{offerId}",
+        "post",
+        "parameters",
+        "4",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}/offers/{offerId}",
+          "post",
+          "parameters",
+          "4",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/newrelic/NewRelicObservability.Management",
+      "swaggerFile": "projects/specification/newrelic/NewRelicObservability.Management/swagger/resource-manager/NewRelic.Observability/preview/2025-05-01-preview/NewRelic.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/NewRelic.Observability/monitors/{monitorName}/listConnectedPartnerResources",
+        "post",
+        "parameters",
+        "4",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/NewRelic.Observability/monitors/{monitorName}/listConnectedPartnerResources",
+          "post",
+          "parameters",
+          "4",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 0
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}/spaceAllocation",
+        "post",
+        "parameters",
+        "4",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}/spaceAllocation",
+          "post",
+          "parameters",
+          "4",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 3001,
+            "column": 22
+          },
+          "end": {
+            "line": 3001,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersSchemaAsTypeObject",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/scriptExecutions/{scriptExecutionName}/getExecutionLogs",
+        "post",
+        "parameters",
+        "5",
+        "schema",
+        "type"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/scriptExecutions/{scriptExecutionName}/getExecutionLogs",
+          "post",
+          "parameters",
+          "5",
+          "schema",
+          "type"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-POST-V1-05",
+        "range": {
+          "start": {
+            "line": 5211,
+            "column": 22
+          },
+          "end": {
+            "line": 5211,
+            "column": 29
+          }
+        }
+      }
+    }
+  ]
+}

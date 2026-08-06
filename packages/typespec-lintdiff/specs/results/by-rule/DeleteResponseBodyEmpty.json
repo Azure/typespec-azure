@@ -1,0 +1,1767 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "DeleteResponseBodyEmpty",
+  "count": 45,
+  "levels": {
+    "error": 45
+  },
+  "results": [
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/swagger/stable/2015-05-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/APIKeys/{keyId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/APIKeys/{keyId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 117,
+            "column": 21
+          },
+          "end": {
+            "line": 118,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/swagger/stable/2015-05-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/exportconfiguration/{exportId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/exportconfiguration/{exportId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1107,
+            "column": 21
+          },
+          "end": {
+            "line": 1108,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/{roleAssignmentId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{roleAssignmentId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 177,
+            "column": 21
+          },
+          "end": {
+            "line": 178,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignments/{roleAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignments/{roleAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 423,
+            "column": 21
+          },
+          "end": {
+            "line": 424,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/swagger/preview/2022-05-01-preview/authorization-RoleDefinitionsCalls.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleDefinitions/{roleDefinitionId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleDefinitions/{roleDefinitionId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 232,
+            "column": 21
+          },
+          "end": {
+            "line": 233,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1353,
+            "column": 21
+          },
+          "end": {
+            "line": 1354,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 4417,
+            "column": 21
+          },
+          "end": {
+            "line": 4418,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 5196,
+            "column": 21
+          },
+          "end": {
+            "line": 5197,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+      "swaggerFile": "projects/specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub/swagger/preview/2025-03-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevHub/workflows/{workflowName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevHub/workflows/{workflowName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1453,
+            "column": 21
+          },
+          "end": {
+            "line": 1454,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1466,
+            "column": 21
+          },
+          "end": {
+            "line": 1467,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 322,
+            "column": 21
+          },
+          "end": {
+            "line": 323,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 496,
+            "column": 21
+          },
+          "end": {
+            "line": 497,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/iotHubs/{resourceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/iotHubs/{resourceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 2086,
+            "column": 21
+          },
+          "end": {
+            "line": 2087,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 21
+          },
+          "end": {
+            "line": 1393,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 2379,
+            "column": 21
+          },
+          "end": {
+            "line": 2380,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 358,
+            "column": 21
+          },
+          "end": {
+            "line": 359,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 894,
+            "column": 21
+          },
+          "end": {
+            "line": 895,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1259,
+            "column": 21
+          },
+          "end": {
+            "line": 1260,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1508,
+            "column": 21
+          },
+          "end": {
+            "line": 1509,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1761,
+            "column": 21
+          },
+          "end": {
+            "line": 1762,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/linkedServices/{linkedServiceName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/linkedServices/{linkedServiceName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 2733,
+            "column": 21
+          },
+          "end": {
+            "line": 2734,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1012,
+            "column": 21
+          },
+          "end": {
+            "line": 1013,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1840,
+            "column": 21
+          },
+          "end": {
+            "line": 1841,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 4596,
+            "column": 21
+          },
+          "end": {
+            "line": 4597,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/remediations/{remediationName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 5842,
+            "column": 21
+          },
+          "end": {
+            "line": 5843,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "swaggerFile": "projects/specification/postgresql/DBforPostgreSQL.Management/swagger/resource-manager/Microsoft.DBforPostgreSQL/preview/2026-04-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/migrations/{migrationName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/migrations/{migrationName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 3553,
+            "column": 21
+          },
+          "end": {
+            "line": 3554,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 316,
+            "column": 21
+          },
+          "end": {
+            "line": 317,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1501,
+            "column": 21
+          },
+          "end": {
+            "line": 1502,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1140,
+            "column": 21
+          },
+          "end": {
+            "line": 1140,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1144,
+            "column": 21
+          },
+          "end": {
+            "line": 1144,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedInstanceLongTermRetentionPolicies.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/backupLongTermRetentionPolicies/{policyName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/backupLongTermRetentionPolicies/{policyName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 331,
+            "column": 21
+          },
+          "end": {
+            "line": 332,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}/immutabilityPolicies/default",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}/immutabilityPolicies/default",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 1974,
+            "column": 21
+          },
+          "end": {
+            "line": 1975,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/trafficManagerUserMetricsKeys/default",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/trafficManagerUserMetricsKeys/default",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 258,
+            "column": 21
+          },
+          "end": {
+            "line": 259,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 571,
+            "column": 21
+          },
+          "end": {
+            "line": 572,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 874,
+            "column": 21
+          },
+          "end": {
+            "line": 875,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 3320,
+            "column": 21
+          },
+          "end": {
+            "line": 3320,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 3324,
+            "column": 21
+          },
+          "end": {
+            "line": 3324,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 4473,
+            "column": 21
+          },
+          "end": {
+            "line": 4473,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 4492,
+            "column": 21
+          },
+          "end": {
+            "line": 4492,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 18385,
+            "column": 21
+          },
+          "end": {
+            "line": 18385,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 18404,
+            "column": 21
+          },
+          "end": {
+            "line": 18404,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 29720,
+            "column": 21
+          },
+          "end": {
+            "line": 29720,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 29739,
+            "column": 21
+          },
+          "end": {
+            "line": 29739,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 39190,
+            "column": 21
+          },
+          "end": {
+            "line": 39190,
+            "column": 24
+          }
+        }
+      }
+    },
+    {
+      "rule": "DeleteResponseBodyEmpty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The delete response body must be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Delete-V1-04",
+        "range": {
+          "start": {
+            "line": 39209,
+            "column": 21
+          },
+          "end": {
+            "line": 39209,
+            "column": 24
+          }
+        }
+      }
+    }
+  ]
+}

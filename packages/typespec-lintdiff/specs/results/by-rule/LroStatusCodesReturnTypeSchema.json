@@ -1,0 +1,752 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "LroStatusCodesReturnTypeSchema",
+  "count": 20,
+  "levels": {
+    "error": 20
+  },
+  "results": [
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'DscNodeConfiguration_CreateOrUpdate', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/nodeConfigurations/{nodeConfigurationName}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/nodeConfigurations/{nodeConfigurationName}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4691,
+            "column": 16
+          },
+          "end": {
+            "line": 4692,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Extensions_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/{extensionName}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/{extensionName}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1507,
+            "column": 16
+          },
+          "end": {
+            "line": 1508,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Extensions_EnableAzureMonitor', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1750,
+            "column": 16
+          },
+          "end": {
+            "line": 1751,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Extensions_EnableAzureMonitorAgent', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1926,
+            "column": 16
+          },
+          "end": {
+            "line": 1927,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'Extensions_EnableMonitoring', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2102,
+            "column": 16
+          },
+          "end": {
+            "line": 2103,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "LroStatusCodesReturnTypeSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "200/201 Responses of long running operations must have a schema definition for return type. OperationId: 'VipSwap_Create', Response code: '200'",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 13793,
+            "column": 16
+          },
+          "end": {
+            "line": 13794,
+            "column": 55
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,4569 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ValidFormats",
+  "count": 123,
+  "levels": {
+    "error": 123
+  },
+  "results": [
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/commerce/resource-manager/Microsoft.Commerce/Commerce",
+      "swaggerFile": "projects/specification/commerce/resource-manager/Microsoft.Commerce/Commerce/swagger/preview/2015-06-01-preview/commerce.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MonetaryCommitment",
+        "properties",
+        "TieredDiscount",
+        "additionalProperties",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MonetaryCommitment",
+          "properties",
+          "TieredDiscount",
+          "additionalProperties",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 325,
+            "column": 22
+          },
+          "end": {
+            "line": 325,
+            "column": 31
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/commerce/resource-manager/Microsoft.Commerce/Commerce",
+      "swaggerFile": "projects/specification/commerce/resource-manager/Microsoft.Commerce/Commerce/swagger/preview/2015-06-01-preview/commerce.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MonetaryCredit",
+        "properties",
+        "Credit",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MonetaryCredit",
+          "properties",
+          "Credit",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 350,
+            "column": 20
+          },
+          "end": {
+            "line": 350,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Consumption/reservationTransactions",
+        "get",
+        "parameters",
+        "4",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Consumption/reservationTransactions",
+          "get",
+          "parameters",
+          "4",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1716,
+            "column": 22
+          },
+          "end": {
+            "line": 1716,
+            "column": 31
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "AmountWithExchangeRate",
+        "properties",
+        "exchangeRate",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AmountWithExchangeRate",
+          "properties",
+          "exchangeRate",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2294,
+            "column": 20
+          },
+          "end": {
+            "line": 2294,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "beginningBalance",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "beginningBalance",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2355,
+            "column": 20
+          },
+          "end": {
+            "line": 2355,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "endingBalance",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "endingBalance",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2361,
+            "column": 20
+          },
+          "end": {
+            "line": 2361,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "newPurchases",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "newPurchases",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2367,
+            "column": 20
+          },
+          "end": {
+            "line": 2367,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "adjustments",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "adjustments",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2373,
+            "column": 20
+          },
+          "end": {
+            "line": 2373,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "utilized",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "utilized",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2379,
+            "column": 20
+          },
+          "end": {
+            "line": 2379,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "serviceOverage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "serviceOverage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2385,
+            "column": 20
+          },
+          "end": {
+            "line": 2385,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "chargesBilledSeparately",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "chargesBilledSeparately",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2391,
+            "column": 20
+          },
+          "end": {
+            "line": 2391,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "totalOverage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "totalOverage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2397,
+            "column": 20
+          },
+          "end": {
+            "line": 2397,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "totalUsage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "totalUsage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2403,
+            "column": 20
+          },
+          "end": {
+            "line": 2403,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "azureMarketplaceServiceCharges",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "azureMarketplaceServiceCharges",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2409,
+            "column": 20
+          },
+          "end": {
+            "line": 2409,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalanceProperties",
+        "properties",
+        "overageRefund",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalanceProperties",
+          "properties",
+          "overageRefund",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2424,
+            "column": 20
+          },
+          "end": {
+            "line": 2424,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalancePropertiesAdjustmentDetailsItem",
+        "properties",
+        "value",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalancePropertiesAdjustmentDetailsItem",
+          "properties",
+          "value",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2462,
+            "column": 20
+          },
+          "end": {
+            "line": 2462,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BalancePropertiesNewPurchasesDetailsItem",
+        "properties",
+        "value",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BalancePropertiesNewPurchasesDetailsItem",
+          "properties",
+          "value",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2478,
+            "column": 20
+          },
+          "end": {
+            "line": 2478,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "BudgetProperties",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BudgetProperties",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2622,
+            "column": 20
+          },
+          "end": {
+            "line": 2622,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "CurrentSpend",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "CurrentSpend",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2998,
+            "column": 20
+          },
+          "end": {
+            "line": 2998,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ForecastSpend",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ForecastSpend",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3282,
+            "column": 20
+          },
+          "end": {
+            "line": 3282,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyChargeSummaryProperties",
+        "properties",
+        "azureCharges",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyChargeSummaryProperties",
+          "properties",
+          "azureCharges",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3360,
+            "column": 20
+          },
+          "end": {
+            "line": 3360,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyChargeSummaryProperties",
+        "properties",
+        "chargesBilledSeparately",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyChargeSummaryProperties",
+          "properties",
+          "chargesBilledSeparately",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3366,
+            "column": 20
+          },
+          "end": {
+            "line": 3366,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyChargeSummaryProperties",
+        "properties",
+        "azureMarketplaceCharges",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyChargeSummaryProperties",
+          "properties",
+          "azureMarketplaceCharges",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3372,
+            "column": 20
+          },
+          "end": {
+            "line": 3372,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationRecommendationProperties",
+        "properties",
+        "costWithNoReservedInstances",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationRecommendationProperties",
+          "properties",
+          "costWithNoReservedInstances",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3451,
+            "column": 20
+          },
+          "end": {
+            "line": 3451,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationRecommendationProperties",
+        "properties",
+        "recommendedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationRecommendationProperties",
+          "properties",
+          "recommendedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3457,
+            "column": 20
+          },
+          "end": {
+            "line": 3457,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationRecommendationProperties",
+        "properties",
+        "totalCostWithReservedInstances",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationRecommendationProperties",
+          "properties",
+          "totalCostWithReservedInstances",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3463,
+            "column": 20
+          },
+          "end": {
+            "line": 3463,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationRecommendationProperties",
+        "properties",
+        "netSavings",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationRecommendationProperties",
+          "properties",
+          "netSavings",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3469,
+            "column": 20
+          },
+          "end": {
+            "line": 3469,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationTransactionProperties",
+        "properties",
+        "quantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationTransactionProperties",
+          "properties",
+          "quantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3558,
+            "column": 20
+          },
+          "end": {
+            "line": 3558,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationTransactionProperties",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationTransactionProperties",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3564,
+            "column": 20
+          },
+          "end": {
+            "line": 3564,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationTransactionProperties",
+        "properties",
+        "monetaryCommitment",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationTransactionProperties",
+          "properties",
+          "monetaryCommitment",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3647,
+            "column": 20
+          },
+          "end": {
+            "line": 3647,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyReservationTransactionProperties",
+        "properties",
+        "overage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyReservationTransactionProperties",
+          "properties",
+          "overage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3653,
+            "column": 20
+          },
+          "end": {
+            "line": 3653,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyUsageDetailProperties",
+        "properties",
+        "quantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyUsageDetailProperties",
+          "properties",
+          "quantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3792,
+            "column": 20
+          },
+          "end": {
+            "line": 3792,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyUsageDetailProperties",
+        "properties",
+        "effectivePrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyUsageDetailProperties",
+          "properties",
+          "effectivePrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3798,
+            "column": 20
+          },
+          "end": {
+            "line": 3798,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyUsageDetailProperties",
+        "properties",
+        "cost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyUsageDetailProperties",
+          "properties",
+          "cost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3804,
+            "column": 20
+          },
+          "end": {
+            "line": 3804,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyUsageDetailProperties",
+        "properties",
+        "unitPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyUsageDetailProperties",
+          "properties",
+          "unitPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3810,
+            "column": 20
+          },
+          "end": {
+            "line": 3810,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "LegacyUsageDetailProperties",
+        "properties",
+        "payGPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LegacyUsageDetailProperties",
+          "properties",
+          "payGPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3931,
+            "column": 20
+          },
+          "end": {
+            "line": 3931,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ManagementGroupAggregatedCostProperties",
+        "properties",
+        "azureCharges",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagementGroupAggregatedCostProperties",
+          "properties",
+          "azureCharges",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4164,
+            "column": 20
+          },
+          "end": {
+            "line": 4164,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ManagementGroupAggregatedCostProperties",
+        "properties",
+        "marketplaceCharges",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagementGroupAggregatedCostProperties",
+          "properties",
+          "marketplaceCharges",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4170,
+            "column": 20
+          },
+          "end": {
+            "line": 4170,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ManagementGroupAggregatedCostProperties",
+        "properties",
+        "chargesBilledSeparately",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagementGroupAggregatedCostProperties",
+          "properties",
+          "chargesBilledSeparately",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4176,
+            "column": 20
+          },
+          "end": {
+            "line": 4176,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MarketplaceProperties",
+        "properties",
+        "resourceRate",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MarketplaceProperties",
+          "properties",
+          "resourceRate",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4289,
+            "column": 20
+          },
+          "end": {
+            "line": 4289,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MarketplaceProperties",
+        "properties",
+        "consumedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MarketplaceProperties",
+          "properties",
+          "consumedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4330,
+            "column": 20
+          },
+          "end": {
+            "line": 4330,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MarketplaceProperties",
+        "properties",
+        "pretaxCost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MarketplaceProperties",
+          "properties",
+          "pretaxCost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4341,
+            "column": 20
+          },
+          "end": {
+            "line": 4341,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MeterDetails",
+        "properties",
+        "totalIncludedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MeterDetails",
+          "properties",
+          "totalIncludedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4459,
+            "column": 20
+          },
+          "end": {
+            "line": 4459,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "MeterDetails",
+        "properties",
+        "pretaxStandardRate",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "MeterDetails",
+          "properties",
+          "pretaxStandardRate",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4465,
+            "column": 20
+          },
+          "end": {
+            "line": 4465,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernReservationRecommendationProperties",
+        "properties",
+        "recommendedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernReservationRecommendationProperties",
+          "properties",
+          "recommendedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4701,
+            "column": 20
+          },
+          "end": {
+            "line": 4701,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernReservationTransactionProperties",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernReservationTransactionProperties",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4797,
+            "column": 20
+          },
+          "end": {
+            "line": 4797,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernReservationTransactionProperties",
+        "properties",
+        "quantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernReservationTransactionProperties",
+          "properties",
+          "quantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4875,
+            "column": 20
+          },
+          "end": {
+            "line": 4875,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "effectivePrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "effectivePrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4979,
+            "column": 20
+          },
+          "end": {
+            "line": 4979,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "quantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "quantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5069,
+            "column": 20
+          },
+          "end": {
+            "line": 5069,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "costInUSD",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "costInUSD",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5085,
+            "column": 20
+          },
+          "end": {
+            "line": 5085,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "unitPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "unitPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5091,
+            "column": 20
+          },
+          "end": {
+            "line": 5091,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "costInBillingCurrency",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "costInBillingCurrency",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5197,
+            "column": 20
+          },
+          "end": {
+            "line": 5197,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "costInPricingCurrency",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "costInPricingCurrency",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5203,
+            "column": 20
+          },
+          "end": {
+            "line": 5203,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "marketPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "marketPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5292,
+            "column": 20
+          },
+          "end": {
+            "line": 5292,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "exchangeRatePricingToBilling",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "exchangeRatePricingToBilling",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5298,
+            "column": 20
+          },
+          "end": {
+            "line": 5298,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "paygCostInBillingCurrency",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "paygCostInBillingCurrency",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5304,
+            "column": 20
+          },
+          "end": {
+            "line": 5304,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "paygCostInUSD",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "paygCostInUSD",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5310,
+            "column": 20
+          },
+          "end": {
+            "line": 5310,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "partnerEarnedCreditRate",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "partnerEarnedCreditRate",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5316,
+            "column": 20
+          },
+          "end": {
+            "line": 5316,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ModernUsageDetailProperties",
+        "properties",
+        "payGPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ModernUsageDetailProperties",
+          "properties",
+          "payGPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5327,
+            "column": 20
+          },
+          "end": {
+            "line": 5327,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "Notification",
+        "properties",
+        "threshold",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Notification",
+          "properties",
+          "threshold",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5367,
+            "column": 20
+          },
+          "end": {
+            "line": 5367,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "PriceSheetProperties",
+        "properties",
+        "includedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PriceSheetProperties",
+          "properties",
+          "includedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5647,
+            "column": 20
+          },
+          "end": {
+            "line": 5647,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "PriceSheetProperties",
+        "properties",
+        "unitPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PriceSheetProperties",
+          "properties",
+          "unitPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5658,
+            "column": 20
+          },
+          "end": {
+            "line": 5658,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationDetailProperties",
+        "properties",
+        "reservedHours",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationDetailProperties",
+          "properties",
+          "reservedHours",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5828,
+            "column": 20
+          },
+          "end": {
+            "line": 5828,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationDetailProperties",
+        "properties",
+        "usedHours",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationDetailProperties",
+          "properties",
+          "usedHours",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5840,
+            "column": 20
+          },
+          "end": {
+            "line": 5840,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationDetailProperties",
+        "properties",
+        "totalReservedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationDetailProperties",
+          "properties",
+          "totalReservedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5851,
+            "column": 20
+          },
+          "end": {
+            "line": 5851,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "reservedHours",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "reservedHours",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6290,
+            "column": 20
+          },
+          "end": {
+            "line": 6290,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "usedHours",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "usedHours",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6302,
+            "column": 20
+          },
+          "end": {
+            "line": 6302,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "minUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "minUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6308,
+            "column": 20
+          },
+          "end": {
+            "line": 6308,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "avgUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "avgUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6314,
+            "column": 20
+          },
+          "end": {
+            "line": 6314,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "maxUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "maxUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6320,
+            "column": 20
+          },
+          "end": {
+            "line": 6320,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "purchasedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "purchasedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6331,
+            "column": 20
+          },
+          "end": {
+            "line": 6331,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "remainingQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "remainingQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6337,
+            "column": 20
+          },
+          "end": {
+            "line": 6337,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "totalReservedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "totalReservedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6343,
+            "column": 20
+          },
+          "end": {
+            "line": 6343,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "usedQuantity",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "usedQuantity",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6349,
+            "column": 20
+          },
+          "end": {
+            "line": 6349,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "ReservationSummaryProperties",
+        "properties",
+        "utilizedPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ReservationSummaryProperties",
+          "properties",
+          "utilizedPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6355,
+            "column": 20
+          },
+          "end": {
+            "line": 6355,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "SavingsPlan",
+        "properties",
+        "marketPrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SavingsPlan",
+          "properties",
+          "marketPrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6445,
+            "column": 20
+          },
+          "end": {
+            "line": 6445,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "SavingsPlan",
+        "properties",
+        "effectivePrice",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SavingsPlan",
+          "properties",
+          "effectivePrice",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6451,
+            "column": 20
+          },
+          "end": {
+            "line": 6451,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "amount",
+        "properties",
+        "value",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "amount",
+          "properties",
+          "value",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6778,
+            "column": 20
+          },
+          "end": {
+            "line": 6778,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "CopyJobProperties",
+        "properties",
+        "duration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "CopyJobProperties",
+          "properties",
+          "duration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 24058,
+            "column": 20
+          },
+          "end": {
+            "line": 24058,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "DataTransferJobProperties",
+        "properties",
+        "duration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataTransferJobProperties",
+          "properties",
+          "duration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 24689,
+            "column": 20
+          },
+          "end": {
+            "line": 24689,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "AlertPropertiesDetails",
+        "properties",
+        "threshold",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AlertPropertiesDetails",
+          "properties",
+          "threshold",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4965,
+            "column": 20
+          },
+          "end": {
+            "line": 4965,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "AlertPropertiesDetails",
+        "properties",
+        "amount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AlertPropertiesDetails",
+          "properties",
+          "amount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4974,
+            "column": 20
+          },
+          "end": {
+            "line": 4974,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "AlertPropertiesDetails",
+        "properties",
+        "currentSpend",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AlertPropertiesDetails",
+          "properties",
+          "currentSpend",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4983,
+            "column": 20
+          },
+          "end": {
+            "line": 4983,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "AlertPropertiesDetails",
+        "properties",
+        "invoicingThreshold",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AlertPropertiesDetails",
+          "properties",
+          "invoicingThreshold",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5033,
+            "column": 20
+          },
+          "end": {
+            "line": 5033,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "IncludedQuantityUtilizationSummaryProperties",
+        "properties",
+        "utilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "IncludedQuantityUtilizationSummaryProperties",
+          "properties",
+          "utilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8097,
+            "column": 20
+          },
+          "end": {
+            "line": 8097,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "SavingsPlanUtilizationSummaryProperties",
+        "properties",
+        "avgUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SavingsPlanUtilizationSummaryProperties",
+          "properties",
+          "avgUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 9531,
+            "column": 20
+          },
+          "end": {
+            "line": 9531,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "SavingsPlanUtilizationSummaryProperties",
+        "properties",
+        "minUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SavingsPlanUtilizationSummaryProperties",
+          "properties",
+          "minUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 9537,
+            "column": 20
+          },
+          "end": {
+            "line": 9537,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "SavingsPlanUtilizationSummaryProperties",
+        "properties",
+        "maxUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SavingsPlanUtilizationSummaryProperties",
+          "properties",
+          "maxUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 9543,
+            "column": 20
+          },
+          "end": {
+            "line": 9543,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "overageCost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "overageCost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10308,
+            "column": 20
+          },
+          "end": {
+            "line": 10308,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "benefitCost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "benefitCost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10314,
+            "column": 20
+          },
+          "end": {
+            "line": 10314,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "totalCost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "totalCost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10320,
+            "column": 20
+          },
+          "end": {
+            "line": 10320,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "savingsAmount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "savingsAmount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10326,
+            "column": 20
+          },
+          "end": {
+            "line": 10326,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "savingsPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "savingsPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10332,
+            "column": 20
+          },
+          "end": {
+            "line": 10332,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "coveragePercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "coveragePercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10338,
+            "column": 20
+          },
+          "end": {
+            "line": 10338,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "commitmentAmount",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "commitmentAmount",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10344,
+            "column": 20
+          },
+          "end": {
+            "line": 10344,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "averageUtilizationPercentage",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "averageUtilizationPercentage",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10350,
+            "column": 20
+          },
+          "end": {
+            "line": 10350,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "allSavingsBenefitDetails",
+        "properties",
+        "wastageCost",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "allSavingsBenefitDetails",
+          "properties",
+          "wastageCost",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10356,
+            "column": 20
+          },
+          "end": {
+            "line": 10356,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "benefitRecommendationProperties",
+        "properties",
+        "costWithoutBenefit",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "benefitRecommendationProperties",
+          "properties",
+          "costWithoutBenefit",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10448,
+            "column": 20
+          },
+          "end": {
+            "line": 10448,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'decimal' is not a known format.",
+      "path": [
+        "definitions",
+        "recommendationUsageDetails",
+        "properties",
+        "charges",
+        "items",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "recommendationUsageDetails",
+          "properties",
+          "charges",
+          "items",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 10502,
+            "column": 22
+          },
+          "end": {
+            "line": 10502,
+            "column": 31
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ArmRollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmRollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2556,
+            "column": 20
+          },
+          "end": {
+            "line": 2556,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ArmRollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckStableDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmRollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckStableDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2561,
+            "column": 20
+          },
+          "end": {
+            "line": 2561,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ArmRollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckRetryTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmRollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckRetryTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2566,
+            "column": 20
+          },
+          "end": {
+            "line": 2566,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ArmRollingUpgradeMonitoringPolicy",
+        "properties",
+        "upgradeTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmRollingUpgradeMonitoringPolicy",
+          "properties",
+          "upgradeTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2571,
+            "column": 20
+          },
+          "end": {
+            "line": 2571,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ArmRollingUpgradeMonitoringPolicy",
+        "properties",
+        "upgradeDomainTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ArmRollingUpgradeMonitoringPolicy",
+          "properties",
+          "upgradeDomainTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2576,
+            "column": 20
+          },
+          "end": {
+            "line": 2576,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterUpgradePolicy",
+        "properties",
+        "healthCheckWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterUpgradePolicy",
+          "properties",
+          "healthCheckWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3425,
+            "column": 20
+          },
+          "end": {
+            "line": 3425,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterUpgradePolicy",
+        "properties",
+        "healthCheckStableDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterUpgradePolicy",
+          "properties",
+          "healthCheckStableDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3430,
+            "column": 20
+          },
+          "end": {
+            "line": 3430,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterUpgradePolicy",
+        "properties",
+        "healthCheckRetryTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterUpgradePolicy",
+          "properties",
+          "healthCheckRetryTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3435,
+            "column": 20
+          },
+          "end": {
+            "line": 3435,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterUpgradePolicy",
+        "properties",
+        "upgradeTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterUpgradePolicy",
+          "properties",
+          "upgradeTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3440,
+            "column": 20
+          },
+          "end": {
+            "line": 3440,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterUpgradePolicy",
+        "properties",
+        "upgradeDomainTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterUpgradePolicy",
+          "properties",
+          "upgradeDomainTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3445,
+            "column": 20
+          },
+          "end": {
+            "line": 3445,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterMonitoringPolicy",
+        "properties",
+        "healthCheckWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterMonitoringPolicy",
+          "properties",
+          "healthCheckWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4973,
+            "column": 20
+          },
+          "end": {
+            "line": 4973,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterMonitoringPolicy",
+        "properties",
+        "healthCheckStableDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterMonitoringPolicy",
+          "properties",
+          "healthCheckStableDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4978,
+            "column": 20
+          },
+          "end": {
+            "line": 4978,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterMonitoringPolicy",
+        "properties",
+        "healthCheckRetryTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterMonitoringPolicy",
+          "properties",
+          "healthCheckRetryTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4983,
+            "column": 20
+          },
+          "end": {
+            "line": 4983,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterMonitoringPolicy",
+        "properties",
+        "upgradeTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterMonitoringPolicy",
+          "properties",
+          "upgradeTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4988,
+            "column": 20
+          },
+          "end": {
+            "line": 4988,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "ClusterMonitoringPolicy",
+        "properties",
+        "upgradeDomainTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterMonitoringPolicy",
+          "properties",
+          "upgradeDomainTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4993,
+            "column": 20
+          },
+          "end": {
+            "line": 4993,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "RollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7724,
+            "column": 20
+          },
+          "end": {
+            "line": 7724,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "RollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckStableDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckStableDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7729,
+            "column": 20
+          },
+          "end": {
+            "line": 7729,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "RollingUpgradeMonitoringPolicy",
+        "properties",
+        "healthCheckRetryTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeMonitoringPolicy",
+          "properties",
+          "healthCheckRetryTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7734,
+            "column": 20
+          },
+          "end": {
+            "line": 7734,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "RollingUpgradeMonitoringPolicy",
+        "properties",
+        "upgradeTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeMonitoringPolicy",
+          "properties",
+          "upgradeTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7739,
+            "column": 20
+          },
+          "end": {
+            "line": 7739,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "RollingUpgradeMonitoringPolicy",
+        "properties",
+        "upgradeDomainTimeout",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RollingUpgradeMonitoringPolicy",
+          "properties",
+          "upgradeDomainTimeout",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7744,
+            "column": 20
+          },
+          "end": {
+            "line": 7744,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "StatefulServiceProperties",
+        "properties",
+        "replicaRestartWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StatefulServiceProperties",
+          "properties",
+          "replicaRestartWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8839,
+            "column": 20
+          },
+          "end": {
+            "line": 8839,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "StatefulServiceProperties",
+        "properties",
+        "quorumLossWaitDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StatefulServiceProperties",
+          "properties",
+          "quorumLossWaitDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8844,
+            "column": 20
+          },
+          "end": {
+            "line": 8844,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "StatefulServiceProperties",
+        "properties",
+        "standByReplicaKeepDuration",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StatefulServiceProperties",
+          "properties",
+          "standByReplicaKeepDuration",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8849,
+            "column": 20
+          },
+          "end": {
+            "line": 8849,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "ValidFormats",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "'duration-constant' is not a known format.",
+      "path": [
+        "definitions",
+        "StatefulServiceProperties",
+        "properties",
+        "servicePlacementTimeLimit",
+        "format"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StatefulServiceProperties",
+          "properties",
+          "servicePlacementTimeLimit",
+          "format"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 8854,
+            "column": 20
+          },
+          "end": {
+            "line": 8854,
+            "column": 39
+          }
+        }
+      }
+    }
+  ]
+}

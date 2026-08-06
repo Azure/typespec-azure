@@ -1,0 +1,732 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "MissingXmsErrorResponse",
+  "count": 20,
+  "levels": {
+    "error": 20
+  },
+  "results": [
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Response code 409 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/schedules/{scheduleName}",
+        "put",
+        "responses",
+        "409"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/schedules/{scheduleName}",
+          "put",
+          "responses",
+          "409"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 8172,
+            "column": 18
+          },
+          "end": {
+            "line": 8174,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 455,
+            "column": 18
+          },
+          "end": {
+            "line": 457,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 525,
+            "column": 18
+          },
+          "end": {
+            "line": 530,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/dataExports/{dataExportName}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/dataExports/{dataExportName}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1948,
+            "column": 18
+          },
+          "end": {
+            "line": 1950,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/PaloAltoNetworks.Cloudngfw/listProductSerialNumberStatus",
+        "post",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/PaloAltoNetworks.Cloudngfw/listProductSerialNumberStatus",
+          "post",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2602,
+            "column": 18
+          },
+          "end": {
+            "line": 2604,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 595,
+            "column": 18
+          },
+          "end": {
+            "line": 600,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1175,
+            "column": 18
+          },
+          "end": {
+            "line": 1180,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1785,
+            "column": 18
+          },
+          "end": {
+            "line": 1790,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2376,
+            "column": 18
+          },
+          "end": {
+            "line": 2381,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3044,
+            "column": 18
+          },
+          "end": {
+            "line": 3049,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 429,
+            "column": 18
+          },
+          "end": {
+            "line": 434,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1097,
+            "column": 18
+          },
+          "end": {
+            "line": 1102,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Response code 400 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+        "post",
+        "responses",
+        "400"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}/validate",
+          "post",
+          "responses",
+          "400"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1758,
+            "column": 18
+          },
+          "end": {
+            "line": 1763,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/deleteQueryKey/{key}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/deleteQueryKey/{key}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 921,
+            "column": 18
+          },
+          "end": {
+            "line": 923,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1505,
+            "column": 18
+          },
+          "end": {
+            "line": 1507,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/sharedPrivateLinkResources/{sharedPrivateLinkResourceName}",
+        "delete",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/sharedPrivateLinkResources/{sharedPrivateLinkResourceName}",
+          "delete",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1970,
+            "column": 18
+          },
+          "end": {
+            "line": 1972,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/{applicationId}",
+        "get",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}",
+          "get",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 86,
+            "column": 18
+          },
+          "end": {
+            "line": 88,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+        "get",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+          "get",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 568,
+            "column": 18
+          },
+          "end": {
+            "line": 570,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+        "get",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+          "get",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 823,
+            "column": 18
+          },
+          "end": {
+            "line": 825,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "MissingXmsErrorResponse",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Response code 404 is defined without a x-ms-error-response.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/jitRequests/{jitRequestName}",
+        "get",
+        "responses",
+        "404"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/jitRequests/{jitRequestName}",
+          "get",
+          "responses",
+          "404"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1370,
+            "column": 18
+          },
+          "end": {
+            "line": 1372,
+            "column": 12
+          }
+        }
+      }
+    }
+  ]
+}

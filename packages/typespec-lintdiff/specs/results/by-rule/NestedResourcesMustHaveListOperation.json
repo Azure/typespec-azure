@@ -1,0 +1,2112 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "NestedResourcesMustHaveListOperation",
+  "count": 70,
+  "levels": {
+    "error": 70
+  },
+  "results": [
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The nested resource \"RecipientEmailContract\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "RecipientEmailContract"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecipientEmailContract"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 62671,
+            "column": 31
+          },
+          "end": {
+            "line": 62686,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The nested resource \"RecipientUserContract\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "RecipientUserContract"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecipientUserContract"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 62719,
+            "column": 30
+          },
+          "end": {
+            "line": 62734,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The nested resource \"QuotaCounterCollection\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "QuotaCounterCollection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "QuotaCounterCollection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 62549,
+            "column": 31
+          },
+          "end": {
+            "line": 62574,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "swaggerFile": "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/swagger/preview/2025-08-01-preview/appconfiguration.json",
+      "message": "The nested resource \"KeyValue\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "KeyValue"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "KeyValue"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2583,
+            "column": 17
+          },
+          "end": {
+            "line": 2598,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "swaggerFile": "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/swagger/preview/2025-08-01-preview/appconfiguration.json",
+      "message": "The nested resource \"Snapshot\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "Snapshot"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Snapshot"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3327,
+            "column": 17
+          },
+          "end": {
+            "line": 3345,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/swagger/stable/2015-05-01/openapi.json",
+      "message": "The nested resource \"ApplicationInsightsComponentProactiveDetectionConfiguration\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationInsightsComponentProactiveDetectionConfiguration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationInsightsComponentProactiveDetectionConfiguration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1778,
+            "column": 68
+          },
+          "end": {
+            "line": 1810,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/swagger/stable/2015-05-01/openapi.json",
+      "message": "The nested resource \"ApplicationInsightsComponentExportConfiguration\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationInsightsComponentExportConfiguration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationInsightsComponentExportConfiguration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1455,
+            "column": 56
+          },
+          "end": {
+            "line": 1553,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentLinkedStorageAccountApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentLinkedStorageAccountApi/swagger/preview/2020-03-01-preview/componentLinkedStorageAccounts_API.json",
+      "message": "The nested resource \"ComponentLinkedStorageAccounts\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ComponentLinkedStorageAccounts"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ComponentLinkedStorageAccounts"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 338,
+            "column": 39
+          },
+          "end": {
+            "line": 353,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Favorites",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Favorites/swagger/stable/2015-05-01/favorites_API.json",
+      "message": "The nested resource \"ApplicationInsightsComponentFavorite\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationInsightsComponentFavorite"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationInsightsComponentFavorite"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 45
+          },
+          "end": {
+            "line": 434,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The nested resource \"SourceControlSyncJob\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "SourceControlSyncJob"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SourceControlSyncJob"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 16483,
+            "column": 29
+          },
+          "end": {
+            "line": 16508,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The nested resource \"RestorePoint\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "RestorePoint"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RestorePoint"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17628,
+            "column": 21
+          },
+          "end": {
+            "line": 17643,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The nested resource \"AgentPoolUpgradeProfile\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "AgentPoolUpgradeProfile"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AgentPoolUpgradeProfile"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7741,
+            "column": 32
+          },
+          "end": {
+            "line": 7759,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The nested resource \"ManagedClusterUpgradeProfile\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ManagedClusterUpgradeProfile"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagedClusterUpgradeProfile"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 13779,
+            "column": 37
+          },
+          "end": {
+            "line": 13797,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The nested resource \"ThroughputSettingsGetResults\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ThroughputSettingsGetResults"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ThroughputSettingsGetResults"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 33474,
+            "column": 37
+          },
+          "end": {
+            "line": 33509,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"DeviceCapacityInfo\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DeviceCapacityInfo"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeviceCapacityInfo"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6459,
+            "column": 27
+          },
+          "end": {
+            "line": 6474,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"DiagnosticProactiveLogCollectionSettings\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DiagnosticProactiveLogCollectionSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DiagnosticProactiveLogCollectionSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6560,
+            "column": 49
+          },
+          "end": {
+            "line": 6578,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"DiagnosticRemoteSupportSettings\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DiagnosticRemoteSupportSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DiagnosticRemoteSupportSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6579,
+            "column": 40
+          },
+          "end": {
+            "line": 6597,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"Job\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "Job"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Job"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7176,
+            "column": 12
+          },
+          "end": {
+            "line": 7219,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"NetworkSettings\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "NetworkSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 8472,
+            "column": 24
+          },
+          "end": {
+            "line": 8488,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "The nested resource \"UpdateSummary\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "UpdateSummary"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "UpdateSummary"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10838,
+            "column": 22
+          },
+          "end": {
+            "line": 10853,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "The nested resource \"SelfHostedIntegrationRuntimeNode\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "SelfHostedIntegrationRuntimeNode"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SelfHostedIntegrationRuntimeNode"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 29505,
+            "column": 41
+          },
+          "end": {
+            "line": 29613,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The nested resource \"LabCost\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "LabCost"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "LabCost"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11178,
+            "column": 16
+          },
+          "end": {
+            "line": 11211,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "swaggerFile": "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/swagger/stable/2018-09-15/DTL.json",
+      "message": "The nested resource \"ServiceRunner\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ServiceRunner"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ServiceRunner"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 13053,
+            "column": 22
+          },
+          "end": {
+            "line": 13082,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "The nested resource \"UpgradePreferences\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "UpgradePreferences"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "UpgradePreferences"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7750,
+            "column": 27
+          },
+          "end": {
+            "line": 7764,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "The nested resource \"ClusterQuotaConfigurationProperties\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ClusterQuotaConfigurationProperties"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ClusterQuotaConfigurationProperties"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5282,
+            "column": 44
+          },
+          "end": {
+            "line": 5294,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The nested resource \"PrivateEndpointConnection\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "PrivateEndpointConnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PrivateEndpointConnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4241,
+            "column": 34
+          },
+          "end": {
+            "line": 4258,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The nested resource \"VaultAccessPolicyParameters\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VaultAccessPolicyParameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultAccessPolicyParameters"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5818,
+            "column": 36
+          },
+          "end": {
+            "line": 5850,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The nested resource \"CapabilityHost\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "CapabilityHost"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "CapabilityHost"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23922,
+            "column": 23
+          },
+          "end": {
+            "line": 23939,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "The nested resource \"FirewallPolicyDraft\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "FirewallPolicyDraft"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "FirewallPolicyDraft"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1505,
+            "column": 28
+          },
+          "end": {
+            "line": 1520,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "The nested resource \"FirewallPolicyRuleCollectionGroupDraft\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "FirewallPolicyRuleCollectionGroupDraft"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "FirewallPolicyRuleCollectionGroupDraft"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1998,
+            "column": 47
+          },
+          "end": {
+            "line": 2013,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 28
+          },
+          "end": {
+            "line": 16008,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The nested resource \"InboundSecurityRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "InboundSecurityRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "InboundSecurityRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15988,
+            "column": 26
+          },
+          "end": {
+            "line": 16008,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "swaggerFile": "projects/specification/providerhub/ProviderHub.Management/swagger/resource-manager/Microsoft.ProviderHub/stable/2024-09-01/providerhub.json",
+      "message": "The nested resource \"OperationsPutContent\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "OperationsPutContent"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "OperationsPutContent"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6329,
+            "column": 29
+          },
+          "end": {
+            "line": 6342,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The nested resource \"VaultCertificateResponse\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VaultCertificateResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultCertificateResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3329,
+            "column": 33
+          },
+          "end": {
+            "line": 3353,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The nested resource \"VaultCredentialCertificateResponse\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VaultCredentialCertificateResponse"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VaultCredentialCertificateResponse"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17251,
+            "column": 43
+          },
+          "end": {
+            "line": 17265,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The nested resource \"PrivateEndpointConnectionResource\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "PrivateEndpointConnectionResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PrivateEndpointConnectionResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14174,
+            "column": 42
+          },
+          "end": {
+            "line": 14207,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "The nested resource \"NetworkRuleSet\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "NetworkRuleSet"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkRuleSet"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3380,
+            "column": 23
+          },
+          "end": {
+            "line": 3395,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseAdvisors.json",
+      "message": "The nested resource \"Advisor\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "Advisor"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Advisor"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 145,
+            "column": 14
+          },
+          "end": {
+            "line": 170,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseExtensions.json",
+      "message": "The nested resource \"ImportExportExtensionsOperationResult\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ImportExportExtensionsOperationResult"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ImportExportExtensionsOperationResult"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 383,
+            "column": 46
+          },
+          "end": {
+            "line": 398,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseRecommendedActions.json",
+      "message": "The nested resource \"RecommendedAction\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "RecommendedAction"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RecommendedAction"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5234,
+            "column": 24
+          },
+          "end": {
+            "line": 5259,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/databaseVulnerabilityAssessmentRuleBaselines.json",
+      "message": "The nested resource \"DatabaseVulnerabilityAssessmentRuleBaseline\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DatabaseVulnerabilityAssessmentRuleBaseline"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DatabaseVulnerabilityAssessmentRuleBaseline"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2382,
+            "column": 50
+          },
+          "end": {
+            "line": 2397,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingPolicies.json",
+      "message": "The nested resource \"DataMaskingPolicy\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DataMaskingPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 213,
+            "column": 26
+          },
+          "end": {
+            "line": 238,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/dataMaskingRules.json",
+      "message": "The nested resource \"DataMaskingRule\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DataMaskingRule"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DataMaskingRule"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 239,
+            "column": 24
+          },
+          "end": {
+            "line": 264,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseQueries.json",
+      "message": "The nested resource \"ManagedInstanceQuery\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ManagedInstanceQuery"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagedInstanceQuery"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 219,
+            "column": 29
+          },
+          "end": {
+            "line": 234,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseRestoreDetails.json",
+      "message": "The nested resource \"ManagedDatabaseRestoreDetailsResult\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ManagedDatabaseRestoreDetailsResult"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagedDatabaseRestoreDetailsResult"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 302,
+            "column": 44
+          },
+          "end": {
+            "line": 317,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseVulnerabilityAssessmentRuleBaselines.json",
+      "message": "The nested resource \"DatabaseVulnerabilityAssessmentRuleBaseline\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "DatabaseVulnerabilityAssessmentRuleBaseline"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DatabaseVulnerabilityAssessmentRuleBaseline"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2382,
+            "column": 50
+          },
+          "end": {
+            "line": 2397,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverAdvisors.json",
+      "message": "The nested resource \"Advisor\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "Advisor"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Advisor"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 145,
+            "column": 14
+          },
+          "end": {
+            "line": 170,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The nested resource \"StorageAccountMigration\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "StorageAccountMigration"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StorageAccountMigration"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14553,
+            "column": 32
+          },
+          "end": {
+            "line": 14572,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The nested resource \"ImmutabilityPolicy\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ImmutabilityPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ImmutabilityPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10710,
+            "column": 27
+          },
+          "end": {
+            "line": 10733,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The nested resource \"ManagementPolicy\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "ManagementPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagementPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11760,
+            "column": 25
+          },
+          "end": {
+            "line": 11775,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The nested resource \"HeatMapModel\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "HeatMapModel"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "HeatMapModel"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1344,
+            "column": 21
+          },
+          "end": {
+            "line": 1359,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"VnetInfoResource\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VnetInfoResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VnetInfoResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 57033,
+            "column": 25
+          },
+          "end": {
+            "line": 57052,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"VnetGateway\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VnetGateway"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VnetGateway"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 56948,
+            "column": 20
+          },
+          "end": {
+            "line": 56967,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"VnetRoute\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "VnetRoute"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "VnetRoute"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 57091,
+            "column": 18
+          },
+          "end": {
+            "line": 57110,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"NetworkFeatures\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "NetworkFeatures"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkFeatures"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 48270,
+            "column": 24
+          },
+          "end": {
+            "line": 48289,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"KeyInfo\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "KeyInfo"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "KeyInfo"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 47215,
+            "column": 16
+          },
+          "end": {
+            "line": 47228,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "NestedResourcesMustHaveListOperation",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The nested resource \"StaticSiteUserARMResource\" does not have list operation, please add it.",
+      "path": [
+        "definitions",
+        "StaticSiteUserARMResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "StaticSiteUserARMResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 55336,
+            "column": 34
+          },
+          "end": {
+            "line": 55351,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

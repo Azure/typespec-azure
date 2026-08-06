@@ -1,0 +1,771 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+  "count": 23,
+  "levels": {
+    "error": 23
+  },
+  "results": [
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/nodeConfigurations/{nodeConfigurationName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/nodeConfigurations/{nodeConfigurationName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 4647,
+            "column": 12
+          },
+          "end": {
+            "line": 4727,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/{extensionName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/{extensionName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 1466,
+            "column": 12
+          },
+          "end": {
+            "line": 1539,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 1716,
+            "column": 12
+          },
+          "end": {
+            "line": 1782,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 1892,
+            "column": 12
+          },
+          "end": {
+            "line": 1958,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 2068,
+            "column": 12
+          },
+          "end": {
+            "line": 2134,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 180,
+            "column": 12
+          },
+          "end": {
+            "line": 220,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/microsoft.Compute/cloudServices/{resourceName}/providers/Microsoft.Network/cloudServiceSlots/{singletonResource}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 13742,
+            "column": 12
+          },
+          "end": {
+            "line": 13825,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 2120,
+            "column": 12
+          },
+          "end": {
+            "line": 2166,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/maintenanceWindows.json",
+      "message": "The 200 success status code has missing response schema. 200 and 201 success status codes for an ARM PUT operation must have a response schema specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-24",
+        "range": {
+          "start": {
+            "line": 106,
+            "column": 12
+          },
+          "end": {
+            "line": 166,
+            "column": 70
+          }
+        }
+      }
+    }
+  ]
+}

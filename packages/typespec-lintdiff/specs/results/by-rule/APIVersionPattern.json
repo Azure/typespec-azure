@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "APIVersionPattern",
+  "count": 3,
+  "levels": {
+    "error": 3
+  },
+  "results": [
+    {
+      "rule": "APIVersionPattern",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The API Version parameter MUST be in the Year-Month-Date format (i.e. 2016-07-04.)  NOTE that this is the en-US ordering of month and date.",
+      "path": [
+        "info",
+        "version"
+      ],
+      "details": {
+        "jsonpath": [
+          "info",
+          "version"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6,
+            "column": 15
+          },
+          "end": {
+            "line": 6,
+            "column": 20
+          }
+        }
+      }
+    },
+    {
+      "rule": "APIVersionPattern",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk/swagger/stable/2026-03-02/DiskRP.json",
+      "message": "The API Version parameter MUST be in the Year-Month-Date format (i.e. 2016-07-04.)  NOTE that this is the en-US ordering of month and date.",
+      "path": [
+        "info",
+        "version"
+      ],
+      "details": {
+        "jsonpath": [
+          "info",
+          "version"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6,
+            "column": 15
+          },
+          "end": {
+            "line": 6,
+            "column": 20
+          }
+        }
+      }
+    },
+    {
+      "rule": "APIVersionPattern",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The API Version parameter MUST be in the Year-Month-Date format (i.e. 2016-07-04.)  NOTE that this is the en-US ordering of month and date.",
+      "path": [
+        "info",
+        "version"
+      ],
+      "details": {
+        "jsonpath": [
+          "info",
+          "version"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6,
+            "column": 15
+          },
+          "end": {
+            "line": 6,
+            "column": 20
+          }
+        }
+      }
+    }
+  ]
+}

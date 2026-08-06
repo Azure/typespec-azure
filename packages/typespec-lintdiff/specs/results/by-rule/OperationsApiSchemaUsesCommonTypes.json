@@ -1,0 +1,3620 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "OperationsApiSchemaUsesCommonTypes",
+  "count": 88,
+  "levels": {
+    "error": 88
+  },
+  "results": [
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Advisor/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Advisor/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 437,
+            "column": 22
+          },
+          "end": {
+            "line": 437,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ApiManagement/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ApiManagement/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 373,
+            "column": 22
+          },
+          "end": {
+            "line": 373,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.App/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.App/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 138,
+            "column": 22
+          },
+          "end": {
+            "line": 138,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "swaggerFile": "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/swagger/preview/2025-08-01-preview/appconfiguration.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AppConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AppConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 94,
+            "column": 22
+          },
+          "end": {
+            "line": 94,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations/swagger/stable/2021-03-08/workbookOperations_API.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Insights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Insights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 63,
+            "column": 22
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Attestation/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Attestation/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 69,
+            "column": 22
+          },
+          "end": {
+            "line": 69,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Authorization/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Authorization/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 1769,
+            "column": 22
+          },
+          "end": {
+            "line": 1769,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Automation/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Automation/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 204,
+            "column": 22
+          },
+          "end": {
+            "line": 204,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Kusto/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Kusto/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 105,
+            "column": 22
+          },
+          "end": {
+            "line": 105,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "swaggerFile": "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AzureArcData/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AzureArcData/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 93,
+            "column": 22
+          },
+          "end": {
+            "line": 93,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "swaggerFile": "projects/specification/batch/resource-manager/Microsoft.Batch/Batch/swagger/stable/2025-06-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Batch/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Batch/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 90,
+            "column": 22
+          },
+          "end": {
+            "line": 90,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 13044,
+            "column": 22
+          },
+          "end": {
+            "line": 13044,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BotService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BotService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 117,
+            "column": 22
+          },
+          "end": {
+            "line": 117,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Cdn/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Cdn/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 180,
+            "column": 22
+          },
+          "end": {
+            "line": 180,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "swaggerFile": "projects/specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CertificateRegistration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CertificateRegistration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 72,
+            "column": 22
+          },
+          "end": {
+            "line": 72,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "swaggerFile": "projects/specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger/swagger/preview/2026-05-22-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ConfidentialLedger/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ConfidentialLedger/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
+      "swaggerFile": "projects/specification/confluent/resource-manager/Microsoft.Confluent/Confluent/swagger/preview/2026-06-02-preview/confluent.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Confluent/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Confluent/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 83,
+            "column": 22
+          },
+          "end": {
+            "line": 83,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Consumption/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Consumption/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 2033,
+            "column": 22
+          },
+          "end": {
+            "line": 2033,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ContainerInstance/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ContainerInstance/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/swagger/preview/2026-03-01-preview/containerregistry.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ContainerRegistry/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ContainerRegistry/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 108,
+            "column": 22
+          },
+          "end": {
+            "line": 108,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ContainerService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ContainerService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 120,
+            "column": 22
+          },
+          "end": {
+            "line": 120,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DocumentDB/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DocumentDB/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 133,
+            "column": 22
+          },
+          "end": {
+            "line": 133,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CostManagement/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CostManagement/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 2885,
+            "column": 22
+          },
+          "end": {
+            "line": 2885,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "swaggerFile": "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/swagger/stable/2025-07-01/databox.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DataBox/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DataBox/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 65,
+            "column": 22
+          },
+          "end": {
+            "line": 65,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "swaggerFile": "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/swagger/stable/2023-12-01/databoxedge.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DataBoxEdge/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DataBoxEdge/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 123,
+            "column": 22
+          },
+          "end": {
+            "line": 123,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "swaggerFile": "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/swagger/stable/2026-01-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Databricks/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Databricks/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 87,
+            "column": 22
+          },
+          "end": {
+            "line": 87,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Datadog/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Datadog/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 75,
+            "column": 22
+          },
+          "end": {
+            "line": 75,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DataFactory/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DataFactory/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 137,
+            "column": 22
+          },
+          "end": {
+            "line": 137,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DataMigration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DataMigration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 114,
+            "column": 22
+          },
+          "end": {
+            "line": 114,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DesktopVirtualization/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DesktopVirtualization/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 135,
+            "column": 22
+          },
+          "end": {
+            "line": 135,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Devices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Devices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 75,
+            "column": 22
+          },
+          "end": {
+            "line": 75,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "swaggerFile": "projects/specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DomainRegistration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DomainRegistration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 72,
+            "column": 22
+          },
+          "end": {
+            "line": 72,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "swaggerFile": "projects/specification/domainservices/resource-manager/Microsoft.AAD/DomainServices/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AAD/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AAD/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 70,
+            "column": 22
+          },
+          "end": {
+            "line": 70,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "swaggerFile": "projects/specification/elastic/resource-manager/Microsoft.Elastic/Elastic/swagger/stable/2025-06-01/elastic.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Elastic/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Elastic/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 74,
+            "column": 22
+          },
+          "end": {
+            "line": 74,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.EventGrid/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.EventGrid/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 649,
+            "column": 22
+          },
+          "end": {
+            "line": 649,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.EventHub/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.EventHub/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 108,
+            "column": 22
+          },
+          "end": {
+            "line": 108,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
+      "swaggerFile": "projects/specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations/swagger/preview/2021-08-31-preview/customlocations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ExtendedLocation/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ExtendedLocation/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.GuestConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.GuestConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 71,
+            "column": 22
+          },
+          "end": {
+            "line": 71,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
+      "swaggerFile": "projects/specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure/swagger/preview/2020-02-07-preview/hanaonazure.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HanaOnAzure/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HanaOnAzure/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 63,
+            "column": 22
+          },
+          "end": {
+            "line": 63,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HDInsight/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HDInsight/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 96,
+            "column": 22
+          },
+          "end": {
+            "line": 96,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot",
+      "swaggerFile": "projects/specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot/swagger/stable/2025-11-01/healthbot.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HealthBot/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HealthBot/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HealthcareApis/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HealthcareApis/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 93,
+            "column": 22
+          },
+          "end": {
+            "line": 93,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HybridCompute/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HybridCompute/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 310,
+            "column": 22
+          },
+          "end": {
+            "line": 310,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes",
+      "swaggerFile": "projects/specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes/swagger/stable/2026-05-01/connectedClusters.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Kubernetes/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Kubernetes/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder",
+      "swaggerFile": "projects/specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder/swagger/stable/2025-10-01/imagebuilder.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.VirtualMachineImages/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.VirtualMachineImages/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 69,
+            "column": 22
+          },
+          "end": {
+            "line": 69,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Devices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Devices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 81,
+            "column": 22
+          },
+          "end": {
+            "line": 81,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.KeyVault/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.KeyVault/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 96,
+            "column": 22
+          },
+          "end": {
+            "line": 96,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/swagger/preview/2026-07-01-preview/operations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.KubernetesConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.KubernetesConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/swagger/preview/2026-07-01-preview/operations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 129,
+            "column": 22
+          },
+          "end": {
+            "line": 129,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Maintenance/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Maintenance/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 22
+          },
+          "end": {
+            "line": 88,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 78,
+            "column": 22
+          },
+          "end": {
+            "line": 78,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ManagedIdentity/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ManagedIdentity/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 113,
+            "column": 22
+          },
+          "end": {
+            "line": 113,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "swaggerFile": "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DBforMySQL/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DBforMySQL/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 147,
+            "column": 22
+          },
+          "end": {
+            "line": 147,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.NetApp/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.NetApp/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 141,
+            "column": 22
+          },
+          "end": {
+            "line": 141,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkingOperations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Network/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Network/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 63,
+            "column": 22
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector",
+      "swaggerFile": "projects/specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector/swagger/stable/2022-11-01/AzureTrafficCollector.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.NetworkFunction/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.NetworkFunction/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 69,
+            "column": 22
+          },
+          "end": {
+            "line": 69,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "swaggerFile": "projects/specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs/swagger/preview/2023-10-01-preview/notificationhubs.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.NotificationHubs/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.NotificationHubs/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 81,
+            "column": 22
+          },
+          "end": {
+            "line": 81,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.OperationalInsights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.OperationalInsights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 108,
+            "column": 22
+          },
+          "end": {
+            "line": 108,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "swaggerFile": "projects/specification/peering/resource-manager/Microsoft.Peering/Peering/swagger/stable/2025-05-01/peering.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Peering/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Peering/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 84,
+            "column": 22
+          },
+          "end": {
+            "line": 84,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PolicyInsights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PolicyInsights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 2001,
+            "column": 22
+          },
+          "end": {
+            "line": 2001,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "swaggerFile": "projects/specification/postgresql/DBforPostgreSQL.Management/swagger/resource-manager/Microsoft.DBforPostgreSQL/preview/2026-04-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.DBforPostgreSQL/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.DBforPostgreSQL/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 138,
+            "column": 22
+          },
+          "end": {
+            "line": 138,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "swaggerFile": "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/swagger/stable/2021-01-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PowerBIDedicated/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PowerBIDedicated/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 69,
+            "column": 22
+          },
+          "end": {
+            "line": 69,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "swaggerFile": "projects/specification/providerhub/ProviderHub.Management/swagger/resource-manager/Microsoft.ProviderHub/stable/2024-09-01/providerhub.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ProviderHub/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ProviderHub/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 102,
+            "column": 22
+          },
+          "end": {
+            "line": 102,
+            "column": 87
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Purview/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Purview/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 149,
+            "column": 22
+          },
+          "end": {
+            "line": 149,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Quota/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Quota/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 2365,
+            "column": 22
+          },
+          "end": {
+            "line": 2365,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 78,
+            "column": 22
+          },
+          "end": {
+            "line": 78,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 279,
+            "column": 22
+          },
+          "end": {
+            "line": 279,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 234,
+            "column": 22
+          },
+          "end": {
+            "line": 234,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters",
+      "swaggerFile": "projects/specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters/swagger/stable/2025-07-25/redhatopenshift.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.RedHatOpenShift/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.RedHatOpenShift/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 72,
+            "column": 22
+          },
+          "end": {
+            "line": 72,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "swaggerFile": "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/swagger/preview/2025-08-01-preview/redis.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Cache/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Cache/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 84,
+            "column": 22
+          },
+          "end": {
+            "line": 84,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 286,
+            "column": 22
+          },
+          "end": {
+            "line": 286,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
+      "swaggerFile": "projects/specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector/swagger/preview/2025-03-01-preview/appliances.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ResourceConnector/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ResourceConnector/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi",
+      "swaggerFile": "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi/swagger/stable/2024-04-01/resourcegraph.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ResourceGraph/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ResourceGraph/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ResourceHealth/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ResourceHealth/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 873,
+            "column": 22
+          },
+          "end": {
+            "line": 873,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Search/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Search/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 123,
+            "column": 22
+          },
+          "end": {
+            "line": 123,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SecurityInsights/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SecurityInsights/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 216,
+            "column": 22
+          },
+          "end": {
+            "line": 216,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "swaggerFile": "projects/specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole/swagger/stable/2024-07-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SerialConsole/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SerialConsole/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 22
+          },
+          "end": {
+            "line": 66,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ServiceBus/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ServiceBus/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 96,
+            "column": 22
+          },
+          "end": {
+            "line": 96,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ServiceFabric/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ServiceFabric/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 22
+          },
+          "end": {
+            "line": 88,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.ServiceFabric/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.ServiceFabric/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 103,
+            "column": 22
+          },
+          "end": {
+            "line": 103,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-01-01-preview/signalr.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SignalRService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SignalRService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 84,
+            "column": 22
+          },
+          "end": {
+            "line": 84,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/operations.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Sql/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Sql/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 63,
+            "column": 22
+          },
+          "end": {
+            "line": 63,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SqlVirtualMachine/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SqlVirtualMachine/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 72,
+            "column": 22
+          },
+          "end": {
+            "line": 72,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Storage/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Storage/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 135,
+            "column": 22
+          },
+          "end": {
+            "line": 135,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.StorageCache/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.StorageCache/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 99,
+            "column": 22
+          },
+          "end": {
+            "line": 99,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "swaggerFile": "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/swagger/stable/2022-09-01/storagesync.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.StorageSync/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.StorageSync/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 84,
+            "column": 22
+          },
+          "end": {
+            "line": 84,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Web/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Web/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 405,
+            "column": 22
+          },
+          "end": {
+            "line": 405,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiSchemaUsesCommonTypes",
+      "level": "error",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-12-01-preview/webpubsub.json",
+      "message": "Operations API path must follow the schema provided in the common types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.SignalRService/operations",
+        "get",
+        "responses",
+        "200",
+        "schema",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.SignalRService/operations",
+          "get",
+          "responses",
+          "200",
+          "schema",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-01",
+        "range": {
+          "start": {
+            "line": 90,
+            "column": 22
+          },
+          "end": {
+            "line": 90,
+            "column": 51
+          }
+        }
+      }
+    }
+  ]
+}

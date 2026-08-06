@@ -1,0 +1,1233 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "TrackedExtensionResourcesAreNotAllowed",
+  "count": 37,
+  "levels": {
+    "error": 37
+  },
+  "results": [
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "swaggerFile": "projects/specification/chaos/resource-manager/Microsoft.Chaos/Chaos/swagger/preview/2026-08-01-preview/openapi.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 814,
+            "column": 12
+          },
+          "end": {
+            "line": 882,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "swaggerFile": "projects/specification/chaos/resource-manager/Microsoft.Chaos/Chaos/swagger/preview/2026-08-01-preview/openapi.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 886,
+            "column": 12
+          },
+          "end": {
+            "line": 969,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "swaggerFile": "projects/specification/chaos/resource-manager/Microsoft.Chaos/Chaos/swagger/preview/2026-08-01-preview/openapi.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 886,
+            "column": 12
+          },
+          "end": {
+            "line": 969,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 556,
+            "column": 12
+          },
+          "end": {
+            "line": 715,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.CostManagement/exports/{exportName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 945,
+            "column": 12
+          },
+          "end": {
+            "line": 1012,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.CostManagement/exports/{exportName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1016,
+            "column": 12
+          },
+          "end": {
+            "line": 1109,
+            "column": 97
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.CostManagement/exports/{exportName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1016,
+            "column": 12
+          },
+          "end": {
+            "line": 1109,
+            "column": 97
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 180,
+            "column": 12
+          },
+          "end": {
+            "line": 224,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 228,
+            "column": 12
+          },
+          "end": {
+            "line": 287,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{name}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 228,
+            "column": 12
+          },
+          "end": {
+            "line": 287,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 504,
+            "column": 12
+          },
+          "end": {
+            "line": 552,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 556,
+            "column": 12
+          },
+          "end": {
+            "line": 619,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 556,
+            "column": 12
+          },
+          "end": {
+            "line": 619,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 839,
+            "column": 12
+          },
+          "end": {
+            "line": 888,
+            "column": 91
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 892,
+            "column": 12
+          },
+          "end": {
+            "line": 956,
+            "column": 102
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConnectedVMwarevSphere/virtualmachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 892,
+            "column": 12
+          },
+          "end": {
+            "line": 956,
+            "column": 102
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1223,
+            "column": 12
+          },
+          "end": {
+            "line": 1270,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 12
+          },
+          "end": {
+            "line": 1336,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridCompute/machines/{machineName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 12
+          },
+          "end": {
+            "line": 1336,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 659,
+            "column": 12
+          },
+          "end": {
+            "line": 734,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 738,
+            "column": 12
+          },
+          "end": {
+            "line": 828,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 738,
+            "column": 12
+          },
+          "end": {
+            "line": 828,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1066,
+            "column": 12
+          },
+          "end": {
+            "line": 1127,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1131,
+            "column": 12
+          },
+          "end": {
+            "line": 1207,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 1131,
+            "column": 12
+          },
+          "end": {
+            "line": 1207,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 48,
+            "column": 12
+          },
+          "end": {
+            "line": 83,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 87,
+            "column": 12
+          },
+          "end": {
+            "line": 131,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service is an extension resource and 200 response schema in patch operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service",
+          "patch"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 135,
+            "column": 14
+          },
+          "end": {
+            "line": 176,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "/{scope}/providers/Microsoft.ManagedIdentity/identities/default is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.ManagedIdentity/identities/default",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.ManagedIdentity/identities/default",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 57,
+            "column": 12
+          },
+          "end": {
+            "line": 92,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 133,
+            "column": 12
+          },
+          "end": {
+            "line": 182,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 246,
+            "column": 12
+          },
+          "end": {
+            "line": 295,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 63,
+            "column": 12
+          },
+          "end": {
+            "line": 128,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 132,
+            "column": 12
+          },
+          "end": {
+            "line": 211,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName} is an extension resource and 200 response schema in patch operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "patch"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 215,
+            "column": 14
+          },
+          "end": {
+            "line": 282,
+            "column": 90
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName} is an extension resource and 200 response schema in get operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 105,
+            "column": 12
+          },
+          "end": {
+            "line": 144,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName} is an extension resource and 200 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 149,
+            "column": 12
+          },
+          "end": {
+            "line": 228,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TrackedExtensionResourcesAreNotAllowed",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName} is an extension resource and 201 response schema in put operation includes location property. Extension resources of type tracked are not allowed.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}",
+          "put"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-12",
+        "range": {
+          "start": {
+            "line": 149,
+            "column": 12
+          },
+          "end": {
+            "line": 228,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

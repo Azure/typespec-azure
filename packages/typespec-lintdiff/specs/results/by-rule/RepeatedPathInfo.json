@@ -1,0 +1,2269 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "RepeatedPathInfo",
+  "count": 61,
+  "levels": {
+    "error": 61
+  },
+  "results": [
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The 'apiId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 4019,
+            "column": 10
+          },
+          "end": {
+            "line": 4026,
+            "column": 27
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The 'apiId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/releases/{releaseId}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/releases/{releaseId}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7479,
+            "column": 10
+          },
+          "end": {
+            "line": 7486,
+            "column": 27
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The 'apiId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/workspaces/{workspaceId}/apis/{apiId}/releases/{releaseId}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/workspaces/{workspaceId}/apis/{apiId}/releases/{releaseId}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 40407,
+            "column": 10
+          },
+          "end": {
+            "line": 40414,
+            "column": 27
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi/swagger/stable/2023-06-01/workbooks_API.json",
+      "message": "The 'sourceId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 320,
+            "column": 10
+          },
+          "end": {
+            "line": 325,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization/swagger/preview/2024-09-01-preview/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignmentScheduleRequests/{roleAssignmentScheduleRequestName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignmentScheduleRequests/{roleAssignmentScheduleRequestName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 329,
+            "column": 10
+          },
+          "end": {
+            "line": 335,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization/swagger/preview/2024-09-01-preview/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleEligibilityScheduleRequests/{roleEligibilityScheduleRequestName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleEligibilityScheduleRequests/{roleEligibilityScheduleRequestName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 783,
+            "column": 10
+          },
+          "end": {
+            "line": 789,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization/swagger/preview/2024-09-01-preview/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleManagementPolicyAssignments/{roleManagementPolicyAssignmentName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleManagementPolicyAssignments/{roleManagementPolicyAssignmentName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1330,
+            "column": 10
+          },
+          "end": {
+            "line": 1336,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/denyAssignments/{denyAssignmentId}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/denyAssignments/{denyAssignmentId}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 196,
+            "column": 10
+          },
+          "end": {
+            "line": 202,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignments/{roleAssignmentName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignments/{roleAssignmentName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 328,
+            "column": 10
+          },
+          "end": {
+            "line": 334,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "The 'channelName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/channels/{channelName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/channels/{channelName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 745,
+            "column": 10
+          },
+          "end": {
+            "line": 774,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/afdEndpoints/{endpointName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/afdEndpoints/{endpointName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1288,
+            "column": 10
+          },
+          "end": {
+            "line": 1296,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'endpointName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/afdEndpoints/{endpointName}/routes/{routeName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/afdEndpoints/{endpointName}/routes/{routeName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1762,
+            "column": 10
+          },
+          "end": {
+            "line": 1767,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/customDomains/{customDomainName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/customDomains/{customDomainName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 2580,
+            "column": 10
+          },
+          "end": {
+            "line": 2588,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/originGroups/{originGroupName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/originGroups/{originGroupName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 6068,
+            "column": 10
+          },
+          "end": {
+            "line": 6076,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'originGroupName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/originGroups/{originGroupName}/origins/{originName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/originGroups/{originGroupName}/origins/{originName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 6458,
+            "column": 10
+          },
+          "end": {
+            "line": 6463,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/ruleSets/{ruleSetName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/ruleSets/{ruleSetName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 6889,
+            "column": 10
+          },
+          "end": {
+            "line": 6897,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'ruleSetName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/ruleSets/{ruleSetName}/rules/{ruleName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/ruleSets/{ruleSetName}/rules/{ruleName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7186,
+            "column": 10
+          },
+          "end": {
+            "line": 7191,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/secrets/{secretName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/secrets/{secretName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7624,
+            "column": 10
+          },
+          "end": {
+            "line": 7632,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'profileName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/securityPolicies/{securityPolicyName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/securityPolicies/{securityPolicyName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7914,
+            "column": 10
+          },
+          "end": {
+            "line": 7922,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "swaggerFile": "projects/specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger/swagger/preview/2026-05-22-preview/openapi.json",
+      "message": "The 'ledgerName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers/{ledgerName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers/{ledgerName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 285,
+            "column": 10
+          },
+          "end": {
+            "line": 291,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The 'jobName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/dataTransferJobs/{jobName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/dataTransferJobs/{jobName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 5656,
+            "column": 10
+          },
+          "end": {
+            "line": 5662,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/scheduledActions/{name}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/scheduledActions/{name}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1896,
+            "column": 10
+          },
+          "end": {
+            "line": 1901,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/views/{viewName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/views/{viewName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 2400,
+            "column": 10
+          },
+          "end": {
+            "line": 2405,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The 'name' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/eventHubEndpoints/{eventHubEndpointName}/ConsumerGroups/{name}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/eventHubEndpoints/{eventHubEndpointName}/ConsumerGroups/{name}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1171,
+            "column": 10
+          },
+          "end": {
+            "line": 1176,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
+      "swaggerFile": "projects/specification/liftrmongodb/MongoDB.Atlas.Management/swagger/resource-manager/MongoDB.Atlas/preview/2026-03-01-preview/openapi.json",
+      "message": "The 'projectName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/MongoDB.Atlas/organizations/{organizationName}/projects/{projectName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/MongoDB.Atlas/organizations/{organizationName}/projects/{projectName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 579,
+            "column": 10
+          },
+          "end": {
+            "line": 587,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
+      "swaggerFile": "projects/specification/liftrmongodb/MongoDB.Atlas.Management/swagger/resource-manager/MongoDB.Atlas/preview/2026-03-01-preview/openapi.json",
+      "message": "The 'clusterName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/MongoDB.Atlas/organizations/{organizationName}/projects/{projectName}/clusters/{clusterName}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/MongoDB.Atlas/organizations/{organizationName}/projects/{projectName}/clusters/{clusterName}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 938,
+            "column": 10
+          },
+          "end": {
+            "line": 946,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The 'privateStoreId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 190,
+            "column": 10
+          },
+          "end": {
+            "line": 195,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The 'collectionId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}",
+        "put",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}",
+          "put",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 643,
+            "column": 10
+          },
+          "end": {
+            "line": 648,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "The 'privateStoreId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}/offers/{offerId}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}/collections/{collectionId}/offers/{offerId}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1042,
+            "column": 10
+          },
+          "end": {
+            "line": 1047,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "swaggerFile": "projects/specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs/swagger/preview/2023-10-01-preview/notificationhubs.json",
+      "message": "The 'subscriptionId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 315,
+            "column": 10
+          },
+          "end": {
+            "line": 316,
+            "column": 131
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "The 'id' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/queryPacks/{queryPackName}/queries/{id}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/queryPacks/{queryPackName}/queries/{id}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1151,
+            "column": 10
+          },
+          "end": {
+            "line": 1156,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "The 'dataSourceType' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/linkedStorageAccounts/{dataSourceType}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/linkedStorageAccounts/{dataSourceType}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 2944,
+            "column": 10
+          },
+          "end": {
+            "line": 2984,
+            "column": 41
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "The 'priority' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}/postRules/{priority}",
+        "put",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}/postRules/{priority}",
+          "put",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1449,
+            "column": 10
+          },
+          "end": {
+            "line": 1454,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "The 'priority' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}/preRules/{priority}",
+        "put",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}/preRules/{priority}",
+          "put",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1855,
+            "column": 10
+          },
+          "end": {
+            "line": 1860,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "The 'priority' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/PaloAltoNetworks.Cloudngfw/localRulestacks/{localRulestackName}/localRules/{priority}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/PaloAltoNetworks.Cloudngfw/localRulestacks/{localRulestackName}/localRules/{priority}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 5344,
+            "column": 10
+          },
+          "end": {
+            "line": 5349,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "swaggerFile": "projects/specification/providerhub/ProviderHub.Management/swagger/resource-manager/Microsoft.ProviderHub/stable/2024-09-01/providerhub.json",
+      "message": "The 'providerNamespace' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ProviderHub/providerRegistrations/{providerNamespace}/newRegionFrontloadRelease/{releaseName}",
+        "put",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ProviderHub/providerRegistrations/{providerNamespace}/newRegionFrontloadRelease/{releaseName}",
+          "put",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1397,
+            "column": 10
+          },
+          "end": {
+            "line": 1402,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The 'subscriptionId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 2130,
+            "column": 10
+          },
+          "end": {
+            "line": 2131,
+            "column": 131
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The 'containerName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/protectedItems/{protectedItemName}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/protectedItems/{protectedItemName}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 3144,
+            "column": 10
+          },
+          "end": {
+            "line": 3149,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "The 'scope' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "put",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "put",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 142,
+            "column": 10
+          },
+          "end": {
+            "line": 148,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The 'watchlistAlias' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/watchlists/{watchlistAlias}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/watchlists/{watchlistAlias}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 9970,
+            "column": 10
+          },
+          "end": {
+            "line": 9975,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The 'watchlistItemId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/watchlists/{watchlistAlias}/watchlistItems/{watchlistItemId}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/watchlists/{watchlistAlias}/watchlistItems/{watchlistItemId}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 10259,
+            "column": 10
+          },
+          "end": {
+            "line": 10264,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "swaggerFile": "projects/specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere/swagger/stable/2024-04-01/azuresphere.json",
+      "message": "The 'imageName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureSphere/catalogs/{catalogName}/images/{imageName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureSphere/catalogs/{catalogName}/images/{imageName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 839,
+            "column": 10
+          },
+          "end": {
+            "line": 844,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/distributedAvailabilityGroups.json",
+      "message": "The 'distributedAvailabilityGroupName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/distributedAvailabilityGroups/{distributedAvailabilityGroupName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/distributedAvailabilityGroups/{distributedAvailabilityGroupName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 171,
+            "column": 10
+          },
+          "end": {
+            "line": 176,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseSensitivityLabels.json",
+      "message": "The 'schemaName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 442,
+            "column": 10
+          },
+          "end": {
+            "line": 447,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseSensitivityLabels.json",
+      "message": "The 'tableName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 449,
+            "column": 10
+          },
+          "end": {
+            "line": 454,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabaseSensitivityLabels.json",
+      "message": "The 'columnName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "7"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "7"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 456,
+            "column": 10
+          },
+          "end": {
+            "line": 461,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/sensitivityLabels.json",
+      "message": "The 'schemaName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 442,
+            "column": 10
+          },
+          "end": {
+            "line": 447,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/sensitivityLabels.json",
+      "message": "The 'tableName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 449,
+            "column": 10
+          },
+          "end": {
+            "line": 454,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/sensitivityLabels.json",
+      "message": "The 'columnName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+        "put",
+        "parameters",
+        "7"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/schemas/{schemaName}/tables/{tableName}/columns/{columnName}/sensitivityLabels/{sensitivityLabelSource}",
+          "put",
+          "parameters",
+          "7"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 456,
+            "column": 10
+          },
+          "end": {
+            "line": 461,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/serverTrustCertificates.json",
+      "message": "The 'certificateName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/serverTrustCertificates/{certificateName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/serverTrustCertificates/{certificateName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 171,
+            "column": 10
+          },
+          "end": {
+            "line": 176,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/syncMembers.json",
+      "message": "The 'serverName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+        "put",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+          "put",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 195,
+            "column": 10
+          },
+          "end": {
+            "line": 200,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/syncMembers.json",
+      "message": "The 'databaseName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 202,
+            "column": 10
+          },
+          "end": {
+            "line": 207,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The 'tableName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/tableServices/default/tables/{tableName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/tableServices/default/tables/{tableName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7825,
+            "column": 10
+          },
+          "end": {
+            "line": 7833,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "swaggerFile": "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/swagger/stable/2022-09-01/storagesync.json",
+      "message": "The 'serverId' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers/{serverId}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers/{serverId}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 1177,
+            "column": 10
+          },
+          "end": {
+            "line": 1183,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'vnetName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 7327,
+            "column": 10
+          },
+          "end": {
+            "line": 7332,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'relayName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 15419,
+            "column": 10
+          },
+          "end": {
+            "line": 15424,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'entityName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection/{entityName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection/{entityName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 15726,
+            "column": 10
+          },
+          "end": {
+            "line": 15731,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'relayName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}",
+        "put",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}",
+          "put",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 26622,
+            "column": 10
+          },
+          "end": {
+            "line": 26627,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'entityName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection/{entityName}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection/{entityName}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 26971,
+            "column": 10
+          },
+          "end": {
+            "line": 26976,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'vnetName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+        "put",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+          "put",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 33110,
+            "column": 10
+          },
+          "end": {
+            "line": 33115,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "RepeatedPathInfo",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The 'vnetName' already appears in the path, please don't repeat it in the request body.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+        "put",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+          "put",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-05",
+        "range": {
+          "start": {
+            "line": 34962,
+            "column": 10
+          },
+          "end": {
+            "line": 34967,
+            "column": 28
+          }
+        }
+      }
+    }
+  ]
+}

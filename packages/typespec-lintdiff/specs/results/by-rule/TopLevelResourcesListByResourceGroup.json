@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "TopLevelResourcesListByResourceGroup",
+  "count": 3,
+  "levels": {
+    "error": 3
+  },
+  "results": [
+    {
+      "rule": "TopLevelResourcesListByResourceGroup",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The top-level resource \"ConfigData\" does not have list by resource group operation, please add it.",
+      "path": [
+        "definitions",
+        "ConfigData"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConfigData"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1681,
+            "column": 19
+          },
+          "end": {
+            "line": 1696,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListByResourceGroup",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "The top-level resource \"RaiExternalSafetyProviderSchema\" does not have list by resource group operation, please add it.",
+      "path": [
+        "definitions",
+        "RaiExternalSafetyProviderSchema"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RaiExternalSafetyProviderSchema"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15577,
+            "column": 40
+          },
+          "end": {
+            "line": 15604,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListByResourceGroup",
+      "level": "error",
+      "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
+      "swaggerFile": "projects/specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure/swagger/preview/2020-02-07-preview/hanaonazure.json",
+      "message": "The top-level resource \"SapMonitor\" does not have list by resource group operation, please add it.",
+      "path": [
+        "definitions",
+        "SapMonitor"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SapMonitor"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 839,
+            "column": 19
+          },
+          "end": {
+            "line": 854,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

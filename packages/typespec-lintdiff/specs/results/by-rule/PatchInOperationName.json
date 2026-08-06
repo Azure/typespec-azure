@@ -1,0 +1,607 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PatchInOperationName",
+  "count": 17,
+  "levels": {
+    "warning": 17
+  },
+  "results": [
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "'PATCH' operation 'AccessReviewInstanceMyDecisions_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions/{decisionId}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions/{decisionId}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1692,
+            "column": 23
+          },
+          "end": {
+            "line": 1692,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "'PATCH' operation 'HybridRunbookWorkers_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/hybridRunbookWorkerGroups/{hybridRunbookWorkerGroupName}/hybridRunbookWorkers/{hybridRunbookWorkerId}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/hybridRunbookWorkerGroups/{hybridRunbookWorkerGroupName}/hybridRunbookWorkers/{hybridRunbookWorkerId}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2727,
+            "column": 23
+          },
+          "end": {
+            "line": 2727,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "swaggerFile": "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "'PATCH' operation 'DataControllers_PatchDataController' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/dataControllers/{dataControllerName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AzureArcData/dataControllers/{dataControllerName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 517,
+            "column": 23
+          },
+          "end": {
+            "line": 517,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "'PATCH' operation 'SecurityPolicies_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/securityPolicies/{securityPolicyName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/securityPolicies/{securityPolicyName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 7996,
+            "column": 23
+          },
+          "end": {
+            "line": 7996,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "'PATCH' operation 'ManagedNetworkSettings_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/managedNetworks/{managedNetworkName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/managedNetworks/{managedNetworkName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3936,
+            "column": 23
+          },
+          "end": {
+            "line": 3936,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "'PATCH' operation 'Alerts_Dismiss' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/alerts/{alertId}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/alerts/{alertId}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 23
+          },
+          "end": {
+            "line": 200,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "swaggerFile": "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/swagger/preview/2026-04-01-preview/dataprotection.json",
+      "message": "'PATCH' operation 'ResourceGuards_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/resourceGuards/{resourceGuardsName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/resourceGuards/{resourceGuardsName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3836,
+            "column": 23
+          },
+          "end": {
+            "line": 3836,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "swaggerFile": "projects/specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter/swagger/preview/2026-01-01-preview/DevCenterRP.json",
+      "message": "'PATCH' operation 'ProjectCatalogs_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevCenter/projects/{projectName}/catalogs/{catalogName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevCenter/projects/{projectName}/catalogs/{catalogName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5986,
+            "column": 23
+          },
+          "end": {
+            "line": 5986,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "'PATCH' operation 'Configuration_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/clusters/{clusterName}/quotaConfiguration/default",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/clusters/{clusterName}/quotaConfiguration/default",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 705,
+            "column": 23
+          },
+          "end": {
+            "line": 705,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "'PATCH' operation 'Settings_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{baseProvider}/{baseResourceType}/{baseResourceName}/providers/Microsoft.HybridCompute/settings/{settingsResourceName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{baseProvider}/{baseResourceType}/{baseResourceName}/providers/Microsoft.HybridCompute/settings/{settingsResourceName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 866,
+            "column": 23
+          },
+          "end": {
+            "line": 866,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "'PATCH' operation 'ManagedNetworkSettings_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/managedNetworks/{managedNetworkName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/managedNetworks/{managedNetworkName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 17573,
+            "column": 23
+          },
+          "end": {
+            "line": 17573,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "'PATCH' operation 'FirewallPolicyIdpsSignaturesOverrides_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1255,
+            "column": 23
+          },
+          "end": {
+            "line": 1255,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkManager.json",
+      "message": "'PATCH' operation 'NetworkManagers_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkManagers/{networkManagerName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkManagers/{networkManagerName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 738,
+            "column": 23
+          },
+          "end": {
+            "line": 738,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkSecurityPerimeter.json",
+      "message": "'PATCH' operation 'NetworkSecurityPerimeters_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 428,
+            "column": 23
+          },
+          "end": {
+            "line": 428,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "'PATCH' operation 'BackupResourceStorageConfigsNonCRR_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 6450,
+            "column": 23
+          },
+          "end": {
+            "line": 6450,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "'PATCH' operation 'EncryptionScopes_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/encryptionScopes/{encryptionScopeName}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/encryptionScopes/{encryptionScopeName}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3392,
+            "column": 23
+          },
+          "end": {
+            "line": 3392,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchInOperationName",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "'PATCH' operation 'AiGateways_Patch' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/aigateways/{name}",
+        "patch",
+        "operationId"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/aigateways/{name}",
+          "patch",
+          "operationId"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2361,
+            "column": 23
+          },
+          "end": {
+            "line": 2361,
+            "column": 41
+          }
+        }
+      }
+    }
+  ]
+}

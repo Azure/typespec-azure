@@ -1,0 +1,4082 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "UnSupportedPatchProperties",
+  "count": 110,
+  "levels": {
+    "error": 110
+  },
+  "results": [
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1966,
+            "column": 10
+          },
+          "end": {
+            "line": 1972,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 4902,
+            "column": 10
+          },
+          "end": {
+            "line": 4908,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/httpRouteConfigs/{httpRouteName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/httpRouteConfigs/{httpRouteName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6058,
+            "column": 10
+          },
+          "end": {
+            "line": 6064,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/javaComponents/{name}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/javaComponents/{name}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6393,
+            "column": 10
+          },
+          "end": {
+            "line": 6399,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 481,
+            "column": 10
+          },
+          "end": {
+            "line": 487,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 481,
+            "column": 10
+          },
+          "end": {
+            "line": 487,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/certificates/{certificateName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/certificates/{certificateName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 875,
+            "column": 10
+          },
+          "end": {
+            "line": 881,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/configurations/{configurationName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/configurations/{configurationName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1202,
+            "column": 10
+          },
+          "end": {
+            "line": 1208,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/connections/{connectionName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/connections/{connectionName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1787,
+            "column": 10
+          },
+          "end": {
+            "line": 1793,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/credentials/{credentialName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/credentials/{credentialName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2142,
+            "column": 10
+          },
+          "end": {
+            "line": 2148,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/hybridRunbookWorkerGroups/{hybridRunbookWorkerGroupName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/hybridRunbookWorkerGroups/{hybridRunbookWorkerGroupName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2440,
+            "column": 10
+          },
+          "end": {
+            "line": 2446,
+            "column": 86
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6487,
+            "column": 10
+          },
+          "end": {
+            "line": 6493,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6487,
+            "column": 10
+          },
+          "end": {
+            "line": 6493,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/schedules/{scheduleName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/schedules/{scheduleName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 8221,
+            "column": 10
+          },
+          "end": {
+            "line": 8227,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/variables/{variableName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/variables/{variableName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 9824,
+            "column": 10
+          },
+          "end": {
+            "line": 9830,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/watchers/{watcherName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/watchers/{watcherName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 10122,
+            "column": 10
+          },
+          "end": {
+            "line": 10128,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/webhooks/{webhookName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/webhooks/{webhookName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 10526,
+            "column": 10
+          },
+          "end": {
+            "line": 10532,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 552,
+            "column": 10
+          },
+          "end": {
+            "line": 558,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 552,
+            "column": 10
+          },
+          "end": {
+            "line": 558,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1623,
+            "column": 10
+          },
+          "end": {
+            "line": 1629,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2335,
+            "column": 10
+          },
+          "end": {
+            "line": 2341,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/scripts/{scriptName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/scripts/{scriptName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 3265,
+            "column": 10
+          },
+          "end": {
+            "line": 3271,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/managedPrivateEndpoints/{managedPrivateEndpointName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/managedPrivateEndpoints/{managedPrivateEndpointName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 4049,
+            "column": 10
+          },
+          "end": {
+            "line": 4055,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/sandboxCustomImages/{sandboxCustomImageName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/sandboxCustomImages/{sandboxCustomImageName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 5371,
+            "column": 10
+          },
+          "end": {
+            "line": 5377,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "swaggerFile": "projects/specification/batch/resource-manager/Microsoft.Batch/Batch/swagger/stable/2025-06-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2004,
+            "column": 10
+          },
+          "end": {
+            "line": 2010,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 346,
+            "column": 10
+          },
+          "end": {
+            "line": 352,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/billingSubscriptions/{billingSubscriptionName}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/billingSubscriptions/{billingSubscriptionName}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 7333,
+            "column": 10
+          },
+          "end": {
+            "line": 7339,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 516,
+            "column": 10
+          },
+          "end": {
+            "line": 522,
+            "column": 41
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/channels/{channelName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/channels/{channelName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 883,
+            "column": 10
+          },
+          "end": {
+            "line": 889,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/connections/{connectionName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/connections/{connectionName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1364,
+            "column": 10
+          },
+          "end": {
+            "line": 1370,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/connections/{connectionName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/connections/{connectionName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1364,
+            "column": 10
+          },
+          "end": {
+            "line": 1370,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "swaggerFile": "projects/specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 356,
+            "column": 10
+          },
+          "end": {
+            "line": 362,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "swaggerFile": "projects/specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}/certificates/{name}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}/certificates/{name}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 644,
+            "column": 10
+          },
+          "end": {
+            "line": 650,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1298,
+            "column": 10
+          },
+          "end": {
+            "line": 1304,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/ngroups/{ngroupsName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/ngroups/{ngroupsName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1961,
+            "column": 10
+          },
+          "end": {
+            "line": 1967,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "swaggerFile": "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks/swagger/preview/2025-03-01-preview/containerregistry_build.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/taskRuns/{taskRunName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1122,
+            "column": 10
+          },
+          "end": {
+            "line": 1128,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1439,
+            "column": 10
+          },
+          "end": {
+            "line": 1445,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1439,
+            "column": 10
+          },
+          "end": {
+            "line": 1445,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}/dataCenters/{dataCenterName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/cassandraClusters/{clusterName}/dataCenters/{dataCenterName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1983,
+            "column": 10
+          },
+          "end": {
+            "line": 1989,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2601,
+            "column": 10
+          },
+          "end": {
+            "line": 2607,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/fleets/{fleetName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/fleets/{fleetName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 18480,
+            "column": 10
+          },
+          "end": {
+            "line": 18486,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/fleets/{fleetName}/fleetspaces/{fleetspaceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/fleets/{fleetName}/fleetspaces/{fleetspaceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 19045,
+            "column": 10
+          },
+          "end": {
+            "line": 19051,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/throughputPools/{throughputPoolName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/throughputPools/{throughputPoolName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 20289,
+            "column": 10
+          },
+          "end": {
+            "line": 20295,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 967,
+            "column": 10
+          },
+          "end": {
+            "line": 973,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1432,
+            "column": 10
+          },
+          "end": {
+            "line": 1438,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure",
+      "swaggerFile": "projects/specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure/swagger/preview/2026-07-03-preview/devopsinfrastructure.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevOpsInfrastructure/pools/{poolName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevOpsInfrastructure/pools/{poolName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 506,
+            "column": 10
+          },
+          "end": {
+            "line": 512,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "swaggerFile": "projects/specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration/swagger/stable/2024-11-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 582,
+            "column": 10
+          },
+          "end": {
+            "line": 588,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/dynatrace/resource-manager/Dynatrace.Observability/DynatraceObservability",
+      "swaggerFile": "projects/specification/dynatrace/resource-manager/Dynatrace.Observability/DynatraceObservability/swagger/stable/2024-04-24/dynatrace.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Dynatrace.Observability/monitors/{monitorName}/monitoredSubscriptions/default",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Dynatrace.Observability/monitors/{monitorName}/monitoredSubscriptions/default",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1260,
+            "column": 10
+          },
+          "end": {
+            "line": 1266,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "swaggerFile": "projects/specification/elastic/resource-manager/Microsoft.Elastic/Elastic/swagger/stable/2025-06-01/elastic.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1601,
+            "column": 10
+          },
+          "end": {
+            "line": 1607,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "swaggerFile": "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/swagger/preview/2026-07-01-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/clusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/clusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 482,
+            "column": 10
+          },
+          "end": {
+            "line": 488,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
+      "swaggerFile": "projects/specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations/swagger/preview/2021-08-31-preview/customlocations.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ExtendedLocation/customLocations/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ExtendedLocation/customLocations/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 324,
+            "column": 10
+          },
+          "end": {
+            "line": 332,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "swaggerFile": "projects/specification/help/resource-manager/Microsoft.Help/Help/swagger/preview/2024-03-01-preview/help.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Help/solutions/{solutionResourceName}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Help/solutions/{solutionResourceName}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 532,
+            "column": 10
+          },
+          "end": {
+            "line": 538,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 773,
+            "column": 10
+          },
+          "end": {
+            "line": 779,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/managedNetworks/{managedNetworkName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/managedNetworks/{managedNetworkName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 17605,
+            "column": 10
+          },
+          "end": {
+            "line": 17611,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 304,
+            "column": 10
+          },
+          "end": {
+            "line": 310,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1450,
+            "column": 10
+          },
+          "end": {
+            "line": 1456,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1704,
+            "column": 10
+          },
+          "end": {
+            "line": 1710,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ServiceGroups/swagger/preview/2024-02-01-preview/serviceGroups.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 175,
+            "column": 10
+          },
+          "end": {
+            "line": 181,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 616,
+            "column": 10
+          },
+          "end": {
+            "line": 622,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/importSites/{siteName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/importSites/{siteName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2831,
+            "column": 10
+          },
+          "end": {
+            "line": 2837,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/sqlServers/{sqlServerName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/sqlServers/{sqlServerName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6412,
+            "column": 10
+          },
+          "end": {
+            "line": 6418,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/machines/{machineName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/machines/{machineName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 9852,
+            "column": 10
+          },
+          "end": {
+            "line": 9858,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 10731,
+            "column": 10
+          },
+          "end": {
+            "line": 10737,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 5991,
+            "column": 10
+          },
+          "end": {
+            "line": 5997,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 7049,
+            "column": 10
+          },
+          "end": {
+            "line": 7055,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/snapshotPolicies/{snapshotPolicyName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/snapshotPolicies/{snapshotPolicyName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 12566,
+            "column": 10
+          },
+          "end": {
+            "line": 12572,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "Mark the top-level property \"id\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 10
+          },
+          "end": {
+            "line": 1280,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 10
+          },
+          "end": {
+            "line": 1280,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "Mark the top-level property \"type\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}/signatureOverrides/default",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1274,
+            "column": 10
+          },
+          "end": {
+            "line": 1280,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/newrelic/NewRelicObservability.Management",
+      "swaggerFile": "projects/specification/newrelic/NewRelicObservability.Management/swagger/resource-manager/NewRelic.Observability/preview/2025-05-01-preview/NewRelic.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/NewRelic.Observability/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/NewRelic.Observability/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1493,
+            "column": 10
+          },
+          "end": {
+            "line": 1499,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "swaggerFile": "projects/specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs/swagger/preview/2023-10-01-preview/notificationhubs.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 408,
+            "column": 10
+          },
+          "end": {
+            "line": 414,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1579,
+            "column": 10
+          },
+          "end": {
+            "line": 1585,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "swaggerFile": "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/swagger/stable/2025-07-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/tables/{tableName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/tables/{tableName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 4787,
+            "column": 10
+          },
+          "end": {
+            "line": 4793,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 261,
+            "column": 10
+          },
+          "end": {
+            "line": 267,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Purview/accounts/{accountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Purview/accounts/{accountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 671,
+            "column": 10
+          },
+          "end": {
+            "line": 677,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 674,
+            "column": 10
+          },
+          "end": {
+            "line": 680,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6320,
+            "column": 10
+          },
+          "end": {
+            "line": 6326,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6472,
+            "column": 10
+          },
+          "end": {
+            "line": 6478,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters",
+      "swaggerFile": "projects/specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters/swagger/stable/2025-07-25/redhatopenshift.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/openShiftClusters/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RedHatOpenShift/openShiftClusters/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 507,
+            "column": 10
+          },
+          "end": {
+            "line": 513,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "swaggerFile": "projects/specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise/swagger/preview/2026-06-01-preview/redisenterprise.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redisEnterprise/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redisEnterprise/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 369,
+            "column": 10
+          },
+          "end": {
+            "line": 375,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "swaggerFile": "projects/specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise/swagger/preview/2026-06-01-preview/redisenterprise.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redisEnterprise/{clusterName}/databases/{databaseName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redisEnterprise/{clusterName}/databases/{databaseName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 718,
+            "column": 10
+          },
+          "end": {
+            "line": 724,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 241,
+            "column": 10
+          },
+          "end": {
+            "line": 247,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 199,
+            "column": 10
+          },
+          "end": {
+            "line": 205,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}",
+        "patch",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}",
+          "patch",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1185,
+            "column": 10
+          },
+          "end": {
+            "line": 1191,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "patch",
+        "parameters",
+        "7"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "patch",
+          "parameters",
+          "7"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1709,
+            "column": 10
+          },
+          "end": {
+            "line": 1715,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 670,
+            "column": 10
+          },
+          "end": {
+            "line": 676,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI/swagger/preview/2025-11-01-preview/securityConnectorsDevOps.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 266,
+            "column": 10
+          },
+          "end": {
+            "line": 272,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI/swagger/preview/2025-11-01-preview/securityConnectorsDevOps.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 596,
+            "column": 10
+          },
+          "end": {
+            "line": 602,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI/swagger/preview/2025-11-01-preview/securityConnectorsDevOps.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}/projects/{projectName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}/projects/{projectName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 887,
+            "column": 10
+          },
+          "end": {
+            "line": 893,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI/swagger/preview/2025-11-01-preview/securityConnectorsDevOps.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}/projects/{projectName}/repos/{repoName}",
+        "patch",
+        "parameters",
+        "7"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/securityConnectors/{securityConnectorName}/devops/default/azureDevOpsOrgs/{orgName}/projects/{projectName}/repos/{repoName}",
+          "patch",
+          "parameters",
+          "7"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1202,
+            "column": 10
+          },
+          "end": {
+            "line": 1208,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "swaggerFile": "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/swagger/preview/2026-07-01-preview/servicebus.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 407,
+            "column": 10
+          },
+          "end": {
+            "line": 413,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-01-01-preview/signalr.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 431,
+            "column": 10
+          },
+          "end": {
+            "line": 437,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-01-01-preview/signalr.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}/replicas/{replicaName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}/replicas/{replicaName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 1706,
+            "column": 10
+          },
+          "end": {
+            "line": 1712,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/{applicationId}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 190,
+            "column": 10
+          },
+          "end": {
+            "line": 196,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/{applicationId}",
+        "patch",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}",
+          "patch",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 190,
+            "column": 10
+          },
+          "end": {
+            "line": 196,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Mark the top-level property \"location\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 941,
+            "column": 10
+          },
+          "end": {
+            "line": 947,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 941,
+            "column": 10
+          },
+          "end": {
+            "line": 947,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedInstances.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 380,
+            "column": 10
+          },
+          "end": {
+            "line": 386,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/caches/{cacheName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2552,
+            "column": 10
+          },
+          "end": {
+            "line": 2558,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"id\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 511,
+            "column": 10
+          },
+          "end": {
+            "line": 517,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 511,
+            "column": 10
+          },
+          "end": {
+            "line": 517,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"type\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 511,
+            "column": 10
+          },
+          "end": {
+            "line": 517,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"id\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 797,
+            "column": 10
+          },
+          "end": {
+            "line": 803,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"name\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 797,
+            "column": 10
+          },
+          "end": {
+            "line": 803,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "Mark the top-level property \"type\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 797,
+            "column": 10
+          },
+          "end": {
+            "line": 803,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2909,
+            "column": 10
+          },
+          "end": {
+            "line": 2915,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/kubeEnvironments/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/kubeEnvironments/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6004,
+            "column": 10
+          },
+          "end": {
+            "line": 6010,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 6335,
+            "column": 10
+          },
+          "end": {
+            "line": 6341,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-12-01-preview/webpubsub.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/webPubSub/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/webPubSub/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 425,
+            "column": 10
+          },
+          "end": {
+            "line": 431,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "UnSupportedPatchProperties",
+      "level": "error",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "swaggerFile": "projects/specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService/swagger/preview/2025-12-01-preview/webpubsub.json",
+      "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/webPubSub/{resourceName}/replicas/{replicaName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/webPubSub/{resourceName}/replicas/{replicaName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-02",
+        "range": {
+          "start": {
+            "line": 2221,
+            "column": 10
+          },
+          "end": {
+            "line": 2227,
+            "column": 45
+          }
+        }
+      }
+    }
+  ]
+}

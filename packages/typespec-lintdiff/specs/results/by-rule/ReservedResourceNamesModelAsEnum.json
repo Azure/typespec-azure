@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ReservedResourceNamesModelAsEnum",
+  "count": 8,
+  "levels": {
+    "warning": 8
+  },
+  "results": [
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "The service-defined (reserved name) resource \"service\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 77
+          },
+          "end": {
+            "line": 176,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/VmInsightsOnboarding",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/VmInsightsOnboarding/swagger/preview/2018-11-27-preview/vmInsightsOnboarding.json",
+      "message": "The service-defined (reserved name) resource \"default\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.Insights/vmInsightsOnboardingStatuses/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.Insights/vmInsightsOnboardingStatuses/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 87
+          },
+          "end": {
+            "line": 95,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "The service-defined (reserved name) resource \"default\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.ManagedIdentity/identities/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.ManagedIdentity/identities/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 56,
+            "column": 70
+          },
+          "end": {
+            "line": 92,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/portalservices/CopilotSettings.Management",
+      "swaggerFile": "projects/specification/portalservices/CopilotSettings.Management/swagger/resource-manager/Microsoft.PortalServices/copilotSettings/preview/2024-04-01-preview/copilotSettings.json",
+      "message": "The service-defined (reserved name) resource \"default\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PortalServices/copilotSettings/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PortalServices/copilotSettings/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 66
+          },
+          "end": {
+            "line": 195,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI/swagger/preview/2026-04-01-preview/security-SqlVulnerabilityAssessments.json",
+      "message": "The service-defined (reserved name) resource \"default\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.Security/sqlVulnerabilityAssessments/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.Security/sqlVulnerabilityAssessments/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 56,
+            "column": 85
+          },
+          "end": {
+            "line": 206,
+            "column": 106
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/maintenanceWindowOptions.json",
+      "message": "The service-defined (reserved name) resource \"current\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindowOptions/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindowOptions/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 176
+          },
+          "end": {
+            "line": 102,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/maintenanceWindows.json",
+      "message": "The service-defined (reserved name) resource \"current\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 170
+          },
+          "end": {
+            "line": 166,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "ReservedResourceNamesModelAsEnum",
+      "level": "warning",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "swaggerFile": "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/swagger/preview/2025-11-01-preview/subscriptions.json",
+      "message": "The service-defined (reserved name) resource \"default\" should be represented as a path parameter enum with `modelAsString` set to `true`.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Subscription/policies/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Subscription/policies/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-ConstrainedCollections-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 120
+          },
+          "end": {
+            "line": 79,
+            "column": 61
+          }
+        }
+      }
+    }
+  ]
+}

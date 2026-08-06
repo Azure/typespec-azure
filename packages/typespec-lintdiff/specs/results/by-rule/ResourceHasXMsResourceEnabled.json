@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ResourceHasXMsResourceEnabled",
+  "count": 3,
+  "levels": {
+    "error": 3
+  },
+  "results": [
+    {
+      "rule": "ResourceHasXMsResourceEnabled",
+      "level": "error",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules/swagger/stable/2021-08-08/AlertProcessingRules.json",
+      "message": "A 'Resource' definition must have x-ms-azure-resource extension enabled and set to true.",
+      "path": [
+        "definitions",
+        "Resource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Resource"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 958,
+            "column": 15
+          },
+          "end": {
+            "line": 975,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResourceHasXMsResourceEnabled",
+      "level": "error",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "swaggerFile": "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/swagger/stable/2026-01-01/openapi.json",
+      "message": "A 'Resource' definition must have x-ms-azure-resource extension enabled and set to true.",
+      "path": [
+        "definitions",
+        "Resource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Resource"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2795,
+            "column": 15
+          },
+          "end": {
+            "line": 2812,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "ResourceHasXMsResourceEnabled",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "A 'Resource' definition must have x-ms-azure-resource extension enabled and set to true.",
+      "path": [
+        "definitions",
+        "Resource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Resource"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3618,
+            "column": 15
+          },
+          "end": {
+            "line": 3640,
+            "column": 26
+          }
+        }
+      }
+    }
+  ]
+}

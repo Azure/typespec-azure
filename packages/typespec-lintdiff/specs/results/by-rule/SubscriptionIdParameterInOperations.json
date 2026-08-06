@@ -1,0 +1,530 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "SubscriptionIdParameterInOperations",
+  "count": 14,
+  "levels": {
+    "error": 14
+  },
+  "results": [
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1subscriptions~1%7BsubscriptionId%7D~1resourceGroups~1%7BresourceGroupName%7D~1providers~1%7BresourceProviderNamespace%7D~1%7BparentResourcePath%7D~1%7BresourceType%7D~1%7BresourceName%7D~1providers~1Microsoft.Authorization~1denyAssignments/get/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/denyAssignments",
+        "get",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/denyAssignments",
+          "get",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 351,
+            "column": 10
+          },
+          "end": {
+            "line": 356,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1subscriptions~1%7BsubscriptionId%7D~1resourceGroups~1%7BresourceGroupName%7D~1providers~1%7BresourceProviderNamespace%7D~1%7BresourceType%7D~1%7BresourceName%7D~1providers~1Microsoft.Authorization~1roleAssignments/get/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments",
+        "get",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments",
+          "get",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 508,
+            "column": 10
+          },
+          "end": {
+            "line": 513,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/swagger/preview/2022-05-01-preview/authorization-RoleDefinitionsCalls.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1subscriptions~1%7BsubscriptionId%7D~1resourceGroups~1%7BresourceGroupName%7D~1providers~1%7BresourceProviderNamespace%7D~1%7BparentResourcePath%7D~1%7BresourceType%7D~1%7BresourceName%7D~1providers~1Microsoft.Authorization~1permissions/get/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/permissions",
+        "get",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/permissions",
+          "get",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 264,
+            "column": 10
+          },
+          "end": {
+            "line": 269,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Billing~1billingAccounts~1default~1billingSubscriptions~1%7BsubscriptionId%7D~1downloadDocuments/post/parameters/0' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+        "post",
+        "parameters",
+        "0"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+          "post",
+          "parameters",
+          "0"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12482,
+            "column": 10
+          },
+          "end": {
+            "line": 12488,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Billing~1billingAccounts~1default~1billingSubscriptions~1%7BsubscriptionId%7D~1invoices/get/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices",
+        "get",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices",
+          "get",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12555,
+            "column": 10
+          },
+          "end": {
+            "line": 12561,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Billing~1billingAccounts~1default~1billingSubscriptions~1%7BsubscriptionId%7D~1invoices~1%7BinvoiceName%7D/get/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}",
+        "get",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}",
+          "get",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12662,
+            "column": 10
+          },
+          "end": {
+            "line": 12668,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Billing~1billingAccounts~1default~1billingSubscriptions~1%7BsubscriptionId%7D~1invoices~1%7BinvoiceName%7D~1download/post/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}/download",
+        "post",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}/download",
+          "post",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12714,
+            "column": 10
+          },
+          "end": {
+            "line": 12720,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Management~1managementGroups~1%7BgroupId%7D~1subscriptions~1%7BsubscriptionId%7D/get/parameters/2' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "get",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "get",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 955,
+            "column": 10
+          },
+          "end": {
+            "line": 960,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Management~1managementGroups~1%7BgroupId%7D~1subscriptions~1%7BsubscriptionId%7D/put/parameters/2' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "put",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "put",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1008,
+            "column": 10
+          },
+          "end": {
+            "line": 1013,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Management~1managementGroups~1%7BgroupId%7D~1subscriptions~1%7BsubscriptionId%7D/delete/parameters/2' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "delete",
+        "parameters",
+        "2"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "delete",
+          "parameters",
+          "2"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1061,
+            "column": 10
+          },
+          "end": {
+            "line": 1066,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1subscriptions~1%7BsubscriptionId%7D~1providers~1Microsoft.PolicyInsights~1policyStates~1latest~1triggerEvaluation/post/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+        "post",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+          "post",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4374,
+            "column": 10
+          },
+          "end": {
+            "line": 4381,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1subscriptions~1%7BsubscriptionId%7D~1resourceGroups~1%7BresourceGroupName%7D~1providers~1Microsoft.PolicyInsights~1policyStates~1latest~1triggerEvaluation/post/parameters/1' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+        "post",
+        "parameters",
+        "1"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+          "post",
+          "parameters",
+          "1"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5607,
+            "column": 10
+          },
+          "end": {
+            "line": 5614,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Management~1managementGroups~1%7BmanagementGroupId%7D~1providers~1Microsoft.Quota~1groupQuotas~1%7BgroupQuotaName%7D~1subscriptions~1%7BsubscriptionId%7D/get/parameters/3' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+        "get",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+          "get",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1766,
+            "column": 10
+          },
+          "end": {
+            "line": 1772,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "SubscriptionIdParameterInOperations",
+      "level": "error",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "Parameter 'subscriptionId' is not allowed in the operations section, define it in the global parameters section instead/Parameter '#/paths/~1providers~1Microsoft.Management~1managementGroups~1%7BmanagementGroupId%7D~1providers~1Microsoft.Quota~1groupQuotas~1%7BgroupQuotaName%7D~1subscriptions~1%7BsubscriptionId%7D/delete/parameters/3' is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+        "delete",
+        "parameters",
+        "3"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+          "delete",
+          "parameters",
+          "3"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1981,
+            "column": 10
+          },
+          "end": {
+            "line": 1987,
+            "column": 28
+          }
+        }
+      }
+    }
+  ]
+}

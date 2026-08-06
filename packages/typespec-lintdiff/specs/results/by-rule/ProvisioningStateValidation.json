@@ -1,0 +1,586 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ProvisioningStateValidation",
+  "count": 18,
+  "levels": {
+    "error": 18
+  },
+  "results": [
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "AssociationContractProperties",
+        "properties",
+        "provisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AssociationContractProperties",
+          "properties",
+          "provisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 54382,
+            "column": 28
+          },
+          "end": {
+            "line": 54389,
+            "column": 34
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "DscConfigurationProperties",
+        "properties",
+        "provisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DscConfigurationProperties",
+          "properties",
+          "provisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 12264,
+            "column": 28
+          },
+          "end": {
+            "line": 12271,
+            "column": 34
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 15173,
+            "column": 24
+          },
+          "end": {
+            "line": 15198,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "RunbookProperties",
+        "properties",
+        "provisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RunbookProperties",
+          "properties",
+          "provisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 15616,
+            "column": 28
+          },
+          "end": {
+            "line": 15623,
+            "column": 34
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "swaggerFile": "projects/specification/batch/resource-manager/Microsoft.Batch/Batch/swagger/stable/2025-06-01/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 6085,
+            "column": 24
+          },
+          "end": {
+            "line": 6132,
+            "column": 22
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 8587,
+            "column": 24
+          },
+          "end": {
+            "line": 8638,
+            "column": 22
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "swaggerFile": "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/swagger/preview/2023-09-15-preview/botservice.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "NetworkSecurityPerimeterConfigurationProperties",
+        "properties",
+        "provisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "NetworkSecurityPerimeterConfigurationProperties",
+          "properties",
+          "provisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 3407,
+            "column": 28
+          },
+          "end": {
+            "line": 3444,
+            "column": 35
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "swaggerFile": "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 15180,
+            "column": 24
+          },
+          "end": {
+            "line": 15202,
+            "column": 29
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "swaggerFile": "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/swagger/preview/2026-04-01-preview/dataprotection.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 7948,
+            "column": 24
+          },
+          "end": {
+            "line": 7984,
+            "column": 22
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 5222,
+            "column": 24
+          },
+          "end": {
+            "line": 5281,
+            "column": 22
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector",
+      "swaggerFile": "projects/specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector/swagger/stable/2022-11-01/AzureTrafficCollector.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 1097,
+            "column": 24
+          },
+          "end": {
+            "line": 1128,
+            "column": 35
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 2566,
+            "column": 24
+          },
+          "end": {
+            "line": 2593,
+            "column": 30
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 15081,
+            "column": 24
+          },
+          "end": {
+            "line": 15108,
+            "column": 30
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "swaggerFile": "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/swagger/preview/2025-08-01-preview/redis.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 2908,
+            "column": 24
+          },
+          "end": {
+            "line": 3023,
+            "column": 104
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 2966,
+            "column": 24
+          },
+          "end": {
+            "line": 3051,
+            "column": 35
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "swaggerFile": "projects/specification/search/resource-manager/Microsoft.Search/Search/swagger/preview/2026-09-01-preview/search.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 2994,
+            "column": 24
+          },
+          "end": {
+            "line": 3019,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 13201,
+            "column": 24
+          },
+          "end": {
+            "line": 13223,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateValidation",
+      "level": "error",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "swaggerFile": "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/swagger/preview/2025-11-01-preview/subscriptions.json",
+      "message": "ProvisioningState must have terminal states: Succeeded, Failed and Canceled.",
+      "path": [
+        "definitions",
+        "ProvisioningState"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProvisioningState"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-03",
+        "range": {
+          "start": {
+            "line": 1099,
+            "column": 24
+          },
+          "end": {
+            "line": 1124,
+            "column": 35
+          }
+        }
+      }
+    }
+  ]
+}

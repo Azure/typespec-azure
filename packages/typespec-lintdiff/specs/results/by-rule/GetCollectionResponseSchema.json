@@ -1,0 +1,1122 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "GetCollectionResponseSchema",
+  "count": 37,
+  "levels": {
+    "error": 37
+  },
+  "results": [
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/swagger/stable/2015-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"WorkItemConfigurations_List\" does not match the response definition in the individual GET  operation \"WorkItemConfigurations_GetItem\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/WorkItemConfigs"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/WorkItemConfigs"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 590,
+            "column": 146
+          },
+          "end": {
+            "line": 679,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The response in the GET collection operation \"Job_ListByAutomationAccount\" does not match the response definition in the individual GET  operation \"Job_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/jobs"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/jobs"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3159,
+            "column": 154
+          },
+          "end": {
+            "line": 3224,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The response in the GET collection operation \"SoftwareUpdateConfigurations_List\" does not match the response definition in the individual GET  operation \"SoftwareUpdateConfigurations_GetByName\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/softwareUpdateConfigurations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/softwareUpdateConfigurations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 8591,
+            "column": 178
+          },
+          "end": {
+            "line": 8656,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The response in the GET collection operation \"SourceControlSyncJob_ListByAutomationAccount\" does not match the response definition in the individual GET  operation \"SourceControlSyncJob_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/sourceControls/{sourceControlName}/sourceControlSyncJobs"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/sourceControls/{sourceControlName}/sourceControlSyncJobs"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9155,
+            "column": 206
+          },
+          "end": {
+            "line": 9220,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The response in the GET collection operation \"SourceControlSyncJobStreams_ListBySyncJob\" does not match the response definition in the individual GET  operation \"SourceControlSyncJobStreams_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/sourceControls/{sourceControlName}/sourceControlSyncJobs/{sourceControlSyncJobId}/streams"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/sourceControls/{sourceControlName}/sourceControlSyncJobs/{sourceControlSyncJobId}/streams"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9356,
+            "column": 239
+          },
+          "end": {
+            "line": 9429,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The response in the GET collection operation \"VirtualMachineRunCommands_List\" does not match the response definition in the individual GET  operation \"VirtualMachineRunCommands_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/runCommands"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/runCommands"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 36,
+            "column": 11
+          },
+          "end": {
+            "line": 36,
+            "column": 13
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The response in the GET collection operation \"VirtualMachineRunCommands_List\" does not match the response definition in the individual GET  operation \"VirtualMachineRunCommands_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/runCommands"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/runCommands"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1464,
+            "column": 101
+          },
+          "end": {
+            "line": 1505,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "The response in the GET collection operation \"ContainerGroups_List\" does not match the response definition in the individual GET  operation \"ContainerGroups_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContainerInstance/containerGroups"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ContainerInstance/containerGroups"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 163,
+            "column": 94
+          },
+          "end": {
+            "line": 199,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The response in the GET collection operation \"DatabaseMigrationsMongoToCosmosDbRUMongo_GetForScope\" does not match the response definition in the individual GET  operation \"DatabaseMigrationsSqlMi_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3672,
+            "column": 197
+          },
+          "end": {
+            "line": 3724,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The response in the GET collection operation \"DatabaseMigrationsMongoToCosmosDbRUMongo_GetForScope\" does not match the response definition in the individual GET  operation \"DatabaseMigrationsSqlDb_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3672,
+            "column": 197
+          },
+          "end": {
+            "line": 3724,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "swaggerFile": "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The response in the GET collection operation \"DatabaseMigrationsMongoToCosmosDbRUMongo_GetForScope\" does not match the response definition in the individual GET  operation \"DatabaseMigrationsSqlVm_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3672,
+            "column": 197
+          },
+          "end": {
+            "line": 3724,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The response in the GET collection operation \"IotDpsResource_ListPrivateEndpointConnections\" does not match the response definition in the individual GET  operation \"IotDpsResource_GetPrivateEndpointConnection\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1253,
+            "column": 166
+          },
+          "end": {
+            "line": 1298,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "swaggerFile": "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"ExtensionMetadataV2_List\" does not match the response definition in the individual GET  operation \"ExtensionMetadata_Get\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.HybridCompute/locations/{location}/publishers/{publisher}/extensionTypes/{extensionType}/versions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.HybridCompute/locations/{location}/publishers/{publisher}/extensionTypes/{extensionType}/versions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 174,
+            "column": 127
+          },
+          "end": {
+            "line": 231,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "The response in the GET collection operation \"ManagementGroups_List\" does not match the response definition in the individual GET  operation \"ManagementGroups_Get\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 264,
+            "column": 57
+          },
+          "end": {
+            "line": 311,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "The response in the GET collection operation \"HierarchySettings_List\" does not match the response definition in the individual GET  operation \"HierarchySettings_Get\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/settings"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/settings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 678,
+            "column": 76
+          },
+          "end": {
+            "line": 717,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"ProductList_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"ProductGet_GetByBillingProfile\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 53,
+            "column": 148
+          },
+          "end": {
+            "line": 149,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"ProductList_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"ProductGet_GetByBillingAccount\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 53,
+            "column": 148
+          },
+          "end": {
+            "line": 149,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"ProductList_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"ProductGet_GetByTenant\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 53,
+            "column": 148
+          },
+          "end": {
+            "line": 149,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"ProductList_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"ProductGet_GetBySubscription\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 53,
+            "column": 148
+          },
+          "end": {
+            "line": 149,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"Skus_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"Skus_GetByBillingProfile\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 144
+          },
+          "end": {
+            "line": 151,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/swagger/stable/2025-05-01/openapi.json",
+      "message": "The response in the GET collection operation \"Skus_ListByBillingProfile\" does not match the response definition in the individual GET  operation \"Skus_GetByBillingAccount\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 144
+          },
+          "end": {
+            "line": 151,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi/swagger/stable/2026-01-01/metricAlert.json",
+      "message": "The response in the GET collection operation \"MetricAlertsStatus_List\" does not match the response definition in the individual GET  operation \"MetricAlertsStatus_ListByName\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/metricAlerts/{ruleName}/status"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/metricAlerts/{ruleName}/status"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 381,
+            "column": 135
+          },
+          "end": {
+            "line": 426,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "swaggerFile": "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/swagger/preview/2026-05-15-preview/netapp.json",
+      "message": "The response in the GET collection operation \"VolumeGroups_ListByNetAppAccount\" does not match the response definition in the individual GET  operation \"VolumeGroups_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/volumeGroups"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/volumeGroups"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12811,
+            "column": 144
+          },
+          "end": {
+            "line": 12866,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
+      "swaggerFile": "projects/specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus/swagger/stable/2025-11-01/swagger.json",
+      "message": "The response in the GET collection operation \"WafPolicy_List\" does not match the response definition in the individual GET  operation \"WafPolicy_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/wafPolicies"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/wafPolicies"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1291,
+            "column": 147
+          },
+          "end": {
+            "line": 1340,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The response in the GET collection operation \"PolicyMetadata_List\" does not match the response definition in the individual GET  operation \"PolicyMetadata_GetResource\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PolicyInsights/policyMetadata"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PolicyInsights/policyMetadata"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2018,
+            "column": 59
+          },
+          "end": {
+            "line": 2063,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "The response in the GET collection operation \"ClusterVersions_List\" does not match the response definition in the individual GET  operation \"ClusterVersions_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/clusterVersions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/clusterVersions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 148,
+            "column": 111
+          },
+          "end": {
+            "line": 187,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "The response in the GET collection operation \"ClusterVersions_ListByEnvironment\" does not match the response definition in the individual GET  operation \"ClusterVersions_GetByEnvironment\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/clusterVersions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/clusterVersions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 235,
+            "column": 138
+          },
+          "end": {
+            "line": 301,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The response in the GET collection operation \"BlobContainers_List\" does not match the response definition in the individual GET  operation \"BlobContainers_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1362,
+            "column": 165
+          },
+          "end": {
+            "line": 1450,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The response in the GET collection operation \"FileShares_List\" does not match the response definition in the individual GET  operation \"FileShares_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/default/shares"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/default/shares"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3700,
+            "column": 161
+          },
+          "end": {
+            "line": 3784,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/storage/Storage.Management",
+      "swaggerFile": "projects/specification/storage/Storage.Management/swagger/resource-manager/Microsoft.Storage/stable/2026-04-01/openapi.json",
+      "message": "The response in the GET collection operation \"Queue_List\" does not match the response definition in the individual GET  operation \"Queue_Get\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/queueServices/default/queues"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/queueServices/default/queues"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6344,
+            "column": 162
+          },
+          "end": {
+            "line": 6409,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "swaggerFile": "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/swagger/preview/2025-11-01-preview/subscriptions.json",
+      "message": "The response in the GET collection operation \"SubscriptionPolicy_ListPolicyForTenant\" does not match the response definition in the individual GET  operation \"BillingAccount_GetPolicy\" .",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Subscription/policies"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Subscription/policies"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 291,
+            "column": 51
+          },
+          "end": {
+            "line": 323,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"Recommendations_ListRecommendedRulesForHostingEnvironment\" does not match the response definition in the individual GET  operation \"Recommendations_GetRuleDetailsByHostingEnvironment\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{hostingEnvironmentName}/recommendations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{hostingEnvironmentName}/recommendations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4663,
+            "column": 160
+          },
+          "end": {
+            "line": 4721,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"Recommendations_ListRecommendedRulesForWebApp\" does not match the response definition in the individual GET  operation \"Recommendations_GetRuleDetailsByWebApp\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/recommendations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/recommendations"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 19162,
+            "column": 132
+          },
+          "end": {
+            "line": 19220,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"WebApps_ListRelayServiceConnections\" does not match the response definition in the individual GET  operation \"WebApps_GetRelayServiceConnection\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15612,
+            "column": 129
+          },
+          "end": {
+            "line": 15653,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"WebApps_ListRelayServiceConnectionsSlot\" does not match the response definition in the individual GET  operation \"WebApps_GetRelayServiceConnectionSlot\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 26836,
+            "column": 142
+          },
+          "end": {
+            "line": 26884,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"WebApps_ListPremierAddOns\" does not match the response definition in the individual GET  operation \"WebApps_GetPremierAddOn\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 17836,
+            "column": 126
+          },
+          "end": {
+            "line": 17877,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetCollectionResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The response in the GET collection operation \"WebApps_ListPremierAddOnsSlot\" does not match the response definition in the individual GET  operation \"WebApps_GetPremierAddOnSlot\" .",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 29094,
+            "column": 139
+          },
+          "end": {
+            "line": 29142,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

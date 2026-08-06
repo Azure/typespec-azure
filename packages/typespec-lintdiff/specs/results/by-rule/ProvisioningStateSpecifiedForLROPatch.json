@@ -1,0 +1,1492 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ProvisioningStateSpecifiedForLROPatch",
+  "count": 40,
+  "levels": {
+    "error": 40
+  },
+  "results": [
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1634,
+            "column": 16
+          },
+          "end": {
+            "line": 1637,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "swaggerFile": "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/swagger/stable/2025-02-14/kusto.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 2346,
+            "column": 16
+          },
+          "end": {
+            "line": 2349,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{galleryApplicationName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1668,
+            "column": 16
+          },
+          "end": {
+            "line": 1681,
+            "column": 137
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "swaggerFile": "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/swagger/stable/2025-07-01/databox.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 514,
+            "column": 16
+          },
+          "end": {
+            "line": 517,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}/monitoredSubscriptions/{configurationName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1466,
+            "column": 16
+          },
+          "end": {
+            "line": 1469,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 2798,
+            "column": 16
+          },
+          "end": {
+            "line": 2799,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerNamespaces/{partnerNamespaceName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerNamespaces/{partnerNamespaceName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 8562,
+            "column": 16
+          },
+          "end": {
+            "line": 8563,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerRegistrations/{partnerRegistrationName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/partnerRegistrations/{partnerRegistrationName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 9350,
+            "column": 16
+          },
+          "end": {
+            "line": 9351,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 11333,
+            "column": 16
+          },
+          "end": {
+            "line": 11334,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/fileshares/resource-manager/Microsoft.FileShares/FileShares",
+      "swaggerFile": "projects/specification/fileshares/resource-manager/Microsoft.FileShares/FileShares/swagger/stable/2026-06-01/fileshares.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FileShares/fileShares/{resourceName}/fileShareSnapshots/{name}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.FileShares/fileShares/{resourceName}/fileShareSnapshots/{name}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 856,
+            "column": 16
+          },
+          "end": {
+            "line": 859,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/NetworkExperimentProfiles/{profileName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/NetworkExperimentProfiles/{profileName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 850,
+            "column": 16
+          },
+          "end": {
+            "line": 853,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "swaggerFile": "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/swagger/stable/2025-11-01/openapi.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/NetworkExperimentProfiles/{profileName}/Experiments/{experimentName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/NetworkExperimentProfiles/{profileName}/Experiments/{experimentName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1208,
+            "column": 16
+          },
+          "end": {
+            "line": 1211,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "swaggerFile": "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 790,
+            "column": 16
+          },
+          "end": {
+            "line": 793,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "swaggerFile": "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/swagger/preview/2025-12-01-preview/openapi.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}/configurations/{configurationName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/flexibleServers/{serverName}/configurations/{configurationName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 2337,
+            "column": 16
+          },
+          "end": {
+            "line": 2340,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Quota/quotas/{resourceName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Quota/quotas/{resourceName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 441,
+            "column": 16
+          },
+          "end": {
+            "line": 444,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks/{networkName}/replicationNetworkMappings/{networkMappingName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks/{networkName}/replicationNetworkMappings/{networkMappingName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1667,
+            "column": 16
+          },
+          "end": {
+            "line": 1670,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 2399,
+            "column": 16
+          },
+          "end": {
+            "line": 2402,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 3592,
+            "column": 16
+          },
+          "end": {
+            "line": 3595,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 6842,
+            "column": 16
+          },
+          "end": {
+            "line": 6845,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationvCenters/{vcenterName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationvCenters/{vcenterName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 8242,
+            "column": 16
+          },
+          "end": {
+            "line": 8245,
+            "column": 45
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationPolicies/{policyName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationPolicies/{policyName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 9081,
+            "column": 16
+          },
+          "end": {
+            "line": 9084,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 9754,
+            "column": 16
+          },
+          "end": {
+            "line": 9757,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota/swagger/stable/2020-10-25/quota.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Capacity/resourceProviders/{providerId}/locations/{location}/serviceLimits/{resourceName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Capacity/resourceProviders/{providerId}/locations/{location}/serviceLimits/{resourceName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 311,
+            "column": 16
+          },
+          "end": {
+            "line": 314,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 210,
+            "column": 16
+          },
+          "end": {
+            "line": 213,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/tags/default",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/tags/default",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 483,
+            "column": 16
+          },
+          "end": {
+            "line": 486,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 1720,
+            "column": 16
+          },
+          "end": {
+            "line": 1723,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/backupShortTermRetentionPolicies.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/backupShortTermRetentionPolicies/{policyName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/backupShortTermRetentionPolicies/{policyName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 338,
+            "column": 16
+          },
+          "end": {
+            "line": 341,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/distributedAvailabilityGroups.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/distributedAvailabilityGroups/{distributedAvailabilityGroupName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/distributedAvailabilityGroups/{distributedAvailabilityGroupName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 288,
+            "column": 16
+          },
+          "end": {
+            "line": 291,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/elasticPools.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/elasticPools/{elasticPoolName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/elasticPools/{elasticPoolName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 321,
+            "column": 16
+          },
+          "end": {
+            "line": 324,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/failoverGroups.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/failoverGroups/{failoverGroupName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/failoverGroups/{failoverGroupName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 288,
+            "column": 16
+          },
+          "end": {
+            "line": 291,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/instancePools.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/instancePools/{instancePoolName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/instancePools/{instancePoolName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 299,
+            "column": 16
+          },
+          "end": {
+            "line": 302,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/jobAgents.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 291,
+            "column": 16
+          },
+          "end": {
+            "line": 294,
+            "column": 46
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedBackupShortTermRetentionPolicies.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/backupShortTermRetentionPolicies/{policyName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}/backupShortTermRetentionPolicies/{policyName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 338,
+            "column": 16
+          },
+          "end": {
+            "line": 341,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedDatabases.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/databases/{databaseName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 309,
+            "column": 16
+          },
+          "end": {
+            "line": 312,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedRestorableDroppedDatabaseBackupShortTermRetentionPolicies.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/restorableDroppedDatabases/{restorableDroppedDatabaseId}/backupShortTermRetentionPolicies/{policyName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/restorableDroppedDatabases/{restorableDroppedDatabaseId}/backupShortTermRetentionPolicies/{policyName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 334,
+            "column": 16
+          },
+          "end": {
+            "line": 337,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/replicationLinks.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/replicationLinks/{linkId}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/replicationLinks/{linkId}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 296,
+            "column": 16
+          },
+          "end": {
+            "line": 299,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/servers.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 377,
+            "column": 16
+          },
+          "end": {
+            "line": 380,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/syncGroups.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 368,
+            "column": 16
+          },
+          "end": {
+            "line": 371,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/syncMembers.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/syncGroups/{syncGroupName}/syncMembers/{syncMemberName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 350,
+            "column": 16
+          },
+          "end": {
+            "line": 353,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "ProvisioningStateSpecifiedForLROPatch",
+      "level": "error",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/virtualClusters.json",
+      "message": "200 response schema in long running PATCH operation is missing ProvisioningState property. A LRO PATCH operations 200 response schema must have ProvisioningState specified.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/virtualClusters/{virtualClusterName}",
+        "patch",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/virtualClusters/{virtualClusterName}",
+          "patch",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Async-V1-02",
+        "range": {
+          "start": {
+            "line": 296,
+            "column": 16
+          },
+          "end": {
+            "line": 299,
+            "column": 52
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ImplementPrivateEndpointAPIs",
+  "count": 19,
+  "levels": {
+    "warning": 19
+  },
+  "results": [
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 55,
+            "column": 12
+          },
+          "end": {
+            "line": 1552,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 121,
+            "column": 12
+          },
+          "end": {
+            "line": 4899,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 1691,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 58,
+            "column": 12
+          },
+          "end": {
+            "line": 3824,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 58,
+            "column": 12
+          },
+          "end": {
+            "line": 2349,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 610,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 169,
+            "column": 12
+          },
+          "end": {
+            "line": 14142,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 365,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 67,
+            "column": 12
+          },
+          "end": {
+            "line": 7835,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName} is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 61,
+            "column": 12
+          },
+          "end": {
+            "line": 1378,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "swaggerFile": "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/swagger/preview/2026-05-31-preview/openapi.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 61,
+            "column": 12
+          },
+          "end": {
+            "line": 1378,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 262,
+            "column": 12
+          },
+          "end": {
+            "line": 7013,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 262,
+            "column": 12
+          },
+          "end": {
+            "line": 7013,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedInstancePrivateEndpointConnections.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 297,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedInstancePrivateLinkResources.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/privateEndpointConnections/{privateEndpointConnectionName} is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 149,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/managedInstancePrivateLinkResources.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/privateEndpointConnections is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 149,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/privateEndpointConnections.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/privateLinkResources is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 297,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/privateLinkResources.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/privateEndpointConnections/{privateEndpointConnectionName} is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 149,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "ImplementPrivateEndpointAPIs",
+      "level": "warning",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "swaggerFile": "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/swagger/preview/2025-02-01-preview/privateLinkResources.json",
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/privateEndpointConnections is missing.",
+      "path": [
+        "paths"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 46,
+            "column": 12
+          },
+          "end": {
+            "line": 149,
+            "column": 4
+          }
+        }
+      }
+    }
+  ]
+}

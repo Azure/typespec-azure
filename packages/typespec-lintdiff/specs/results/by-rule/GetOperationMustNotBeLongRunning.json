@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "GetOperationMustNotBeLongRunning",
+  "count": 4,
+  "levels": {
+    "error": 4
+  },
+  "results": [
+    {
+      "rule": "GetOperationMustNotBeLongRunning",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/costDetailsOperationResults/{operationId}",
+        "get",
+        "x-ms-long-running-operation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/costDetailsOperationResults/{operationId}",
+          "get",
+          "x-ms-long-running-operation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-14",
+        "range": {
+          "start": {
+            "line": 722,
+            "column": 39
+          },
+          "end": {
+            "line": 722,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetOperationMustNotBeLongRunning",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/operationResults/{operationId}",
+        "get",
+        "x-ms-long-running-operation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/operationResults/{operationId}",
+          "get",
+          "x-ms-long-running-operation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-14",
+        "range": {
+          "start": {
+            "line": 1620,
+            "column": 39
+          },
+          "end": {
+            "line": 1620,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetOperationMustNotBeLongRunning",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deploymentStatus/{deploymentStatusId}",
+        "get",
+        "x-ms-long-running-operation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deploymentStatus/{deploymentStatusId}",
+          "get",
+          "x-ms-long-running-operation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-14",
+        "range": {
+          "start": {
+            "line": 11232,
+            "column": 39
+          },
+          "end": {
+            "line": 11232,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetOperationMustNotBeLongRunning",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The GET operation cannot be long running. It must not have the `x-ms-long-running-operation` and `x-ms-long-running-operation-options` properties defined.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deploymentStatus/{deploymentStatusId}",
+        "get",
+        "x-ms-long-running-operation"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deploymentStatus/{deploymentStatusId}",
+          "get",
+          "x-ms-long-running-operation"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-14",
+        "range": {
+          "start": {
+            "line": 23930,
+            "column": 39
+          },
+          "end": {
+            "line": 23930,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

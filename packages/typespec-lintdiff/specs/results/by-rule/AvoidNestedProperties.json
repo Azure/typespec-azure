@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "AvoidNestedProperties",
+  "count": 16,
+  "levels": {
+    "warning": 16
+  },
+  "results": [
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "ManagedClusterNATGatewayProfile",
+        "properties",
+        "outboundIPPrefixes"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagedClusterNATGatewayProfile",
+          "properties",
+          "outboundIPPrefixes"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12609,
+            "column": 29
+          },
+          "end": {
+            "line": 12623,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "ManagedClusterNATGatewayProfile",
+        "properties",
+        "outboundIPs"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ManagedClusterNATGatewayProfile",
+          "properties",
+          "outboundIPs"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12631,
+            "column": 22
+          },
+          "end": {
+            "line": 12645,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "Operation",
+        "properties",
+        "display"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Operation",
+          "properties",
+          "display"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2293,
+            "column": 18
+          },
+          "end": {
+            "line": 2310,
+            "column": 30
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/durabletask/resource-manager/Microsoft.DurableTask/DurableTask",
+      "swaggerFile": "projects/specification/durabletask/resource-manager/Microsoft.DurableTask/DurableTask/swagger/preview/2026-05-01-preview/durabletask.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "Azure.ResourceManager.PrivateEndpointConnectionUpdate",
+        "properties",
+        "properties"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Azure.ResourceManager.PrivateEndpointConnectionUpdate",
+          "properties",
+          "properties"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1691,
+            "column": 21
+          },
+          "end": {
+            "line": 1701,
+            "column": 131
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "ErrorResponse",
+        "properties",
+        "error"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ErrorResponse",
+          "properties",
+          "error"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1846,
+            "column": 16
+          },
+          "end": {
+            "line": 1855,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb",
+      "swaggerFile": "projects/specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb/swagger/preview/2026-01-20-preview/openapi.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "Azure.ResourceManager.PrivateEndpointConnectionUpdate",
+        "properties",
+        "properties"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Azure.ResourceManager.PrivateEndpointConnectionUpdate",
+          "properties",
+          "properties"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2127,
+            "column": 21
+          },
+          "end": {
+            "line": 2137,
+            "column": 131
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/liftrcommvault/Commvault.ContentStore.Management",
+      "swaggerFile": "projects/specification/liftrcommvault/Commvault.ContentStore.Management/swagger/resource-manager/Commvault.ContentStore/preview/2026-07-03-preview/commvault.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "ProtectionGroupResources",
+        "properties",
+        "matchRules"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProtectionGroupResources",
+          "properties",
+          "matchRules"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3556,
+            "column": 21
+          },
+          "end": {
+            "line": 3590,
+            "column": 20
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/onlineexperimentation/OnlineExperimentation.Management",
+      "swaggerFile": "projects/specification/onlineexperimentation/OnlineExperimentation.Management/swagger/resource-manager/Microsoft.OnlineExperimentation/preview/2025-08-01-preview/OnlineExperimentationWorkspace.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "OnlineExperimentationWorkspacePatch",
+        "properties",
+        "properties"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "OnlineExperimentationWorkspacePatch",
+          "properties",
+          "properties"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 962,
+            "column": 21
+          },
+          "end": {
+            "line": 996,
+            "column": 276
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "swaggerFile": "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/swagger/stable/2021-01-01/openapi.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "ErrorResponse",
+        "properties",
+        "error"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ErrorResponse",
+          "properties",
+          "error"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1388,
+            "column": 16
+          },
+          "end": {
+            "line": 1398,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "swaggerFile": "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/swagger/stable/2021-01-01/openapi.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "Operation",
+        "properties",
+        "display"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Operation",
+          "properties",
+          "display"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1513,
+            "column": 18
+          },
+          "end": {
+            "line": 1534,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "DeploymentStacksWhatIfChange",
+        "properties",
+        "denySettingsChange"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeploymentStacksWhatIfChange",
+          "properties",
+          "denySettingsChange"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2912,
+            "column": 29
+          },
+          "end": {
+            "line": 2935,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "DeploymentStacksWhatIfChange",
+        "properties",
+        "deploymentScopeChange"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeploymentStacksWhatIfChange",
+          "properties",
+          "deploymentScopeChange"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2937,
+            "column": 32
+          },
+          "end": {
+            "line": 2947,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "DeploymentStacksWhatIfResourceChange",
+        "properties",
+        "managementStatusChange"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeploymentStacksWhatIfResourceChange",
+          "properties",
+          "managementStatusChange"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3151,
+            "column": 33
+          },
+          "end": {
+            "line": 3161,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "DeploymentStacksWhatIfResourceChange",
+        "properties",
+        "denyStatusChange"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeploymentStacksWhatIfResourceChange",
+          "properties",
+          "denyStatusChange"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3165,
+            "column": 27
+          },
+          "end": {
+            "line": 3175,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "DeploymentStacksWhatIfResourceChange",
+        "properties",
+        "resourceConfigurationChanges"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DeploymentStacksWhatIfResourceChange",
+          "properties",
+          "resourceConfigurationChanges"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3183,
+            "column": 39
+          },
+          "end": {
+            "line": 3208,
+            "column": 32
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidNestedProperties",
+      "level": "warning",
+      "project": "specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover",
+      "swaggerFile": "projects/specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover/swagger/stable/2026-05-01/storagemover.json",
+      "message": "Consider using x-ms-client-flatten to provide a better end user experience",
+      "path": [
+        "definitions",
+        "JobDefinitionProperties",
+        "properties",
+        "sourceTargetMap"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "JobDefinitionProperties",
+          "properties",
+          "sourceTargetMap"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 3455,
+            "column": 26
+          },
+          "end": {
+            "line": 3465,
+            "column": 36
+          }
+        }
+      }
+    }
+  ]
+}

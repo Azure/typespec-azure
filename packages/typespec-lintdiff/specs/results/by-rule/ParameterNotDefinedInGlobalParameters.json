@@ -1,0 +1,887 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ParameterNotDefinedInGlobalParameters",
+  "count": 25,
+  "levels": {
+    "warning": 25
+  },
+  "results": [
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/denyAssignments",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/denyAssignments",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 347,
+            "column": 21
+          },
+          "end": {
+            "line": 402,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 504,
+            "column": 21
+          },
+          "end": {
+            "line": 558,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/swagger/preview/2022-05-01-preview/authorization-RoleDefinitionsCalls.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/permissions",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/permissions",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 260,
+            "column": 21
+          },
+          "end": {
+            "line": 308,
+            "column": 27
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+        "post",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/downloadDocuments",
+          "post",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12481,
+            "column": 21
+          },
+          "end": {
+            "line": 12501,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12551,
+            "column": 21
+          },
+          "end": {
+            "line": 12621,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12658,
+            "column": 21
+          },
+          "end": {
+            "line": 12676,
+            "column": 153
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}/download",
+        "post",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/default/billingSubscriptions/{subscriptionId}/invoices/{invoiceName}/download",
+          "post",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 12710,
+            "column": 21
+          },
+          "end": {
+            "line": 12735,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resources",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resources",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 2711,
+            "column": 21
+          },
+          "end": {
+            "line": 2748,
+            "column": 131
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 944,
+            "column": 21
+          },
+          "end": {
+            "line": 968,
+            "column": 33
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "put",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "put",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 997,
+            "column": 21
+          },
+          "end": {
+            "line": 1021,
+            "column": 33
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+        "delete",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/subscriptions/{subscriptionId}",
+          "delete",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1050,
+            "column": 21
+          },
+          "end": {
+            "line": 1074,
+            "column": 33
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+        "post",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+          "post",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 4370,
+            "column": 21
+          },
+          "end": {
+            "line": 4381,
+            "column": 26
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+        "post",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/policyStates/latest/triggerEvaluation",
+          "post",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 5603,
+            "column": 21
+          },
+          "end": {
+            "line": 5621,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1743,
+            "column": 21
+          },
+          "end": {
+            "line": 1772,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "Parameter \"subscriptionId\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+        "delete",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}/subscriptions/{subscriptionId}",
+          "delete",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1958,
+            "column": 21
+          },
+          "end": {
+            "line": 1987,
+            "column": 28
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 66,
+            "column": 21
+          },
+          "end": {
+            "line": 80,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "put",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "put",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 21
+          },
+          "end": {
+            "line": 126,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "patch",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "patch",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 183,
+            "column": 21
+          },
+          "end": {
+            "line": 205,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "delete",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "delete",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 249,
+            "column": 21
+          },
+          "end": {
+            "line": 263,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/{resourceId}",
+        "head",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}",
+          "head",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 305,
+            "column": 21
+          },
+          "end": {
+            "line": 319,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "get",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "get",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1468,
+            "column": 21
+          },
+          "end": {
+            "line": 1518,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "put",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "put",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1542,
+            "column": 21
+          },
+          "end": {
+            "line": 1600,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "patch",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "patch",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1657,
+            "column": 21
+          },
+          "end": {
+            "line": 1715,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "delete",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "delete",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1759,
+            "column": 21
+          },
+          "end": {
+            "line": 1809,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParameterNotDefinedInGlobalParameters",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "Parameter \"api-version\" is referenced but not defined in the global parameters section of Service Definition",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+        "head",
+        "parameters"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}",
+          "head",
+          "parameters"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1851,
+            "column": 21
+          },
+          "end": {
+            "line": 1901,
+            "column": 44
+          }
+        }
+      }
+    }
+  ]
+}

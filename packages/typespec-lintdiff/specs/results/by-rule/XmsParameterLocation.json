@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "XmsParameterLocation",
+  "count": 6,
+  "levels": {
+    "error": 6
+  },
+  "results": [
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The parameter 'SubscriptionIdParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "SubscriptionIdParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "SubscriptionIdParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 266,
+            "column": 30
+          },
+          "end": {
+            "line": 271,
+            "column": 167
+          }
+        }
+      }
+    },
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The parameter 'ApiVersionParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "ApiVersionParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "ApiVersionParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 273,
+            "column": 26
+          },
+          "end": {
+            "line": 278,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk/swagger/stable/2026-03-02/DiskRP.json",
+      "message": "The parameter 'SubscriptionIdParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "SubscriptionIdParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "SubscriptionIdParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 266,
+            "column": 30
+          },
+          "end": {
+            "line": 271,
+            "column": 167
+          }
+        }
+      }
+    },
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk/swagger/stable/2026-03-02/DiskRP.json",
+      "message": "The parameter 'ApiVersionParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "ApiVersionParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "ApiVersionParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 273,
+            "column": 26
+          },
+          "end": {
+            "line": 278,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The parameter 'SubscriptionIdParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "SubscriptionIdParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "SubscriptionIdParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 266,
+            "column": 30
+          },
+          "end": {
+            "line": 271,
+            "column": 167
+          }
+        }
+      }
+    },
+    {
+      "rule": "XmsParameterLocation",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The parameter 'ApiVersionParameter' is defined in global parameters section without 'x-ms-parameter-location' extension. This would add the parameter as the client property. Please ensure that this is exactly you want. If so, apply the extension \"x-ms-parameter-location\": \"client\". Else, apply the extension \"x-ms-parameter-location\": \"method\".",
+      "path": [
+        "parameters",
+        "ApiVersionParameter"
+      ],
+      "details": {
+        "jsonpath": [
+          "parameters",
+          "ApiVersionParameter"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 273,
+            "column": 26
+          },
+          "end": {
+            "line": 278,
+            "column": 42
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,2771 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PathForTrackedResourceTypes",
+  "count": 89,
+  "levels": {
+    "error": 89
+  },
+  "results": [
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts/swagger/preview/2023-04-01-preview/TenantActivityLogAlerts.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 128,
+            "column": 154
+          },
+          "end": {
+            "line": 341,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ApiManagement/locations/{location}/deletedservices/{serviceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ApiManagement/locations/{location}/deletedservices/{serviceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 559,
+            "column": 123
+          },
+          "end": {
+            "line": 668,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Attestation/locations/{location}/defaultProvider"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Attestation/locations/{location}/defaultProvider"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 155,
+            "column": 107
+          },
+          "end": {
+            "line": 186,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/reservationOrders/{reservationOrderId}/reservations/{reservationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/reservationOrders/{reservationOrderId}/reservations/{reservationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 11612,
+            "column": 140
+          },
+          "end": {
+            "line": 11766,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 519,
+            "column": 95
+          },
+          "end": {
+            "line": 633,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.CognitiveServices/locations/{location}/resourceGroups/{resourceGroupName}/deletedAccounts/{accountName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.CognitiveServices/locations/{location}/resourceGroups/{resourceGroupName}/deletedAccounts/{accountName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 679,
+            "column": 162
+          },
+          "end": {
+            "line": 796,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/edgeZones/{edgeZone}/publishers/{publisherName}/artifacttypes/vmimage/offers/{offer}/skus/{skus}/versions/{version}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/edgeZones/{edgeZone}/publishers/{publisherName}/artifacttypes/vmimage/offers/{offer}/skus/{skus}/versions/{version}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 702,
+            "column": 203
+          },
+          "end": {
+            "line": 774,
+            "column": 113
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/publishers/{publisherName}/artifacttypes/vmextension/types/{type}/versions/{version}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/publishers/{publisherName}/artifacttypes/vmextension/types/{type}/versions/{version}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1136,
+            "column": 172
+          },
+          "end": {
+            "line": 1192,
+            "column": 122
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/publishers/{publisherName}/artifacttypes/vmimage/offers/{offer}/skus/{skus}/versions/{version}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/publishers/{publisherName}/artifacttypes/vmimage/offers/{offer}/skus/{skus}/versions/{version}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1394,
+            "column": 182
+          },
+          "end": {
+            "line": 1459,
+            "column": 104
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/swagger/stable/2026-03-01/ComputeRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/rollingUpgrades/latest"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/rollingUpgrades/latest"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 8033,
+            "column": 165
+          },
+          "end": {
+            "line": 8077,
+            "column": 130
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 274,
+            "column": 126
+          },
+          "end": {
+            "line": 315,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}/images/{galleryImageName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}/images/{galleryImageName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 369,
+            "column": 152
+          },
+          "end": {
+            "line": 417,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}/images/{galleryImageName}/versions/{galleryImageVersionName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/communityGalleries/{publicGalleryName}/images/{galleryImageName}/versions/{galleryImageVersionName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 478,
+            "column": 187
+          },
+          "end": {
+            "line": 533,
+            "column": 95
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 600,
+            "column": 123
+          },
+          "end": {
+            "line": 641,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}/images/{galleryImageName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}/images/{galleryImageName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 715,
+            "column": 149
+          },
+          "end": {
+            "line": 763,
+            "column": 82
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "swaggerFile": "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/swagger/stable/2025-12-03/GalleryRP.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}/images/{galleryImageName}/versions/{galleryImageVersionName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/sharedGalleries/{galleryUniqueName}/images/{galleryImageName}/versions/{galleryImageVersionName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 844,
+            "column": 184
+          },
+          "end": {
+            "line": 899,
+            "column": 89
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 555,
+            "column": 88
+          },
+          "end": {
+            "line": 715,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.DocumentDB/locations/{location}/restorableDatabaseAccounts/{instanceId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.DocumentDB/locations/{location}/restorableDatabaseAccounts/{instanceId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 416,
+            "column": 130
+          },
+          "end": {
+            "line": 458,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/exports/{exportName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 944,
+            "column": 71
+          },
+          "end": {
+            "line": 1170,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 186,
+            "column": 125
+          },
+          "end": {
+            "line": 374,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "swaggerFile": "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/swagger/preview/2025-10-01-preview/Maintenance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/{resourceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/{resourceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 457,
+            "column": 117
+          },
+          "end": {
+            "line": 495,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/swagger/stable/2025-05-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus/{skuId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/skus/{skuId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 152,
+            "column": 150
+          },
+          "end": {
+            "line": 212,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+      "swaggerFile": "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/swagger/stable/2025-05-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Marketplace/skus/{skuId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Marketplace/skus/{skuId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 316,
+            "column": 115
+          },
+          "end": {
+            "line": 373,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi/swagger/stable/2016-03-01/logProfiles.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Insights/logprofiles/{logProfileName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Insights/logprofiles/{logProfileName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 86,
+            "column": 96
+          },
+          "end": {
+            "line": 259,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/swagger/stable/2016-09-01/serviceDiagnosticsSettings.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 77
+          },
+          "end": {
+            "line": 176,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups/swagger/preview/2023-05-01-preview/tenantActionGroups.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 91,
+            "column": 147
+          },
+          "end": {
+            "line": 324,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "swaggerFile": "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/swagger/preview/2025-05-31-preview/ManagedIdentity.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.ManagedIdentity/identities/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.ManagedIdentity/identities/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 56,
+            "column": 70
+          },
+          "end": {
+            "line": 92,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 212,
+            "column": 112
+          },
+          "end": {
+            "line": 243,
+            "column": 78
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 200,
+            "column": 108
+          },
+          "end": {
+            "line": 238,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/expressRouteProviderPorts/{providerport}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 410,
+            "column": 107
+          },
+          "end": {
+            "line": 448,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Network/networkVirtualApplianceSkus/{skuName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1125,
+            "column": 104
+          },
+          "end": {
+            "line": 1163,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 130,
+            "column": 83
+          },
+          "end": {
+            "line": 351,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 2075,
+            "column": 184
+          },
+          "end": {
+            "line": 2166,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 6187,
+            "column": 154
+          },
+          "end": {
+            "line": 6346,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 6351,
+            "column": 168
+          },
+          "end": {
+            "line": 6495,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 343,
+            "column": 75
+          },
+          "end": {
+            "line": 461,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 680,
+            "column": 104
+          },
+          "end": {
+            "line": 812,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 132,
+            "column": 85
+          },
+          "end": {
+            "line": 182,
+            "column": 70
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "swaggerFile": "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/swagger/stable/2025-05-01/ResourceHealth.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 245,
+            "column": 90
+          },
+          "end": {
+            "line": 295,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 62,
+            "column": 90
+          },
+          "end": {
+            "line": 332,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 74
+          },
+          "end": {
+            "line": 329,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 675,
+            "column": 124
+          },
+          "end": {
+            "line": 904,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1366,
+            "column": 66
+          },
+          "end": {
+            "line": 1559,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1930,
+            "column": 97
+          },
+          "end": {
+            "line": 2135,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 106,
+            "column": 144
+          },
+          "end": {
+            "line": 315,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacksWhatIfResults/{deploymentStacksWhatIfResultName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacksWhatIfResults/{deploymentStacksWhatIfResultName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 497,
+            "column": 170
+          },
+          "end": {
+            "line": 686,
+            "column": 87
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 799,
+            "column": 107
+          },
+          "end": {
+            "line": 993,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacksWhatIfResults/{deploymentStacksWhatIfResultName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deploymentStacksWhatIfResults/{deploymentStacksWhatIfResultName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1160,
+            "column": 133
+          },
+          "end": {
+            "line": 1334,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{resourceId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 59,
+            "column": 20
+          },
+          "end": {
+            "line": 332,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 1062,
+            "column": 73
+          },
+          "end": {
+            "line": 1314,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathForTrackedResourceTypes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "The path must be under a subscription and resource group for tracked resource types.",
+      "path": [
+        "paths",
+        "/{applicationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Put-V1-01, RPC-Get-V1-11",
+        "range": {
+          "start": {
+            "line": 59,
+            "column": 23
+          },
+          "end": {
+            "line": 297,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

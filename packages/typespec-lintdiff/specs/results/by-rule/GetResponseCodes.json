@@ -1,0 +1,3180 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "GetResponseCodes",
+  "count": 96,
+  "levels": {
+    "error": 96
+  },
+  "results": [
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{resourceUri}/providers/Microsoft.Advisor/recommendations/{recommendationId}/suppressions/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceUri}/providers/Microsoft.Advisor/recommendations/{recommendationId}/suppressions/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 173,
+            "column": 12
+          },
+          "end": {
+            "line": 224,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Advisor/metadata/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Advisor/metadata/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 375,
+            "column": 12
+          },
+          "end": {
+            "line": 416,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/generateRecommendations/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/generateRecommendations/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 912,
+            "column": 12
+          },
+          "end": {
+            "line": 955,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1802,
+            "column": 12
+          },
+          "end": {
+            "line": 1847,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "swaggerFile": "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/swagger/stable/2026-01-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}/detectorProperties/rootApi/",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/containerApps/{containerAppName}/detectorProperties/rootApi/",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2416,
+            "column": 12
+          },
+          "end": {
+            "line": 2462,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Consumption/marketplaces",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Consumption/marketplaces",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 373,
+            "column": 12
+          },
+          "end": {
+            "line": 466,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendationDetails",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 556,
+            "column": 12
+          },
+          "end": {
+            "line": 715,
+            "column": 84
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendations",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceScope}/providers/Microsoft.Consumption/reservationRecommendations",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 721,
+            "column": 12
+          },
+          "end": {
+            "line": 785,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Consumption/tags",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Consumption/tags",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 908,
+            "column": 12
+          },
+          "end": {
+            "line": 946,
+            "column": 42
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Consumption/usageDetails",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Consumption/usageDetails",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 952,
+            "column": 12
+          },
+          "end": {
+            "line": 1112,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Consumption/credits/balanceSummary",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Consumption/credits/balanceSummary",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1225,
+            "column": 12
+          },
+          "end": {
+            "line": 1272,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.CostManagement/dimensions",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.CostManagement/dimensions",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 726,
+            "column": 12
+          },
+          "end": {
+            "line": 874,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "swaggerFile": "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/swagger/stable/2026-01-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}/virtualNetworkPeerings/{peeringName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}/virtualNetworkPeerings/{peeringName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1318,
+            "column": 12
+          },
+          "end": {
+            "line": 1370,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 343,
+            "column": 12
+          },
+          "end": {
+            "line": 397,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/credentials/{credentialName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/credentials/{credentialName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1181,
+            "column": 12
+          },
+          "end": {
+            "line": 1245,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/datasets/{datasetName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/datasets/{datasetName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1687,
+            "column": 12
+          },
+          "end": {
+            "line": 1751,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2486,
+            "column": 12
+          },
+          "end": {
+            "line": 2550,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/linkedservices/{linkedServiceName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/linkedservices/{linkedServiceName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 4159,
+            "column": 12
+          },
+          "end": {
+            "line": 4223,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 5076,
+            "column": 12
+          },
+          "end": {
+            "line": 5140,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "swaggerFile": "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/swagger/stable/2018-06-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 6003,
+            "column": 12
+          },
+          "end": {
+            "line": 6067,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 92,
+            "column": 12
+          },
+          "end": {
+            "line": 129,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "swaggerFile": "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/swagger/stable/2024-04-05/guestconfiguration.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1132,
+            "column": 12
+          },
+          "end": {
+            "line": 1169,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 628,
+            "column": 12
+          },
+          "end": {
+            "line": 671,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2220,
+            "column": 12
+          },
+          "end": {
+            "line": 2270,
+            "column": 66
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2484,
+            "column": 12
+          },
+          "end": {
+            "line": 2538,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2966,
+            "column": 12
+          },
+          "end": {
+            "line": 3033,
+            "column": 86
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/protectedItems/{protectedItemName}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectionContainers/{containerName}/protectedItems/{protectedItemName}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 3359,
+            "column": 12
+          },
+          "end": {
+            "line": 3433,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs/{jobName}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs/{jobName}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 4424,
+            "column": 12
+          },
+          "end": {
+            "line": 4481,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 4596,
+            "column": 12
+          },
+          "end": {
+            "line": 4646,
+            "column": 81
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 2432,
+            "column": 12
+          },
+          "end": {
+            "line": 2485,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/OperationsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/OperationsAPI/swagger/preview/2025-10-01-preview/security-Operations.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{location}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{location}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 90,
+            "column": 12
+          },
+          "end": {
+            "line": 145,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "swaggerFile": "projects/specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole/swagger/stable/2024-07-01/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.SerialConsole/consoleServices/{default}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.SerialConsole/consoleServices/{default}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 84,
+            "column": 12
+          },
+          "end": {
+            "line": 129,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 269,
+            "column": 12
+          },
+          "end": {
+            "line": 317,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/{applicationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 60,
+            "column": 12
+          },
+          "end": {
+            "line": 98,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 535,
+            "column": 12
+          },
+          "end": {
+            "line": 580,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 790,
+            "column": 12
+          },
+          "end": {
+            "line": 835,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/jitRequests/{jitRequestName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/jitRequests/{jitRequestName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1337,
+            "column": 12
+          },
+          "end": {
+            "line": 1382,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "x-ms-paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "x-ms-paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1568,
+            "column": 12
+          },
+          "end": {
+            "line": 1613,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Web/locations/{location}/operations/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Web/locations/{location}/operations/{operationId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 1536,
+            "column": 12
+          },
+          "end": {
+            "line": 1574,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 6191,
+            "column": 12
+          },
+          "end": {
+            "line": 6236,
+            "column": 55
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 7196,
+            "column": 12
+          },
+          "end": {
+            "line": 7242,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes/{routeName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes/{routeName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 7420,
+            "column": 12
+          },
+          "end": {
+            "line": 7476,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 7826,
+            "column": 12
+          },
+          "end": {
+            "line": 7871,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs/{webJobName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs/{webJobName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 10862,
+            "column": 12
+          },
+          "end": {
+            "line": 10908,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy/log",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy/log",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 12565,
+            "column": 12
+          },
+          "end": {
+            "line": 12604,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 12689,
+            "column": 12
+          },
+          "end": {
+            "line": 12733,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 12738,
+            "column": 12
+          },
+          "end": {
+            "line": 12784,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy/log",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy/log",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16087,
+            "column": 12
+          },
+          "end": {
+            "line": 16133,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16140,
+            "column": 12
+          },
+          "end": {
+            "line": 16191,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16196,
+            "column": 12
+          },
+          "end": {
+            "line": 16249,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/dump",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/dump",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16311,
+            "column": 12
+          },
+          "end": {
+            "line": 16368,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16375,
+            "column": 12
+          },
+          "end": {
+            "line": 16433,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16438,
+            "column": 12
+          },
+          "end": {
+            "line": 16498,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 16505,
+            "column": 12
+          },
+          "end": {
+            "line": 16563,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkFeatures/{view}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkFeatures/{view}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 17103,
+            "column": 12
+          },
+          "end": {
+            "line": 17149,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18473,
+            "column": 12
+          },
+          "end": {
+            "line": 18517,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18522,
+            "column": 12
+          },
+          "end": {
+            "line": 18568,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/dump",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/dump",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18623,
+            "column": 12
+          },
+          "end": {
+            "line": 18673,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18680,
+            "column": 12
+          },
+          "end": {
+            "line": 18731,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules/{baseAddress}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules/{baseAddress}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18736,
+            "column": 12
+          },
+          "end": {
+            "line": 18789,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 18796,
+            "column": 12
+          },
+          "end": {
+            "line": 18847,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 20002,
+            "column": 12
+          },
+          "end": {
+            "line": 20046,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 20051,
+            "column": 12
+          },
+          "end": {
+            "line": 20097,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 20275,
+            "column": 12
+          },
+          "end": {
+            "line": 20327,
+            "column": 51
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs/{webJobName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs/{webJobName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 23514,
+            "column": 12
+          },
+          "end": {
+            "line": 23567,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy/log",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy/log",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 25424,
+            "column": 12
+          },
+          "end": {
+            "line": 25470,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 25477,
+            "column": 12
+          },
+          "end": {
+            "line": 25528,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 25533,
+            "column": 12
+          },
+          "end": {
+            "line": 25586,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy/log",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy/log",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27374,
+            "column": 12
+          },
+          "end": {
+            "line": 27427,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27434,
+            "column": 12
+          },
+          "end": {
+            "line": 27492,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27497,
+            "column": 12
+          },
+          "end": {
+            "line": 27557,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/dump",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/dump",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27626,
+            "column": 12
+          },
+          "end": {
+            "line": 27690,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27697,
+            "column": 12
+          },
+          "end": {
+            "line": 27762,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27767,
+            "column": 12
+          },
+          "end": {
+            "line": 27834,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 27841,
+            "column": 12
+          },
+          "end": {
+            "line": 27906,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkFeatures/{view}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkFeatures/{view}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 28378,
+            "column": 12
+          },
+          "end": {
+            "line": 28431,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 29815,
+            "column": 12
+          },
+          "end": {
+            "line": 29866,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 29871,
+            "column": 12
+          },
+          "end": {
+            "line": 29924,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/dump",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/dump",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 29986,
+            "column": 12
+          },
+          "end": {
+            "line": 30043,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 30050,
+            "column": 12
+          },
+          "end": {
+            "line": 30108,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules/{baseAddress}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules/{baseAddress}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 30113,
+            "column": 12
+          },
+          "end": {
+            "line": 30173,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 30180,
+            "column": 12
+          },
+          "end": {
+            "line": 30238,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 31200,
+            "column": 12
+          },
+          "end": {
+            "line": 31251,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 31256,
+            "column": 12
+          },
+          "end": {
+            "line": 31309,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 31689,
+            "column": 12
+          },
+          "end": {
+            "line": 31743,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 32365,
+            "column": 12
+          },
+          "end": {
+            "line": 32418,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 32479,
+            "column": 12
+          },
+          "end": {
+            "line": 32537,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history/{id}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history/{id}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 32542,
+            "column": 12
+          },
+          "end": {
+            "line": 32602,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 33014,
+            "column": 12
+          },
+          "end": {
+            "line": 33074,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/workflows/{workflowName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/workflows/{workflowName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 33386,
+            "column": 12
+          },
+          "end": {
+            "line": 33448,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 33664,
+            "column": 12
+          },
+          "end": {
+            "line": 33711,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 34263,
+            "column": 12
+          },
+          "end": {
+            "line": 34309,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 34363,
+            "column": 12
+          },
+          "end": {
+            "line": 34414,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history/{id}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history/{id}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 34419,
+            "column": 12
+          },
+          "end": {
+            "line": 34472,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 34880,
+            "column": 12
+          },
+          "end": {
+            "line": 34933,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "GetResponseCodes",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/workflows/{workflowName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/workflows/{workflowName}",
+          "get"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Get-V1-01",
+        "range": {
+          "start": {
+            "line": 35210,
+            "column": 12
+          },
+          "end": {
+            "line": 35265,
+            "column": 49
+          }
+        }
+      }
+    }
+  ]
+}

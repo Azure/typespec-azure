@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "OperationsApiTenantLevelOnly",
+  "count": 2,
+  "levels": {
+    "error": 2
+  },
+  "results": [
+    {
+      "rule": "OperationsApiTenantLevelOnly",
+      "level": "error",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/swagger/preview/2026-07-01-preview/operations.json",
+      "message": "The get operations endpoint for the operations API must only be at the tenant level.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/operations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-02",
+        "range": {
+          "start": {
+            "line": 86,
+            "column": 186
+          },
+          "end": {
+            "line": 145,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "OperationsApiTenantLevelOnly",
+      "level": "error",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "swaggerFile": "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/swagger/preview/2026-05-31-preview/service.json",
+      "message": "The get operations endpoint for the operations API must only be at the tenant level.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/operations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Operations-V1-02",
+        "range": {
+          "start": {
+            "line": 211,
+            "column": 121
+          },
+          "end": {
+            "line": 244,
+            "column": 36
+          }
+        }
+      }
+    }
+  ]
+}

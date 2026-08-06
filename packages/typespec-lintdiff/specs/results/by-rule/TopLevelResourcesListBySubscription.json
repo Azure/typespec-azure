@@ -1,0 +1,582 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "TopLevelResourcesListBySubscription",
+  "count": 19,
+  "levels": {
+    "error": 19
+  },
+  "results": [
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The top-level resource \"ConfigData\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ConfigData"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConfigData"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1681,
+            "column": 19
+          },
+          "end": {
+            "line": 1696,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "The top-level resource \"AccessReviewDefaultSettings\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "AccessReviewDefaultSettings"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "AccessReviewDefaultSettings"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3226,
+            "column": 36
+          },
+          "end": {
+            "line": 3241,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The top-level resource \"BillingProperty\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "BillingProperty"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "BillingProperty"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15295,
+            "column": 24
+          },
+          "end": {
+            "line": 15316,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "The top-level resource \"SubscriptionPolicy\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "SubscriptionPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "SubscriptionPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 23182,
+            "column": 27
+          },
+          "end": {
+            "line": 23203,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "swaggerFile": "projects/specification/cognitiveservices/CognitiveServices.Management/swagger/resource-manager/Microsoft.CognitiveServices/stable/2026-07-01/cognitiveservices.json",
+      "message": "The top-level resource \"RaiPolicy\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "RaiPolicy"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "RaiPolicy"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 15667,
+            "column": 18
+          },
+          "end": {
+            "line": 15698,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
+      "swaggerFile": "projects/specification/confluent/resource-manager/Microsoft.Confluent/Confluent/swagger/preview/2026-06-02-preview/confluent.json",
+      "message": "The top-level resource \"ConfluentAgreementResource\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ConfluentAgreementResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ConfluentAgreementResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4307,
+            "column": 35
+          },
+          "end": {
+            "line": 4337,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "swaggerFile": "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/swagger/stable/2024-08-01/openapi.json",
+      "message": "The top-level resource \"PriceSheetResult\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "PriceSheetResult"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "PriceSheetResult"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5679,
+            "column": 25
+          },
+          "end": {
+            "line": 5707,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "The top-level resource \"DatadogAgreementResource\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "DatadogAgreementResource"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "DatadogAgreementResource"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2296,
+            "column": 33
+          },
+          "end": {
+            "line": 2324,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 46
+          },
+          "end": {
+            "line": 1667,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The top-level resource \"ApplicationGatewayAvailableSslOptions\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "ApplicationGatewayAvailableSslOptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ApplicationGatewayAvailableSslOptions"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1652,
+            "column": 44
+          },
+          "end": {
+            "line": 1667,
+            "column": 4
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/support/resource-manager/Microsoft.Support/Support",
+      "swaggerFile": "projects/specification/support/resource-manager/Microsoft.Support/Support/swagger/preview/2025-06-01-preview/support.json",
+      "message": "The top-level resource \"FileWorkspaceDetails\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "FileWorkspaceDetails"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "FileWorkspaceDetails"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2799,
+            "column": 29
+          },
+          "end": {
+            "line": 2814,
+            "column": 6
+          }
+        }
+      }
+    },
+    {
+      "rule": "TopLevelResourcesListBySubscription",
+      "level": "error",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "swaggerFile": "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/swagger/preview/2024-04-01-preview/trafficmanager.json",
+      "message": "The top-level resource \"UserMetricsModel\" does not have list by subscription operation, please add it.",
+      "path": [
+        "definitions",
+        "UserMetricsModel"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "UserMetricsModel"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1913,
+            "column": 25
+          },
+          "end": {
+            "line": 1928,
+            "column": 6
+          }
+        }
+      }
+    }
+  ]
+}

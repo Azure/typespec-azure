@@ -19,7 +19,7 @@ import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
 const MAX_BUFFER = 64 * 1024 * 1024;
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 4;
 
 interface Config {
   specsRepo: string;
@@ -45,11 +45,13 @@ interface EmittedSwagger {
 interface ProjectRecord {
   sourcePath: string;
   typespecPath: string;
+  typespecFiles: string[];
   apiVersion?: string;
   compileStatus: "success" | "failed";
   compileDurationMs: number;
   compileError?: string;
   swaggerFiles: string[];
+  swaggerAssets: string[];
   validationStatus: "success" | "failed" | "no-swagger";
   validationDurationMs: number;
   validationError?: string;
@@ -76,6 +78,7 @@ interface DatasetMetadata {
   validatorCommand: string;
   readmeSuppressionsApplied: false;
   commonTypesPath: string;
+  commonTypesFiles: string[];
   filters: {
     serviceType: "resource-manager";
     path?: string;
@@ -91,6 +94,7 @@ interface DatasetMetadata {
     violations: number;
     distinctRules: number;
   };
+  resultFiles: string[];
   projects: ProjectRecord[];
 }
 
@@ -105,6 +109,21 @@ interface AggregateResults {
       count: number;
       levels: Record<string, number>;
       results: ValidatorViolation[];
+    }
+  >;
+}
+
+interface AggregateIndex {
+  schemaVersion: number;
+  specsCommit: string;
+  generatedAt: string;
+  totalViolations: number;
+  rules: Record<
+    string,
+    {
+      count: number;
+      levels: Record<string, number>;
+      resultsFile: string;
     }
   >;
 }
@@ -172,6 +191,27 @@ function normalizeRelative(filePath: string): string {
   return filePath.replace(/\\/g, "/");
 }
 
+function listRelativeFiles(directory: string, datasetDir: string): string[] {
+  if (!fs.existsSync(directory)) {
+    return [];
+  }
+
+  const files: string[] = [];
+  const pending = [directory];
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const absolutePath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(absolutePath);
+      } else if (entry.isFile()) {
+        files.push(normalizeRelative(path.relative(datasetDir, absolutePath)));
+      }
+    }
+  }
+  return files.sort();
+}
+
 function git(specsRepo: string, args: string[]): string {
   return execFileSync("git", ["-C", specsRepo, ...args], { encoding: "utf8" }).trim();
 }
@@ -225,22 +265,30 @@ function tryReuseDataset(config: Config): boolean {
 
   const datasetRoot = path.resolve(config.datasetDir);
   const datasetPrefix = `${datasetRoot}${path.sep}`;
-  const indexedFiles = meta.projects.flatMap((project) => [
-    ...project.swaggerFiles,
-    ...project.rawFiles,
-  ]);
+  if (
+    !Array.isArray(meta.resultFiles) ||
+    !Array.isArray(meta.commonTypesFiles) ||
+    meta.projects.some(
+      (project) => !Array.isArray(project.typespecFiles) || !Array.isArray(project.swaggerAssets),
+    )
+  ) {
+    throw new Error(
+      `Cached dataset metadata does not contain a complete file manifest: ${metaPath}`,
+    );
+  }
+  const indexedFiles = [
+    ...meta.resultFiles,
+    ...meta.commonTypesFiles,
+    ...meta.projects.flatMap((project) => [
+      ...project.typespecFiles,
+      ...project.swaggerAssets,
+      ...project.rawFiles,
+    ]),
+  ];
   const missingFiles = indexedFiles.filter((relativePath) => {
     const absolutePath = path.resolve(datasetRoot, relativePath);
     return !absolutePath.startsWith(datasetPrefix) || !fs.existsSync(absolutePath);
   });
-  if (!fs.existsSync(path.resolve(datasetRoot, meta.commonTypesPath))) {
-    missingFiles.push(meta.commonTypesPath);
-  }
-  for (const project of meta.projects) {
-    if (!fs.existsSync(path.resolve(datasetRoot, project.typespecPath))) {
-      missingFiles.push(project.typespecPath);
-    }
-  }
   if (missingFiles.length > 0) {
     throw new Error(
       `Cached dataset is incomplete; ${missingFiles.length} indexed file(s) are missing. ` +
@@ -265,6 +313,7 @@ function cleanGeneratedDataset(datasetDir: string): void {
   for (const relativePath of [
     "projects",
     "common-types",
+    "results",
     // Schema v1 used these top-level directories.
     "swagger",
     "raw",
@@ -360,6 +409,10 @@ export function updateAutorestOption(content: string, name: string, value: strin
   return content.slice(0, autorestIndex) + updatedBlock + remaining.slice(blockEnd);
 }
 
+export function keepOutputFileInsideEmitterDirectory(content: string): string {
+  return content.replace(/(output-file:\s*["']?)(?:(?:\.\.\/)+|\{project-root\}\/)+(.*)/, "$1$2");
+}
+
 function buildTempConfig(project: ArmProject, outputDir: string, commonTypesDir: string): string {
   let content = fs.readFileSync(project.tspConfigPath, "utf8");
   const yamlOutputDir = normalizeRelative(outputDir);
@@ -374,7 +427,7 @@ function buildTempConfig(project: ArmProject, outputDir: string, commonTypesDir:
     const nextEmitter = block.match(/\n\s{2}["']?@[^@]/);
     const blockEnd = nextEmitter?.index ?? block.length;
     const autorestBlock = block.slice(0, blockEnd);
-    const fixedBlock = autorestBlock.replace(/(output-file:\s*["']?)(\.\.\/)+(.*)/, "$1$3");
+    const fixedBlock = keepOutputFileInsideEmitterDirectory(autorestBlock);
     content = content.slice(0, updatedAutorestIndex) + fixedBlock + block.slice(blockEnd);
   }
 
@@ -463,9 +516,90 @@ function findSwaggerFiles(directory: string): EmittedSwagger[] {
   return files;
 }
 
+function collectLocalReferences(value: unknown, references: string[]): void {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectLocalReferences(item, references);
+    }
+    return;
+  }
+  if (!value || typeof value !== "object") {
+    return;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if (key === "$ref" && typeof child === "string") {
+      const filePart = child.split("#", 1)[0];
+      if (filePart && !/^[a-z]+:/i.test(filePart)) {
+        references.push(decodeURIComponent(filePart));
+      }
+    } else {
+      collectLocalReferences(child, references);
+    }
+  }
+}
+
+function copyReferencedFileClosure(
+  sourceFile: string,
+  destinationRelativePath: string,
+  outputDir: string,
+  stagingDir: string,
+  fallbackRoots: string[],
+  seen: Set<string>,
+): void {
+  const seenKey = `${path.resolve(sourceFile)}|${destinationRelativePath}`;
+  if (seen.has(seenKey) || !fs.existsSync(sourceFile)) {
+    return;
+  }
+  seen.add(seenKey);
+
+  let document: unknown;
+  try {
+    document = JSON.parse(fs.readFileSync(sourceFile, "utf8"));
+  } catch {
+    return;
+  }
+
+  const references: string[] = [];
+  collectLocalReferences(document, references);
+  for (const reference of references) {
+    const relativePath = path.normalize(
+      path.join(path.dirname(destinationRelativePath), reference),
+    );
+    if (relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+      continue;
+    }
+
+    const emittedFile = path.join(outputDir, relativePath);
+    const referencedFile = fs.existsSync(emittedFile)
+      ? emittedFile
+      : fallbackRoots
+          .map((root) => path.join(root, relativePath))
+          .find((candidate) => fs.existsSync(candidate));
+    if (!referencedFile) {
+      continue;
+    }
+
+    const destination = path.join(stagingDir, relativePath);
+    if (!fs.existsSync(destination)) {
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.copyFileSync(referencedFile, destination);
+    }
+    copyReferencedFileClosure(
+      referencedFile,
+      relativePath,
+      outputDir,
+      stagingDir,
+      fallbackRoots,
+      seen,
+    );
+  }
+}
+
 function retainLatestSwagger(
   outputDir: string,
   swaggerFiles: EmittedSwagger[],
+  projectDir: string,
 ): { apiVersion?: string; swaggerFiles: EmittedSwagger[] } {
   const apiVersion = selectLatestApiVersion(swaggerFiles.map((file) => file.apiVersion));
   if (!apiVersion) {
@@ -476,6 +610,7 @@ function retainLatestSwagger(
   const stagingDir = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-latest-swagger-"));
   try {
     const copiedRoots = new Set<string>();
+    const sourceRoots: string[] = [];
     for (const swagger of selected) {
       const relativePath = path.relative(outputDir, swagger.absolutePath);
       const segments = relativePath.split(path.sep);
@@ -489,9 +624,43 @@ function retainLatestSwagger(
       }
       copiedRoots.add(relativeRoot);
       const source = path.join(outputDir, relativeRoot);
+      sourceRoots.push(source);
       const destination = path.join(stagingDir, relativeRoot);
       fs.mkdirSync(path.dirname(destination), { recursive: true });
       fs.cpSync(source, destination, { recursive: true });
+    }
+
+    const seenReferences = new Set<string>();
+    const fallbackRoots: string[] = [];
+    let fallbackRoot = projectDir;
+    while (path.basename(fallbackRoot) !== "specification") {
+      fallbackRoots.push(fallbackRoot);
+      const parent = path.dirname(fallbackRoot);
+      if (parent === fallbackRoot) {
+        break;
+      }
+      fallbackRoot = parent;
+    }
+    for (const sourceRoot of sourceRoots) {
+      const pending = [sourceRoot];
+      while (pending.length > 0) {
+        const current = pending.pop()!;
+        const stat = fs.statSync(current);
+        if (stat.isDirectory()) {
+          for (const entry of fs.readdirSync(current)) {
+            pending.push(path.join(current, entry));
+          }
+        } else if (current.endsWith(".json")) {
+          copyReferencedFileClosure(
+            current,
+            path.relative(outputDir, current),
+            outputDir,
+            stagingDir,
+            fallbackRoots,
+            seenReferences,
+          );
+        }
+      }
     }
 
     fs.rmSync(outputDir, { recursive: true, force: true });
@@ -556,7 +725,7 @@ async function compileProject(
         shell: process.platform === "win32",
       },
     );
-    const latest = retainLatestSwagger(outputDir, findSwaggerFiles(outputDir));
+    const latest = retainLatestSwagger(outputDir, findSwaggerFiles(outputDir), project.projectDir);
     return {
       status: "success",
       durationMs: Date.now() - started,
@@ -760,6 +929,44 @@ export function aggregateResults(
   };
 }
 
+function ruleFileName(rule: string): string {
+  return `${rule.replace(/[^A-Za-z0-9._-]/g, (character) => {
+    return `_${character.codePointAt(0)!.toString(16)}`;
+  })}.json`;
+}
+
+function writeAggregateResults(datasetDir: string, aggregate: AggregateResults): string[] {
+  const rules: AggregateIndex["rules"] = {};
+  const resultFiles: string[] = [];
+
+  for (const [rule, result] of Object.entries(aggregate.rules)) {
+    const resultsFile = normalizeRelative(path.join("results", "by-rule", ruleFileName(rule)));
+    writeJson(path.join(datasetDir, resultsFile), {
+      schemaVersion: SCHEMA_VERSION,
+      specsCommit: aggregate.specsCommit,
+      generatedAt: aggregate.generatedAt,
+      rule,
+      ...result,
+    });
+    resultFiles.push(resultsFile);
+    rules[rule] = {
+      count: result.count,
+      levels: result.levels,
+      resultsFile,
+    };
+  }
+
+  const index: AggregateIndex = {
+    schemaVersion: SCHEMA_VERSION,
+    specsCommit: aggregate.specsCommit,
+    generatedAt: aggregate.generatedAt,
+    totalViolations: aggregate.totalViolations,
+    rules,
+  };
+  writeJson(path.join(datasetDir, "validator-results.json"), index);
+  return resultFiles;
+}
+
 async function generateDataset(config: Config): Promise<void> {
   ensureSpecsRepo(config);
 
@@ -837,7 +1044,7 @@ async function generateDataset(config: Config): Promise<void> {
     const generatedAt = new Date().toISOString();
     const allViolations = validated.flatMap((result) => result.validation.violations);
     const aggregate = aggregateResults(targetCommit, generatedAt, allViolations);
-    writeJson(path.join(config.datasetDir, "validator-results.json"), aggregate);
+    const resultFiles = writeAggregateResults(config.datasetDir, aggregate);
 
     const projectRecords: ProjectRecord[] = validated.map((result) => ({
       sourcePath: result.project.sourcePath,
@@ -847,12 +1054,20 @@ async function generateDataset(config: Config): Promise<void> {
           path.join(getProjectDatasetDir(config, result.project), "typespec"),
         ),
       ),
+      typespecFiles: listRelativeFiles(
+        path.join(getProjectDatasetDir(config, result.project), "typespec"),
+        config.datasetDir,
+      ),
       apiVersion: result.apiVersion,
       compileStatus: result.status,
       compileDurationMs: result.durationMs,
       compileError: result.error,
       swaggerFiles: result.swaggerFiles.map((swagger) =>
         normalizeRelative(path.relative(config.datasetDir, swagger.absolutePath)),
+      ),
+      swaggerAssets: listRelativeFiles(
+        path.join(getProjectDatasetDir(config, result.project), "swagger"),
+        config.datasetDir,
       ),
       validationStatus: result.validation.status,
       validationDurationMs: result.validation.durationMs,
@@ -874,6 +1089,7 @@ async function generateDataset(config: Config): Promise<void> {
         "--input-file=<swagger>",
       readmeSuppressionsApplied: false,
       commonTypesPath: "common-types/resource-management",
+      commonTypesFiles: listRelativeFiles(datasetCommonTypes, config.datasetDir),
       filters: {
         serviceType: "resource-manager",
         path: config.filter,
@@ -895,6 +1111,7 @@ async function generateDataset(config: Config): Promise<void> {
         violations: allViolations.length,
         distinctRules: Object.keys(aggregate.rules).length,
       },
+      resultFiles,
       projects: projectRecords,
     };
 

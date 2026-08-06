@@ -1,0 +1,1740 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "ParametersOrder",
+  "count": 54,
+  "levels": {
+    "error": 54
+  },
+  "results": [
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "swaggerFile": "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The parameters:configurationName,resourceGroup should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations/{configurationName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Advisor/configurations/{configurationName}",
+          "put"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1355,
+            "column": 14
+          },
+          "end": {
+            "line": 1422,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestsApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestsApi/swagger/stable/2022-06-15/webTests_API.json",
+      "message": "The parameters:componentName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{componentName}/webtests",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{componentName}/webtests",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 74,
+            "column": 14
+          },
+          "end": {
+            "line": 111,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "swaggerFile": "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/swagger/preview/2026-04-01-preview/dataprotection.json",
+      "message": "The parameters:operationId,location should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.DataProtection/locations/{location}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.DataProtection/locations/{location}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 337,
+            "column": 14
+          },
+          "end": {
+            "line": 392,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The parameters:resourceGroupName,zoneName,relativeRecordSetName,recordType should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 565,
+            "column": 14
+          },
+          "end": {
+            "line": 675,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The parameters:resourceGroupName,zoneName,relativeRecordSetName,recordType should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+        "put"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+          "put"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 676,
+            "column": 14
+          },
+          "end": {
+            "line": 823,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The parameters:resourceGroupName,zoneName,relativeRecordSetName,recordType should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+          "patch"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 824,
+            "column": 16
+          },
+          "end": {
+            "line": 951,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "swaggerFile": "projects/specification/dns/resource-manager/Microsoft.Network/Dns/swagger/preview/2023-07-01-preview/dns.json",
+      "message": "The parameters:resourceGroupName,zoneName,relativeRecordSetName,recordType should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 952,
+            "column": 17
+          },
+          "end": {
+            "line": 1067,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,dicomServiceName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/dicomservices/{dicomServiceName}",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/dicomservices/{dicomServiceName}",
+          "patch"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1487,
+            "column": 16
+          },
+          "end": {
+            "line": 1572,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,dicomServiceName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/dicomservices/{dicomServiceName}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/dicomservices/{dicomServiceName}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1573,
+            "column": 17
+          },
+          "end": {
+            "line": 1645,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,fhirServiceName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/fhirservices/{fhirServiceName}",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/fhirservices/{fhirServiceName}",
+          "patch"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1857,
+            "column": 16
+          },
+          "end": {
+            "line": 1942,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,fhirServiceName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/fhirservices/{fhirServiceName}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/fhirservices/{fhirServiceName}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1943,
+            "column": 17
+          },
+          "end": {
+            "line": 2015,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,iotConnectorName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}",
+        "patch"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}",
+          "patch"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2227,
+            "column": 16
+          },
+          "end": {
+            "line": 2312,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The parameters:resourceGroupName,iotConnectorName,workspaceName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/workspaces/{workspaceName}/iotconnectors/{iotConnectorName}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2313,
+            "column": 17
+          },
+          "end": {
+            "line": 2385,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyEventsResource,resourceId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 407,
+            "column": 15
+          },
+          "end": {
+            "line": 560,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesResource,resourceId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 563,
+            "column": 15
+          },
+          "end": {
+            "line": 725,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesSummaryResource,resourceId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/{resourceId}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 728,
+            "column": 15
+          },
+          "end": {
+            "line": 820,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyEventsResource,managementGroupsNamespace,managementGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1196,
+            "column": 15
+          },
+          "end": {
+            "line": 1338,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesResource,managementGroupsNamespace,managementGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1341,
+            "column": 15
+          },
+          "end": {
+            "line": 1489,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesSummaryResource,managementGroupsNamespace,managementGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1492,
+            "column": 15
+          },
+          "end": {
+            "line": 1596,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyEventsResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2240,
+            "column": 15
+          },
+          "end": {
+            "line": 2385,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2388,
+            "column": 15
+          },
+          "end": {
+            "line": 2539,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesSummaryResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2542,
+            "column": 15
+          },
+          "end": {
+            "line": 2649,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyEventsResource,authorizationNamespace,policyDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2789,
+            "column": 15
+          },
+          "end": {
+            "line": 2934,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesResource,authorizationNamespace,policyDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2937,
+            "column": 15
+          },
+          "end": {
+            "line": 3088,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesSummaryResource,authorizationNamespace,policyDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policyDefinitions/{policyDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3091,
+            "column": 15
+          },
+          "end": {
+            "line": 3198,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyEventsResource,authorizationNamespace,policySetDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3201,
+            "column": 15
+          },
+          "end": {
+            "line": 3346,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesResource,authorizationNamespace,policySetDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3349,
+            "column": 15
+          },
+          "end": {
+            "line": 3500,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:policyStatesSummaryResource,authorizationNamespace,policySetDefinitionName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{authorizationNamespace}/policySetDefinitions/{policySetDefinitionName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3503,
+            "column": 15
+          },
+          "end": {
+            "line": 3610,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:resourceGroupName,policyEventsResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyEvents/{policyEventsResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5963,
+            "column": 15
+          },
+          "end": {
+            "line": 6115,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:resourceGroupName,policyStatesResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesResource}/queryResults",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6118,
+            "column": 15
+          },
+          "end": {
+            "line": 6276,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "The parameters:resourceGroupName,policyStatesSummaryResource,authorizationNamespace,policyAssignmentName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{authorizationNamespace}/policyAssignments/{policyAssignmentName}/providers/Microsoft.PolicyInsights/policyStates/{policyStatesSummaryResource}/summarize",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6279,
+            "column": 15
+          },
+          "end": {
+            "line": 6393,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,fabricName,operationId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/operationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/operationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2484,
+            "column": 14
+          },
+          "end": {
+            "line": 2541,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,fabricName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectableContainers",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/protectableContainers",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2544,
+            "column": 14
+          },
+          "end": {
+            "line": 2603,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,fabricName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/refreshContainers",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/refreshContainers",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4195,
+            "column": 15
+          },
+          "end": {
+            "line": 4249,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobsExport",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobsExport",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4546,
+            "column": 15
+          },
+          "end": {
+            "line": 4593,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,operationId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4596,
+            "column": 14
+          },
+          "end": {
+            "line": 4649,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,operationId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperations/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupOperations/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4652,
+            "column": 14
+          },
+          "end": {
+            "line": 4702,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectableItems",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectableItems",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5108,
+            "column": 14
+          },
+          "end": {
+            "line": 5168,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectedItems",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectedItems",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5171,
+            "column": 14
+          },
+          "end": {
+            "line": 5231,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectionContainers",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectionContainers",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5234,
+            "column": 14
+          },
+          "end": {
+            "line": 5290,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectionIntents",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupProtectionIntents",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5293,
+            "column": 14
+          },
+          "end": {
+            "line": 5353,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupSecurityPIN",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupSecurityPIN",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5631,
+            "column": 15
+          },
+          "end": {
+            "line": 5689,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupTriggerValidateOperation",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupTriggerValidateOperation",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5888,
+            "column": 15
+          },
+          "end": {
+            "line": 5952,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupUsageSummaries",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupUsageSummaries",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5955,
+            "column": 14
+          },
+          "end": {
+            "line": 6018,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperation",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperation",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6021,
+            "column": 15
+          },
+          "end": {
+            "line": 6076,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,operationId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperationResults/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperationResults/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6079,
+            "column": 14
+          },
+          "end": {
+            "line": 6132,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+      "message": "The parameters:vaultName,resourceGroupName,operationId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperationsStatuses/{operationId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupValidateOperationsStatuses/{operationId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6135,
+            "column": 14
+          },
+          "end": {
+            "line": 6185,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The parameters:resourceProviderNamespace,groupId should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/providers/{resourceProviderNamespace}/register",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/providers/{resourceProviderNamespace}/register",
+          "post"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 669,
+            "column": 15
+          },
+          "end": {
+            "line": 706,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,dhcpId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dhcpConfigurations/{dhcpId}",
+        "get"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dhcpConfigurations/{dhcpId}",
+          "get"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5610,
+            "column": 14
+          },
+          "end": {
+            "line": 5649,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,dnsServiceId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dnsServices/{dnsServiceId}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dnsServices/{dnsServiceId}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6123,
+            "column": 17
+          },
+          "end": {
+            "line": 6180,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,dnsZoneId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dnsZones/{dnsZoneId}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/dnsZones/{dnsZoneId}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6433,
+            "column": 17
+          },
+          "end": {
+            "line": 6490,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,portMirroringId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/portMirroringProfiles/{portMirroringId}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/portMirroringProfiles/{portMirroringId}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6848,
+            "column": 17
+          },
+          "end": {
+            "line": 6905,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,publicIPId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/publicIPs/{publicIPId}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/publicIPs/{publicIPId}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7081,
+            "column": 17
+          },
+          "end": {
+            "line": 7138,
+            "column": 8
+          }
+        }
+      }
+    },
+    {
+      "rule": "ParametersOrder",
+      "level": "error",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "swaggerFile": "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/swagger/stable/2025-09-01/vmware.json",
+      "message": "The parameters:resourceGroupName,vmGroupId,privateCloudName should be kept in the same order as they present in the path.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/vmGroups/{vmGroupId}",
+        "delete"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/default/vmGroups/{vmGroupId}",
+          "delete"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7831,
+            "column": 17
+          },
+          "end": {
+            "line": 7888,
+            "column": 8
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,880 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "TenantLevelAPIsNotAllowed",
+  "count": 28,
+  "levels": {
+    "warning": 28
+  },
+  "results": [
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts",
+      "swaggerFile": "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts/swagger/preview/2023-04-01-preview/TenantActivityLogAlerts.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 128,
+            "column": 154
+          },
+          "end": {
+            "line": 341,
+            "column": 75
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "swaggerFile": "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/swagger/resource-manager/Microsoft.AppComplianceAutomation/stable/2024-06-27/appcomplianceautomation.json",
+      "message": "/providers/Microsoft.AppComplianceAutomation/reports/{reportName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.AppComplianceAutomation/reports/{reportName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.AppComplianceAutomation/reports/{reportName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 72
+          },
+          "end": {
+            "line": 604,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "swaggerFile": "projects/specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement/swagger/preview/2026-06-01-preview/openapi.json",
+      "message": "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 217,
+            "column": 136
+          },
+          "end": {
+            "line": 460,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "swaggerFile": "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/swagger/stable/2024-04-01/openapi.json",
+      "message": "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/associatedTenants/{associatedTenantName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/associatedTenants/{associatedTenantName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/associatedTenants/{associatedTenantName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 679,
+            "column": 113
+          },
+          "end": {
+            "line": 874,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.BillingBenefits/reservationOrderAliases/{reservationOrderAliasName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 519,
+            "column": 95
+          },
+          "end": {
+            "line": 633,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "/providers/Microsoft.CostManagement/scheduledActions/{name} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CostManagement/scheduledActions/{name}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CostManagement/scheduledActions/{name}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 2954,
+            "column": 66
+          },
+          "end": {
+            "line": 3093,
+            "column": 85
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/sites",
+      "swaggerFile": "projects/specification/edge/resource-manager/Microsoft.Edge/sites/swagger/stable/2025-06-01/sites.json",
+      "message": "/providers/Microsoft.Management/serviceGroups/{servicegroupName}/providers/Microsoft.Edge/sites/{siteName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/serviceGroups/{servicegroupName}/providers/Microsoft.Edge/sites/{siteName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/serviceGroups/{servicegroupName}/providers/Microsoft.Edge/sites/{siteName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 113
+          },
+          "end": {
+            "line": 300,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/education/resource-manager/Microsoft.Education/Education",
+      "swaggerFile": "projects/specification/education/resource-manager/Microsoft.Education/Education/swagger/preview/2021-12-01-preview/education.json",
+      "message": "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/billingProfiles/{billingProfileName}/invoiceSections/{invoiceSectionName}/providers/Microsoft.Education/labs/default is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/billingProfiles/{billingProfileName}/invoiceSections/{invoiceSectionName}/providers/Microsoft.Education/labs/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Billing/billingAccounts/{billingAccountName}/billingProfiles/{billingProfileName}/invoiceSections/{invoiceSectionName}/providers/Microsoft.Education/labs/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 129,
+            "column": 189
+          },
+          "end": {
+            "line": 307,
+            "column": 47
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/swagger/stable/2023-04-01/management.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{groupId} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 312,
+            "column": 65
+          },
+          "end": {
+            "line": 617,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "swaggerFile": "projects/specification/management/resource-manager/Microsoft.Management/ServiceGroups/swagger/preview/2024-02-01-preview/serviceGroups.json",
+      "message": "/providers/Microsoft.Management/serviceGroups/{serviceGroupName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 71
+          },
+          "end": {
+            "line": 276,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "/providers/Microsoft.Marketplace/privateStores/{privateStoreId} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Marketplace/privateStores/{privateStoreId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 141,
+            "column": 70
+          },
+          "end": {
+            "line": 258,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "swaggerFile": "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups/swagger/preview/2023-05-01-preview/tenantActionGroups.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 91,
+            "column": 147
+          },
+          "end": {
+            "line": 324,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Slis",
+      "swaggerFile": "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/Slis/swagger/preview/2025-03-01-preview/openapi.json",
+      "message": "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.Monitor/slis/{sliName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.Monitor/slis/{sliName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.Monitor/slis/{sliName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 133,
+            "column": 114
+          },
+          "end": {
+            "line": 271,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkManager.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Network/networkManagerConnections/{networkManagerConnectionName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Network/networkManagerConnections/{networkManagerConnectionName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Network/networkManagerConnections/{networkManagerConnectionName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 165,
+            "column": 160
+          },
+          "end": {
+            "line": 315,
+            "column": 83
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "swaggerFile": "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/swagger/preview/2026-05-11-preview/PaloAltoNetworks.Cloudngfw.json",
+      "message": "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/PaloAltoNetworks.Cloudngfw/globalRulestacks/{globalRulestackName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 130,
+            "column": 83
+          },
+          "end": {
+            "line": 351,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "swaggerFile": "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/swagger/stable/2024-10-01/openapi.json",
+      "message": "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/remediations/{remediationName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/remediations/{remediationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 1673,
+            "column": 148
+          },
+          "end": {
+            "line": 1856,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/portal/TenantConfiguration.Management",
+      "swaggerFile": "projects/specification/portal/TenantConfiguration.Management/swagger/resource-manager/Microsoft.Portal/stable/2026-04-01/tenantConfiguration.json",
+      "message": "/providers/Microsoft.Portal/tenantConfigurations/{configurationName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Portal/tenantConfigurations/{configurationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Portal/tenantConfigurations/{configurationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 122,
+            "column": 75
+          },
+          "end": {
+            "line": 252,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/portalservices/CopilotSettings.Management",
+      "swaggerFile": "projects/specification/portalservices/CopilotSettings.Management/swagger/resource-manager/Microsoft.PortalServices/copilotSettings/preview/2024-04-01-preview/copilotSettings.json",
+      "message": "/providers/Microsoft.PortalServices/copilotSettings/default is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.PortalServices/copilotSettings/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.PortalServices/copilotSettings/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 66
+          },
+          "end": {
+            "line": 195,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "swaggerFile": "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/swagger/preview/2026-09-01-preview/openapi.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Quota/groupQuotas/{groupQuotaName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 636,
+            "column": 130
+          },
+          "end": {
+            "line": 924,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "swaggerFile": "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/swagger/stable/2022-11-01/reservations.json",
+      "message": "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 343,
+            "column": 75
+          },
+          "end": {
+            "line": 461,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/swagger/stable/2026-07-01/openapi.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 1149,
+            "column": 150
+          },
+          "end": {
+            "line": 1293,
+            "column": 77
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/databoundaries",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/databoundaries/swagger/stable/2024-08-01/dataBoundaries.json",
+      "message": "/providers/Microsoft.Resources/dataBoundaries/{default} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Resources/dataBoundaries/{default}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Resources/dataBoundaries/{default}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 112,
+            "column": 62
+          },
+          "end": {
+            "line": 228,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 675,
+            "column": 124
+          },
+          "end": {
+            "line": 904,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/swagger/stable/2025-07-01/deploymentStacks.json",
+      "message": "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Resources/deploymentStacks/{deploymentStackName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 106,
+            "column": 144
+          },
+          "end": {
+            "line": 315,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI/swagger/preview/2023-02-15-preview/sensitivitySettings.json",
+      "message": "/providers/Microsoft.Security/sensitivitySettings/current is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Security/sensitivitySettings/current"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Security/sensitivitySettings/current"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 77,
+            "column": 64
+          },
+          "end": {
+            "line": 145,
+            "column": 88
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "swaggerFile": "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/swagger/preview/2025-11-01-preview/subscriptions.json",
+      "message": "/providers/Microsoft.Subscription/aliases/{aliasName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Subscription/aliases/{aliasName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Subscription/aliases/{aliasName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 117,
+            "column": 60
+          },
+          "end": {
+            "line": 250,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/support/resource-manager/Microsoft.Support/Support",
+      "swaggerFile": "projects/specification/support/resource-manager/Microsoft.Support/Support/swagger/preview/2025-06-01-preview/support.json",
+      "message": "/providers/Microsoft.Support/fileWorkspaces/{fileWorkspaceName} is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Support/fileWorkspaces/{fileWorkspaceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Support/fileWorkspaces/{fileWorkspaceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 167,
+            "column": 70
+          },
+          "end": {
+            "line": 242,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "TenantLevelAPIsNotAllowed",
+      "level": "warning",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "/providers/Microsoft.Web/publishingUsers/web is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest",
+      "path": [
+        "paths",
+        "/providers/Microsoft.Web/publishingUsers/web"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.Web/publishingUsers/web"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-11",
+        "range": {
+          "start": {
+            "line": 425,
+            "column": 51
+          },
+          "end": {
+            "line": 478,
+            "column": 58
+          }
+        }
+      }
+    }
+  ]
+}

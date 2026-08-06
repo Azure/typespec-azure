@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PrivateEndpointResourceSchemaValidation",
+  "count": 4,
+  "levels": {
+    "error": 4
+  },
+  "results": [
+    {
+      "rule": "PrivateEndpointResourceSchemaValidation",
+      "level": "error",
+      "project": "specification/automation/Automation.Management",
+      "swaggerFile": "projects/specification/automation/Automation.Management/swagger/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json",
+      "message": "The private endpoint model \"PrivateLinkResourceListResult\" schema does not conform to the common type definition.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/privateLinkResources",
+        "get",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/privateLinkResources",
+          "get",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5664,
+            "column": 18
+          },
+          "end": {
+            "line": 5669,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "PrivateEndpointResourceSchemaValidation",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The private endpoint model \"PrivateLinkResourcesListResult\" schema does not conform to the common type definition.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/privateLinkResources",
+        "get",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/privateLinkResources",
+          "get",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5636,
+            "column": 18
+          },
+          "end": {
+            "line": 5641,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "PrivateEndpointResourceSchemaValidation",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The private endpoint model \"PrivateEndpointConnectionsList\" schema does not conform to the common type definition.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections",
+        "get",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{resourceName}/privateEndpointConnections",
+          "get",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1279,
+            "column": 18
+          },
+          "end": {
+            "line": 1284,
+            "column": 12
+          }
+        }
+      }
+    },
+    {
+      "rule": "PrivateEndpointResourceSchemaValidation",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The private endpoint model \"\" schema does not conform to the common type definition.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/iotHubs/{resourceName}/privateEndpointConnections",
+        "get",
+        "responses",
+        "200"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/iotHubs/{resourceName}/privateEndpointConnections",
+          "get",
+          "responses",
+          "200"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1892,
+            "column": 18
+          },
+          "end": {
+            "line": 1900,
+            "column": 12
+          }
+        }
+      }
+    }
+  ]
+}

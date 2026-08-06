@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "XmsPathsMustOverloadPaths",
+  "count": 1,
+  "levels": {
+    "error": 1
+  },
+  "results": [
+    {
+      "rule": "XmsPathsMustOverloadPaths",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/swagger/preview/2022-05-01-preview/authorization-RoleDefinitionsCalls.json",
+      "message": "Paths in x-ms-paths must overload a normal path in the paths section, i.e. a path in the x-ms-paths must either be same as a path in the paths section or a path in the paths sections followed by additional parameters.",
+      "path": [
+        "x-ms-paths",
+        "/{roleId}?disambiguation_dummy"
+      ],
+      "details": {
+        "jsonpath": [
+          "x-ms-paths",
+          "/{roleId}?disambiguation_dummy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 37
+          },
+          "end": {
+            "line": 415,
+            "column": 63
+          }
+        }
+      }
+    }
+  ]
+}

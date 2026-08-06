@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "IntegerTypeMustHaveFormat",
+  "count": 5,
+  "levels": {
+    "error": 5
+  },
+  "results": [
+    {
+      "rule": "IntegerTypeMustHaveFormat",
+      "level": "error",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "swaggerFile": "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/swagger/preview/2025-01-15-preview/openapi.json",
+      "message": "The integer type does not have a format, please add it.",
+      "path": [
+        "definitions",
+        "Role",
+        "properties",
+        "minInstanceCount"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Role",
+          "properties",
+          "minInstanceCount"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5931,
+            "column": 29
+          },
+          "end": {
+            "line": 5936,
+            "column": 10
+          }
+        }
+      }
+    },
+    {
+      "rule": "IntegerTypeMustHaveFormat",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The integer type does not have a format, please add it.",
+      "path": [
+        "definitions",
+        "Attributes",
+        "properties",
+        "nbf"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Attributes",
+          "properties",
+          "nbf"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2874,
+            "column": 16
+          },
+          "end": {
+            "line": 2879,
+            "column": 10
+          }
+        }
+      }
+    },
+    {
+      "rule": "IntegerTypeMustHaveFormat",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The integer type does not have a format, please add it.",
+      "path": [
+        "definitions",
+        "Attributes",
+        "properties",
+        "exp"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Attributes",
+          "properties",
+          "exp"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2880,
+            "column": 16
+          },
+          "end": {
+            "line": 2885,
+            "column": 10
+          }
+        }
+      }
+    },
+    {
+      "rule": "IntegerTypeMustHaveFormat",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The integer type does not have a format, please add it.",
+      "path": [
+        "definitions",
+        "Attributes",
+        "properties",
+        "created"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Attributes",
+          "properties",
+          "created"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2886,
+            "column": 20
+          },
+          "end": {
+            "line": 2891,
+            "column": 10
+          }
+        }
+      }
+    },
+    {
+      "rule": "IntegerTypeMustHaveFormat",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The integer type does not have a format, please add it.",
+      "path": [
+        "definitions",
+        "Attributes",
+        "properties",
+        "updated"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Attributes",
+          "properties",
+          "updated"
+        ],
+        "validationCategory": "ARMViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2892,
+            "column": 20
+          },
+          "end": {
+            "line": 2897,
+            "column": 10
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1066 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PathContainsResourceType",
+  "count": 34,
+  "levels": {
+    "error": 34
+  },
+  "results": [
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/{denyAssignmentId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{denyAssignmentId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 26
+          },
+          "end": {
+            "line": 83,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/{roleAssignmentId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{roleAssignmentId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 47,
+            "column": 26
+          },
+          "end": {
+            "line": 193,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/swagger/preview/2022-05-01-preview/authorization-RoleDefinitionsCalls.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "x-ms-paths",
+        "/{roleId}?disambiguation_dummy"
+      ],
+      "details": {
+        "jsonpath": [
+          "x-ms-paths",
+          "/{roleId}?disambiguation_dummy"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 37
+          },
+          "end": {
+            "line": 415,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/alerts"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/alerts"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2499,
+            "column": 103
+          },
+          "end": {
+            "line": 2562,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "swaggerFile": "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/swagger/stable/2025-03-01/openapi.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/dimensions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/Microsoft.CostManagement/{externalCloudProviderType}/{externalCloudProviderId}/dimensions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2567,
+            "column": 107
+          },
+          "end": {
+            "line": 2665,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{resourceType}/{resourceName}/networkSecurityPerimeterConfigurations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{resourceType}/{resourceName}/networkSecurityPerimeterConfigurations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1750,
+            "column": 172
+          },
+          "end": {
+            "line": 1826,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{resourceType}/{resourceName}/networkSecurityPerimeterConfigurations/{perimeterGuid}.{associationName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{resourceType}/{resourceName}/networkSecurityPerimeterConfigurations/{perimeterGuid}.{associationName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1830,
+            "column": 206
+          },
+          "end": {
+            "line": 1916,
+            "column": 80
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateEndpointConnections"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateEndpointConnections"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2031,
+            "column": 156
+          },
+          "end": {
+            "line": 2131,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateEndpointConnections/{privateEndpointConnectionName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateEndpointConnections/{privateEndpointConnectionName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2135,
+            "column": 188
+          },
+          "end": {
+            "line": 2453,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2456,
+            "column": 150
+          },
+          "end": {
+            "line": 2524,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "swaggerFile": "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/swagger/preview/2025-11-15-preview/EventGrid.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources/{privateLinkResourceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources/{privateLinkResourceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2528,
+            "column": 176
+          },
+          "end": {
+            "line": 2584,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "swaggerFile": "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/swagger/preview/2026-03-01-preview/openapi.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resources"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resources"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2707,
+            "column": 48
+          },
+          "end": {
+            "line": 2771,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2475,
+            "column": 113
+          },
+          "end": {
+            "line": 2526,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2530,
+            "column": 127
+          },
+          "end": {
+            "line": 2575,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/{resourceId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{resourceId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 59,
+            "column": 20
+          },
+          "end": {
+            "line": 332,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/providers"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 583,
+            "column": 17
+          },
+          "end": {
+            "line": 617,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/providers/{resourceProviderNamespace}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/providers/{resourceProviderNamespace}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 621,
+            "column": 45
+          },
+          "end": {
+            "line": 663,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 739,
+            "column": 48
+          },
+          "end": {
+            "line": 781,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 785,
+            "column": 76
+          },
+          "end": {
+            "line": 830,
+            "column": 49
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/providerPermissions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/providerPermissions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 835,
+            "column": 96
+          },
+          "end": {
+            "line": 873,
+            "column": 60
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/resourceTypes"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}/resourceTypes"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 925,
+            "column": 90
+          },
+          "end": {
+            "line": 970,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1013,
+            "column": 53
+          },
+          "end": {
+            "line": 1058,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1062,
+            "column": 73
+          },
+          "end": {
+            "line": 1314,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1461,
+            "column": 162
+          },
+          "end": {
+            "line": 1914,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/resources"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/resources"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 1920,
+            "column": 83
+          },
+          "end": {
+            "line": 1982,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resources"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resources"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2047,
+            "column": 48
+          },
+          "end": {
+            "line": 2099,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/tagNames"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/tagNames"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2103,
+            "column": 47
+          },
+          "end": {
+            "line": 2134,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/tagNames/{tagName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/tagNames/{tagName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2138,
+            "column": 57
+          },
+          "end": {
+            "line": 2214,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/resources/swagger/stable/2025-04-01/resources.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/tagNames/{tagName}/tagValues/{tagValue}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/tagNames/{tagName}/tagValues/{tagValue}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 2220,
+            "column": 78
+          },
+          "end": {
+            "line": 2310,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/swagger/stable/2022-12-01/subscriptions.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 127,
+            "column": 21
+          },
+          "end": {
+            "line": 159,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/swagger/stable/2022-12-01/subscriptions.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 163,
+            "column": 38
+          },
+          "end": {
+            "line": 194,
+            "column": 53
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/swagger/stable/2022-12-01/subscriptions.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/locations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/locations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 199,
+            "column": 48
+          },
+          "end": {
+            "line": 245,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/swagger/stable/2022-12-01/subscriptions.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/tenants"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/tenants"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 294,
+            "column": 15
+          },
+          "end": {
+            "line": 326,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "PathContainsResourceType",
+      "level": "error",
+      "project": "specification/solutions/Solutions.Management",
+      "swaggerFile": "projects/specification/solutions/Solutions.Management/swagger/resource-manager/Microsoft.Solutions/preview/2023-12-01-preview/managedapplications.json",
+      "message": "The path for the CURD methods do not contain a resource type.",
+      "path": [
+        "paths",
+        "/{applicationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{applicationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-04",
+        "range": {
+          "start": {
+            "line": 59,
+            "column": 23
+          },
+          "end": {
+            "line": 297,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

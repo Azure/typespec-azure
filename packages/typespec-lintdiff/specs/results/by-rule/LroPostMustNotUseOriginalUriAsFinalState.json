@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "LroPostMustNotUseOriginalUriAsFinalState",
+  "count": 1,
+  "levels": {
+    "error": 1
+  },
+  "results": [
+    {
+      "rule": "LroPostMustNotUseOriginalUriAsFinalState",
+      "level": "error",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/AlertsAPI",
+      "swaggerFile": "projects/specification/security/resource-manager/Microsoft.Security/Security/AlertsAPI/swagger/stable/2022-01-01/alerts.json",
+      "message": "The long running post operation must not use final-stat-via:original-uri.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{ascLocation}/alerts/default/simulate",
+        "post",
+        "x-ms-long-running-operation-options"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{ascLocation}/alerts/default/simulate",
+          "post",
+          "x-ms-long-running-operation-options"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 428,
+            "column": 46
+          },
+          "end": {
+            "line": 429,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

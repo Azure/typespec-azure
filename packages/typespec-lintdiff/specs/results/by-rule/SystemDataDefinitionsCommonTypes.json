@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "SystemDataDefinitionsCommonTypes",
+  "count": 3,
+  "levels": {
+    "error": 3
+  },
+  "results": [
+    {
+      "rule": "SystemDataDefinitionsCommonTypes",
+      "level": "error",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "swaggerFile": "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/swagger/stable/2025-01-01/Marketplace.json",
+      "message": "System data references must utilize common types.",
+      "path": [
+        "definitions",
+        "Resource",
+        "properties",
+        "systemData",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Resource",
+          "properties",
+          "systemData",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+        "range": {
+          "start": {
+            "line": 3638,
+            "column": 18
+          },
+          "end": {
+            "line": 3638,
+            "column": 44
+          }
+        }
+      }
+    },
+    {
+      "rule": "SystemDataDefinitionsCommonTypes",
+      "level": "error",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "System data references must utilize common types.",
+      "path": [
+        "definitions",
+        "ProxyResource",
+        "properties",
+        "systemData",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "ProxyResource",
+          "properties",
+          "systemData",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+        "range": {
+          "start": {
+            "line": 3509,
+            "column": 18
+          },
+          "end": {
+            "line": 3509,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "SystemDataDefinitionsCommonTypes",
+      "level": "error",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "swaggerFile": "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/swagger/preview/2024-04-01-preview/purview.json",
+      "message": "System data references must utilize common types.",
+      "path": [
+        "definitions",
+        "TrackedResource",
+        "properties",
+        "systemData",
+        "$ref"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "TrackedResource",
+          "properties",
+          "systemData",
+          "$ref"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-SystemData-V1-01, RPC-SystemData-V1-02",
+        "range": {
+          "start": {
+            "line": 3712,
+            "column": 18
+          },
+          "end": {
+            "line": 3712,
+            "column": 59
+          }
+        }
+      }
+    }
+  ]
+}

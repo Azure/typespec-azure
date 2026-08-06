@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   aggregateResults,
+  keepOutputFileInsideEmitterDirectory,
   parseViolations,
   selectLatestApiVersion,
   updateAutorestOption,
@@ -111,6 +112,17 @@ describe("spec dataset results", () => {
   it("selects the newest API date regardless of stable or preview status", () => {
     expect(selectLatestApiVersion(["2024-10-01", "2025-01-15-preview", "2023-11-01"])).toBe(
       "2025-01-15-preview",
+    );
+  });
+
+  it("keeps output files inside the overridden emitter directory", () => {
+    expect(
+      keepOutputFileInsideEmitterDirectory(
+        '    output-file: "{project-root}/{version-status}/{version}/hci.json"',
+      ),
+    ).toBe('    output-file: "{version-status}/{version}/hci.json"');
+    expect(keepOutputFileInsideEmitterDirectory("    output-file: ../../stable/openapi.json")).toBe(
+      "    output-file: stable/openapi.json",
     );
   });
 });

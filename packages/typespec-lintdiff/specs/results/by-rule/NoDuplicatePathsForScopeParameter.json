@@ -1,0 +1,1283 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "NoDuplicatePathsForScopeParameter",
+  "count": 41,
+  "levels": {
+    "error": 41
+  },
+  "results": [
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 140,
+            "column": 80
+          },
+          "end": {
+            "line": 187,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 191,
+            "column": 102
+          },
+          "end": {
+            "line": 335,
+            "column": 73
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 340,
+            "column": 112
+          },
+          "end": {
+            "line": 387,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances/{instanceId}/generateDownloadUri\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances/{instanceId}/generateDownloadUri\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances/{instanceId}/generateDownloadUri"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewHistoryDefinitions/{historyDefinitionId}/instances/{instanceId}/generateDownloadUri"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 391,
+            "column": 145
+          },
+          "end": {
+            "line": 441,
+            "column": 79
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 446,
+            "column": 81
+          },
+          "end": {
+            "line": 493,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 497,
+            "column": 104
+          },
+          "end": {
+            "line": 641,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 646,
+            "column": 114
+          },
+          "end": {
+            "line": 700,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 704,
+            "column": 119
+          },
+          "end": {
+            "line": 816,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/applyDecisions\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/applyDecisions\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/applyDecisions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/applyDecisions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 821,
+            "column": 134
+          },
+          "end": {
+            "line": 868,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/contactedReviewers\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/contactedReviewers\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/contactedReviewers"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/contactedReviewers"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 873,
+            "column": 138
+          },
+          "end": {
+            "line": 927,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/decisions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 931,
+            "column": 129
+          },
+          "end": {
+            "line": 992,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/resetDecisions\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/resetDecisions\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/resetDecisions"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/resetDecisions"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 1057,
+            "column": 134
+          },
+          "end": {
+            "line": 1104,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/sendReminders\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/sendReminders\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/sendReminders"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/sendReminders"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 1109,
+            "column": 133
+          },
+          "end": {
+            "line": 1156,
+            "column": 71
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/stop\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/stop\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/stop"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/instances/{id}/stop"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 1161,
+            "column": 124
+          },
+          "end": {
+            "line": 1208,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/stop\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/stop\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/stop"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleDefinitions/{scheduleDefinitionId}/stop"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 1213,
+            "column": 109
+          },
+          "end": {
+            "line": 1253,
+            "column": 72
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/swagger/preview/2021-12-01-preview/authorization-AccessReviewCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/accessReviewScheduleSettings/default\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/accessReviewScheduleSettings/default\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleSettings/default"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/accessReviewScheduleSettings/default"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 1258,
+            "column": 86
+          },
+          "end": {
+            "line": 1342,
+            "column": 68
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/denyAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/denyAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 65
+          },
+          "end": {
+            "line": 135,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/denyAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/denyAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 65
+          },
+          "end": {
+            "line": 135,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/swagger/preview/2024-07-01-preview/authorization-DenyAssignmentCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Authorization/denyAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/denyAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/denyAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 88,
+            "column": 65
+          },
+          "end": {
+            "line": 135,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/roleAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/roleAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 198,
+            "column": 65
+          },
+          "end": {
+            "line": 259,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/roleAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 198,
+            "column": 65
+          },
+          "end": {
+            "line": 259,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "swaggerFile": "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/swagger/stable/2022-04-01/authorization-RoleAssignmentsCalls.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Authorization/roleAssignments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Authorization/roleAssignments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Authorization/roleAssignments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 198,
+            "column": 65
+          },
+          "end": {
+            "line": 259,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 57
+          },
+          "end": {
+            "line": 100,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 57
+          },
+          "end": {
+            "line": 100,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 50,
+            "column": 57
+          },
+          "end": {
+            "line": 100,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 74
+          },
+          "end": {
+            "line": 329,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 74
+          },
+          "end": {
+            "line": 329,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 104,
+            "column": 74
+          },
+          "end": {
+            "line": 329,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 335,
+            "column": 81
+          },
+          "end": {
+            "line": 373,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 335,
+            "column": 81
+          },
+          "end": {
+            "line": 373,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/cancel"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 335,
+            "column": 81
+          },
+          "end": {
+            "line": 373,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 89
+          },
+          "end": {
+            "line": 419,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 89
+          },
+          "end": {
+            "line": 419,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/exportTemplate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 379,
+            "column": 89
+          },
+          "end": {
+            "line": 419,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 425,
+            "column": 85
+          },
+          "end": {
+            "line": 478,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 425,
+            "column": 85
+          },
+          "end": {
+            "line": 478,
+            "column": 36
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 482,
+            "column": 99
+          },
+          "end": {
+            "line": 529,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 482,
+            "column": 99
+          },
+          "end": {
+            "line": 529,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 535,
+            "column": 83
+          },
+          "end": {
+            "line": 617,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 535,
+            "column": 83
+          },
+          "end": {
+            "line": 617,
+            "column": 43
+          }
+        }
+      }
+    },
+    {
+      "rule": "NoDuplicatePathsForScopeParameter",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/swagger/stable/2025-04-01/deployments.json",
+      "message": "Path \"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" with explicitly defined scope is a duplicate of path \"/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate\" that has the scope parameter.\".",
+      "path": [
+        "paths",
+        "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/{scope}/providers/Microsoft.Resources/deployments/{deploymentName}/validate"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Uri-V1-10",
+        "range": {
+          "start": {
+            "line": 535,
+            "column": 83
+          },
+          "end": {
+            "line": 617,
+            "column": 43
+          }
+        }
+      }
+    }
+  ]
+}

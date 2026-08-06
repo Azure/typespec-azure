@@ -1,0 +1,2406 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "AvoidEmptyResponseSchema",
+  "count": 63,
+  "levels": {
+    "error": 63
+  },
+  "results": [
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/clientGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/clientGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 730,
+            "column": 23
+          },
+          "end": {
+            "line": 730,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportApplications",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportApplications",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1158,
+            "column": 23
+          },
+          "end": {
+            "line": 1158,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportDependencies",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportDependencies",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1231,
+            "column": 23
+          },
+          "end": {
+            "line": 1231,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportMachineErrors",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/exportMachineErrors",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1304,
+            "column": 23
+          },
+          "end": {
+            "line": 1304,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/generateCoarseMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/generateCoarseMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1377,
+            "column": 23
+          },
+          "end": {
+            "line": 1377,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/generateDetailedMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/generateDetailedMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1450,
+            "column": 23
+          },
+          "end": {
+            "line": 1450,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/serverGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/serverGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2431,
+            "column": 23
+          },
+          "end": {
+            "line": 2431,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/updateDependencyMapStatus",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/updateDependencyMapStatus",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2551,
+            "column": 23
+          },
+          "end": {
+            "line": 2551,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/updateProperties",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/hypervSites/{siteName}/updateProperties",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2624,
+            "column": 23
+          },
+          "end": {
+            "line": 2624,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/refreshArcStatus",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/refreshArcStatus",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4434,
+            "column": 23
+          },
+          "end": {
+            "line": 4434,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/exportSqlServerErrors",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/exportSqlServerErrors",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5161,
+            "column": 23
+          },
+          "end": {
+            "line": 5161,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/exportSqlServers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/exportSqlServers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5242,
+            "column": 23
+          },
+          "end": {
+            "line": 5242,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/refresh",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/sqlSites/{sqlSiteName}/refresh",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 5767,
+            "column": 23
+          },
+          "end": {
+            "line": 5767,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/exportInventory",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/exportInventory",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7289,
+            "column": 23
+          },
+          "end": {
+            "line": 7289,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/refresh",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/refresh",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7890,
+            "column": 23
+          },
+          "end": {
+            "line": 7890,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/updateProperties",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/masterSites/{siteName}/webAppSites/{webAppSiteName}/updateProperties",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 8518,
+            "column": 23
+          },
+          "end": {
+            "line": 8518,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/clientGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/clientGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9029,
+            "column": 23
+          },
+          "end": {
+            "line": 9029,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportApplications",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportApplications",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9208,
+            "column": 23
+          },
+          "end": {
+            "line": 9208,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportDependencies",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportDependencies",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9281,
+            "column": 23
+          },
+          "end": {
+            "line": 9281,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportMachineErrors",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/exportMachineErrors",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9354,
+            "column": 23
+          },
+          "end": {
+            "line": 9354,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/generateCoarseMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/generateCoarseMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9427,
+            "column": 23
+          },
+          "end": {
+            "line": 9427,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/generateDetailedMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/generateDetailedMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 9500,
+            "column": 23
+          },
+          "end": {
+            "line": 9500,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/refreshSite",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/refreshSite",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10152,
+            "column": 23
+          },
+          "end": {
+            "line": 10152,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/serverGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/serverGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10330,
+            "column": 23
+          },
+          "end": {
+            "line": 10330,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/updateDependencyMapStatus",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/updateDependencyMapStatus",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10450,
+            "column": 23
+          },
+          "end": {
+            "line": 10450,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/updateProperties",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/serverSites/{siteName}/updateProperties",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10523,
+            "column": 23
+          },
+          "end": {
+            "line": 10523,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/clientGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/clientGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 10845,
+            "column": 23
+          },
+          "end": {
+            "line": 10845,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportApplications",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportApplications",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11024,
+            "column": 23
+          },
+          "end": {
+            "line": 11024,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportDependencies",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportDependencies",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11097,
+            "column": 23
+          },
+          "end": {
+            "line": 11097,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportMachineErrors",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportMachineErrors",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11170,
+            "column": 23
+          },
+          "end": {
+            "line": 11170,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportMachines",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/exportMachines",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11243,
+            "column": 23
+          },
+          "end": {
+            "line": 11243,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/generateCoarseMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/generateCoarseMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11316,
+            "column": 23
+          },
+          "end": {
+            "line": 11316,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/generateDetailedMap",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/generateDetailedMap",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 11389,
+            "column": 23
+          },
+          "end": {
+            "line": 11389,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/machines/{machineName}/start",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/machines/{machineName}/start",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12049,
+            "column": 23
+          },
+          "end": {
+            "line": 12049,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/machines/{machineName}/stop",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/machines/{machineName}/stop",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12121,
+            "column": 23
+          },
+          "end": {
+            "line": 12121,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/serverGroupMembers",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/serverGroupMembers",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12352,
+            "column": 23
+          },
+          "end": {
+            "line": 12352,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateDependencyMapStatus",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateDependencyMapStatus",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12472,
+            "column": 23
+          },
+          "end": {
+            "line": 12472,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateProperties",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateProperties",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12545,
+            "column": 23
+          },
+          "end": {
+            "line": 12545,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateRunAsAccount",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateRunAsAccount",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12618,
+            "column": 23
+          },
+          "end": {
+            "line": 12618,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "swaggerFile": "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/swagger/preview/2024-12-01-preview/offazure-migrate.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateTags",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OffAzure/vmwareSites/{siteName}/updateTags",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12691,
+            "column": 23
+          },
+          "end": {
+            "line": 12691,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkSecurityPerimeter.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}/profiles/{profileName}/accessRules/{accessRuleName}/reconcile",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}/profiles/{profileName}/accessRules/{accessRuleName}/reconcile",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1844,
+            "column": 23
+          },
+          "end": {
+            "line": 1844,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkSecurityPerimeter.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}/resourceAssociations/{associationName}/reconcile",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityPerimeters/{networkSecurityPerimeterName}/resourceAssociations/{associationName}/reconcile",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 2203,
+            "column": 23
+          },
+          "end": {
+            "line": 2203,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1140,
+            "column": 23
+          },
+          "end": {
+            "line": 1140,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/automationRules/{automationRuleId}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 1144,
+            "column": 23
+          },
+          "end": {
+            "line": 1144,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/incidents/{incidentIdentifier}/runPlaybook",
+        "post",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/incidents/{incidentIdentifier}/runPlaybook",
+          "post",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 7003,
+            "column": 23
+          },
+          "end": {
+            "line": 7003,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3320,
+            "column": 23
+          },
+          "end": {
+            "line": 3320,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 3324,
+            "column": 23
+          },
+          "end": {
+            "line": 3324,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4473,
+            "column": 23
+          },
+          "end": {
+            "line": 4473,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "202",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "202",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4477,
+            "column": 23
+          },
+          "end": {
+            "line": 4477,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 4492,
+            "column": 23
+          },
+          "end": {
+            "line": 4492,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/skus",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/skus",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 6999,
+            "column": 23
+          },
+          "end": {
+            "line": 6999,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy",
+        "get",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy",
+          "get",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12639,
+            "column": 23
+          },
+          "end": {
+            "line": 12639,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy",
+        "put",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy",
+          "put",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 12677,
+            "column": 23
+          },
+          "end": {
+            "line": 12677,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18385,
+            "column": 23
+          },
+          "end": {
+            "line": 18385,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "202",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "202",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18389,
+            "column": 23
+          },
+          "end": {
+            "line": 18389,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 18404,
+            "column": 23
+          },
+          "end": {
+            "line": 18404,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 29720,
+            "column": 23
+          },
+          "end": {
+            "line": 29720,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "202",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "202",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 29724,
+            "column": 23
+          },
+          "end": {
+            "line": 29724,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 29739,
+            "column": 23
+          },
+          "end": {
+            "line": 29739,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/updatemachinekey",
+        "post",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/updatemachinekey",
+          "post",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 34557,
+            "column": 23
+          },
+          "end": {
+            "line": 34557,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "200",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "200",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 39190,
+            "column": 23
+          },
+          "end": {
+            "line": 39190,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "202",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "202",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 39194,
+            "column": 23
+          },
+          "end": {
+            "line": 39194,
+            "column": 25
+          }
+        }
+      }
+    },
+    {
+      "rule": "AvoidEmptyResponseSchema",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "Response schema must not be empty.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+        "delete",
+        "responses",
+        "204",
+        "schema"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/privateEndpointConnections/{privateEndpointConnectionName}",
+          "delete",
+          "responses",
+          "204",
+          "schema"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 39209,
+            "column": 23
+          },
+          "end": {
+            "line": 39209,
+            "column": 25
+          }
+        }
+      }
+    }
+  ]
+}

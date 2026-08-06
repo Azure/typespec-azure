@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "XmsEnumValidation",
+  "count": 1,
+  "levels": {
+    "error": 1
+  },
+  "results": [
+    {
+      "rule": "XmsEnumValidation",
+      "level": "error",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "swaggerFile": "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/swagger/preview/2025-10-01-preview/openapi.json",
+      "message": "The enum types should have x-ms-enum type extension set with appropriate options.",
+      "path": [
+        "definitions",
+        "Availability",
+        "properties",
+        "status"
+      ],
+      "details": {
+        "jsonpath": [
+          "definitions",
+          "Availability",
+          "properties",
+          "status"
+        ],
+        "validationCategory": "SDKViolation",
+        "providerNamespace": false,
+        "resourceType": false,
+        "range": {
+          "start": {
+            "line": 14142,
+            "column": 19
+          },
+          "end": {
+            "line": 14148,
+            "column": 10
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "OperationSummaryOrDescription",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "results": [
+    {
+      "rule": "OperationSummaryOrDescription",
+      "level": "warning",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "swaggerFile": "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/swagger/preview/2026-04-01-preview/dataprotection.json",
+      "message": "Operation should have a summary or description.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/backupVaults/{vaultName}/backupInstances/{backupInstanceName}/findRestorableTimeRanges",
+        "post"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataProtection/backupVaults/{vaultName}/backupInstances/{backupInstanceName}/findRestorableTimeRanges",
+          "post"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "",
+        "range": {
+          "start": {
+            "line": 1213,
+            "column": 13
+          },
+          "end": {
+            "line": 1272,
+            "column": 87
+          }
+        }
+      }
+    }
+  ]
+}

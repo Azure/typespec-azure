@@ -1,0 +1,3416 @@
+{
+  "schemaVersion": 4,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-06T08:03:27.940Z",
+  "rule": "PatchIdentityProperty",
+  "count": 92,
+  "levels": {
+    "error": 92
+  },
+  "results": [
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "swaggerFile": "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi/swagger/stable/2023-06-01/workbooks_API.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/workbooks/{resourceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 393,
+            "column": 10
+          },
+          "end": {
+            "line": 399,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/conditionalCredits/{conditionalCreditName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/conditionalCredits/{conditionalCreditName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1963,
+            "column": 10
+          },
+          "end": {
+            "line": 1969,
+            "column": 67
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 2593,
+            "column": 10
+          },
+          "end": {
+            "line": 2599,
+            "column": 56
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}/sources/{sourceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/credits/{creditName}/sources/{sourceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 3072,
+            "column": 10
+          },
+          "end": {
+            "line": 3078,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts/{discountName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/discounts/{discountName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 3467,
+            "column": 10
+          },
+          "end": {
+            "line": 3473,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/freeServices/{freeServiceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/freeServices/{freeServiceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 3849,
+            "column": 10
+          },
+          "end": {
+            "line": 3855,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "swaggerFile": "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/swagger/stable/2026-06-01/billingbenefits.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/maccs/{maccName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BillingBenefits/maccs/{maccName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 4190,
+            "column": 10
+          },
+          "end": {
+            "line": 4196,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "swaggerFile": "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/swagger/preview/2026-08-01-preview/containerInstance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1298,
+            "column": 10
+          },
+          "end": {
+            "line": 1304,
+            "column": 58
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "swaggerFile": "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/swagger/preview/2026-05-02-preview/managedClusters.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1361,
+            "column": 10
+          },
+          "end": {
+            "line": 1367,
+            "column": 48
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "swaggerFile": "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/swagger/preview/2026-04-01-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/garnetClusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/garnetClusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 19660,
+            "column": 10
+          },
+          "end": {
+            "line": 19666,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "swaggerFile": "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/swagger/preview/2025-12-26-preview/datadog.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Datadog/monitors/{monitorName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 540,
+            "column": 10
+          },
+          "end": {
+            "line": 546,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/applicationGroups/{applicationGroupName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/applicationGroups/{applicationGroupName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 888,
+            "column": 10
+          },
+          "end": {
+            "line": 894,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/scalingPlans/{scalingPlanName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/scalingPlans/{scalingPlanName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 4793,
+            "column": 10
+          },
+          "end": {
+            "line": 4799,
+            "column": 54
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "swaggerFile": "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/swagger/preview/2026-04-01-preview/desktopvirtualization.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/workspaces/{workspaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/workspaces/{workspaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 5733,
+            "column": 10
+          },
+          "end": {
+            "line": 5739,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "swaggerFile": "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/swagger/preview/2026-03-01-preview/iotdps.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 370,
+            "column": 10
+          },
+          "end": {
+            "line": 376,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "swaggerFile": "projects/specification/elastic/resource-manager/Microsoft.Elastic/Elastic/swagger/stable/2025-06-01/elastic.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Elastic/monitors/{monitorName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 440,
+            "column": 10
+          },
+          "end": {
+            "line": 446,
+            "column": 76
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "swaggerFile": "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/swagger/preview/2025-04-01-preview/healthcare-apis.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/services/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/services/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 486,
+            "column": 10
+          },
+          "end": {
+            "line": 492,
+            "column": 62
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes",
+      "swaggerFile": "projects/specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes/swagger/stable/2026-05-01/connectedClusters.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kubernetes/connectedClusters/{clusterName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kubernetes/connectedClusters/{clusterName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 326,
+            "column": 10
+          },
+          "end": {
+            "line": 332,
+            "column": 59
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "swaggerFile": "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/swagger/preview/2026-05-01-preview/iothub.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 423,
+            "column": 10
+          },
+          "end": {
+            "line": 429,
+            "column": 50
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions",
+      "swaggerFile": "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions/swagger/stable/2025-03-01/extensions.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensions/{extensionName}",
+        "patch",
+        "parameters",
+        "7"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{clusterRp}/{clusterResourceName}/{clusterName}/providers/Microsoft.KubernetesConfiguration/extensions/{extensionName}",
+          "patch",
+          "parameters",
+          "7"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 352,
+            "column": 10
+          },
+          "end": {
+            "line": 358,
+            "column": 52
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}/deployments/{deploymentName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/batchEndpoints/{endpointName}/deployments/{deploymentName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 5483,
+            "column": 10
+          },
+          "end": {
+            "line": 5489,
+            "column": 103
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 7494,
+            "column": 10
+          },
+          "end": {
+            "line": 7500,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/endpoints/{endpointName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/endpoints/{endpointName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 15736,
+            "column": 10
+          },
+          "end": {
+            "line": 15743,
+            "column": 40
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/groups/{groupName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/inferencePools/{poolName}/groups/{groupName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 16197,
+            "column": 10
+          },
+          "end": {
+            "line": 16203,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "swaggerFile": "projects/specification/machinelearningservices/MachineLearningServices.Management/swagger/resource-manager/Microsoft.MachineLearningServices/preview/2026-05-15-preview/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/onlineEndpoints/{endpointName}/deployments/{deploymentName}",
+        "patch",
+        "parameters",
+        "6"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/onlineEndpoints/{endpointName}/deployments/{deploymentName}",
+          "patch",
+          "parameters",
+          "6"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 19741,
+            "column": 10
+          },
+          "end": {
+            "line": 19747,
+            "column": 74
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/applicationGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/expressRoute.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/firewallPolicy.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/firewallPolicies/{firewallPolicyName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 281,
+            "column": 10
+          },
+          "end": {
+            "line": 287,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/loadBalancer.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/networkWatcher.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/serviceGateway.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetwork.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualNetworkAppliance.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 885,
+            "column": 10
+          },
+          "end": {
+            "line": 891,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 758,
+            "column": 10
+          },
+          "end": {
+            "line": 764,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1392,
+            "column": 10
+          },
+          "end": {
+            "line": 1398,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/flowLogs/{flowLogName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1270,
+            "column": 10
+          },
+          "end": {
+            "line": 1276,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "swaggerFile": "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/swagger/stable/2025-07-01/virtualWan.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkVirtualAppliances/{networkVirtualApplianceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 8461,
+            "column": 10
+          },
+          "end": {
+            "line": 8467,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/quantum/resource-manager/Microsoft.Quantum/Quantum",
+      "swaggerFile": "projects/specification/quantum/resource-manager/Microsoft.Quantum/Quantum/swagger/preview/2026-06-15-preview/quantum.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Quantum/workspaces/{workspaceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Quantum/workspaces/{workspaceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 461,
+            "column": 10
+          },
+          "end": {
+            "line": 467,
+            "column": 64
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
+      "swaggerFile": "projects/specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector/swagger/preview/2025-03-01-preview/appliances.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ResourceConnector/appliances/{resourceName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ResourceConnector/appliances/{resourceName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 361,
+            "column": 10
+          },
+          "end": {
+            "line": 369,
+            "column": 39
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "swaggerFile": "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/swagger/stable/2023-08-01/deploymentScripts.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deploymentScripts/{scriptName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deploymentScripts/{scriptName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 291,
+            "column": 10
+          },
+          "end": {
+            "line": 297,
+            "column": 69
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "swaggerFile": "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/swagger/preview/2026-03-01-preview/servicefabric.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/clusters/{clusterName}/applications/{applicationName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/clusters/{clusterName}/applications/{applicationName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1476,
+            "column": 10
+          },
+          "end": {
+            "line": 1482,
+            "column": 63
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "swaggerFile": "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/swagger/preview/2026-05-01-preview/servicefabricmanagedclusters.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/applications/{applicationName}",
+        "patch",
+        "parameters",
+        "5"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/applications/{applicationName}",
+          "patch",
+          "parameters",
+          "5"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 1758,
+            "column": 10
+          },
+          "end": {
+            "line": 1764,
+            "column": 65
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+      "swaggerFile": "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/swagger/stable/2023-10-01/sqlvm.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 986,
+            "column": 10
+          },
+          "end": {
+            "line": 992,
+            "column": 61
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "swaggerFile": "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/swagger/stable/2026-01-01/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/amlFilesystems/{amlFilesystemName}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageCache/amlFilesystems/{amlFilesystemName}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 652,
+            "column": 10
+          },
+          "end": {
+            "line": 658,
+            "column": 57
+          }
+        }
+      }
+    },
+    {
+      "rule": "PatchIdentityProperty",
+      "level": "error",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "swaggerFile": "projects/specification/web/resource-manager/Microsoft.Web/AppService/swagger/stable/2026-07-15/openapi.json",
+      "message": "The patch operation body parameter schema should contain property 'identity'.",
+      "path": [
+        "paths",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}",
+        "patch",
+        "parameters",
+        "4"
+      ],
+      "details": {
+        "jsonpath": [
+          "paths",
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}",
+          "patch",
+          "parameters",
+          "4"
+        ],
+        "validationCategory": "",
+        "providerNamespace": false,
+        "resourceType": false,
+        "rpcGuidelineCode": "RPC-Patch-V1-11",
+        "range": {
+          "start": {
+            "line": 35454,
+            "column": 10
+          },
+          "end": {
+            "line": 35460,
+            "column": 61
+          }
+        }
+      }
+    }
+  ]
+}
