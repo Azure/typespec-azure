@@ -82,14 +82,14 @@ catalogs:
       specifier: ^7.29.0
       version: 7.29.7
     '@chronus/chronus':
-      specifier: ^1.4.0
-      version: 1.4.0
+      specifier: ^1.5.0
+      version: 1.5.0
     '@chronus/github':
-      specifier: ^1.1.0
-      version: 1.1.0
+      specifier: ^1.2.0
+      version: 1.2.0
     '@chronus/github-pr-commenter':
-      specifier: ^1.1.0
-      version: 1.1.0
+      specifier: ^1.1.1
+      version: 1.1.1
     '@docsearch/css':
       specifier: ^4.6.2
       version: 4.6.3
@@ -220,8 +220,8 @@ catalogs:
       specifier: ^17.0.35
       version: 17.0.35
     '@typespec/http-client-python':
-      specifier: '>=0.35.0 <1.0.0'
-      version: 0.35.0
+      specifier: '>=0.35.1 <1.0.0'
+      version: 0.35.1
     '@typespec/ts-http-runtime':
       specifier: 0.3.7
       version: 0.3.7
@@ -554,13 +554,13 @@ importers:
     devDependencies:
       '@chronus/chronus':
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       '@chronus/github':
         specifier: 'catalog:'
-        version: 1.1.0
+        version: 1.2.0
       '@chronus/github-pr-commenter':
         specifier: 'catalog:'
-        version: 1.1.0
+        version: 1.1.1
       '@types/node':
         specifier: 'catalog:'
         version: 26.1.1
@@ -611,13 +611,13 @@ importers:
     devDependencies:
       '@chronus/chronus':
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       '@chronus/github':
         specifier: 'catalog:'
-        version: 1.1.0
+        version: 1.2.0
       '@chronus/github-pr-commenter':
         specifier: 'catalog:'
-        version: 1.1.0
+        version: 1.1.1
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@26.1.1)
@@ -2337,6 +2337,9 @@ importers:
       '@typespec/events':
         specifier: workspace:^
         version: link:../events
+      '@typespec/graphql':
+        specifier: workspace:^
+        version: link:../graphql
       '@typespec/html-program-viewer':
         specifier: workspace:^
         version: link:../html-program-viewer
@@ -3850,9 +3853,15 @@ importers:
       '@typespec/xml':
         specifier: workspace:^
         version: link:../../core/packages/xml
+      execa:
+        specifier: 'catalog:'
+        version: 9.6.1
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
+      tar:
+        specifier: 'catalog:'
+        version: 7.5.20
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -3907,7 +3916,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.35.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.35.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.5
@@ -4735,18 +4744,18 @@ packages:
     resolution: {integrity: sha512-CuNiSqg7+e1cO/GjffyMOm5Tt2jUF9CWHHnvQ/UkqvtkGfHdgwEC0wpmq7fkN3gxwpRnrAN0WzO3vREKmNolMQ==}
     engines: {node: '>=18'}
 
-  '@chronus/chronus@1.4.0':
-    resolution: {integrity: sha512-JAFQSWsmIoCptmlL++n2C6PzNVpmjWS+671g48ENcTK7zGI/qiBe/unb2AW3K77NAGy87DTNFfvPxa6FchhSdw==}
+  '@chronus/chronus@1.5.0':
+    resolution: {integrity: sha512-HRuATKfcfPZe940m9JqvFeZGRQcue/+z9EJoTr0eVfKcIVMpU1vyJzQmJfjcm10ZLYe3ZuFTNIYlbgZXz6WwWg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@chronus/github-pr-commenter@1.1.0':
-    resolution: {integrity: sha512-D0qhoWIoZcnum+XWi5rJ9zBHkOvMZDxU1/hPgw9QQWd3Jg5DDuX/BQw7Wp6US1/rJosPUDkPnJxZncUcnrwKzQ==}
+  '@chronus/github-pr-commenter@1.1.1':
+    resolution: {integrity: sha512-YHSLzW8XByWkt4hd1diAy+RbUxBL4ZOxxyoqYRwHiD3VrTPzRaZ+bmeinOFzZPYKRiGMffZx9YkcKiIjKv4/3Q==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@chronus/github@1.1.0':
-    resolution: {integrity: sha512-LfEvkJWqF0rL3u1iTmcn6rYxBxwXqqAEYMPlU7UPHXhV+eBkGf5YazCSpB+EMr3tx/oKCFBDBMSUtMvmUCHv6w==}
+  '@chronus/github@1.2.0':
+    resolution: {integrity: sha512-iqiUtRcHGclEQR3Y7Q1z+z6RRqKppUIDHw83cSMJByFESlxIbDDIHZbxQCININqZBULCJ8WnT+HLM+Zu4eDzqw==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -7455,8 +7464,8 @@ packages:
   '@types/yargs@17.0.35':
     resolution: {integrity: sha512-qUHkeCyQFxMXg79wQfTtfndEC+N9ZZg76HJftDJp+qH2tV7Gj4OJi7l+PiWwJ+pWtW8GwSmqsDj/oymhrTWXjg==}
 
-  '@typespec/http-client-python@0.35.0':
-    resolution: {integrity: sha512-fw9MjT0nsqhwweb4+dRvDwp8BaFgxGZv4J4LlH7TEXSXj21mzAlUjatXFhNFruOE5/uEnXJwHLS6V6OsmNZH5w==}
+  '@typespec/http-client-python@0.35.1':
+    resolution: {integrity: sha512-gWibPANAVzadSlOgeALeyTAvpkDPQHusDcQmkpw9y/1pQpgBwuNJmCOHEZRuGf6icPf5buX4a4GzNyj6RPZUrA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@azure-tools/typespec-autorest': '>=0.70.0 <1.0.0'
@@ -12774,7 +12783,7 @@ snapshots:
     dependencies:
       fontkitten: 1.0.3
 
-  '@chronus/chronus@1.4.0':
+  '@chronus/chronus@1.5.0':
     dependencies:
       cross-spawn: 7.0.6
       globby: 16.2.1
@@ -12791,14 +12800,14 @@ snapshots:
       yargs: 18.0.0
       zod: 4.4.3
 
-  '@chronus/github-pr-commenter@1.1.0':
+  '@chronus/github-pr-commenter@1.1.1':
     dependencies:
-      '@chronus/github': 1.1.0
+      '@chronus/github': 1.2.0
       '@octokit/rest': 22.0.1
 
-  '@chronus/github@1.1.0':
+  '@chronus/github@1.2.0':
     dependencies:
-      '@chronus/chronus': 1.4.0
+      '@chronus/chronus': 1.5.0
       '@octokit/graphql': 9.0.3
       '@octokit/rest': 22.0.1
       cross-spawn: 7.0.6
@@ -15994,7 +16003,7 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typespec/http-client-python@0.35.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.35.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core

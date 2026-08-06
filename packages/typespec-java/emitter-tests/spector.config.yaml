@@ -3,7 +3,7 @@
 # Spec selection for @azure-tools/typespec-java (opt-in), for the shared
 # http-specs / azure-http-specs specs. See Azure/typespec-azure#4997.
 # Options are @azure-tools/typespec-java emitter options (without the prefix).
-# Local ./tsp/*.tsp fixtures are handled separately in Generate.ps1.
+# Local ./tsp/*.tsp fixtures are handled separately in eng/scripts/generate.ts.
 
 specs:
   authentication/api-key: true
