@@ -30,9 +30,17 @@ export async function getCoreSourceRoot(
   coreRoot: string,
   packageRoot: string,
 ): Promise<CoreSource> {
-  const originSha = (
-    await execa("git", ["-C", coreRoot, "rev-parse", "HEAD"], { env: gitEnvironment })
-  ).stdout.trim();
+  let originSha: string;
+  try {
+    originSha = (
+      await execa("git", ["-C", coreRoot, "rev-parse", "HEAD"], { env: gitEnvironment })
+    ).stdout.trim();
+  } catch (error) {
+    throw new Error(
+      `The 'core' submodule at ${coreRoot} is not initialized. Run 'git submodule update --init core' from the repository root.`,
+      { cause: error },
+    );
+  }
   const liveRoot = join(coreRoot, coreJavaSubtree);
   const configPath = join(packageRoot, "core-commit.json");
 

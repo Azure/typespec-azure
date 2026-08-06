@@ -11,7 +11,7 @@ try {
   await access(generatorPom);
 } catch {
   throw new Error(
-    `Copied generator not found at: ${generatorPom}\nRun ${join(packageRoot, "eng", "scripts", "copy-sources.ts")} first (build:emitter).`,
+    `Copied generator not found at: ${generatorPom}\nRun 'pnpm run build:emitter' first.`,
   );
 }
 

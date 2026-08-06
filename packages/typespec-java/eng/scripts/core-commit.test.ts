@@ -24,6 +24,15 @@ describe("core source", () => {
     expect(source).toEqual({ root: join(root, "packages", "http-client-java") });
   });
 
+  it("reports how to initialize a missing core submodule", async () => {
+    const root = await mkdtemp(join(tmpdir(), "typespec-java-core-test-"));
+    tempDirectories.push(root);
+
+    await expect(getCoreSourceRoot(root, join(root, "package"))).rejects.toThrow(
+      "Run 'git submodule update --init core' from the repository root.",
+    );
+  });
+
   it("extracts and cleans up a different pinned commit", async () => {
     const root = await createCoreRepository();
     const packageRoot = join(root, "package");

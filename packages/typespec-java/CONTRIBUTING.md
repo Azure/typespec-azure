@@ -134,8 +134,8 @@ Pulls the fix in from core; **no version bump**. Example:
    `sha` in [`core-commit.json`](./core-commit.json) to the target microsoft/typespec commit
    (e.g. the HEAD of core `main`). Build and sync scripts transiently check this commit out without
    moving the submodule pointer.
-2. **Sync tests from core.** Run `pnpm sync-tests`: it
-   copies the tests/specs from the pinned core commit and aligns `emitter-tests/package.json`.
+2. **Sync tests from core.** Run `pnpm sync-tests`: it copies the tests/specs from the pinned core
+   commit.
 3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
 
 Open the PR against `release/<sprint>` (not `main`) and merge it. _(Optional)_ Before merging,
@@ -149,8 +149,8 @@ Bumps the version and publishes, after Part A merges. Example:
 [#4990](https://github.com/Azure/typespec-azure/pull/4990). Prepare the version bump per the
 `hotfix-release` skill (creates the `publish/hotfix/<name>-<sprint>` branch off `release/<sprint>`
 and runs `pnpm chronus version --ignore-policies`, consuming the changeset from Part A). The `core`
-submodule stays unchanged. The bump must also be reflected in `emitter-tests/package.json` (its
-`version` and the `*.tgz` dependency) — rerun `pnpm sync-tests` or update it manually.
+submodule stays unchanged. The `emitter-tests/` folder is part of the parent workspace package, so
+it requires no separate version update.
 
 Open the PR against `release/<sprint>`. After it merges:
 
