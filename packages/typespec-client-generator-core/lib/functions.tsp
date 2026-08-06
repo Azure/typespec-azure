@@ -146,10 +146,7 @@ extern fn reorderParameters(
  * ```
  */
 #suppress "experimental-feature" "replaceResponse uses extern fn which is experimental but provides essential response transformation functionality"
-extern fn replaceResponse(
-  operation: Reflection.Operation,
-  response: unknown
-): Reflection.Operation;
+extern fn replaceResponse(operation: Reflection.Operation, response: unknown): Reflection.Operation;
 
 /**
  * Mark a client name as exact, preventing language emitters from applying

@@ -1,9 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
-  createSdkContextForTester,
-  SimpleTesterWithService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("replaces the generated method response without changing HTTP responses", async () => {
