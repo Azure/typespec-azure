@@ -283,6 +283,8 @@ export interface SdkBuiltInType<
   kind: TKind;
   /** How to encode the type on wire. */
   encode?: string;
+  /** The type this is encoded as on the wire when `@encode` specifies an encodedAs type. */
+  wireType?: SdkBuiltInType;
   /** Client name for the type. */
   name: string;
   /** Which type this type is derived from. */

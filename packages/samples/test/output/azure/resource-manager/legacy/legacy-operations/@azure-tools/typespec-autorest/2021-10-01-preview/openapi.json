@@ -561,6 +561,7 @@
         },
         "extendedLocation": {
           "$ref": "#/definitions/ExtendedLocation",
+          "description": "The extended location of the resource.",
           "x-ms-mutability": [
             "read",
             "create"

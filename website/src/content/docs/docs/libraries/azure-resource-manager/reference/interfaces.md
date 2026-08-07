@@ -780,6 +780,13 @@ op Azure.ResourceManager.ResourceListBySubscription<Resource>.listBySubscription
 **Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
 :::
 
+A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
+and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
+ListBySubscription operations. The actual route depends on the resource model.
+This is the most common API pattern for Tracked Resources to use.
+
+Deprecated: use `Azure.ResourceManager.TrackedResourceOperations` instead.
+
 ```typespec
 interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>
 ```

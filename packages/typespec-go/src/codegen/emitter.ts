@@ -4,24 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as go from "../codemodel/index.js";
-import { generateClientFactory } from "./core/client-factory.js";
-import { generateCloudConfig } from "./core/cloud-config.js";
-import { generateConstants } from "./core/constants.js";
-import { generateExamples } from "./core/example.js";
-import { generateGoModFile } from "./core/gomod.js";
-import { setCustomHeaderText } from "./core/helpers.js";
-import { generateInterfaces } from "./core/interfaces.js";
-import { generateLicenseTxt } from "./core/license.js";
-import { generateMetadataFile } from "./core/metadata.js";
-import { generateModels } from "./core/models.js";
-import { generateOperations } from "./core/operations.js";
-import { generateOptions } from "./core/options.js";
-import { generatePolymorphicHelpers } from "./core/polymorphics.js";
-import { generateResponses } from "./core/responses.js";
-import { generateVersionInfo } from "./core/version.js";
-import { generateXMLAdditionalPropsHelpers } from "./core/xml-additional-props.js";
-import { generateServerFactory } from "./fake/factory.js";
-import { generateServers } from "./fake/servers.js";
+import * as core from "./core/index.js";
+import * as fake from "./fake/index.js";
 
 /** abstractions over various file handling facilities */
 export interface FsFacilities {
@@ -53,7 +37,7 @@ export class Emitter {
       this.filePrefix = "";
     }
     if (this.codeModel.options.headerText) {
-      setCustomHeaderText(this.codeModel.options.headerText);
+      core.setCustomHeaderText(this.codeModel.options.headerText);
     }
 
     switch (this.codeModel.root.kind) {
@@ -80,7 +64,11 @@ export class Emitter {
       if (await this.fs.exists(goModFile)) {
         existingGoMod = await this.fs.read(goModFile);
       }
-      const gomod = generateGoModFile(this.codeModel.root, this.codeModel.options, existingGoMod);
+      const gomod = core.generateGoModFile(
+        this.codeModel.root,
+        this.codeModel.options,
+        existingGoMod,
+      );
       if (gomod.length > 0) {
         await this.fs.write(goModFile, gomod);
       }
@@ -91,7 +79,7 @@ export class Emitter {
         pkg: go.PackageContent,
         write: (name: string, content: string, subdir?: string) => Promise<void>,
       ): Promise<void> => {
-        const clientFactory = generateClientFactory(
+        const clientFactory = core.generateClientFactory(
           pkg,
           this.codeModel.type,
           this.codeModel.options,
@@ -100,22 +88,26 @@ export class Emitter {
           await write("client_factory.go", clientFactory);
         }
 
-        const constants = generateConstants(pkg);
+        const constants = core.generateConstants(pkg);
         if (constants.length > 0) {
           await write("constants.go", constants);
         }
 
-        const interfaces = generateInterfaces(pkg);
+        const interfaces = core.generateInterfaces(pkg);
         if (interfaces.length > 0) {
           await write("interfaces.go", interfaces);
         }
 
-        const operations = generateOperations(pkg, this.codeModel.type, this.codeModel.options);
+        const operations = core.generateOperations(
+          pkg,
+          this.codeModel.type,
+          this.codeModel.options,
+        );
         for (const op of operations) {
           await write(`${snakeClientFileName(op.name)}.go`, op.content);
         }
 
-        const models = generateModels(pkg, this.codeModel.options, emitter);
+        const models = core.generateModels(pkg, this.codeModel.options, emitter);
         if (models.models.length > 0) {
           await write("models.go", models.models);
         }
@@ -123,17 +115,17 @@ export class Emitter {
           await write("models_serde.go", models.serDe);
         }
 
-        const options = generateOptions(pkg);
+        const options = core.generateOptions(pkg);
         if (options.length > 0) {
           await write("options.go", options);
         }
 
-        const polymorphics = generatePolymorphicHelpers(pkg);
+        const polymorphics = core.generatePolymorphicHelpers(pkg);
         if (polymorphics.length > 0) {
           await write("polymorphic_helpers.go", polymorphics);
         }
 
-        const responses = generateResponses(pkg, this.codeModel.options);
+        const responses = core.generateResponses(pkg, this.codeModel.options);
         if (responses.responses.length > 0) {
           await write("responses.go", responses.responses);
         }
@@ -141,28 +133,28 @@ export class Emitter {
           await write("responses_serde.go", responses.serDe);
         }
 
-        const xmlAddlProps = generateXMLAdditionalPropsHelpers(pkg);
+        const xmlAddlProps = core.generateXMLAdditionalPropsHelpers(pkg);
         if (xmlAddlProps.length > 0) {
           await write("xml_helper.go", xmlAddlProps);
         }
 
         if (this.codeModel.options.generateFakes) {
           const fakePkg = new go.FakePackage(pkg);
-          const serverContent = generateServers(fakePkg, this.codeModel.type);
+          const serverContent = fake.generateServers(fakePkg, this.codeModel.type);
           if (serverContent.servers.length > 0) {
             for (const op of serverContent.servers) {
               const fileName = `${snakeClientFileName(op.name, "server")}.go`;
               await write(fileName, op.content, fakePkg.kind);
             }
 
-            const serverFactory = generateServerFactory(fakePkg, this.codeModel.type);
+            const serverFactory = fake.generateServerFactory(fakePkg, this.codeModel.type);
             if (serverFactory.length > 0) {
               await write("server_factory.go", serverFactory, fakePkg.kind);
             }
 
             await write("internal.go", serverContent.internals, fakePkg.kind);
 
-            const polymorphics = generatePolymorphicHelpers(fakePkg);
+            const polymorphics = core.generatePolymorphicHelpers(fakePkg);
             if (polymorphics.length > 0) {
               await write("polymorphic_helpers.go", polymorphics, fakePkg.kind);
             }
@@ -174,7 +166,7 @@ export class Emitter {
     // only one version.go file per module
     if (this.codeModel.root.kind === "module") {
       // don't overwrite an existing version.go file
-      const versionGo = generateVersionInfo(this.codeModel.root);
+      const versionGo = core.generateVersionInfo(this.codeModel.root);
       const versionGoFileName = `${this.filePrefix}version.go`;
       if (versionGo.length > 0 && !(await this.fs.exists(versionGoFileName))) {
         await this.fs.write(versionGoFileName, versionGo);
@@ -187,7 +179,7 @@ export class Emitter {
     if (this.codeModel.root.kind !== "module") {
       return;
     }
-    const cloudConfig = generateCloudConfig(this.codeModel.root, this.codeModel.type);
+    const cloudConfig = core.generateCloudConfig(this.codeModel.root, this.codeModel.type);
     if (cloudConfig.length > 0) {
       await this.fs.write(`${this.filePrefix}cloud_config.go`, cloudConfig);
     }
@@ -204,7 +196,7 @@ export class Emitter {
         pkg: go.PackageContent,
         write: (name: string, content: string) => Promise<void>,
       ): Promise<void> => {
-        const examples = generateExamples(
+        const examples = core.generateExamples(
           new go.TestPackage(pkg),
           this.codeModel.type,
           this.codeModel.options,
@@ -223,7 +215,7 @@ export class Emitter {
     }
 
     // don't overwrite an existing LICENSE.txt file
-    const licenseTxt = generateLicenseTxt(this.codeModel.options);
+    const licenseTxt = core.generateLicenseTxt(this.codeModel.options);
     const licenseTxtFileName = "LICENSE.txt";
     if (licenseTxt && !(await this.fs.exists(licenseTxtFileName))) {
       await this.fs.write(licenseTxtFileName, licenseTxt);
@@ -236,7 +228,7 @@ export class Emitter {
       return;
     }
 
-    const metadata = generateMetadataFile(this.codeModel);
+    const metadata = core.generateMetadataFile(this.codeModel);
     if (metadata.length > 0) {
       await this.fs.write("testdata/_metadata.json", metadata);
     }

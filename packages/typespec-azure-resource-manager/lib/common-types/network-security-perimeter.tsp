@@ -24,12 +24,26 @@ union AccessRuleDirection {
 @added(Versions.v5)
 union NetworkSecurityPerimeterConfigurationProvisioningState {
   string,
+
+  /** The configuration was provisioned successfully. */
   Succeeded: "Succeeded",
+
+  /** The configuration is being created. */
   Creating: "Creating",
+
+  /** The configuration is being updated. */
   Updating: "Updating",
+
+  /** The configuration is being deleted. */
   Deleting: "Deleting",
+
+  /** The configuration request was accepted and provisioning has not started yet. */
   Accepted: "Accepted",
+
+  /** The configuration failed to provision. */
   Failed: "Failed",
+
+  /** The configuration provisioning was canceled. */
   Canceled: "Canceled",
 }
 
@@ -55,7 +69,11 @@ union IssueType {
 @added(Versions.v5)
 union Severity {
   string,
+
+  /** The issue is a warning and does not prevent the configuration from being applied. */
   Warning: "Warning",
+
+  /** The issue is an error and prevents the configuration from being applied. */
   Error: "Error",
 }
 
@@ -95,12 +113,14 @@ model AccessRule {
   /** Name of the access rule */
   name?: string;
 
+  /** Properties of the access rule */
   properties?: AccessRuleProperties;
 }
 
 /** Properties of Access Rule */
 @added(Versions.v5)
 model AccessRuleProperties {
+  /** Direction of the access rule */
   direction?: AccessRuleDirection;
 
   /** Address prefixes in the CIDR format for inbound rules */
@@ -146,12 +166,14 @@ model NetworkSecurityPerimeter {
 /** Network security perimeter (NSP) configuration resource */
 @added(Versions.v5)
 model NetworkSecurityPerimeterConfiguration extends ProxyResource {
+  /** Network security configuration properties. */
   properties?: NetworkSecurityPerimeterConfigurationProperties;
 }
 
 /** Network security configuration properties. */
 @added(Versions.v5)
 model NetworkSecurityPerimeterConfigurationProperties {
+  /** Provisioning state of the network security perimeter configuration */
   @visibility(Lifecycle.Read)
   provisioningState?: NetworkSecurityPerimeterConfigurationProvisioningState;
 
@@ -160,8 +182,13 @@ model NetworkSecurityPerimeterConfigurationProperties {
   @Azure.ResourceManager.identifiers(#[])
   provisioningIssues?: ProvisioningIssue[];
 
+  /** Information about the network security perimeter (NSP) */
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
+
+  /** Information about the resource association */
   resourceAssociation?: ResourceAssociation;
+
+  /** Network security perimeter configuration profile */
   profile?: NetworkSecurityProfile;
 }
 
@@ -172,6 +199,7 @@ model ProvisioningIssue {
   @visibility(Lifecycle.Read)
   name?: string;
 
+  /** Details of the provisioning issue */
   @visibility(Lifecycle.Read)
   properties?: ProvisioningIssueProperties;
 }
@@ -207,6 +235,7 @@ model ResourceAssociation {
   /** Name of the resource association */
   name?: string;
 
+  /** Access mode of the resource association */
   accessMode?: ResourceAssociationAccessMode;
 }
 

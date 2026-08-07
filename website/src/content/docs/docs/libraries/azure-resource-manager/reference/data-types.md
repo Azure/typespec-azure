@@ -629,6 +629,29 @@ model Foo is TrackedResource<FooProperties> {
 | ------ | ---------- | ----------------------- |
 | zones? | `string[]` | The availability zones. |
 
+### `BillingDataProperty` {#Azure.ResourceManager.BillingDataProperty}
+
+Standard resource billing data property to represent the resource's current billing state.
+Spread this model directly into your resource property model when modeling e.g. prepaid resources.
+
+```typespec
+model Azure.ResourceManager.BillingDataProperty
+```
+
+#### Examples
+
+```typespec
+model FooProperties {
+  ...BillingDataProperty;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                           | Description                       |
+| ----------- | ------------------------------------------------------------------------------ | --------------------------------- |
+| billingData | [`BillingData`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingData) | The billing data of the resource. |
+
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
 Standard resource provisioning state model. If you do not have any custom provisioning state,
@@ -719,9 +742,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 #### Properties
 
-| Name              | Type                                                                                     | Description |
-| ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
+| Name              | Type                                                                                     | Description                            |
+| ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------- |
+| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) | The extended location of the resource. |
 
 ### `ExtensionActionScope` {#Azure.ResourceManager.ExtensionActionScope}
 
@@ -1198,7 +1221,7 @@ Spread this model into ARM resource models to specify resource name parameter fo
 is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
 automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
 
-For additional decorators such as
+For additional decorators such as `@minLength`, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
 
 ```typespec
 model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern, Type>
@@ -1630,7 +1653,8 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentConversation<Properties, Agent
 
 Appliance deployment model of AgentDefinition.
 Properties controlled by `@baseTypeOptional` are invisible when the corresponding
-template parameter is false, or read-only when present.
+template parameter is false. When present, `instructions` is read-only while
+`modelDeploymentRef` stays writable so the client can point the agent at a model deployment.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>
@@ -1645,11 +1669,11 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDe
 
 #### Properties
 
-| Name                | Type     | Description                                                       |
-| ------------------- | -------- | ----------------------------------------------------------------- |
-| model               | `string` | Model identifier (RP-defined).                                    |
-| instructions        | `string` | System prompt / behavioral instructions for the agent.            |
-| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| Name                | Type     | Description                                                                                           |
+| ------------------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                                                        |
+| instructions        | `string` | System prompt / behavioral instructions for the agent.                                                |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. Writable in both deployment models. |
 
 ### `AgentDefinitionPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform}
 
@@ -1679,7 +1703,10 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform<HasModelDep
 ### `AgentPropertiesAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance}
 
 Appliance deployment model of AgentProperties.
-All properties are read-only (the appliance owns and reports state).
+All properties are read-only (the appliance owns and reports state), except the `definition`
+container itself: it stays writable so the client can send the fields the agent definition
+marks as writable, such as `modelDeploymentRef`. Every service-owned field inside the
+definition remains read-only.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<AgentDefinitionType>
@@ -1693,13 +1720,13 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<AgentDefin
 
 #### Properties
 
-| Name        | Type                                                              | Description                                                           |
-| ----------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
-| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                  | ARM-managed. Must include the base type descriptor for this resource. |
-| displayName | `string`                                                          | Human-friendly name.                                                  |
-| description | `string`                                                          | Purpose/behavior summary.                                             |
-| definition  | `AgentDefinitionType`                                             | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]` | Tool bindings. Read-only in the Appliance deployment model.           |
+| Name        | Type                                                              | Description                                                                                                                |
+| ----------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                  | ARM-managed. Must include the base type descriptor for this resource.                                                      |
+| displayName | `string`                                                          | Human-friendly name.                                                                                                       |
+| description | `string`                                                          | Purpose/behavior summary.                                                                                                  |
+| definition  | `AgentDefinitionType`                                             | Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned. |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]` | Tool bindings. Read-only in the Appliance deployment model.                                                                |
 
 ### `AgentPropertiesPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform}
 
@@ -2027,10 +2054,10 @@ model Azure.ResourceManager.CommonTypes.AccessRule
 
 #### Properties
 
-| Name        | Type                                                                                             | Description             |
-| ----------- | ------------------------------------------------------------------------------------------------ | ----------------------- |
-| name?       | `string`                                                                                         | Name of the access rule |
-| properties? | [`AccessRuleProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleProperties) |                         |
+| Name        | Type                                                                                             | Description                   |
+| ----------- | ------------------------------------------------------------------------------------------------ | ----------------------------- |
+| name?       | `string`                                                                                         | Name of the access rule       |
+| properties? | [`AccessRuleProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleProperties) | Properties of the access rule |
 
 ### `AccessRuleProperties` {#Azure.ResourceManager.CommonTypes.AccessRuleProperties}
 
@@ -2044,7 +2071,7 @@ model Azure.ResourceManager.CommonTypes.AccessRuleProperties
 
 | Name                       | Type                                                                                           | Description                                            |
 | -------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) |                                                        |
+| direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) | Direction of the access rule                           |
 | addressPrefixes?           | `string[]`                                                                                     | Address prefixes in the CIDR format for inbound rules  |
 | subscriptions?             | `Azure.ResourceManager.CommonTypes.{ id: Azure.Core.armResourceIdentifier }[]`                 | Subscriptions for inbound rules                        |
 | networkSecurityPerimeters? | `Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter[]`                                 | Network security perimeters for inbound rules          |
@@ -2087,6 +2114,65 @@ model Azure.ResourceManager.CommonTypes.AzureEntityResource
 | Name  | Type     | Description    |
 | ----- | -------- | -------------- |
 | etag? | `string` | Resource Etag. |
+
+### `BillingData` {#Azure.ResourceManager.CommonTypes.BillingData}
+
+Billing Data
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingData
+```
+
+#### Properties
+
+| Name          | Type                                                                                   | Description                                                                          |
+| ------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| systemId?     | `Azure.Core.uuid`                                                                      | The system ID of the resource. Globally unique per cloud.                            |
+| state?        | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState)       | Indicates the billing state of the resource.                                         |
+| reasons?      | `Azure.ResourceManager.CommonTypes.BillingStateReason[]`                               | Indicates reason(s) for the current billing state of the resource.                   |
+| productCode   | `Azure.Core.uuid`                                                                      | The product identifier referencing a product in the catalog.                         |
+| productToken? | `string`                                                                               | Product token (JWT) identifying a specific version of the product.                   |
+| quantity      | `int64`                                                                                | The number of instances of the product.                                              |
+| startDate?    | `utcDateTime`                                                                          | Start date indicating the beginning of the term for which the resource is committed. |
+| endDate?      | `utcDateTime`                                                                          | End date indicating the end of the term for which the resource is committed.         |
+| billingToken? | `string`                                                                               | Billing token (JWT) representing additional billing context.                         |
+| schedule?     | [`BillingSchedule`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingSchedule) | The resource's billing schedule.                                                     |
+
+### `BillingSchedule` {#Azure.ResourceManager.CommonTypes.BillingSchedule}
+
+Billing schedule.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingSchedule
+```
+
+#### Properties
+
+| Name     | Type                                                                                         | Description                                      |
+| -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| renewal  | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource. |
+| changes? | `Azure.ResourceManager.CommonTypes.BillingScheduleChange[]`                                  | Schedules billing changes for this resource.     |
+
+### `BillingScheduleChange` {#Azure.ResourceManager.CommonTypes.BillingScheduleChange}
+
+Billing schedule change.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingScheduleChange
+```
+
+#### Properties
+
+| Name           | Type                                                                                                                         | Description                                                                                                                                                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| effective      | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
+| effectiveDate? | `utcDateTime`                                                                                                                | The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.                                                                                                                |
+| kind           | [`BillingScheduleChangeKind`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind)                   | The kind of change.                                                                                                                                                                                                           |
+| productCode?   | `Azure.Core.uuid`                                                                                                            | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
+| productToken?  | `string`                                                                                                                     | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
+| quantity?      | `int64`                                                                                                                      | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
+| endDate?       | `utcDateTime`                                                                                                                | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
+| billingToken?  | `string`                                                                                                                     | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
@@ -2428,9 +2514,9 @@ model Azure.ResourceManager.CommonTypes.ManagedServiceIdentityWithDelegation
 
 #### Properties
 
-| Name                | Type                                                                                         | Description |
-| ------------------- | -------------------------------------------------------------------------------------------- | ----------- |
-| delegatedResources? | [`DelegatedResources`](./data-types.md#Azure.ResourceManager.CommonTypes.DelegatedResources) |             |
+| Name                | Type                                                                                         | Description                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| delegatedResources? | [`DelegatedResources`](./data-types.md#Azure.ResourceManager.CommonTypes.DelegatedResources) | The delegated resources of the identity - internal use only. |
 
 ### `ManagementGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter}
 
@@ -2486,9 +2572,9 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfiguration
 
 #### Properties
 
-| Name        | Type                                                                                                                                                   | Description |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+| Name        | Type                                                                                                                                                   | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) | Network security configuration properties. |
 
 ### `NetworkSecurityPerimeterConfigurationListResult` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationListResult}
 
@@ -2529,13 +2615,13 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationPro
 
 #### Properties
 
-| Name                      | Type                                                                                                                                                                 | Description                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| provisioningState?        | [`NetworkSecurityPerimeterConfigurationProvisioningState`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProvisioningState) |                                     |
-| provisioningIssues?       | `Azure.ResourceManager.CommonTypes.ProvisioningIssue[]`                                                                                                              | List of provisioning issues, if any |
-| networkSecurityPerimeter? | [`NetworkSecurityPerimeter`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter)                                                             |                                     |
-| resourceAssociation?      | [`ResourceAssociation`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociation)                                                                       |                                     |
-| profile?                  | [`NetworkSecurityProfile`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile)                                                                 |                                     |
+| Name                      | Type                                                                                                                                                                 | Description                                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| provisioningState?        | [`NetworkSecurityPerimeterConfigurationProvisioningState`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProvisioningState) | Provisioning state of the network security perimeter configuration |
+| provisioningIssues?       | `Azure.ResourceManager.CommonTypes.ProvisioningIssue[]`                                                                                                              | List of provisioning issues, if any                                |
+| networkSecurityPerimeter? | [`NetworkSecurityPerimeter`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter)                                                             | Information about the network security perimeter (NSP)             |
+| resourceAssociation?      | [`ResourceAssociation`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociation)                                                                       | Information about the resource association                         |
+| profile?                  | [`NetworkSecurityProfile`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile)                                                                 | Network security perimeter configuration profile                   |
 
 ### `NetworkSecurityProfile` {#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile}
 
@@ -2609,9 +2695,9 @@ interface Employees {
 
 #### Properties
 
-| Name        | Type                                                                                                                                                   | Description |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+| Name        | Type                                                                                                                                                   | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) | Network security configuration properties. |
 
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
@@ -3024,10 +3110,10 @@ model Azure.ResourceManager.CommonTypes.ProvisioningIssue
 
 #### Properties
 
-| Name        | Type                                                                                                           | Description       |
-| ----------- | -------------------------------------------------------------------------------------------------------------- | ----------------- |
-| name?       | `string`                                                                                                       | Name of the issue |
-| properties? | [`ProvisioningIssueProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties) |                   |
+| Name        | Type                                                                                                           | Description                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| name?       | `string`                                                                                                       | Name of the issue                 |
+| properties? | [`ProvisioningIssueProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties) | Details of the provisioning issue |
 
 ### `ProvisioningIssueProperties` {#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties}
 
@@ -3086,10 +3172,10 @@ model Azure.ResourceManager.CommonTypes.ResourceAssociation
 
 #### Properties
 
-| Name        | Type                                                                                                               | Description                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| name?       | `string`                                                                                                           | Name of the resource association |
-| accessMode? | [`ResourceAssociationAccessMode`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociationAccessMode) |                                  |
+| Name        | Type                                                                                                               | Description                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| name?       | `string`                                                                                                           | Name of the resource association        |
+| accessMode? | [`ResourceAssociationAccessMode`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociationAccessMode) | Access mode of the resource association |
 
 ### `ResourceGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ResourceGroupNameParameter}
 
@@ -3120,9 +3206,9 @@ model Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
 | managedBy? | `string`                                                                                             | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.<br />If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.                                                                                                        |
 | kind?      | `string`                                                                                             | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.<br />If supported, the resource provider must validate and persist this value.                                                                                                                                                                     |
 | etag?      | `string`                                                                                             | The etag field is _not_ required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.<br />Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),<br />If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
-| identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) | The identity of the resource.                                                                                                                                                                                                                                                                                                                                                                                  |
+| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       | The SKU of the resource.                                                                                                                                                                                                                                                                                                                                                                                       |
+| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     | The plan of the resource.                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### `ScopeParameter` {#Azure.ResourceManager.CommonTypes.ScopeParameter}
 
@@ -3330,6 +3416,84 @@ union Azure.ResourceManager.CommonTypes.ActionType
 | -------- | ------------ | ----------------------------------- |
 | Internal | `"Internal"` | Actions are for internal-only APIs. |
 
+### `BillingRenewalType` {#Azure.ResourceManager.CommonTypes.BillingRenewalType}
+
+Type of renewal.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingRenewalType
+```
+
+#### Variants
+
+| Name      | Type          | Description                                         |
+| --------- | ------------- | --------------------------------------------------- |
+| Automatic | `"Automatic"` | Automatically renew the product when its term ends. |
+| None      | `"None"`      | Don't automatically renew the product.              |
+
+### `BillingScheduleChangeEffectiveType` {#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType}
+
+When a scheduled change is expected to become effective.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType
+```
+
+#### Variants
+
+| Name         | Type             | Description              |
+| ------------ | ---------------- | ------------------------ |
+| AbsoluteDate | `"AbsoluteDate"` | At a specified date.     |
+| Renewal      | `"Renewal"`      | At time of term renewal. |
+
+### `BillingScheduleChangeKind` {#Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind}
+
+Type of scheduled change.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind
+```
+
+#### Variants
+
+| Name   | Type       | Description          |
+| ------ | ---------- | -------------------- |
+| Update | `"Update"` | Update the resource. |
+| Cancel | `"Cancel"` | Cancel the resource. |
+
+### `BillingState` {#Azure.ResourceManager.CommonTypes.BillingState}
+
+Billing state.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingState
+```
+
+#### Variants
+
+| Name     | Type         | Description                               |
+| -------- | ------------ | ----------------------------------------- |
+| Pending  | `"Pending"`  | Resource's billing has not yet started.   |
+| Active   | `"Active"`   | Resource's billing is activate.           |
+| Warned   | `"Warned"`   | Resource's billing is in a warning state. |
+| Inactive | `"Inactive"` | Resource's billing is inactive.           |
+
+### `BillingStateReason` {#Azure.ResourceManager.CommonTypes.BillingStateReason}
+
+Billing state reason.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingStateReason
+```
+
+#### Variants
+
+| Name      | Type          | Description                                         |
+| --------- | ------------- | --------------------------------------------------- |
+| Suspended | `"Suspended"` | Resource's billing has been suspended by Microsoft. |
+| Canceled  | `"Canceled"`  | Resource has been canceled by the customer.         |
+| Expired   | `"Expired"`   | Resource's billing has expired.                     |
+
 ### `CheckNameAvailabilityReason` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason}
 
 Possible reasons for a name not being available.
@@ -3458,15 +3622,15 @@ union Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationPro
 
 #### Variants
 
-| Name      | Type          | Description |
-| --------- | ------------- | ----------- |
-| Succeeded | `"Succeeded"` |             |
-| Creating  | `"Creating"`  |             |
-| Updating  | `"Updating"`  |             |
-| Deleting  | `"Deleting"`  |             |
-| Accepted  | `"Accepted"`  |             |
-| Failed    | `"Failed"`    |             |
-| Canceled  | `"Canceled"`  |             |
+| Name      | Type          | Description                                                                  |
+| --------- | ------------- | ---------------------------------------------------------------------------- |
+| Succeeded | `"Succeeded"` | The configuration was provisioned successfully.                              |
+| Creating  | `"Creating"`  | The configuration is being created.                                          |
+| Updating  | `"Updating"`  | The configuration is being updated.                                          |
+| Deleting  | `"Deleting"`  | The configuration is being deleted.                                          |
+| Accepted  | `"Accepted"`  | The configuration request was accepted and provisioning has not started yet. |
+| Failed    | `"Failed"`    | The configuration failed to provision.                                       |
+| Canceled  | `"Canceled"`  | The configuration provisioning was canceled.                                 |
 
 ### `Origin` {#Azure.ResourceManager.CommonTypes.Origin}
 
@@ -3559,9 +3723,9 @@ union Azure.ResourceManager.CommonTypes.ResourceIdentityType
 
 #### Variants
 
-| Name           | Type               | Description |
-| -------------- | ------------------ | ----------- |
-| SystemAssigned | `"SystemAssigned"` |             |
+| Name           | Type               | Description                             |
+| -------------- | ------------------ | --------------------------------------- |
+| SystemAssigned | `"SystemAssigned"` | The identity is assigned by the system. |
 
 ### `Severity` {#Azure.ResourceManager.CommonTypes.Severity}
 
@@ -3573,10 +3737,10 @@ union Azure.ResourceManager.CommonTypes.Severity
 
 #### Variants
 
-| Name    | Type        | Description |
-| ------- | ----------- | ----------- |
-| Warning | `"Warning"` |             |
-| Error   | `"Error"`   |             |
+| Name    | Type        | Description                                                                       |
+| ------- | ----------- | --------------------------------------------------------------------------------- |
+| Warning | `"Warning"` | The issue is a warning and does not prevent the configuration from being applied. |
+| Error   | `"Error"`   | The issue is an error and prevents the configuration from being applied.          |
 
 ### `SkuTier` {#Azure.ResourceManager.CommonTypes.SkuTier}
 
@@ -3723,9 +3887,9 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 
 #### Properties
 
-| Name | Type       | Description |
-| ---- | ---------- | ----------- |
-| name | `NameType` |             |
+| Name | Type       | Description               |
+| ---- | ---------- | ------------------------- |
+| name | `NameType` | The name of the resource. |
 
 ### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
 
@@ -3763,9 +3927,9 @@ alias Scaleset = Extension.ExternalResource<
 
 #### Properties
 
-| Name | Type       | Description |
-| ---- | ---------- | ----------- |
-| name | `NameType` |             |
+| Name | Type       | Description               |
+| ---- | ---------- | ------------------------- |
+| name | `NameType` | The name of the resource. |
 
 ### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
 
@@ -4073,9 +4237,9 @@ model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Prope
 
 #### Properties
 
-| Name        | Type                                                                                    | Description |
-| ----------- | --------------------------------------------------------------------------------------- | ----------- |
-| properties? | `Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
+| Name        | Type                                                                                    | Description                                         |
+| ----------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| properties? | `Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` | The resource-specific properties for this resource. |
 
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
@@ -4494,9 +4658,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 #### Properties
 
-| Name              | Type                                                                                                | Description |
-| ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
+| Name              | Type                                                                                                | Description                            |
+| ----------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) | The extended location of the resource. |
 
 ### `GenericResource` {#Azure.ResourceManager.Legacy.GenericResource}
 
