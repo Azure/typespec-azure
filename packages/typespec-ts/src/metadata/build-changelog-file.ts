@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 
 function getPackageVersion(model: ClientModel): string {
   return model.options?.packageDetails?.version ?? "1.0.0-beta.1";

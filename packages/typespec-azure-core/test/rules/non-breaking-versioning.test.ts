@@ -1,4 +1,4 @@
-import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { nonBreakingVersioningRule } from "../../src/rules/non-breaking-versioning.js";
 import { Tester } from "../test-host.js";

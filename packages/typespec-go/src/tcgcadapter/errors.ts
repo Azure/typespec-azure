@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as tsp from "@typespec/compiler";
-import { ErrorCode } from "../codemodel/errors.js";
+import type { ErrorCode } from "../codemodel/errors.js";
 
 /**
  * AdapterError is thrown when the emitter fails to convert part of the tcgc code

@@ -32,7 +32,7 @@ steps:
 
   - template: /eng/common/pipelines/templates/steps/maven-authenticate.yml
 
-  - template: /eng/common/pipelines/templates/steps/pip-authenticate.yml
+  - template: /eng/common/pipelines/templates/steps/python-auth-dev-feed.yml
 
   - task: Cache@2
     inputs:

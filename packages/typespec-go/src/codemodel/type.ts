@@ -7,7 +7,7 @@
 
 import * as path from "path";
 import { Client, ClientOptions } from "./client.js";
-import { PackageContent, PackageType, getPackageName } from "./module.js";
+import { type PackageContent, type PackageType, getPackageName } from "./module.js";
 import { ParameterGroup } from "./param.js";
 import { ResponseEnvelope } from "./result.js";
 
@@ -355,7 +355,12 @@ export interface Time extends QualifiedType {
   /** the serde format used */
   format: TimeFormat;
 
-  /** indicates if the time is always in UTC */
+  /**
+   * indicates the value must be coerced to UTC (via .UTC()) before marshalling.
+   * this is only true for RFC3339 utcDateTime values: RFC3339 is the sole
+   * offset-preserving format, so RFC7231 (always GMT) and Unix (absolute) leave
+   * this false even for a utcDateTime.
+   */
   utc: boolean;
 }
 

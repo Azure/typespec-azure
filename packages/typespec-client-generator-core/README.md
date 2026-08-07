@@ -118,11 +118,13 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                                                                                      | Description                                                                                     |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)   | Client names should end with 'Client'.                                                          |
-| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict) | Avoid naming conflicts between a property and a model of the same name.                         |
-| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)     | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
+| Name                                                                                                                                                                                                  | Description                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                          |
+| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                         |
+| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
+| [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                        |
+| [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                |
 
 ## Decorators
 
@@ -988,6 +990,12 @@ model MyModel {
 ```
 
 #### `@operationGroup`
+
+Define the sub client generated in the client SDK.
+If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+
+Deprecated: use `@client` instead. Sub clients should be represented using `@client`.
 
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)

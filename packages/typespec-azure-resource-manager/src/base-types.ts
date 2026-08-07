@@ -1,6 +1,6 @@
 import {
-  DecoratorContext,
-  Model,
+  type DecoratorContext,
+  type Model,
   getNamespaceFullName,
   isTemplateDeclaration,
 } from "@typespec/compiler";

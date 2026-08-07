@@ -21,6 +21,7 @@ specs:
   "azure/client-generator-core/api-version/query/client.tsp":
     { options: { module: apiversionquerygroup } }
   "azure/client-generator-core/client-default-value": { options: { module: defaultvaluegroup } }
+  "azure/client-generator-core/client-doc": { options: { module: clientdocgroup } }
   "azure/client-generator-core/client-initialization/default":
     { options: { module: clientinitdefaultgroup } }
   "azure/client-generator-core/client-initialization/individually":
@@ -37,11 +38,13 @@ specs:
     { options: { module: coreclientlocationmoverootclientgroup } }
   "azure/client-generator-core/deserialize-empty-string-as-null":
     { options: { module: emptystringgroup } }
+  "azure/client-generator-core/exact-name": { options: { module: exactnamegroup } }
   "azure/client-generator-core/flatten-property": { options: { module: flattengroup } }
   "azure/client-generator-core/hierarchy-building": { options: { module: hierarchygroup } }
   "azure/client-generator-core/next-link-verb":
     { options: { module: nextlinkverbgroup, slice-elements-byval: true } }
   "azure/client-generator-core/override/client.tsp": { options: { module: overridegroup } }
+  "azure/client-generator-core/response-as-bool": { options: { module: headasboolgroup } }
   "azure/client-generator-core/usage": { options: { module: coreusagegroup } }
   "azure/core/basic": { options: { module: basicgroup } }
   "azure/core/lro/rpc": { options: { module: lrorpcgroup } }
@@ -57,11 +60,13 @@ specs:
   "azure/payload/pageable": { options: { module: pageablegroup } }
   "azure/resource-manager/common-properties": { options: { module: commonpropsgroup } }
   "azure/resource-manager/large-header": { options: { module: largeheadergroup } }
+  "azure/resource-manager/management-group": { options: { module: managementgroupgroup } }
   "azure/resource-manager/non-resource": { options: { module: nonresourcegroup } }
   "azure/resource-manager/operation-templates": { options: { module: templatesgroup } }
   "azure/resource-manager/resources":
     { options: { module: resources, factory-gather-all-params: false } }
   "azure/special-headers/client-request-id": { options: { module: xmsclientreqidgroup } }
+  "azure/special-headers/conditional-request": { options: { module: azurecondreqgroup } }
   "azure/versioning/previewVersion":
     - options: { module: previewversiongroup, api-version: "2024-12-01-preview" }
     - options: { module: previewversiongroupspecificversion, api-version: "2024-06-01" }
@@ -69,17 +74,13 @@ specs:
   "client/naming": { options: { module: naminggroup } }
   "client/naming/enum-conflict/client.tsp": { options: { module: enumconflictgroup } }
   "client/overload/client.tsp": { options: { module: overloadgroup } }
+  "client/structure/client-operation-group/client.tsp": { options: { module: clientopgroup } }
   "client/structure/default/client.tsp": { options: { module: defaultgroup } }
+  "client/structure/multi-client/client.tsp": { options: { module: multiclientgroup } }
+  "client/structure/renamed-operation/client.tsp": { options: { module: renamedopgroup } }
+  "client/structure/two-operation-group/client.tsp": { options: { module: twoopgroup } }
   "resiliency/srv-driven": { options: { module: srvdrivennewgroup } }
   "resiliency/srv-driven/old.tsp": { options: { module: srvdrivenoldgroup } }
 
   # --- Not generated yet (tracked skips) ---
   "azure/client-generator-core/alternate-type": false
-  # disabled until new TCGC version released
-  "client/structure/client-operation-group/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/multi-client/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/renamed-operation/client.tsp": false
-  # disabled until new TCGC version released
-  "client/structure/two-operation-group/client.tsp": false

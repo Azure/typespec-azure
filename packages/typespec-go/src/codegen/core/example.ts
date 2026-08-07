@@ -8,7 +8,6 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-import { fixUpMethodName } from "./operations.js";
 
 // represents the generated content for an example
 export class ExampleContent {
@@ -77,7 +76,7 @@ export function generateExamples(
         exampleText += `// Generated from example definition: ${example.filePath}\n`;
         const exampleFuncNamePrefix =
           method.examples.length > 1 ? `_${helpers.camelCase(example.name)}` : "";
-        exampleText += `func Example${client.name}_${fixUpMethodName(method)}${exampleFuncNamePrefix}() {\n`;
+        exampleText += `func Example${client.name}_${helpers.fixUpMethodName(method)}${exampleFuncNamePrefix}() {\n`;
 
         // create credential
         exampleText += `${indent.get()}cred, err := azidentity.NewDefaultAzureCredential(nil)\n`;
@@ -195,7 +194,7 @@ export function generateExamples(
         switch (method.kind) {
           case "lroMethod":
           case "lroPageableMethod":
-            exampleText += `${indent.get()}poller, err := ${clientRef}.${fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}poller, err := ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
@@ -206,13 +205,13 @@ export function generateExamples(
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "method":
-            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "pageableMethod":
-            exampleText += `${indent.get()}pager := ${clientRef}.${fixUpMethodName(method)}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}pager := ${clientRef}.${helpers.fixUpMethodName(method)}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             break;
           default:
             method satisfies never;
@@ -444,23 +443,217 @@ function getConstantValue(pkg: go.TestPackage, type: go.Constant, value: any): s
   }
 }
 
-function getTimeValue(type: go.Time, value: any, imports?: ImportManager): string {
-  const formatMap: Record<string, string> = {
-    PlainDate: helpers.plainDateFormat,
-    PlainTime: helpers.plainTimeFormat,
-    RFC1123: helpers.RFC1123Format,
-    RFC3339: helpers.RFC3339Format,
-  };
+// month names indexed by (month - 1), mapped to Go's time.Month constants so an
+// example datetime can be emitted as a readable time.Date(...) literal instead of
+// leaking the wire format into a time.Parse call.
+const goMonthConstants = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
-  if (type.format in formatMap) {
-    imports?.add("time");
-    const format = formatMap[type.format];
-    return `func() time.Time { t, _ := time.Parse(${format}, "${value}"); return t}()`;
-  } else {
-    imports?.add("strconv");
-    imports?.add("time");
-    return `func() time.Time { t, _ := strconv.ParseInt(${value}, 10, 64); return time.Unix(t, 0).UTC()}()`;
+const monthNameToNumber: Record<string, number> = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+};
+
+interface TimeComponents {
+  year: number;
+  /** 1-12 */
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+  nanosecond: number;
+  /** minutes east of UTC carried by the wire value (0 for Z/GMT/zoneless formats) */
+  offsetMinutes: number;
+}
+
+// converts an optional fractional-seconds string (for example "123") into
+// nanoseconds by right-padding to nine digits.
+function fractionalToNanoseconds(fraction: string | undefined): number {
+  if (!fraction) {
+    return 0;
   }
+  return Number((fraction + "000000000").slice(0, 9));
+}
+
+// folds a wall-clock time carrying a UTC offset into UTC. offsets are always
+// whole minutes, so the sub-second component is unaffected and nanosecond
+// fidelity is preserved.
+function foldOffsetToUTC(components: TimeComponents): TimeComponents {
+  if (components.offsetMinutes === 0) {
+    return components;
+  }
+  const utc = new Date(
+    Date.UTC(
+      components.year,
+      components.month - 1,
+      components.day,
+      components.hour,
+      components.minute,
+      components.second,
+    ) -
+      components.offsetMinutes * 60000,
+  );
+  return {
+    year: utc.getUTCFullYear(),
+    month: utc.getUTCMonth() + 1,
+    day: utc.getUTCDate(),
+    hour: utc.getUTCHours(),
+    minute: utc.getUTCMinutes(),
+    second: utc.getUTCSeconds(),
+    nanosecond: components.nanosecond,
+    offsetMinutes: 0,
+  };
+}
+
+// parses an example datetime wire value into its components (preserving any wire
+// offset) based on the Go serde format. returns undefined when the value doesn't
+// match the expected shape so the caller can fall back to a placeholder (examples
+// are illustrative, not production code).
+function parseExampleTime(format: go.Time["format"], value: string): TimeComponents | undefined {
+  switch (format) {
+    case "RFC3339": {
+      const m =
+        /^(\d{4})-(\d{2})-(\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(
+          value,
+        );
+      if (m) {
+        let offsetMinutes = 0;
+        if (m[8]) {
+          offsetMinutes = (Number(m[9]) * 60 + Number(m[10])) * (m[8] === "-" ? -1 : 1);
+        }
+        return {
+          year: Number(m[1]),
+          month: Number(m[2]),
+          day: Number(m[3]),
+          hour: Number(m[4]),
+          minute: Number(m[5]),
+          second: Number(m[6]),
+          nanosecond: fractionalToNanoseconds(m[7]),
+          offsetMinutes,
+        };
+      }
+      break;
+    }
+    case "RFC7231":
+    case "RFC1123": {
+      // RFC7231 (IMF-fixdate) and RFC1123 share the "Wdy, DD Mon YYYY HH:MM:SS GMT"
+      // grammar; the weekday prefix is optional and the zone is treated as UTC
+      // (a rare numeric offset is preserved).
+      const m =
+        /^(?:[A-Za-z]{3,9},?\s+)?(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})\s+([A-Za-z]+|[+-]\d{4})$/.exec(
+          value,
+        );
+      if (m) {
+        const monthName = m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase();
+        const month = monthNameToNumber[monthName];
+        if (month) {
+          let offsetMinutes = 0;
+          const numericOffset = /^([+-])(\d{2})(\d{2})$/.exec(m[7]);
+          if (numericOffset) {
+            offsetMinutes =
+              (Number(numericOffset[2]) * 60 + Number(numericOffset[3])) *
+              (numericOffset[1] === "-" ? -1 : 1);
+          }
+          return {
+            year: Number(m[3]),
+            month,
+            day: Number(m[1]),
+            hour: Number(m[4]),
+            minute: Number(m[5]),
+            second: Number(m[6]),
+            nanosecond: 0,
+            offsetMinutes,
+          };
+        }
+      }
+      break;
+    }
+    case "PlainDate": {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+      if (m) {
+        return {
+          year: Number(m[1]),
+          month: Number(m[2]),
+          day: Number(m[3]),
+          hour: 0,
+          minute: 0,
+          second: 0,
+          nanosecond: 0,
+          offsetMinutes: 0,
+        };
+      }
+      break;
+    }
+    case "PlainTime": {
+      const m = /^(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?$/.exec(value);
+      if (m) {
+        // mirrors time.Parse(time.TimeOnly, ...), which yields the zero date.
+        return {
+          year: 0,
+          month: 1,
+          day: 1,
+          hour: Number(m[1]),
+          minute: Number(m[2]),
+          second: Number(m[3]),
+          nanosecond: fractionalToNanoseconds(m[4]),
+          offsetMinutes: 0,
+        };
+      }
+      break;
+    }
+  }
+  return undefined;
+}
+
+// emits an example datetime as a readable time.Date(...) literal (or time.Unix(...)
+// for epoch timestamps) rather than a time.Parse call that would leak the wire
+// format into the generated sample. utcDateTime (and the inherently-UTC formats)
+// are normalized to time.UTC; offsetDateTime preserves its wire offset via a
+// time.FixedZone so the zone-bearing instant round-trips unchanged.
+function getTimeValue(type: go.Time, value: any, imports?: ImportManager): string {
+  imports?.add("time");
+  if (type.format === "Unix") {
+    // unixTimestamp is absolute epoch seconds; there's no wire-format string to leak.
+    // no .UTC(): the SDK never requires callers to normalize time.Time, and the Unix
+    // marshaler ignores the zone anyway, so a sample must not imply the coercion is needed.
+    return `time.Unix(${Math.trunc(Number(value))}, 0)`;
+  }
+  const c = parseExampleTime(type.format, String(value));
+  if (!c) {
+    // examples are illustrative, not production code: if the value doesn't match the
+    // expected wire shape, fall back to a placeholder rather than failing the build.
+    return "time.Time{}";
+  }
+  // offsetDateTime (utc === false) preserves the authored offset; everything else
+  // (utcDateTime, RFC7231/GMT, plain date/time) is normalized to UTC.
+  if (!type.utc && c.offsetMinutes !== 0) {
+    return `time.Date(${c.year}, time.${goMonthConstants[c.month - 1]}, ${c.day}, ${c.hour}, ${c.minute}, ${c.second}, ${c.nanosecond}, time.FixedZone("", ${c.offsetMinutes * 60}))`;
+  }
+  const utc = foldOffsetToUTC(c);
+  return `time.Date(${utc.year}, time.${goMonthConstants[utc.month - 1]}, ${utc.day}, ${utc.hour}, ${utc.minute}, ${utc.second}, ${utc.nanosecond}, time.UTC)`;
 }
 
 function getPointerValue(

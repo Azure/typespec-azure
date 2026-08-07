@@ -2,30 +2,30 @@ import {
   getClientOptions,
   isHttpMetadata,
   isReadOnly,
-  SdkBodyParameter,
-  SdkClientType,
-  SdkConstantType,
-  SdkEnumType,
-  SdkHttpOperation,
-  SdkHttpParameter,
-  SdkLroPagingServiceMethod,
-  SdkLroServiceMethod,
-  SdkMethod,
-  SdkMethodParameter,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkPagingServiceMethod,
-  SdkServiceResponseHeader,
-  SdkType,
+  type SdkBodyParameter,
+  type SdkClientType,
+  type SdkConstantType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkHttpParameter,
+  type SdkLroPagingServiceMethod,
+  type SdkLroServiceMethod,
+  type SdkMethod,
+  type SdkMethodParameter,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkPagingServiceMethod,
+  type SdkServiceResponseHeader,
+  type SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, Program } from "@typespec/compiler";
+import { NoTarget, type Program } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
-  FunctionDeclarationStructure,
-  OptionalKind,
-  ParameterDeclarationStructure,
+  type FunctionDeclarationStructure,
+  type OptionalKind,
+  type ParameterDeclarationStructure,
   StructureKind,
-  TypeAliasDeclarationStructure,
+  type TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { useSdkTypes } from "../../framework/hooks/sdk-types.js";
@@ -33,7 +33,7 @@ import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
@@ -46,9 +46,9 @@ import {
   isMultipartPayload,
   isXmlPayload,
   KnownCollectionFormat,
-  ServiceOperation,
+  type ServiceOperation,
 } from "../../utils/operation-util.js";
-import { AzurePollingDependencies } from "../external-dependencies.js";
+import { AzureCoreDependencies, AzurePollingDependencies } from "../external-dependencies.js";
 import {
   buildModelDeserializer,
   buildPropertyDeserializer,
@@ -66,11 +66,10 @@ import {
   getPropertyWithOverrides,
   isNormalUnion,
   isSpecialHandledUnion,
-  ModelOverrideOptions,
+  type ModelOverrideOptions,
 } from "../serialization/serialize-utils.js";
 import {
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   StorageCompatHelpers,
@@ -1043,7 +1042,7 @@ export function getOperationFunction(
     statements.push(`const ${streamableMethodVarName} = _${name}Send(${sendParameterList});`);
     const binaryHelper =
       wrapReturn && wrapReturnIsBinary
-        ? SerializationHelpers.getBinaryStreamResponse
+        ? AzureCoreDependencies["getBinaryStreamResponse"]
         : SerializationHelpers.getBinaryResponse;
     statements.push(
       `const ${resultVarName} = await ${resolveReference(binaryHelper)}(${streamableMethodVarName});`,
@@ -3003,7 +3002,7 @@ export function buildNonModelResponseTypeDeclaration(
   let typeBody: string;
 
   if (isBinary) {
-    const nodeReadableStreamRef = resolveReference(PlatformTypeHelpers.NodeReadableStream);
+    const nodeReadableStreamRef = resolveReference(AzureCoreDependencies["NodeReadableStream"]);
     typeBody = `{
       /**
        * BROWSER ONLY

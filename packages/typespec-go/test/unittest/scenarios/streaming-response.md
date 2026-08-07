@@ -191,12 +191,7 @@ func (client *ConfigurationsClient) GetContent(ctx context.Context, apiVersion s
 	if err != nil {
 		return ConfigurationsClientGetContentResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return ConfigurationsClientGetContentResponse{}, err
-	}
-	resp, err := client.getContentHandleResponse(httpResp)
-	return resp, err
+	return client.getContentHandleResponse(httpResp, http.StatusOK)
 }
 
 // getContentCreateRequest creates the GetContent request.
@@ -226,8 +221,11 @@ func (client *ConfigurationsClient) getContentCreateRequest(ctx context.Context,
 }
 
 // getContentHandleResponse handles the GetContent response.
-func (client *ConfigurationsClient) getContentHandleResponse(resp *http.Response) (ConfigurationsClientGetContentResponse, error) {
+func (client *ConfigurationsClient) getContentHandleResponse(resp *http.Response, successCodes ...int) (ConfigurationsClientGetContentResponse, error) {
 	result := ConfigurationsClientGetContentResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.Configuration); err != nil {
 		return ConfigurationsClientGetContentResponse{}, err
 	}
@@ -250,12 +248,7 @@ func (client *ConfigurationsClient) GetStreamingContent(ctx context.Context, api
 	if err != nil {
 		return ConfigurationsClientGetStreamingContentResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return ConfigurationsClientGetStreamingContentResponse{}, err
-	}
-	resp, err := client.getStreamingContentHandleResponse(httpResp)
-	return resp, err
+	return client.getStreamingContentHandleResponse(httpResp, http.StatusOK)
 }
 
 // getStreamingContentCreateRequest creates the GetStreamingContent request.
@@ -286,11 +279,15 @@ func (client *ConfigurationsClient) getStreamingContentCreateRequest(ctx context
 }
 
 // getStreamingContentHandleResponse handles the GetStreamingContent response.
-func (client *ConfigurationsClient) getStreamingContentHandleResponse(resp *http.Response) (ConfigurationsClientGetStreamingContentResponse, error) {
-	result := ConfigurationsClientGetStreamingContentResponse{Body: resp.Body}
+func (client *ConfigurationsClient) getStreamingContentHandleResponse(resp *http.Response, successCodes ...int) (ConfigurationsClientGetStreamingContentResponse, error) {
+	result := ConfigurationsClientGetStreamingContentResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if val := resp.Header.Get("Content-Type"); val != "" {
 		result.ContentType = &val
 	}
+	result.Body = resp.Body
 	return result, nil
 }
 
@@ -310,12 +307,7 @@ func (client *ConfigurationsClient) GetTextContent(ctx context.Context, apiVersi
 	if err != nil {
 		return ConfigurationsClientGetTextContentResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return ConfigurationsClientGetTextContentResponse{}, err
-	}
-	resp, err := client.getTextContentHandleResponse(httpResp)
-	return resp, err
+	return client.getTextContentHandleResponse(httpResp, http.StatusOK)
 }
 
 // getTextContentCreateRequest creates the GetTextContent request.
@@ -345,8 +337,11 @@ func (client *ConfigurationsClient) getTextContentCreateRequest(ctx context.Cont
 }
 
 // getTextContentHandleResponse handles the GetTextContent response.
-func (client *ConfigurationsClient) getTextContentHandleResponse(resp *http.Response) (ConfigurationsClientGetTextContentResponse, error) {
+func (client *ConfigurationsClient) getTextContentHandleResponse(resp *http.Response, successCodes ...int) (ConfigurationsClientGetTextContentResponse, error) {
 	result := ConfigurationsClientGetTextContentResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	body, err := runtime.Payload(resp)
 	if err != nil {
 		return ConfigurationsClientGetTextContentResponse{}, err
@@ -373,8 +368,7 @@ func (client *ConfigurationsClient) PutStreamingContent(ctx context.Context, api
 		return ConfigurationsClientPutStreamingContentResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return ConfigurationsClientPutStreamingContentResponse{}, err
+		return ConfigurationsClientPutStreamingContentResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return ConfigurationsClientPutStreamingContentResponse{}, nil
 }

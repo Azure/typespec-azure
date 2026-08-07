@@ -27,7 +27,6 @@ func TestXMLModelWithDatetimeValueClient_Get(t *testing.T) {
 }
 
 func TestXMLModelWithDatetimeValueClient_Put(t *testing.T) {
-	t.Skip("Go's datetime.RFC1123 marshals as 'UTC' but the mock server expects 'GMT'")
 	client, err := xmlgroup.NewXMLClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
 	rfc3339 := time.Date(2022, 8, 26, 18, 38, 0, 0, time.UTC)

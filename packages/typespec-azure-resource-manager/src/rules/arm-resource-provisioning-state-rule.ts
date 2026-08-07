@@ -1,4 +1,11 @@
-import { Enum, Model, createRule, fileRef, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  type Enum,
+  type Model,
+  createRule,
+  fileRef,
+  getProperty,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import { getArmResource } from "../resource.js";

@@ -40,6 +40,7 @@
     "regenerate": "node ./eng/scripts/ci/regenerate.ts",
     "sync": "node ./eng/scripts/sync.ts",
     "sync:check": "node ./eng/scripts/sync.ts --check",
+    "check-unstaged": "git -c core.safecrlf=false diff --ignore-space-at-eol --exit-code HEAD -- .",
     "test:python:e2e": "node ./eng/scripts/ci/run-tests.ts",
     "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
   },

@@ -1,8 +1,8 @@
-import { getEncode, NoTarget, Program } from "@typespec/compiler";
-import { HttpOperationParameter } from "@typespec/http";
-import { Schema, SchemaContext } from "../interfaces.js";
+import { getEncode, NoTarget, type Program } from "@typespec/compiler";
+import type { HttpOperationParameter } from "@typespec/http";
+import { type Schema, SchemaContext } from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
-import { SdkContext } from "./interfaces.js";
+import type { SdkContext } from "./interfaces.js";
 import { getTypeName, isArrayType, isObjectOrDictType } from "./model-utils.js";
 import { NameType, normalizeName } from "./name-utils.js";
 
