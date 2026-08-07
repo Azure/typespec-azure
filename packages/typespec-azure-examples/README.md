@@ -1,7 +1,7 @@
 # @azure-tools/typespec-azure-examples
 
-Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema
-and the `examples-validate` CLI.
+Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema,
+the `examples-validate` CLI, and the `examples-migrate` CLI.
 
 The unified examples format replaces the ~282K per-version `x-ms-examples` JSON files with a
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
@@ -70,6 +70,33 @@ found (use `--warn-as-error` to also fail on warnings).
 - `{api-version}` is the only supported placeholder, and `api-version` must not appear as a
   request parameter.
 
+## `examples-migrate`
+
+Convert a service's existing `x-ms-examples` JSON into the unified format:
+
+```bash
+examples-migrate <spec-dir> --out <service-dir>
+```
+
+It crawls the versioned Swagger under `<spec-dir>` (the `stable/<version>/` and
+`preview/<version>/` layout), follows each operation's `x-ms-examples` `$ref`, and emits a single
+`examples.yaml` (or `examples/<Interface>.yaml` with `--split-by-interface`). The generated output
+is validated with the same rules as `examples-validate` before it is written.
+
+What it does:
+
+- Derives interface-relative operation keys from the Swagger `operationId` (`CaCertificates_Get` →
+  `CaCertificates.get`) under a single `$namespace` (detected from `/providers/<Namespace>/`, or
+  set with `--namespace`).
+- Buckets each example parameter into `request.path` / `query` / `headers` / `body` using the
+  operation's declared parameter locations, and drops the implicit `api-version`.
+- Normalizes embedded version strings (in `Location`, `Azure-AsyncOperation`, `nextLink`, ...) to
+  the `{api-version}` placeholder, then dedups identical examples across versions into `since`
+  lineages — one base entry plus a `since` variant whenever the content changes.
+
+Options: `--out <dir>` (default `.`), `--namespace <ns>`, `--split-by-interface`, `--dry-run`,
+`--warn-as-error`.
+
 ## API
 
 ```ts
@@ -77,7 +104,10 @@ import {
   validateExamplesDir,
   validateExampleFiles,
   loadExampleFile,
+  migrate,
 } from "@azure-tools/typespec-azure-examples";
 
 const { diagnostics } = await validateExamplesDir("path/to/service");
+
+const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
 ```

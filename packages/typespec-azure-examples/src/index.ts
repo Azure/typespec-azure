@@ -16,6 +16,7 @@ export {
 export { formatDiagnostics, formatSummary } from "./reporter.js";
 export { checkFilePlacement, checkSemantics, type SemanticContext } from "./rules.js";
 export { ExamplesYamlSchema } from "./schema.js";
+export * from "./migrate/index.js";
 export type {
   DiagnosticSeverity,
   ExampleDiagnostic,
