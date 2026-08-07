@@ -752,20 +752,6 @@ function emitPagerDefinition(
     text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${fixUpMethodName(method)}")\n`;
   }
 
-  /** emits code to check the HTTP status code and conditionally call the response handler */
-  const emitStatusCodeCheckAndResponse = function (
-    respVarName: string,
-    indent: helpers.Indentation,
-  ): string {
-    let content = `${indent.get()}${helpers.buildIfBlock(indent, {
-      condition: `!runtime.HasStatusCode(${respVarName}, http.StatusOK)`,
-      body: (indent) =>
-        `${indent.get()}return ${getZeroReturnValue(method, "op")}, runtime.NewResponseError(${respVarName})\n`,
-    })}\n`;
-    content += `${indent.get()}return client.${method.naming.responseMethod}(${respVarName})\n`;
-    return content;
-  };
-
   if (method.strategy) {
     switch (method.strategy.kind) {
       case "continuationToken": {
@@ -801,7 +787,7 @@ function emitPagerDefinition(
 
         text += callCreateRequestWithErrCheck(method, "req", indent, `&${optionsCopy}`);
         text += callPipelineDoWithErrCheck(method, "req", "resp", indent);
-        text += emitStatusCodeCheckAndResponse("resp", indent);
+        text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
         break;
       }
       case "nextLink": {
@@ -851,14 +837,14 @@ function emitPagerDefinition(
         text += `${indent.get()}if err != nil {\n`;
         text += `${indent.push().get()}return ${method.returns.name}{}, err\n`;
         text += `${indent.pop().get()}}\n`;
-        text += `${indent.get()}return client.${method.naming.responseMethod}(resp)\n`;
+        text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
       }
     }
   } else {
     // this is the singular page case, no fetcher helper required
     text += callCreateRequestWithErrCheck(method, "req", indent);
     text += callPipelineDoWithErrCheck(method, "req", "resp", indent);
-    text += emitStatusCodeCheckAndResponse("resp", indent);
+    text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
   }
   text += `${indent.pop().get()}},\n`; // end Fetcher func
   if (options.injectSpans) {
@@ -982,33 +968,45 @@ function generateOperation(
     text += `${indent.get()}ctx, endSpan := runtime.StartSpan(ctx, ${operationName}, client.internal.Tracer(), nil)\n`;
     text += `${indent.get()}defer func() { endSpan(err) }()\n`;
   }
-  const zeroResp = getZeroReturnValue(method, "op");
+
   text += callCreateRequestWithErrCheck(method, "req", indent);
   text += callPipelineDoWithErrCheck(method, "req", "httpResp", indent);
-  text += `${indent.get()}if !runtime.HasStatusCode(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)}) {\n`;
-  indent.push();
-  text += `${indent.get()}err = runtime.NewResponseError(httpResp)\n`;
-  text += `${indent.get()}return ${zeroResp}, err\n`;
-  text += `${indent.pop().get()}}\n`;
-  // HAB with headers response is handled in protocol responder
-  if (
-    method.returns.result?.kind === "headAsBooleanResult" &&
-    method.returns.headers.length === 0
-  ) {
-    text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.StatusCode >= 200 && httpResp.StatusCode < 300}, nil\n`;
+
+  // NOTE: for an LRO's op method we never invoke the response handler.
+  // for vanilla LRO's we don't emit one, only for pageable LROs and in
+  // that case the response handler is invoked by the fetcher.
+  if (needsResponseHandler(method) && !go.isLROMethod(method)) {
+    // methods that return a modeled type, headers, or both call the method's response handler
+    text += `${indent.get()}return client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
   } else {
+    // no response handler so we emit the status code check here
+    const zeroResp = getZeroReturnValue(method, "op");
+    text += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: `!runtime.HasStatusCode(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`,
+      body: (indent) => `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
+    })}\n`;
+
     if (go.isLROMethod(method)) {
       text += `${indent.get()}return httpResp, nil\n`;
-    } else if (needsResponseHandler(method)) {
-      // also cheating here as at present the only param to the responder is an http.Response
-      text += `${indent.get()}resp, err := client.${method.naming.responseMethod}(httpResp)\n`;
-      text += `${indent.get()}return resp, err\n`;
-    } else if (method.returns.result?.kind === "binaryResult") {
-      text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.Body}, nil\n`;
+    } else if (method.returns.result) {
+      switch (method.returns.result.kind) {
+        case "binaryResult":
+          text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.Body}, nil\n`;
+          break;
+        case "headAsBooleanResult":
+          text += `${indent.get()}return ${method.returns.name}{${method.returns.result.fieldName}: httpResp.StatusCode >= 200 && httpResp.StatusCode < 300}, nil\n`;
+          break;
+        default:
+          // we should never get here as the remaining kinds are all modeled results
+          // thus should have been handled by the needsResponseHandler check earlier
+          throw new CodegenError("InternalError", `unexpected method result kind ${method.returns.result.kind}`);
+      }
     } else {
-      text += `${indent.get()}return ${method.returns.name}{}, nil\n`;
+      // no result type, just response envelope
+      text += `${indent.get()}return ${zeroResp}, nil\n`;
     }
   }
+
   text += "}\n\n";
   return text;
 }
@@ -1936,32 +1934,31 @@ function createProtocolResponse(
   }
   const name = method.naming.responseMethod;
   let text = `${helpers.comment(name, "// ")} handles the ${method.name} response.\n`;
-  text += `func ${getClientReceiverDefinition(method.receiver)} ${name}(resp *http.Response) (${generateReturnsInfo(method, "handler").join(", ")}) {\n`;
+  text += `func ${getClientReceiverDefinition(method.receiver)} ${name}(resp *http.Response, successCodes ...int) (${generateReturnsInfo(method, "handler").join(", ")}) {\n`;
 
-  const addHeaders = function (headers: Array<go.HeaderScalarResponse | go.HeaderMapResponse>) {
-    for (const header of headers) {
-      text += formatHeaderResponseValue(
-        method,
-        header,
-        "result",
-        `${method.returns.name}{}`,
-        imports,
-        indent,
-      );
-    }
-  };
+  const resultVarName = "result";
+  text += `${indent.get()}${resultVarName} := ${method.returns.name}{}\n`;
+  text += `${indent.get()}${helpers.buildIfBlock(indent, {
+    condition: "!runtime.HasStatusCode(resp, successCodes...)",
+    body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
+  })}\n`;
+
+  for (const header of method.returns.headers) {
+    text += formatHeaderResponseValue(
+      method,
+      header,
+      resultVarName,
+      `${method.returns.name}{}`,
+      imports,
+      indent,
+    );
+  }
 
   const result = method.returns.result;
-  if (!result) {
-    // only headers
-    text += `${indent.get()}result := ${method.returns.name}{}\n`;
-    addHeaders(method.returns.headers);
-  } else {
+  if (result) {
     switch (result.kind) {
       case "anyResult":
         imports.add("fmt");
-        text += `${indent.get()}result := ${method.returns.name}{}\n`;
-        addHeaders(method.returns.headers);
         text += `${indent.get()}switch resp.StatusCode {\n`;
         for (const statusCode of method.httpStatusCodes) {
           text += `${indent.get()}case ${helpers.formatStatusCodes([statusCode])}:\n`;
@@ -1979,39 +1976,33 @@ function createProtocolResponse(
             imports,
             indent,
           );
-          text += `${indent.get()}result.Value = val\n`;
+          text += `${indent.get()}${resultVarName}.${result.fieldName} = val\n`;
         }
         text += `${indent.get()}default:\n`;
-        text += `${indent.push().get()}return ${getZeroReturnValue(method, "handler")}, fmt.Errorf("unhandled HTTP status code %d", resp.StatusCode)\n`;
+        text += `${indent.push().get()}return ${resultVarName}, fmt.Errorf("unhandled HTTP status code %d", resp.StatusCode)\n`;
         text += `${indent.pop().get()}}\n`;
         break;
       case "binaryResult":
-        text += `${indent.get()}result := ${method.returns.name}{${result.fieldName}: resp.Body}\n`;
-        addHeaders(method.returns.headers);
+        text += `${indent.get()}${resultVarName}.${result.fieldName} = resp.Body\n`;
         break;
       case "headAsBooleanResult":
-        text += `${indent.get()}result := ${method.returns.name}{${result.fieldName}: resp.StatusCode >= 200 && resp.StatusCode < 300}\n`;
-        addHeaders(method.returns.headers);
+        text += `${indent.get()}${resultVarName}.${result.fieldName} = resp.StatusCode >= 200 && resp.StatusCode < 300\n`;
         break;
       case "modelResult":
-        text += `${indent.get()}result := ${method.returns.name}{}\n`;
-        addHeaders(method.returns.headers);
         text += generateResponseUnmarshaller(
           method,
           result.modelType,
           result.format,
-          `result.${helpers.getResultFieldName(method)}`,
+          `${resultVarName}.${helpers.getResultFieldName(method)}`,
           imports,
           indent,
         );
         break;
       case "monomorphicResult":
-        text += `${indent.get()}result := ${method.returns.name}{}\n`;
-        addHeaders(method.returns.headers);
-        let target = `result.${helpers.getResultFieldName(method)}`;
+        let target = `${resultVarName}.${helpers.getResultFieldName(method)}`;
         // when unmarshalling a wrapped XML array, unmarshal into the response envelope
         if (result.format === "XML" && result.monomorphicType.kind === "slice") {
-          target = "result";
+          target = resultVarName;
         }
         text += generateResponseUnmarshaller(
           method,
@@ -2023,13 +2014,11 @@ function createProtocolResponse(
         );
         break;
       case "polymorphicResult":
-        text += `${indent.get()}result := ${method.returns.name}{}\n`;
-        addHeaders(method.returns.headers);
         text += generateResponseUnmarshaller(
           method,
           result.interface,
           result.format,
-          "result",
+          resultVarName,
           imports,
           indent,
         );
@@ -2039,7 +2028,7 @@ function createProtocolResponse(
     }
   }
 
-  text += `${indent.get()}return result, nil\n`;
+  text += `${indent.get()}return ${resultVarName}, nil\n`;
   text += "}\n\n";
   return text;
 }

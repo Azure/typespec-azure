@@ -86,12 +86,7 @@ func (client *HeadersClient) Read(ctx context.Context, requestHeader string, opt
 	if err != nil {
 		return HeadersClientReadResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return HeadersClientReadResponse{}, err
-	}
-	resp, err := client.readHandleResponse(httpResp)
-	return resp, err
+	return client.readHandleResponse(httpResp, http.StatusOK)
 }
 
 // readCreateRequest creates the Read request.
@@ -105,8 +100,11 @@ func (client *HeadersClient) readCreateRequest(ctx context.Context, requestHeade
 }
 
 // readHandleResponse handles the Read response.
-func (client *HeadersClient) readHandleResponse(resp *http.Response) (HeadersClientReadResponse, error) {
+func (client *HeadersClient) readHandleResponse(resp *http.Response, successCodes ...int) (HeadersClientReadResponse, error) {
 	result := HeadersClientReadResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if val := resp.Header.Get("X-Response-Header"); val != "" {
 		result.ResponseHeader = &val
 	}
