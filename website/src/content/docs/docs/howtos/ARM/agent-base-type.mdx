@@ -57,6 +57,9 @@ model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
 model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;
 ```
 
+`modelDeploymentRef` is writable in both deployment models: even when the service owns the rest of
+the appliance definition, the client selects the underlying model deployment.
+
 ## Defining the agent properties
 
 The agent property bag is derived from `AgentPropertiesAppliance` or `AgentPropertiesPlatform`,

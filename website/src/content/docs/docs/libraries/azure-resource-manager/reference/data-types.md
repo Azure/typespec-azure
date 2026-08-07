@@ -1630,7 +1630,8 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentConversation<Properties, Agent
 
 Appliance deployment model of AgentDefinition.
 Properties controlled by `@baseTypeOptional` are invisible when the corresponding
-template parameter is false, or read-only when present.
+template parameter is false. When present, `instructions` is read-only while
+`modelDeploymentRef` stays writable so the client can point the agent at a model deployment.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>
@@ -1645,11 +1646,11 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDe
 
 #### Properties
 
-| Name                | Type     | Description                                                       |
-| ------------------- | -------- | ----------------------------------------------------------------- |
-| model               | `string` | Model identifier (RP-defined).                                    |
-| instructions        | `string` | System prompt / behavioral instructions for the agent.            |
-| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| Name                | Type     | Description                                                                                           |
+| ------------------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                                                        |
+| instructions        | `string` | System prompt / behavioral instructions for the agent.                                                |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. Writable in both deployment models. |
 
 ### `AgentDefinitionPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform}
 
