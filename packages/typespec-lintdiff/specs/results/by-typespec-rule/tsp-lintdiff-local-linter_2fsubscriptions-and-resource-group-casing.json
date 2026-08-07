@@ -1,0 +1,503 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+  "count": 49,
+  "levels": {
+    "warning": 49
+  },
+  "projectCount": 7,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 92,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 137,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 192,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 227,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "routes.tsp",
+      "line": 270,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
+      "sourceFile": "routes.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 674,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1797,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1888,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 833,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 839,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 858,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 864,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 887,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 897,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 918,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 928,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "routes.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "routes.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 86,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 104,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 131,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 141,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 80,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 163,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 183,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 196,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 180,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 186,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 193,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 209,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 218,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "SerialPort.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "SerialPort.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "SerialPort.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "SerialPort.tsp",
+      "line": 103,
+      "column": 3,
+      "message": "The path segment resourcegroups should be resourceGroups."
+    }
+  ]
+}

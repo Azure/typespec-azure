@@ -1,0 +1,64 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:46:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-03-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:820:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'isArchiveEnabled' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:936:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'tags' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2100:7 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'Registry' must have a put/createOrUpdate operation.
+models.tsp:634:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1021:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:499:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:820:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1627:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1652:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1657:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1726:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1800:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1926:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1931:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2019:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2024:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+AgentPool.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AgentPool.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AgentPool.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AgentPool.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AgentPool.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AgentPool.tsp:74:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'getQueueStatus' should contain the action verb 'listqueuestatus' from the route path. Consider updating the operation name.
+AgentPool.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Run.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Run.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Run.tsp:56:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Run.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Run.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Run.tsp:56:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Run.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Run.tsp:56:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Run.tsp:65:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'getLogSasUrl' should contain the action verb 'listlogsasurl' from the route path. Consider updating the operation name.
+Run.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Run.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TaskRun.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TaskRun.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:494:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.runRequest.type.
+models.tsp:499:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.runRequest.isArchiveEnabled.
+TaskRun.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TaskRun.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TaskRun.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TaskRun.tsp:86:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'getDetails' should contain the action verb 'listdetails' from the route path. Consider updating the operation name.
+TaskRun.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Task.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Task.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:1420:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.step.type.
+models.tsp:1579:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.trigger.baseImageTrigger.status.
+models.tsp:1584:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.trigger.baseImageTrigger.name.
+Task.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Task.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Task.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Task.tsp:67:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'getDetails' should contain the action verb 'listdetails' from the route path. Consider updating the operation name.
+Task.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:22:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:43:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'getBuildSourceUploadUrl' should contain the action verb 'listbuildsourceuploadurl' from the route path. Consider updating the operation name.
+routes.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 57 warnings.
+

@@ -1,0 +1,63 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+models.tsp:590:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:596:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:607:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:590:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:596:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:607:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:1054:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1122:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1124:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1132:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1134:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1165:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:208:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:268:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:501:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:561:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:661:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:692:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:712:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+AppServiceCertificateOrder.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:45:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+AppServiceCertificateOrder.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:484:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.validityInYears.
+models.tsp:490:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.keySize.
+models.tsp:496:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.productType.
+models.tsp:501:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.autoRenew.
+AppServiceCertificateOrder.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:115:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:125:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:145:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:160:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateOrder.tsp:176:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'retrieveCertificateEmailHistory' should contain the action verb 'retrieveemailhistory' from the route path. Consider updating the operation name.
+AppServiceCertificateOrder.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateResource.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateResource.tsp:47:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+AppServiceCertificateResource.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateResource.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateResource.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AppServiceCertificateResource.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DetectorResponse.tsp:39:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'startTime' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:45:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'endTime' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:52:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'timeGrain' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DetectorResponse.tsp:39:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'startTime' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:45:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'endTime' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:52:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'timeGrain' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DetectorResponse.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:24:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'validatePurchaseInformation' should contain the action verb 'validatecertificateregistrationinformation' from the route path. Consider updating the operation name.
+routes.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 56 warnings.
+

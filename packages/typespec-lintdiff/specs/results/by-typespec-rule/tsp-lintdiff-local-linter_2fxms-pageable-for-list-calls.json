@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+  "count": 44,
+  "levels": {
+    "warning": 44
+  },
+  "projectCount": 25,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 374,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 385,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 414,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 275,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 323,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 458,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 510,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "routes.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "routes.tsp",
+      "line": 28,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "Bot.tsp",
+      "line": 127,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "Account.tsp",
+      "line": 174,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "Account.tsp",
+      "line": 218,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "routes.tsp",
+      "line": 314,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "DiskAccess.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "routes.tsp",
+      "line": 24,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 37,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Vault.tsp",
+      "line": 155,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "ManagedHsm.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "Workspace.tsp",
+      "line": 214,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "routes.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 113,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/PrivateLinkScopesApi",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "routes.tsp",
+      "line": 69,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "SavedSearch.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "sourceFile": "DedicatedCapacity.tsp",
+      "line": 133,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "sourceFile": "routes.tsp",
+      "line": 22,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "Cluster.tsp",
+      "line": 375,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "Cluster.tsp",
+      "line": 387,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "routes.tsp",
+      "line": 27,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 131,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "routes.tsp",
+      "line": 126,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "routes.tsp",
+      "line": 138,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "routes.tsp",
+      "line": 231,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "SignalRResource.tsp",
+      "line": 139,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "Replica.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 297,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 276,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2390,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1035,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteARMResource.tsp",
+      "line": 334,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "WebPubSubResource.tsp",
+      "line": 140,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "Replica.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    }
+  ]
+}

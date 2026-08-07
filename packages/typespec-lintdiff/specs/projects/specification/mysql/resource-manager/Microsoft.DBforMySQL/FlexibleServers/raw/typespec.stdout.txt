@@ -1,0 +1,117 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:55:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:65:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:70:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:55:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-12-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:65:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:1888:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AzureADAdministrator.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AzureADAdministrator.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AzureADAdministrator.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AzureADAdministrator.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:876:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+models.tsp:881:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.tier.
+models.tsp:1074:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.storage.autoGrow.
+models.tsp:1079:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.storage.logOnDisk.
+models.tsp:1090:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.storage.autoIoScaling.
+models.tsp:1096:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.storage.storageRedundancy.
+models.tsp:1116:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.backup.geoRedundantBackup.
+Server.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:150:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:163:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:193:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'create' should contain the action verb 'backupandexport' from the route path. Consider updating the operation name.
+Server.tsp:193:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:219:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Server.tsp:233:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackup.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackup.tsp:43:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+ServerBackup.tsp:43:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+ServerBackup.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackup.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackupV2.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackupV2.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackupV2.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServerBackupV2.tsp:57:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ServerBackupV2.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Configuration.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Configuration.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Configuration.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Configuration.tsp:67:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'tags' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Configuration.tsp:73:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'keyword' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Configuration.tsp:79:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'page' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Configuration.tsp:85:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'pageSize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Configuration.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Configuration.tsp:97:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'batchUpdate' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+Configuration.tsp:97:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'batchUpdate' should contain the action verb 'updateconfigurations' from the route path. Consider updating the operation name.
+Configuration.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Database.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Database.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Database.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Database.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FirewallRule.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FirewallRule.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FirewallRule.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FirewallRule.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedThreatProtection.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedThreatProtection.tsp:44:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'updatePut' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AdvancedThreatProtection.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:1428:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.state.
+AdvancedThreatProtection.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedThreatProtection.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Capability.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Capability.tsp:48:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Capability.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Maintenance.tsp:35:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'read' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+Maintenance.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Maintenance.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Maintenance.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateLinkResource.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateLinkResource.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "locationName" and "serverName".
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+routes.tsp:41:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'execute' should contain the action verb 'checkvirtualnetworksubnetusage' from the route path. Consider updating the operation name.
+routes.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "locationName" and "serverName".
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+routes.tsp:57:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'execute' should contain the action verb 'checknameavailability' from the route path. Consider updating the operation name.
+routes.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "locationName" and "serverName".
+models.tsp:2165:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+routes.tsp:73:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'execute' should contain the action verb 'checknameavailability' from the route path. Consider updating the operation name.
+routes.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:90:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
+routes.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:108:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
+routes.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:124:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'execute' should contain the action verb 'getprivatednszonesuffix' from the route path. Consider updating the operation name.
+routes.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:136:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FabricMirroringSettings.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FabricMirroringSettings.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FabricMirroringSettings.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 110 warnings.
+

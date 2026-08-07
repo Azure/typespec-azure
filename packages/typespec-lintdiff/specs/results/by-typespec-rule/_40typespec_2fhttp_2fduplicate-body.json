@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "@typespec/http/duplicate-body",
+  "count": 26,
+  "levels": {
+    "error": 26
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 57,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 534,
+      "column": 50,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 377,
+      "column": 4,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 377,
+      "column": 4,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 195,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    },
+    {
+      "rule": "@typespec/http/duplicate-body",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "client.tsp",
+      "line": 216,
+      "column": 31,
+      "message": "Operation has a @body and an unannotated parameter. There can only be one representing the body"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:27:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:32:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:36:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:27:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-04-01-preview' has been in preview for over one year. Move it to GA or retire it.
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+main.tsp:21:18 - warning tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case: The ARM provider namespace "GitHub.Network" must use PascalCase (e.g., Microsoft.Compute).
+NetworkSettingsResource.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+NetworkSettingsResource.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSettingsResource.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSettingsResource.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSettingsResource.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 21 warnings.
+

@@ -1,0 +1,13 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:25:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:25:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+policy.tsp:38:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+policy.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+policy.tsp:29:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+policy.tsp:29:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+
+Found 6 warnings.
+

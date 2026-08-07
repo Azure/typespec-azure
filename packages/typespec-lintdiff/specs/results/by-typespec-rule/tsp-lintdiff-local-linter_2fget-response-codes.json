@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/get-response-codes",
-  "count": 3,
+  "count": 121,
   "levels": {
-    "warning": 3
+    "warning": 121
   },
-  "projectCount": 1,
+  "projectCount": 20,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/get-response-codes",
@@ -37,6 +37,1186 @@
       "sourceFile": "routes.tsp",
       "line": 135,
       "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "client.tsp",
+      "line": 224,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ContainerApp.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Diagnostic.tsp",
+      "line": 131,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "CreditSummary.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "routes.tsp",
+      "line": 104,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "routes.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "routes.tsp",
+      "line": 163,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "routes.tsp",
+      "line": 556,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "routes.tsp",
+      "line": 580,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 717,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1333,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1111,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 748,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 399,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 962,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 247,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 490,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1210,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 148,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 605,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 867,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 53,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "sourceFile": "VirtualNetworkPeering.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "Factory.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "IntegrationRuntimeResource.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "LinkedServiceResource.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "DatasetResource.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "TriggerResource.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "CredentialResource.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 274,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "GuestConfigurationAssignment.tsp",
+      "line": 137,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "routes.tsp",
+      "line": 24,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "ManagedHsm.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "client.tsp",
+      "line": 89,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1760,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1345,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1511,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1700,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1871,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 2088,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "client.tsp",
+      "line": 1946,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectedItemResource.tsp",
+      "line": 211,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 156,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 372,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 483,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "WcfRelay.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/OperationsAPI",
+      "sourceFile": "routes.tsp",
+      "line": 27,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
+      "sourceFile": "Operations.tsp",
+      "line": 22,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "Application.tsp",
+      "line": 59,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "JitRequestDefinition.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "routes.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1563,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServicePlan.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetInfoResource.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 199,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 111,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 102,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 181,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 258,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 344,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 158,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 195,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 299,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 336,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 94,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 128,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 167,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 189,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 201,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 274,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 297,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 309,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 331,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 376,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 398,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 410,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 432,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 198,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 209,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 259,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 269,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "NetworkFeatures.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "NetworkFeatures.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 153,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 196,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 180,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 134,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowEnvelope.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowEnvelope.tsp",
+      "line": 133,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "routes.tsp",
+      "line": 306,
+      "column": 3,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "client.tsp",
+      "line": 309,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "client.tsp",
+      "line": 387,
+      "column": 4,
+      "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-response-codes",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "client.tsp",
+      "line": 465,
+      "column": 4,
       "message": "GET operations must include a 200 response and may only use 202 and default as additional response codes."
     }
   ]

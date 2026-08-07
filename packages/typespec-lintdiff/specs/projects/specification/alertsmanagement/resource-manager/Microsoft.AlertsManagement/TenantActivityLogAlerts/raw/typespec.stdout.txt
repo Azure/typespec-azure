@@ -1,0 +1,41 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-04-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:54:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:205:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+TenantActivityLogAlertResource.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActivityLogAlertResource.tsp:52:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActivityLogAlertResource.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+TenantActivityLogAlertResource.tsp:57:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActivityLogAlertResource.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+TenantActivityLogAlertResource.tsp:66:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+models.tsp:205:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.enabled.
+TenantActivityLogAlertResource.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+TenantActivityLogAlertResource.tsp:75:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts/{alertRuleName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActivityLogAlertResource.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+TenantActivityLogAlertResource.tsp:83:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.AlertsManagement/tenantActivityLogAlerts' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActivityLogAlertResource.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+models.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+  TenantActivityLogAlertResource.tsp:52:25 - occurred while instantiating template
+
+Found 25 warnings.
+

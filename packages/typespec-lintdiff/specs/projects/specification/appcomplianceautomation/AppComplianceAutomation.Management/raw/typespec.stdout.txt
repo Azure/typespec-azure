@@ -1,0 +1,187 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:36:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+resources/ReportResource.tsp:58:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+resources/WebhookResource.tsp:61:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+resources/ScopingConfigurationResource.tsp:62:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+resources/EvidenceResource.tsp:62:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+resources/ReportResource.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1847:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'offerGuid' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1854:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'reportCreatorTenantId' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+resources/ReportResource.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/ReportResource.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:139:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:151:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/WebhookResource.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1847:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'offerGuid' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1854:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'reportCreatorTenantId' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+resources/WebhookResource.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/SnapshotResource.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/SnapshotResource.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/SnapshotResource.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "snapshotName" and "webhookName".
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/SnapshotResource.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1847:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'offerGuid' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1854:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'reportCreatorTenantId' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+resources/SnapshotResource.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/SnapshotResource.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/SnapshotResource.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/SnapshotResource.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "scopingConfigurationName" and "webhookName".
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "scopingConfigurationName" and "webhookName".
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ScopingConfigurationResource.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evidenceName" and "webhookName".
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1866:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'offerGuid' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+models/models.tsp:1873:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'reportCreatorTenantId' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+resources/EvidenceResource.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1866:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'offerGuid' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+models/models.tsp:1873:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'reportCreatorTenantId' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evidenceName" and "webhookName".
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1847:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'offerGuid' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/models.tsp:1854:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'reportCreatorTenantId' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+resources/EvidenceResource.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/models.tsp:1811:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/models.tsp:1819:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/models.tsp:1826:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+models/models.tsp:1833:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+models/models.tsp:1840:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+resources/EvidenceResource.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/ReportResource.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/EvidenceResource.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+routes.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 180 warnings.
+

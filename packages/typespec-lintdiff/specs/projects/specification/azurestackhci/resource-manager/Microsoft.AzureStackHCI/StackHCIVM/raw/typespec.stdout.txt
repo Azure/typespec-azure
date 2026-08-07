@@ -1,0 +1,404 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:53:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:58:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:63:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:68:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:73:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:78:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:83:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:88:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:93:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:98:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:53:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-02-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:58:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-05-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:63:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-08-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:68:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-10-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:73:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-02-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:78:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-04-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:83:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:1184:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1199:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1948:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2095:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2118:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2365:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2427:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2434:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2438:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2460:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2470:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2474:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2481:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2493:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2291:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2731:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2735:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2742:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2746:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2844:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+GalleryImages.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryImages.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImages.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "logicalNetworkName" and "galleryImageName".
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "logicalNetworkName" and "galleryImageName".
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "logicalNetworkName" and "galleryImageName".
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LogicalNetworks.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LogicalNetworks.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "marketplaceGalleryImageName" and "galleryImageName".
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "marketplaceGalleryImageName" and "galleryImageName".
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "marketplaceGalleryImageName" and "galleryImageName".
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+MarketplaceGalleryImages.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MarketplaceGalleryImages.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkInterfaceName" and "galleryImageName".
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkInterfaceName" and "galleryImageName".
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkInterfaceName" and "galleryImageName".
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkInterfaceName" and "galleryImageName".
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkInterfaces.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkInterfaces.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SecurityRules.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SecurityRules.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkSecurityGroupName" and "galleryImageName".
+NetworkSecurityGroups.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "snapshotName" and "galleryImageName".
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "snapshotName" and "galleryImageName".
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "snapshotName" and "galleryImageName".
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Snapshots.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Snapshots.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storageContainerName" and "galleryImageName".
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storageContainerName" and "galleryImageName".
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storageContainerName" and "galleryImageName".
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+StorageContainers.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageContainers.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualHardDiskName" and "galleryImageName".
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualHardDiskName" and "galleryImageName".
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualHardDiskName" and "galleryImageName".
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualHardDiskName" and "galleryImageName".
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualHardDisks.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualMachineInstance.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualMachineInstance.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualMachineInstance.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualMachineInstance.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HybridIdentityMetadata.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+HybridIdentityMetadata.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+HybridIdentityMetadata.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+AttestationStatus.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+AttestationStatus.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "attestationStatus" and "hybridIdentityMetadatum".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+AttestationStatus.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GuestAgent.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+GuestAgent.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "guestAgent" and "hybridIdentityMetadatum".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GuestAgent.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GuestAgent.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+GuestAgent.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "guestAgent" and "hybridIdentityMetadatum".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GuestAgent.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GuestAgent.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GuestAgent.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineInstance" and "galleryImageName".
+VirtualMachineInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworkSubnets.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworkSubnets.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "galleryImageName".
+VirtualNetworks.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicIPAddressName" and "galleryImageName".
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicIPAddressName" and "galleryImageName".
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicIPAddressName" and "galleryImageName".
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicIPAddresses.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'publicIPAddressName' should be camel case.
+PublicIPAddresses.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicIPAddresses.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+InboundRules.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InboundRules.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "natGatewayName" and "galleryImageName".
+NatGateways.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "loadBalancerName" and "galleryImageName".
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "loadBalancerName" and "galleryImageName".
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "loadBalancerName" and "galleryImageName".
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+LoadBalancers.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LoadBalancers.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 397 warnings.
+

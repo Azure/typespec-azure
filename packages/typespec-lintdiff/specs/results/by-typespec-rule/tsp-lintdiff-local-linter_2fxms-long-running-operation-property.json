@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
-  "count": 1,
+  "count": 6,
   "levels": {
-    "warning": 1
+    "warning": 6
   },
-  "projectCount": 1,
+  "projectCount": 3,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
@@ -17,6 +17,56 @@
       "sourceFile": "routes.tsp",
       "line": 124,
       "column": 7,
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "sourceFile": "TroubleshooterResource.tsp",
+      "line": 51,
+      "column": 15,
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "sourceFile": "TroubleshooterResource.tsp",
+      "line": 64,
+      "column": 15,
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/help/resource-manager/Microsoft.Help/Help",
+      "sourceFile": "TroubleshooterResource.tsp",
+      "line": 76,
+      "column": 15,
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 72,
+      "column": 9,
+      "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "MhsmPrivateEndpointConnection.tsp",
+      "line": 77,
+      "column": 9,
       "message": "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`."
     }
   ]

@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+  "count": 20,
+  "levels": {
+    "warning": 20
+  },
+  "projectCount": 6,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/fleet",
+      "sourceFile": "kubefleet/apis/placement/v1/types.tsp",
+      "line": 58,
+      "column": 7,
+      "message": "Description must not match the name of the node it describes. Node name:'ClusterSelector' Description:'ClusterSelector'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/fleet",
+      "sourceFile": "kubefleet/apis/placement/v1/types.tsp",
+      "line": 65,
+      "column": 7,
+      "message": "Description must not match the name of the node it describes. Node name:'ClusterSelectorTerm' Description:'ClusterSelectorTerm'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/fleet",
+      "sourceFile": "k8s.io/api/core/v1/types.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Description must not match the name of the node it describes. Node name:'TaintEffect' Description:'TaintEffect'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/manufacturingplatform/Manufacturingplatform.Management",
+      "sourceFile": "main.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'name' Description:'Name.'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1101,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'title' Description:'title'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1106,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'category' Description:'category'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1111,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'subCategory' Description:'subCategory'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1116,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'risk' Description:'risk'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1121,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'tag' Description:'tag'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1126,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'technology' Description:'technology'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 1131,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'standardPorts' Description:'standardPorts'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "models.tsp",
+      "line": 213,
+      "column": 3,
+      "message": "Description must not match the name of the node it describes. Node name:'properties' Description:'Properties'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 117,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'backupStorageConfigName' Description:'backupStorageConfigName'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 117,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'backupStorageConfigName' Description:'backupStorageConfigName'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 158,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'backupStorageConfigName' Description:'backupStorageConfigName'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 158,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'backupStorageConfigName' Description:'backupStorageConfigName'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 136,
+      "column": 15,
+      "message": "Description must not match the name of the node it describes. Node name:'backupJobs' Description:'backupJobs'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 136,
+      "column": 15,
+      "message": "Description must not match the name of the node it describes. Node name:'backupJobs' Description:'backupJobs'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "EntityQuery.tsp",
+      "line": 49,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'providerNamespace' Description:'providerNamespace'"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "EntityQuery.tsp",
+      "line": 49,
+      "column": 9,
+      "message": "Description must not match the name of the node it describes. Node name:'providerNamespace' Description:'providerNamespace'"
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+PrivateEndpointConnection.tsp:29:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/privateLinkResources is missing.
+main.tsp:65:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:70:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:75:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+BlobContainer.tsp:36:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'BlobContainer' should define a list operation.
+FileShare.tsp:35:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'FileShare' should define a list operation.
+StorageQueue.tsp:26:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'StorageQueue' should define a list operation.
+StorageAccountMigration.tsp:32:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'StorageAccountMigration' should define a list operation.
+DeletedAccount.tsp:29:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'DeletedAccount' should define a list operation.
+client.tsp:408:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:411:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:416:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:404:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:416:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+client.tsp:385:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:388:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:393:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:381:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:393:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:2735:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:56:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1325:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1337:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1348:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1248:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1253:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1373:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1390:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1421:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3229:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3294:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3249:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3532:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3764:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3775:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3780:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3785:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3790:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4128:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4134:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3802:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3547:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3552:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3562:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3834:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3844:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3849:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3854:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3860:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3572:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3599:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3891:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3897:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3610:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3647:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3652:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3657:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1496:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1519:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1640:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1645:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1692:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1697:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1708:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1765:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1573:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1579:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1782:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1589:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1594:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1810:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1820:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1998:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2008:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2362:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2477:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2907:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3096:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3101:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3106:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3111:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3116:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3136:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3146:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3151:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3156:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3162:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4369:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4374:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4379:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4384:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4409:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4419:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4424:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4430:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4879:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4964:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5142:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5168:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5238:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5243:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5248:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5457:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5467:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5478:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5517:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5522:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5527:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5543:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5554:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5656:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5975:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6217:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6384:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6445:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+AdvancedPlatformMetrics.tsp:90:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+BlobContainer.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobContainer.tsp:100:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+BlobContainer.tsp:100:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'objectLevelWorm' should contain the action verb 'migrate' from the route path. Consider updating the operation name.
+BlobContainer.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobServiceProperties.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobServiceProperties.tsp:51:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+BlobServiceProperties.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobServiceProperties.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobServiceProperties.tsp:72:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'blobContainersList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+BlobServiceProperties.tsp:72:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'blobContainersList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+BlobServiceProperties.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobServiceProperties.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+BlobServiceProperties.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+BlobServiceProperties.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+StorageAccount.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:99:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+StorageAccount.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+StorageAccount.tsp:99:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+StorageAccount.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:1446:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+models.tsp:3018:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
+models.tsp:3224:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customDomain.name.
+models.tsp:3244:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.encryption.keySource.
+models.tsp:3199:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sasPolicy.sasExpirationPeriod.
+models.tsp:3204:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sasPolicy.expirationAction.
+models.tsp:3204:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.sasPolicy.expirationAction.
+models.tsp:3214:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyPolicy.keyExpirationPeriodInDays.
+models.tsp:3460:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.azureFilesIdentityBasedAuthentication.directoryServiceOptions.
+models.tsp:3372:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.networkAcls.bypass.
+models.tsp:3400:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.networkAcls.defaultAction.
+models.tsp:3400:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.networkAcls.defaultAction.
+StorageAccount.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:142:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:150:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:65:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+StorageAccount.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:65:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+StorageAccount.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:178:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:190:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:200:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:73:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'failoverType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+StorageAccount.tsp:200:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:216:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:227:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'requestType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+StorageAccount.tsp:216:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'hierarchicalNamespaceMigration' should contain the action verb 'hnsonmigration' from the route path. Consider updating the operation name.
+StorageAccount.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:238:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:238:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'abortHierarchicalNamespaceMigration' should contain the action verb 'aborthnsonmigration' from the route path. Consider updating the operation name.
+StorageAccount.tsp:238:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:253:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:253:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'customerInitiatedMigration' should contain the action verb 'startaccountmigration' from the route path. Consider updating the operation name.
+StorageAccount.tsp:253:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:268:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageAccount.tsp:268:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:285:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:5303:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+StorageAccount.tsp:297:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'StorageAccounts' should not appear after the underscore.
+StorageAccount.tsp:297:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:297:3 - warning tsp-lintdiff-local-linter/xms-pageable-for-list-calls: ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata.
+StorageAccount.tsp:310:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'storageTaskAssignmentsInstancesReportList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+StorageAccount.tsp:310:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'storageTaskAssignmentsInstancesReportList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+StorageAccount.tsp:310:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccount.tsp:319:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+StorageAccount.tsp:325:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ImmutabilityPolicy.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ImmutabilityPolicy.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ImmutabilityPolicy.tsp:65:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ImmutabilityPolicy.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ImmutabilityPolicy.tsp:136:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ImmutabilityPolicy.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+FileShare.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+FileShare.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+FileShare.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+FileShare.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+FileShare.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+FileShare.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+FileShare.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+FileShare.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:100:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$include' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+FileShare.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+FileShare.tsp:100:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$include' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+FileShare.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileShare.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceProperties.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceProperties.tsp:52:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+FileServiceProperties.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:1911:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+FileServiceProperties.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceProperties.tsp:73:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'fileSharesList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+FileServiceProperties.tsp:73:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'fileSharesList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+FileServiceProperties.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceProperties.tsp:82:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+FileServiceProperties.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+FileServiceProperties.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+FileServiceUsage.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceUsage.tsp:46:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$maxpagesize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+FileServiceUsage.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FileServiceUsage.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+FileServiceUsage.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+QueueServiceProperties.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+QueueServiceProperties.tsp:44:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+QueueServiceProperties.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2552:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+QueueServiceProperties.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+QueueServiceProperties.tsp:65:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'queueList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+QueueServiceProperties.tsp:65:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'queueList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+QueueServiceProperties.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+QueueServiceProperties.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+QueueServiceProperties.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+StorageQueue.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageQueue.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageQueue.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageQueue.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageAccountMigration.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DeletedAccount.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementPolicy.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ManagementPolicy.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ManagementPolicy.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+BlobInventoryPolicy.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobInventoryPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+BlobInventoryPolicy.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobInventoryPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+BlobInventoryPolicy.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+BlobInventoryPolicy.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+BlobInventoryPolicy.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:39:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+PrivateEndpointConnection.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ObjectReplicationPolicy.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ObjectReplicationPolicy.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ObjectReplicationPolicy.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ObjectReplicationPolicy.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:61:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$maxpagesize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+LocalUser.tsp:73:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$include' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+LocalUser.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:61:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+LocalUser.tsp:67:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+LocalUser.tsp:73:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+LocalUser.tsp:61:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+LocalUser.tsp:67:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+LocalUser.tsp:73:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+LocalUser.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LocalUser.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EncryptionScope.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EncryptionScope.tsp:39:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+EncryptionScope.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EncryptionScope.tsp:45:3 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+EncryptionScope.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EncryptionScope.tsp:63:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$maxpagesize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+EncryptionScope.tsp:75:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$include' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+EncryptionScope.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EncryptionScope.tsp:63:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+EncryptionScope.tsp:69:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+EncryptionScope.tsp:75:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+EncryptionScope.tsp:63:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+EncryptionScope.tsp:69:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+EncryptionScope.tsp:75:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$include' should not begin with '$' or '@'.
+TableServiceProperties.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TableServiceProperties.tsp:44:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+TableServiceProperties.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:5683:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+TableServiceProperties.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Table.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:5710:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'tableName' repeats information already carried in the path or query.
+Table.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Table.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Table.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Table.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:50:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+NetworkSecurityPerimeterConfiguration.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:42:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageTaskAssignment.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:57:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageTaskAssignment.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:78:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+StorageTaskAssignment.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:98:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+StorageTaskAssignment.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:98:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+StorageTaskAssignment.tsp:98:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+StorageTaskAssignment.tsp:110:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'storageTaskAssignmentInstancesReportList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+StorageTaskAssignment.tsp:110:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'storageTaskAssignmentInstancesReportList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+StorageTaskAssignment.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageTaskAssignment.tsp:119:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$maxpagesize' should not begin with '$' or '@'.
+StorageTaskAssignment.tsp:125:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+StorageTaskAssignment.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageConnector.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageConnector.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:6372:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.state.
+models.tsp:6384:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.testConnection.
+models.tsp:6397:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.source.type.
+StorageConnector.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageConnector.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageConnector.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageConnector.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageDataShare.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageDataShare.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageDataShare.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageDataShare.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+StorageDataShare.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedPlatformMetrics.tsp:133:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedPlatformMetrics.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedPlatformMetrics.tsp:143:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AdvancedPlatformMetrics.tsp:148:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 350 warnings.
+

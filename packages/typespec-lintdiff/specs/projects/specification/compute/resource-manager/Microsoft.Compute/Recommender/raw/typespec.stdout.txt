@@ -1,0 +1,18 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+ComputeDiagnosticBase.tsp:29:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'ComputeDiagnosticBase' should define a list operation.
+SkuMixPlacementBase.tsp:36:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'SkuMixPlacementBase' should define a list operation.
+models.tsp:46:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:82:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:118:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ComputeDiagnosticBase.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ComputeDiagnosticBase.tsp:39:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'post' should contain the action verb 'generate' from the route path. Consider updating the operation name.
+ComputeDiagnosticBase.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuMixPlacementBase.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuMixPlacementBase.tsp:46:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'post' should contain the action verb 'generate' from the route path. Consider updating the operation name.
+SkuMixPlacementBase.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 11 warnings.
+

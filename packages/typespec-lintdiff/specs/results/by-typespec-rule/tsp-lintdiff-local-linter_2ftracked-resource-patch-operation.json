@@ -1,0 +1,853 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+  "count": 84,
+  "levels": {
+    "warning": 84
+  },
+  "projectCount": 33,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Certificate' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "sourceFile": "Workbook.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'Workbook' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Module' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "BotChannel.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'BotChannel' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "Account.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'Account' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "CommitmentPlan.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'CommitmentPlan' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "sourceFile": "launchBulkInstancesOperation.tsp",
+      "line": 264,
+      "column": 7,
+      "message": "Tracked resource 'LocationBasedLaunchBulkInstancesOperation' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "sourceFile": "bulkCreateCustom.tsp",
+      "line": 89,
+      "column": 7,
+      "message": "Tracked resource 'LocationBasedBulkCreateCustom' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'VirtualMachineScaleSetVM' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineRunCommand.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'VirtualMachineRunCommand' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "RollingUpgradeStatusInfo.tsp",
+      "line": 20,
+      "column": 7,
+      "message": "Tracked resource 'RollingUpgradeStatusInfo' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineExtensionImage.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'VirtualMachineExtensionImage' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/computebulkactions/ComputeBulkActions.Management",
+      "sourceFile": "models.tsp",
+      "line": 331,
+      "column": 7,
+      "message": "Tracked resource 'LocationBasedLaunchBulkInstancesOperation' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
+      "sourceFile": "OrganizationResource.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'OrganizationResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "sourceFile": "ContainerGroupProfile.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'ContainerGroupProfile' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GraphResourceGetResults.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Tracked resource 'GraphResourceGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlDatabaseGetResults.tsp",
+      "line": 20,
+      "column": 7,
+      "message": "Tracked resource 'SqlDatabaseGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlContainerGetResults.tsp",
+      "line": 20,
+      "column": 7,
+      "message": "Tracked resource 'SqlContainerGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlStoredProcedureGetResults.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'SqlStoredProcedureGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlUserDefinedFunctionGetResults.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'SqlUserDefinedFunctionGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlTriggerGetResults.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'SqlTriggerGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoDBDatabaseGetResults.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Tracked resource 'MongoDBDatabaseGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoDBCollectionGetResults.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Tracked resource 'MongoDBCollectionGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "TableGetResults.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'TableGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraKeyspaceGetResults.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'CassandraKeyspaceGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraTableGetResults.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'CassandraTableGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GremlinDatabaseGetResults.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'GremlinDatabaseGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GremlinGraphGetResults.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'GremlinGraphGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraViewGetResults.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Tracked resource 'CassandraViewGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Tracked resource 'ThroughputSettingsGetResults' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+      "sourceFile": "DatadogMonitorResource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'DatadogMonitorResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "sourceFile": "Project.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Project' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "sourceFile": "DataMigrationService.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'DataMigrationService' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "BackupVaultResource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'BackupVaultResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "DevBoxDefinition.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'DevBoxDefinition' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Schedule.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'Schedule' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "ArmTemplate.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'ArmTemplate' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Artifact.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'Artifact' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "CustomImage.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'CustomImage' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "GalleryImage.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'GalleryImage' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Policy.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'Policy' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "ServiceRunner.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'ServiceRunner' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "LabCost.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'LabCost' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'ElasticMonitorResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "sourceFile": "DicomService.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'DicomService' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "sourceFile": "IotConnector.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'IotConnector' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "sourceFile": "FhirService.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'FhirService' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "MachineRunCommand.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'MachineRunCommand' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "LicenseProfile.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'LicenseProfile' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "MhsmPrivateEndpointConnection.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'MhsmPrivateEndpointConnection' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'PrivateEndpointConnection' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Key.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Key' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'PrivateEndpointConnection' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "InferenceEndpoint.tsp",
+      "line": 27,
+      "column": 7,
+      "message": "Tracked resource 'InferenceEndpoint' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "InferenceGroup.tsp",
+      "line": 27,
+      "column": 7,
+      "message": "Tracked resource 'InferenceGroup' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "MaintenanceConfiguration.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'MaintenanceConfiguration' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "sourceFile": "SystemAssignedIdentity.tsp",
+      "line": 13,
+      "column": 7,
+      "message": "Tracked resource 'SystemAssignedIdentity' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "sourceFile": "SharedAccessAuthorizationRuleResource.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'SharedAccessAuthorizationRuleResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "Vault.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'Vault' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionIntentResource.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Tracked resource 'ProtectionIntentResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'BackupResourceEncryptionConfigExtendedResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'PrivateEndpointConnectionResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectedItemResource.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'ProtectedItemResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'ProtectionContainerResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionPolicyResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'ProtectionPolicyResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'JobResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupEngineBaseResource.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'BackupEngineBaseResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ResourceGuardProxyBaseResource.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Tracked resource 'ResourceGuardProxyBaseResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "RedisResource.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Tracked resource 'RedisResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'DeploymentExtended' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "models.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Tracked resource 'DeploymentStack' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "models-whatIf.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'DeploymentStacksWhatIfResult' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/StandardsAPI",
+      "sourceFile": "Standard.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Standard' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/StandardsAPI",
+      "sourceFile": "Assignment.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'Assignment' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "ApplicationTypeResource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'ApplicationTypeResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "ApplicationTypeVersionResource.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'ApplicationTypeVersionResource' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 20,
+      "column": 7,
+      "message": "Tracked resource 'RestorableDroppedDatabase' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "RestorableDroppedManagedDatabase.tsp",
+      "line": 22,
+      "column": 7,
+      "message": "Tracked resource 'RestorableDroppedManagedDatabase' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Tracked resource 'Site' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Certificate.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Tracked resource 'Certificate' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowRunActionRepetitionDefinition.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'WorkflowRunActionRepetitionDefinition' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'PremierAddOn' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RequestHistory.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Tracked resource 'RequestHistory' must have patch operation that at least supports the update of tags."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowVersion.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "Tracked resource 'WorkflowVersion' must have patch operation that at least supports the update of tags."
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+PrivateEndpointConnection.tsp:36:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/privateLinkResources is missing.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-05-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:1170:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:487:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:552:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:502:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:840:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:884:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:974:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1271:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1319:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1357:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1525:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1530:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1540:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1560:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1570:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1575:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1691:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1701:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1711:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1721:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1726:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1777:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1797:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1853:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1903:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1913:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1918:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1938:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1958:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1984:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1989:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2015:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+SBAuthorizationRule.tsp:186:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:155:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:164:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:196:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:155:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:164:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:206:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:155:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:164:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBNamespace.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:57:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SBNamespace.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:75:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`.
+models.tsp:339:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+models.tsp:547:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.encryption.keySource.
+SBNamespace.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:92:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SBNamespace.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:124:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SBNamespace.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:140:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'privateLinkResourcesGet' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+SBNamespace.tsp:140:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'privateLinkResourcesGet' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+SBNamespace.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBNamespace.tsp:152:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkRuleSet.tsp:43:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore.
+NetworkRuleSet.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkRuleSet.tsp:50:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore.
+NetworkRuleSet.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkRuleSet.tsp:60:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore.
+NetworkRuleSet.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:64:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:64:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:64:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:64:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:53:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:64:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:259:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:247:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:268:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:247:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:279:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:247:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:289:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:300:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:247:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:312:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:229:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:237:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:247:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:365:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:353:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:376:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:353:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:387:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:353:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:397:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:408:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:353:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:420:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBAuthorizationRule.tsp:335:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+SBAuthorizationRule.tsp:343:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SBAuthorizationRule.tsp:353:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+PrivateEndpointConnection.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:52:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`.
+PrivateEndpointConnection.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:71:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+PrivateEndpointConnection.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmDisasterRecovery.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:45:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+MigrationConfigProperties.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:72:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'completeMigration' should contain the action verb 'upgrade' from the route path. Consider updating the operation name.
+MigrationConfigProperties.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationConfigProperties.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBQueue.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBQueue.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBQueue.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBQueue.tsp:78:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBQueue.tsp:86:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBQueue.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBQueue.tsp:78:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBQueue.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+SBQueue.tsp:78:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBQueue.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+SBTopic.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBTopic.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBTopic.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBTopic.tsp:78:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBTopic.tsp:86:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBTopic.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBTopic.tsp:78:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBTopic.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+SBTopic.tsp:78:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBTopic.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Rule.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Rule.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Rule.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Rule.tsp:66:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Rule.tsp:74:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Rule.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Rule.tsp:66:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+Rule.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Rule.tsp:66:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+Rule.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+SBSubscription.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBSubscription.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBSubscription.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBSubscription.tsp:79:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBSubscription.tsp:87:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SBSubscription.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SBSubscription.tsp:79:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBSubscription.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+SBSubscription.tsp:79:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+SBSubscription.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+routes.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 195 warnings.
+

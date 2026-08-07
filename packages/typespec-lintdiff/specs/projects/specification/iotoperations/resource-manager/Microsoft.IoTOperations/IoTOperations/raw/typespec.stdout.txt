@@ -1,0 +1,105 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:40:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:48:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:56:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:48:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-07-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models/akri/connectorTemplate.tsp:447:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:450:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:453:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:456:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:447:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:450:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:453:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:456:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:447:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:450:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:453:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/akri/connectorTemplate.tsp:456:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/broker/authentications.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "authenticationName" and "listenerName".
+main.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/broker/authentications.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "authenticationName" and "listenerName".
+main.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/broker/authorizations.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "authorizationName" and "listenerName".
+main.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/broker/authorizations.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "authorizationName" and "listenerName".
+main.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:115:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:125:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowEndpoints.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowEndpointName" and "brokerName".
+main.tsp:136:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowEndpoints.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowEndpointName" and "brokerName".
+main.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+models/dataflows/dataflowGraphs.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowGraphName" and "dataflowName".
+main.tsp:147:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+models/dataflows/dataflowGraphs.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowGraphName" and "dataflowName".
+main.tsp:148:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/dataflows/dataflowProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataflowProfileName" and "brokerName".
+main.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/registryEndpoints/registryEndpoint.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "registryEndpointName" and "brokerName".
+main.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/registryEndpoints/registryEndpoint.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "registryEndpointName" and "brokerName".
+main.tsp:158:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/connectorTemplate.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriConnectorTemplateName" and "brokerName".
+main.tsp:167:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/connectorTemplate.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriConnectorTemplateName" and "brokerName".
+main.tsp:168:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:169:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/connectorTemplate.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriConnectorTemplateName" and "brokerName".
+main.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/connectorTemplate.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriConnectorTemplateName" and "brokerName".
+main.tsp:178:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:179:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/connectorTemplate.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriConnectorTemplateName" and "brokerName".
+main.tsp:186:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/service.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriServiceName" and "brokerName".
+main.tsp:187:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/akri/service.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "akriServiceName" and "brokerName".
+main.tsp:188:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 98 warnings.
+

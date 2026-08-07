@@ -1,0 +1,19 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+models.tsp:66:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProviderOperationsMetadata.tsp:85:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProviderOperationsMetadata.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderOperationsMetadata.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProviderOperationsMetadata.tsp:85:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ProviderOperationsMetadata.tsp:85:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProviderOperationsMetadata.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProviderOperationsMetadata.tsp:85:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ProviderOperationsMetadata.tsp:93:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ProviderOperationsMetadata.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderOperationsMetadata.tsp:93:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ProviderOperationsMetadata.tsp:93:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+
+Found 12 warnings.
+

@@ -1,0 +1,55 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:42:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:42:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-05-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:33:20 - warning tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case: The ARM provider namespace "NewRelic.Observability" must use PascalCase (e.g., Microsoft.Compute).
+models.tsp:1319:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+NewRelicMonitorResource.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:65:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'userEmail' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+NewRelicMonitorResource.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:65:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'userEmail' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+NewRelicMonitorResource.tsp:65:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'userEmail' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+NewRelicMonitorResource.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:117:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`.
+NewRelicMonitorResource.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:160:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
+NewRelicMonitorResource.tsp:160:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:170:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'vmHostPayload' should contain the action verb 'vmhostpayloads' from the route path. Consider updating the operation name.
+NewRelicMonitorResource.tsp:170:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:179:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:191:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
+NewRelicMonitorResource.tsp:191:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:214:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'billingInfoGet' should contain the action verb 'getbillinginfo' from the route path. Consider updating the operation name.
+NewRelicMonitorResource.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NewRelicMonitorResource.tsp:223:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'list' should contain the action verb 'listconnectedpartnerresources' from the route path. Consider updating the operation name.
+NewRelicMonitorResource.tsp:223:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TagRule.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TagRule.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TagRule.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TagRule.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TagRule.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MonitoredSubscriptionProperties.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MonitoredSubscriptionProperties.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MonitoredSubscriptionProperties.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MonitoredSubscriptionProperties.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MonitoredSubscriptionProperties.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:106:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'activateResource' should contain the action verb 'activatesaas' from the route path. Consider updating the operation name.
+routes.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 48 warnings.
+

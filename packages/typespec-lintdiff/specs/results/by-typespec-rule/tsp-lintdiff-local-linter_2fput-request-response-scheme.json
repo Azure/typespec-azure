@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/put-request-response-scheme",
+  "count": 4,
+  "levels": {
+    "warning": 4
+  },
+  "projectCount": 2,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "back-compatible.tsp",
+      "line": 163,
+      "column": 4,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 178,
+      "column": 4,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 426,
+      "column": 4,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 607,
+      "column": 4,
+      "message": "PUT request body schema should match the 200 response schema."
+    }
+  ]
+}

@@ -1,0 +1,513 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:58:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+ServiceRunner.tsp:41:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'ServiceRunner' should define a list operation.
+LabCost.tsp:36:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'LabCost' should define a list operation.
+models.tsp:626:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Schedule.tsp:439:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'Schedule' must have a put/createOrUpdate operation.
+Schedule.tsp:17:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'Schedule' must have patch operation that at least supports the update of tags.
+models.tsp:957:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ArmTemplate.tsp:37:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'ArmTemplate' must have a put/createOrUpdate operation.
+ArmTemplate.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'ArmTemplate' must have patch operation that at least supports the update of tags.
+Artifact.tsp:37:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'Artifact' must have a put/createOrUpdate operation.
+Artifact.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'Artifact' must have patch operation that at least supports the update of tags.
+models.tsp:1468:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1398:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CustomImage.tsp:57:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'CustomImage' must have a put/createOrUpdate operation.
+CustomImage.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'CustomImage' must have patch operation that at least supports the update of tags.
+models.tsp:1662:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1677:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1709:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2082:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2092:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+GalleryImage.tsp:37:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'GalleryImage' must have a put/createOrUpdate operation.
+GalleryImage.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'GalleryImage' must have patch operation that at least supports the update of tags.
+models.tsp:2238:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Policy.tsp:57:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'Policy' must have a put/createOrUpdate operation.
+Policy.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'Policy' must have patch operation that at least supports the update of tags.
+models.tsp:2837:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2858:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2908:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ServiceRunner.tsp:17:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'ServiceRunner' must have patch operation that at least supports the update of tags.
+LabCost.tsp:17:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'LabCost' must have patch operation that at least supports the update of tags.
+Lab.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Lab.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Lab.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:87:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:105:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Lab.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Lab.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Lab.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Lab.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Lab.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Lab.tsp:120:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:132:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:138:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Lab.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:120:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:126:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Lab.tsp:132:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Lab.tsp:138:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Lab.tsp:120:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Lab.tsp:126:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Lab.tsp:132:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Lab.tsp:138:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Lab.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:172:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:185:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:194:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Lab.tsp:208:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:67:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:67:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:67:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:105:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:117:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:123:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:123:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:139:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:151:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:157:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:139:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:145:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:151:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:157:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:139:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:145:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:151:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:157:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:180:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:223:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:223:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:223:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:231:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:239:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:248:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:261:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:273:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:279:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:254:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:261:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:267:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:273:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:279:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:287:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:301:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:200:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:345:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:338:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:345:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:345:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:352:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:359:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:367:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:379:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:391:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:397:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:372:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:379:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:385:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:391:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:397:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:405:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:317:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:320:33 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:323:42 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:450:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:443:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:450:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:450:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Schedule.tsp:457:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:464:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:472:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:484:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:496:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:502:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Schedule.tsp:477:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:484:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Schedule.tsp:490:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Schedule.tsp:496:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Schedule.tsp:502:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Schedule.tsp:510:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schedule.tsp:425:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Schedule.tsp:428:43 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ArtifactSource.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ArtifactSource.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArtifactSource.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArtifactSource.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ArtifactSource.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArtifactSource.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArtifactSource.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArtifactSource.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArtifactSource.tsp:82:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArtifactSource.tsp:94:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArtifactSource.tsp:100:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArtifactSource.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArtifactSource.tsp:82:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArtifactSource.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ArtifactSource.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ArtifactSource.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ArtifactSource.tsp:82:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArtifactSource.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ArtifactSource.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ArtifactSource.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ArmTemplate.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ArmTemplate.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmTemplate.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArmTemplate.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ArmTemplate.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArmTemplate.tsp:63:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArmTemplate.tsp:75:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArmTemplate.tsp:81:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ArmTemplate.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ArmTemplate.tsp:63:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArmTemplate.tsp:69:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ArmTemplate.tsp:75:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ArmTemplate.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ArmTemplate.tsp:63:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ArmTemplate.tsp:69:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ArmTemplate.tsp:75:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ArmTemplate.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Artifact.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Artifact.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Artifact.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Artifact.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Artifact.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Artifact.tsp:62:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Artifact.tsp:74:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Artifact.tsp:80:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Artifact.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Artifact.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Artifact.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Artifact.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Artifact.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Artifact.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Artifact.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Artifact.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Artifact.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Artifact.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabCost.tsp:49:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+LabCost.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabCost.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabCost.tsp:49:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+LabCost.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabCost.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+CustomImage.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:46:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CustomImage.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+CustomImage.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+CustomImage.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:46:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CustomImage.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:46:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CustomImage.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:46:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CustomImage.tsp:113:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+CustomImage.tsp:125:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+CustomImage.tsp:131:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+CustomImage.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomImage.tsp:46:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CustomImage.tsp:113:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+CustomImage.tsp:119:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+CustomImage.tsp:125:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+CustomImage.tsp:131:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Formula.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Formula.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Formula.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Formula.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Formula.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Formula.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Formula.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Formula.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Formula.tsp:81:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Formula.tsp:93:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Formula.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Formula.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Formula.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Formula.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Formula.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Formula.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Formula.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Formula.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Formula.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Formula.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+GalleryImage.tsp:48:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+GalleryImage.tsp:60:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+GalleryImage.tsp:66:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+GalleryImage.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImage.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryImage.tsp:54:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+GalleryImage.tsp:60:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+GalleryImage.tsp:66:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+GalleryImage.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryImage.tsp:54:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+GalleryImage.tsp:60:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+GalleryImage.tsp:66:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+NotificationChannel.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+NotificationChannel.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationChannel.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+NotificationChannel.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+NotificationChannel.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+NotificationChannel.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationChannel.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationChannel.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationChannel.tsp:82:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+NotificationChannel.tsp:94:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+NotificationChannel.tsp:100:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+NotificationChannel.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationChannel.tsp:82:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+NotificationChannel.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+NotificationChannel.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+NotificationChannel.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+NotificationChannel.tsp:82:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+NotificationChannel.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+NotificationChannel.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+NotificationChannel.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+NotificationChannel.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Policy.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:43:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:46:38 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Policy.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Policy.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:43:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:46:38 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:43:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:46:38 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:43:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:46:38 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Policy.tsp:111:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Policy.tsp:117:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Policy.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Policy.tsp:43:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:46:38 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Policy.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Policy.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Policy.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Policy.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+PolicySet.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PolicySet.tsp:35:32 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ServiceRunner.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceRunner.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceRunner.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+User.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+User.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+User.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+User.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:88:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+User.tsp:100:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+User.tsp:106:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+User.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+User.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+User.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+User.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+User.tsp:106:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+User.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+User.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+User.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+User.tsp:106:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Disk.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Disk.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Disk.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Disk.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Disk.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:87:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Disk.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Disk.tsp:105:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Disk.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Disk.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Disk.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Disk.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Disk.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Disk.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Disk.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Disk.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Disk.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Disk.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:50:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DtlEnvironment.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DtlEnvironment.tsp:50:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DtlEnvironment.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DtlEnvironment.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+DtlEnvironment.tsp:111:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+DtlEnvironment.tsp:117:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+DtlEnvironment.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DtlEnvironment.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DtlEnvironment.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+DtlEnvironment.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+DtlEnvironment.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+DtlEnvironment.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DtlEnvironment.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+DtlEnvironment.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+DtlEnvironment.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Secret.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Secret.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Secret.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Secret.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Secret.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Secret.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Secret.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Secret.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Secret.tsp:81:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Secret.tsp:93:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Secret.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+Secret.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Secret.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Secret.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Secret.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Secret.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+Secret.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Secret.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Secret.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+Secret.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ServiceFabric.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ServiceFabric.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ServiceFabric.tsp:48:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ServiceFabric.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ServiceFabric.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:93:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ServiceFabric.tsp:105:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ServiceFabric.tsp:111:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ServiceFabric.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ServiceFabric.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ServiceFabric.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ServiceFabric.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ServiceFabric.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ServiceFabric.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ServiceFabric.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+ServiceFabric.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+ServiceFabric.tsp:119:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceFabric.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:50:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+LabVirtualMachine.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:50:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+LabVirtualMachine.tsp:50:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:99:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+LabVirtualMachine.tsp:111:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+LabVirtualMachine.tsp:117:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+LabVirtualMachine.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:99:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:105:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:117:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+LabVirtualMachine.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:168:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:182:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:192:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:202:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:230:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:244:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:258:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:272:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LabVirtualMachine.tsp:286:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:49:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+VirtualNetwork.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+VirtualNetwork.tsp:49:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+VirtualNetwork.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+VirtualNetwork.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:94:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+VirtualNetwork.tsp:106:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+VirtualNetwork.tsp:112:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderby' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+VirtualNetwork.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+VirtualNetwork.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+VirtualNetwork.tsp:106:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+VirtualNetwork.tsp:112:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+VirtualNetwork.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+VirtualNetwork.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+VirtualNetwork.tsp:106:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+VirtualNetwork.tsp:112:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderby' should not begin with '$' or '@'.
+routes.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 506 warnings.
+

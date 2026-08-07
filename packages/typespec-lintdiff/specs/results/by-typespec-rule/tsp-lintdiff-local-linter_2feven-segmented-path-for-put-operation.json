@@ -1,0 +1,843 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+  "count": 83,
+  "levels": {
+    "warning": 83
+  },
+  "projectCount": 23,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalSigninSettings.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signin' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalSignupSettings.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/signup' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalDelegationSettings.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/portalsettings/delegation' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems",
+      "sourceFile": "routes.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}/item' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/Annotations' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 361,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/currentbillingfeatures' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "sourceFile": "RoleAssignment.tsp",
+      "line": 309,
+      "column": 3,
+      "message": "ARM PUT path '/{roleAssignmentId}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 127,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 260,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "sourceFile": "RecordSet.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}/transferOut' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateEndpointConnections/{privateEndpointConnectionName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 160,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 200,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitor' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/azureMonitorAgent' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "sourceFile": "ServiceDiagnosticSettingsResource.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "ARM PUT path '/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGatewayConnection.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}/sharedkey' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "routes.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/queryPacks' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
+      "sourceFile": "RecordSet.tsp",
+      "line": 101,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}/{relativeRecordSetName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "VaultExtendedInfoResource.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/extendedInformation/vaultExtendedInfo' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceVaultConfigResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupconfig/vaultconfig' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupEncryptionConfigs/backupResourceEncryptionConfig' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "sourceFile": "client.tsp",
+      "line": 44,
+      "column": 6,
+      "message": "ARM PUT path '/{policyAssignmentId}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "ARM PUT path '/{resourceId}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 193,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "routes.tsp",
+      "line": 250,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/tagNames/{tagName}/tagValues/{tagValue}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "routes.tsp",
+      "line": 279,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/tagNames/{tagName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
+      "sourceFile": "GetSensitivitySettingsResponse.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "ARM PUT path '/providers/Microsoft.Security/sensitivitySettings/current' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "ThreatIntelligenceInformation.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/threatIntelligence/main/indicators/{name}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 105,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "routes.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "ARM PUT path '/{applicationId}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/firewallRules' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "MaintenanceWindows.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/maintenanceWindows/current' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "SqlAgentConfiguration.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/sqlAgent/current' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "sourceFile": "Endpoint.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/{endpointType}/{endpointName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/customdnssuffix' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AseV3NetworkingConfiguration.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/configurations/networking' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1704,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1730,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1756,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/azurestorageaccounts' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1782,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/backup' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1823,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1849,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1897,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2027,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/host/default/{keyType}/{keyName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 244,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 270,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 296,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 322,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 363,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 389,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 429,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 522,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/onedeploy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 584,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/host/default/{keyType}/{keyName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 714,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/migrate' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "User.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "ARM PUT path '/providers/Microsoft.Web/publishingUsers/web' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteARMResource.tsp",
+      "line": 217,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/appsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteARMResource.tsp",
+      "line": 231,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/config/functionappsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteBuildARMResource.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/appsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteBuildARMResource.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/staticSites/{name}/builds/{environmentName}/config/functionappsettings' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/ftp' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 136,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/basicPublishingCredentialsPolicies/scm' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 190,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/ftp' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 256,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/basicPublishingCredentialsPolicies/scm' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteAuthSettingsV2.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettingsV2' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteAuthSettingsV2.tsp",
+      "line": 143,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettingsV2' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteLogsConfig.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteLogsConfig.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SlotConfigNamesResource.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteConfigResource.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteConfigResource.tsp",
+      "line": 243,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 239,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkConfig/virtualNetwork' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 156,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkConfig/virtualNetwork' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PrivateAccess.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateAccess/virtualNetworks' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PrivateAccess.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateAccess/virtualNetworks' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 198,
+      "column": 3,
+      "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+    }
+  ]
+}

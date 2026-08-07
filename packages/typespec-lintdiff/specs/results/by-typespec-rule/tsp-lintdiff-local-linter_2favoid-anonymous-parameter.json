@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+  "count": 8,
+  "levels": {
+    "warning": 8
+  },
+  "projectCount": 7,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AKSAssessments",
+      "sourceFile": "aksroutes.tsp",
+      "line": 37,
+      "column": 56,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AvsAssessments",
+      "sourceFile": "avsasmroutes.tsp",
+      "line": 39,
+      "column": 58,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/BusinessCases",
+      "sourceFile": "businesscaseroutes.tsp",
+      "line": 26,
+      "column": 58,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/BusinessCases",
+      "sourceFile": "businesscaseroutes.tsp",
+      "line": 33,
+      "column": 5,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/MachineAssessments",
+      "sourceFile": "machineasmroutes.tsp",
+      "line": 34,
+      "column": 62,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/SqlAssessments",
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 34,
+      "column": 58,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppAssessments",
+      "sourceFile": "waasmroutes.tsp",
+      "line": 35,
+      "column": 61,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppCompoundAssessments",
+      "sourceFile": "wacasmroutes.tsp",
+      "line": 27,
+      "column": 61,
+      "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+    }
+  ]
+}

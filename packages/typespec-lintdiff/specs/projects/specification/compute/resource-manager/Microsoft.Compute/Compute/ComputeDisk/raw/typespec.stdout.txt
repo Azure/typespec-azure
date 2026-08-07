@@ -1,0 +1,282 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+PrivateEndpointConnection.tsp:30:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/diskAccesses/{diskAccessName}/privateLinkResources is missing.
+main.tsp:46:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:58:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+models.tsp:721:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:797:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:849:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:632:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:643:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:668:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1072:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1093:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1108:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1135:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1228:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1477:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1553:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1646:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1818:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1849:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1963:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Disk.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:63:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:63:10 - occurred while instantiating template
+Disk.tsp:70:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Disk.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:70:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:70:21 - occurred while instantiating template
+Disk.tsp:85:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:849:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.encryptionSettingsCollection.enabled.
+models.tsp:691:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.purchasePlan.name.
+models.tsp:696:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.purchasePlan.publisher.
+models.tsp:701:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.purchasePlan.product.
+Disk.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:85:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:85:13 - occurred while instantiating template
+Disk.tsp:102:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Disk.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:102:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:102:13 - occurred while instantiating template
+Disk.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:107:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:107:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:107:26 - occurred while instantiating template
+Disk.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeListBySubscription' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:112:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeListBySubscription' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Disk.tsp:112:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:112:11 - occurred while instantiating template
+Disk.tsp:118:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Disk.tsp:118:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'grantAccess' should contain the action verb 'begingetaccess' from the route path. Consider updating the operation name.
+Disk.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'disks' from the route path. Consider updating the operation name.
+  Disk.tsp:118:18 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:118:18 - occurred while instantiating template
+Disk.tsp:124:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Disk.tsp:124:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'revokeAccess' should contain the action verb 'endgetaccess' from the route path. Consider updating the operation name.
+Disk.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'disks' from the route path. Consider updating the operation name.
+  Disk.tsp:124:19 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Disk.tsp:124:19 - occurred while instantiating template
+DiskAccess.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:38:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:38:10 - occurred while instantiating template
+DiskAccess.tsp:45:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskAccess.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:45:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:45:21 - occurred while instantiating template
+DiskAccess.tsp:60:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskAccess.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:60:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:60:13 - occurred while instantiating template
+DiskAccess.tsp:77:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskAccess.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:77:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:77:13 - occurred while instantiating template
+DiskAccess.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:82:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:82:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:82:26 - occurred while instantiating template
+DiskAccess.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeListBySubscription' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:90:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeListBySubscription' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:90:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:90:11 - occurred while instantiating template
+models.tsp:1356:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+DiskAccess.tsp:97:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'getPrivateLinkResources' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+DiskAccess.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DiskAccess.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-pageable-for-list-calls: ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata.
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceActionSync' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskAccess.tsp:97:30 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/pagination-response: Operation might be pageable. Consider adding the x-ms-pageable extension.
+  DiskAccess.tsp:97:30 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionSync' should contain the action verb 'diskaccesses' from the route path. Consider updating the operation name.
+  DiskAccess.tsp:97:30 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskAccess.tsp:97:30 - occurred while instantiating template
+PrivateEndpointConnection.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  PrivateEndpointConnection.tsp:38:36 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  PrivateEndpointConnection.tsp:38:36 - occurred while instantiating template
+PrivateEndpointConnection.tsp:49:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+PrivateEndpointConnection.tsp:49:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'updateAPrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+PrivateEndpointConnection.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  PrivateEndpointConnection.tsp:49:39 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  PrivateEndpointConnection.tsp:49:39 - occurred while instantiating template
+PrivateEndpointConnection.tsp:69:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+PrivateEndpointConnection.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  PrivateEndpointConnection.tsp:69:39 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  PrivateEndpointConnection.tsp:69:39 - occurred while instantiating template
+PrivateEndpointConnection.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  PrivateEndpointConnection.tsp:77:37 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  PrivateEndpointConnection.tsp:77:37 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  PrivateEndpointConnection.tsp:77:37 - occurred while instantiating template
+DiskEncryptionSet.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:38:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:38:10 - occurred while instantiating template
+DiskEncryptionSet.tsp:45:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskEncryptionSet.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:45:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:45:21 - occurred while instantiating template
+DiskEncryptionSet.tsp:60:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:1510:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.activeKey.keyUrl.
+DiskEncryptionSet.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:60:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:60:13 - occurred while instantiating template
+DiskEncryptionSet.tsp:77:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskEncryptionSet.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:77:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:77:13 - occurred while instantiating template
+DiskEncryptionSet.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:82:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:82:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:82:26 - occurred while instantiating template
+DiskEncryptionSet.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeListBySubscription' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:90:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeListBySubscription' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:90:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:90:11 - occurred while instantiating template
+DiskEncryptionSet.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceActionSync' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DiskEncryptionSet.tsp:102:30 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionSync' should contain the action verb 'diskencryptionsets' from the route path. Consider updating the operation name.
+  DiskEncryptionSet.tsp:102:30 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DiskEncryptionSet.tsp:102:30 - occurred while instantiating template
+DiskRestorePoint.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DiskRestorePoint.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DiskRestorePoint.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:90:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskRestorePoint.tsp:90:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'grantAccess' should contain the action verb 'begingetaccess' from the route path. Consider updating the operation name.
+DiskRestorePoint.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DiskRestorePoint.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:103:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DiskRestorePoint.tsp:103:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'revokeAccess' should contain the action verb 'endgetaccess' from the route path. Consider updating the operation name.
+DiskRestorePoint.tsp:103:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DiskRestorePoint.tsp:38:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DiskRestorePoint.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Snapshot.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:52:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:52:10 - occurred while instantiating template
+Snapshot.tsp:59:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:59:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:59:21 - occurred while instantiating template
+Snapshot.tsp:74:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:849:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.encryptionSettingsCollection.enabled.
+Snapshot.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:74:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:74:13 - occurred while instantiating template
+Snapshot.tsp:91:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:91:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:91:13 - occurred while instantiating template
+Snapshot.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:96:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:96:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:96:26 - occurred while instantiating template
+Snapshot.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeListBySubscription' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:104:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeListBySubscription' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Snapshot.tsp:104:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:104:11 - occurred while instantiating template
+Snapshot.tsp:110:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:110:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'grantAccess' should contain the action verb 'begingetaccess' from the route path. Consider updating the operation name.
+Snapshot.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'snapshots' from the route path. Consider updating the operation name.
+  Snapshot.tsp:110:18 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:110:18 - occurred while instantiating template
+Snapshot.tsp:120:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:120:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'revokeAccess' should contain the action verb 'endgetaccess' from the route path. Consider updating the operation name.
+Snapshot.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'snapshots' from the route path. Consider updating the operation name.
+  Snapshot.tsp:120:19 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:120:19 - occurred while instantiating template
+Snapshot.tsp:132:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'snapshots' from the route path. Consider updating the operation name.
+  Snapshot.tsp:132:31 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:132:31 - occurred while instantiating template
+Snapshot.tsp:146:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Snapshot.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsync' should contain the action verb 'snapshots' from the route path. Consider updating the operation name.
+  Snapshot.tsp:146:35 - occurred while instantiating template
+../common/operations.tsp:220:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Snapshot.tsp:146:35 - occurred while instantiating template
+
+Found 191 warnings.
+

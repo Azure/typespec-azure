@@ -1,0 +1,10 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+models.tsp:21:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'fetch' should contain the action verb 'fetchdatacollectionruleconfigurationmetadata' from the route path. Consider updating the operation name.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 3 warnings.
+

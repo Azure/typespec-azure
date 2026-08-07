@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/post-201-response",
+  "count": 6,
+  "levels": {
+    "warning": 6
+  },
+  "projectCount": 2,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "client.tsp",
+      "line": 412,
+      "column": 6,
+      "message": "Using post for a create operation is discouraged."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "client.tsp",
+      "line": 366,
+      "column": 6,
+      "message": "Using post for a create operation is discouraged."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 825,
+      "column": 4,
+      "message": "Using post for a create operation is discouraged."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 545,
+      "column": 4,
+      "message": "Using post for a create operation is discouraged."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 763,
+      "column": 4,
+      "message": "Using post for a create operation is discouraged."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/post-201-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 617,
+      "column": 4,
+      "message": "Using post for a create operation is discouraged."
+    }
+  ]
+}

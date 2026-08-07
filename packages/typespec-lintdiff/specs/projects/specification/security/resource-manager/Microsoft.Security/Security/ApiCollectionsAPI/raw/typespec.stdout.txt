@@ -1,0 +1,21 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+ApiCollection.tsp:50:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/providers/Microsoft.Security/apiCollections/{apiId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+ApiCollection.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiCollection.tsp:61:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/providers/Microsoft.Security/apiCollections/{apiId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+ApiCollection.tsp:61:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'onboardAzureApiManagementApi' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+ApiCollection.tsp:61:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+ApiCollection.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiCollection.tsp:76:3 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'offboardAzureApiManagementApi' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+ApiCollection.tsp:76:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/providers/Microsoft.Security/apiCollections/{apiId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+ApiCollection.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiCollection.tsp:87:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/providers/Microsoft.Security/apiCollections' should use {scope}/providers/... instead of hardcoding the parent scope.
+ApiCollection.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiCollection.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 14 warnings.
+

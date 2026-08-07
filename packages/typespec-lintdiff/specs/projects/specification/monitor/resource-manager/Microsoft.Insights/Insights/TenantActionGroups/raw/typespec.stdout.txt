@@ -1,0 +1,48 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'subscriptionId' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'resourceGroupName' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'serviceName' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'quotaCounterKey' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'subscriptionId' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'resourceGroupName' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'serviceName' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp:368:3 - error @typespec/http/missing-uri-param: Route reference parameter 'quotaCounterKey' but wasn't found in operation parameters
+  TenantActionGroupResource.tsp:162:60 - occurred while instantiating template
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-05-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:28:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+../Common/main.tsp:179:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:78:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:83:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+../Common/main.tsp:256:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+TenantActionGroupResource.tsp:146:4 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}/createNotifications' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:146:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:162:4 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/microsoft.Management/managementGroups/{managementGroupId}/providers/microsoft.Insights/tenantActionGroups/{tenantActionGroupName}/notificationStatus/{notificationId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:162:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:44:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+TenantActionGroupResource.tsp:65:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+TenantActionGroupResource.tsp:81:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:93:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:106:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+../Common/main.tsp:256:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.enabled.
+TenantActionGroupResource.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:119:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups/{tenantActionGroupName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:119:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TenantActionGroupResource.tsp:131:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.Insights/tenantActionGroups' should use {scope}/providers/... instead of hardcoding the parent scope.
+TenantActionGroupResource.tsp:131:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Common/main.tsp:132:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+
+Found 8 errors, 25 warnings.
+

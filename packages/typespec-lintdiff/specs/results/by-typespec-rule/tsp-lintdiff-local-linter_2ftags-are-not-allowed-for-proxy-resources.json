@@ -1,0 +1,583 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+  "count": 57,
+  "levels": {
+    "warning": 57
+  },
+  "projectCount": 17,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7762,
+      "column": 3,
+      "message": "Proxy resource 'NamedValueContract' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "sourceFile": "models.tsp",
+      "line": 965,
+      "column": 3,
+      "message": "Proxy resource 'DeletedConfigurationStore' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "sourceFile": "models.tsp",
+      "line": 926,
+      "column": 3,
+      "message": "Proxy resource 'KeyValue' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 4097,
+      "column": 3,
+      "message": "Proxy resource 'BillingProfile' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 6125,
+      "column": 3,
+      "message": "Proxy resource 'Customer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 6785,
+      "column": 3,
+      "message": "Proxy resource 'InvoiceSection' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth",
+      "sourceFile": "main.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "Proxy resource 'SignalDefinition' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth",
+      "sourceFile": "main.tsp",
+      "line": 564,
+      "column": 3,
+      "message": "Proxy resource 'Entity' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth",
+      "sourceFile": "main.tsp",
+      "line": 1107,
+      "column": 3,
+      "message": "Proxy resource 'Relationship' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4317,
+      "column": 3,
+      "message": "Proxy resource 'CapabilityHost' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4317,
+      "column": 3,
+      "message": "Proxy resource 'AgentApplication' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4317,
+      "column": 3,
+      "message": "Proxy resource 'AgentDeployment' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 263,
+      "column": 3,
+      "message": "Proxy resource 'AgentPool' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 263,
+      "column": 3,
+      "message": "Proxy resource 'AgentPoolCustomize' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "Machine.tsp",
+      "line": 455,
+      "column": 3,
+      "message": "Proxy resource 'Machine' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "models.tsp",
+      "line": 1249,
+      "column": 3,
+      "message": "Proxy resource 'Catalog' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "models.tsp",
+      "line": 747,
+      "column": 3,
+      "message": "Proxy resource 'Schedule' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceregistry/DeviceRegistry.Management",
+      "sourceFile": "schemaRegistries.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "Proxy resource 'Schema' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "models.tsp",
+      "line": 3059,
+      "column": 3,
+      "message": "Proxy resource 'Subscription' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "models.tsp",
+      "line": 1558,
+      "column": 3,
+      "message": "Proxy resource 'DeletedVault' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "models.tsp",
+      "line": 2021,
+      "column": 3,
+      "message": "Proxy resource 'DeletedManagedHsm' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'CodeContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'CodeVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'ComponentContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'ComponentVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'DataContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'DataVersionBase' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'EnvironmentContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'EnvironmentVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'ModelContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'ModelVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'Datastore' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'FeaturesetContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'Feature' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'FeaturesetVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'FeaturestoreEntityContainer' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'FeaturestoreEntityVersion' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'JobBase' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'Schedule' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4857,
+      "column": 3,
+      "message": "Proxy resource 'CapabilityHost' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 2995,
+      "column": 3,
+      "message": "Proxy resource 'HypervMachine' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 4543,
+      "column": 3,
+      "message": "Proxy resource 'ImportMachine' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 5554,
+      "column": 3,
+      "message": "Proxy resource 'SqlServerV2' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 6060,
+      "column": 3,
+      "message": "Proxy resource 'IisWebApplications' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 6555,
+      "column": 3,
+      "message": "Proxy resource 'TomcatWebApplications' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 7440,
+      "column": 3,
+      "message": "Proxy resource 'Server' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "models.tsp",
+      "line": 8201,
+      "column": 3,
+      "message": "Proxy resource 'MachineResource' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
+      "sourceFile": "typespec/healthmodels/models.tsp",
+      "line": 353,
+      "column": 3,
+      "message": "Proxy resource 'Entity' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
+      "sourceFile": "typespec/healthmodels/models.tsp",
+      "line": 590,
+      "column": 3,
+      "message": "Proxy resource 'Relationship' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
+      "sourceFile": "typespec/healthmodels/models.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "Proxy resource 'SignalDefinition' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 1889,
+      "column": 3,
+      "message": "Proxy resource 'SavedSearch' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 1741,
+      "column": 3,
+      "message": "Proxy resource 'LogAnalyticsQueryPackQuery' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 926,
+      "column": 3,
+      "message": "Proxy resource 'PostRulesResource' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 926,
+      "column": 3,
+      "message": "Proxy resource 'PreRulesResource' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 926,
+      "column": 3,
+      "message": "Proxy resource 'LocalRulesResource' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign",
+      "sourceFile": "landingZoneConfigurationResourceProperties.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Proxy resource 'LandingZoneConfigurationResource' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "models.tsp",
+      "line": 448,
+      "column": 3,
+      "message": "Proxy resource 'SubscriptionAliasResponse' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+  "count": 33,
+  "levels": {
+    "warning": 33
+  },
+  "projectCount": 27,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 22,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Attestation/attestationProviders/{providerName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BotService/botServices/{resourceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "privateEndpointConnection.tsp",
+      "line": 17,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Chaos/privateAccesses/{privateAccessName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/diskAccesses/{diskAccessName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 45,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 49,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/hostPools/{hostPoolName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 49,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DesktopVirtualization/workspaces/{workspaceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ElasticSan/elasticSans/{elasticSanName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 50,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/cloudHsmClusters/{cloudHsmClusterName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "sourceFile": "PaymentHsmClusterPrivateEndpointConnection.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HardwareSecurityModules/paymentHsmClusters/{paymentHsmClusterName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "sourceFile": "PrivateEndpointConnectionDescription.tsp",
+      "line": 67,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HealthcareApis/services/{resourceName}/privateEndpointConnections/{privateEndpointConnectionName} is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb",
+      "sourceFile": "routes.tsp",
+      "line": 136,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HorizonDb/clusters/{clusterName}/privateEndpointConnections/{privateEndpointConnectionName} is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb",
+      "sourceFile": "routes.tsp",
+      "line": 136,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HorizonDb/clusters/{clusterName}/privateEndpointConnections is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 55,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/iotHubs/{resourceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "MhsmPrivateEndpointConnection.tsp",
+      "line": 56,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/managedHSMs/{name}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 50,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 42,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections/{privateEndpointConnectionName} is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 39,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateEndpointConnections is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 39,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 21,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 21,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redisEnterprise/{clusterName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 23,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/privateLinkResources is missing."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/implement-private-endpoint-apis",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/webPubSub/{resourceName}/privateLinkResources is missing."
+    }
+  ]
+}

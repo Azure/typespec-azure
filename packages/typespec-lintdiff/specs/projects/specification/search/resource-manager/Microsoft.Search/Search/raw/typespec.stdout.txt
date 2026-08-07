@@ -1,0 +1,190 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+PrivateEndpointConnection.tsp:29:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/privateLinkResources is missing.
+models.tsp:1326:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:95:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'usageBySubscriptionSku' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+routes.tsp:95:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:136:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:161:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SearchService.tsp:161:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:732:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.replicaCount.
+models.tsp:739:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.partitionCount.
+models.tsp:749:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.hostingMode.
+models.tsp:759:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.publicNetworkAccess.
+models.tsp:1155:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
+SearchService.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:242:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:268:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:295:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'adminKeysGet' should contain the action verb 'listadminkeys' from the route path. Consider updating the operation name.
+SearchService.tsp:295:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:323:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'regenerate' should contain the action verb 'regenerateadminkey' from the route path. Consider updating the operation name.
+SearchService.tsp:323:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SearchService.tsp:59:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SearchService.tsp:352:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'create' should contain the action verb 'createquerykey' from the route path. Consider updating the operation name.
+SearchService.tsp:352:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SearchService.tsp:88:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SearchService.tsp:381:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'SearchServices' should not appear after the underscore.
+SearchService.tsp:381:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'listBySearchService' should contain the action verb 'listquerykeys' from the route path. Consider updating the operation name.
+SearchService.tsp:381:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:411:3 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'queryKeysDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+SearchService.tsp:411:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'queryKeysDelete' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+SearchService.tsp:411:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:109:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SearchService.tsp:117:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SearchService.tsp:436:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SearchService.tsp:436:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SearchService.tsp:453:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:60:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+PrivateEndpointConnection.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:88:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+PrivateEndpointConnection.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SharedPrivateLinkResource.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SharedPrivateLinkResource.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SharedPrivateLinkResource.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SharedPrivateLinkResource.tsp:93:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SharedPrivateLinkResource.tsp:93:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+SharedPrivateLinkResource.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SharedPrivateLinkResource.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NetworkSecurityPerimeterConfiguration.tsp:77:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+NetworkSecurityPerimeterConfiguration.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:154:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'fetch' should contain the action verb 'fetchofferings' from the route path. Consider updating the operation name.
+routes.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:153:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'searchGetCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:153:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:164:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:153:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:153:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:178:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:178:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'searchCreateOrUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:178:4 - warning tsp-lintdiff-local-linter/put-path: The path for a put should have a final path parameter.
+client.tsp:178:4 - warning tsp-lintdiff-local-linter/put-request-response-scheme: PUT request body schema should match the 200 response schema.
+client.tsp:189:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:178:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:209:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:209:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'searchUpdateCustomization' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:220:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:209:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:239:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'searchDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:239:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:250:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:239:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:239:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:137:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'searchServicesListByResourceGroupCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:137:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:143:3 - warning tsp-lintdiff-local-linter/request-body-optional: The body parameter is not marked as required.
+client.tsp:137:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:124:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'searchServicesListBySubscriptionCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:124:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:129:3 - warning tsp-lintdiff-local-linter/request-body-optional: The body parameter is not marked as required.
+client.tsp:124:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:322:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:322:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'adminKeysGetCustomization' should contain the action verb 'searchservices' from the route path. Consider updating the operation name.
+client.tsp:333:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:322:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:520:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:520:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'privateLinkResourcesRegenerateCustomization' should contain the action verb 'searchservices' from the route path. Consider updating the operation name.
+client.tsp:536:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "keyKind" and "privateEndpointConnectionName".
+client.tsp:530:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:536:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:520:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:262:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:262:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'queryKeysCreateCustomization' should contain the action verb 'searchservices' from the route path. Consider updating the operation name.
+client.tsp:278:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "privateEndpointConnectionName".
+client.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:278:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:262:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:348:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'queryKeysListBySearchServiceCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:348:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:359:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:348:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:292:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'queryKeysDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:292:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:308:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "key" and "privateEndpointConnectionName".
+client.tsp:302:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:308:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:292:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:292:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:495:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'privateLinkResourcesListSupportedCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:495:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'privateLinkResourcesListSupportedCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:495:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:506:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:495:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:495:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'privateEndpointConnectionsGetCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:408:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:414:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:426:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:426:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'privateEndpointConnectionsUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:426:4 - warning tsp-lintdiff-local-linter/put-request-response-scheme: PUT request body schema should match the 200 response schema.
+client.tsp:437:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:443:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:426:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:462:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'privateEndpointConnectionsDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:462:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:473:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:479:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:462:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:462:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:374:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'privateEndpointConnectionsListByServiceCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:374:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'privateEndpointConnectionsListByServiceCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:374:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:385:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:374:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:374:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:576:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'SharedPrivateLinkResourcesGetCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:576:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:593:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "sharedPrivateLinkResourceName" and "privateEndpointConnectionName".
+client.tsp:587:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:593:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:576:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:576:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:607:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:607:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'SharedPrivateLinkResourcesCreateOrUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:607:4 - warning tsp-lintdiff-local-linter/put-request-response-scheme: PUT request body schema should match the 200 response schema.
+client.tsp:624:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "sharedPrivateLinkResourceName" and "privateEndpointConnectionName".
+client.tsp:618:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:624:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:607:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:654:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'SharedPrivateLinkResourcesDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:654:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:671:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "sharedPrivateLinkResourceName" and "privateEndpointConnectionName".
+client.tsp:665:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:671:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:654:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:654:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:552:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'SharedPrivateLinkResourcesListByServiceCustomization' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:552:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'SharedPrivateLinkResourcesListByServiceCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:552:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:563:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+client.tsp:552:4 - warning tsp-lintdiff-local-linter/request-body-not-allowed: GET and DELETE operations must not accept a request body.
+client.tsp:552:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:59:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:59:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:39:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:39:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:85:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'usagesListBySubscriptionCustomization' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:85:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:85:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:102:4 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore.
+client.tsp:111:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "skuName" and "resourceGroupName".
+client.tsp:111:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:114:3 - warning tsp-lintdiff-local-linter/request-body-optional: The body parameter is not marked as required.
+client.tsp:102:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 183 warnings.
+

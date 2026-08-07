@@ -1,0 +1,20 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:41:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:41:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2015-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:79:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:189:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:234:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:338:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:362:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+routes.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:33:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:33:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:177:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+routes.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:90:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+
+Found 13 warnings.
+

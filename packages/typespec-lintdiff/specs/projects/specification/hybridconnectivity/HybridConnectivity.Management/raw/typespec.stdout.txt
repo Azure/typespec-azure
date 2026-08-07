@@ -1,0 +1,88 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:39:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+PublicCloud.tsp:165:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+EndpointResource.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:66:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.type.
+EndpointResource.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:135:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+EndpointResource.tsp:123:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionSync' should contain the action verb 'endpoints' from the route path. Consider updating the operation name.
+  EndpointResource.tsp:123:22 - occurred while instantiating template
+EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  EndpointResource.tsp:123:22 - occurred while instantiating template
+EndpointResource.tsp:163:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+EndpointResource.tsp:151:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionSync' should contain the action verb 'endpoints' from the route path. Consider updating the operation name.
+  EndpointResource.tsp:151:36 - occurred while instantiating template
+EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  EndpointResource.tsp:151:36 - occurred while instantiating template
+EndpointResource.tsp:179:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceConfigurationResource.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceConfigurationResource.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceConfigurationResource.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceConfigurationResource.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceConfigurationResource.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:355:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'post' should contain the action verb 'generateawstemplate' from the route path. Consider updating the operation name.
+PublicCloud.tsp:355:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:375:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicCloudConnector" and "endpointName".
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:376:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicCloudConnector" and "endpointName".
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:378:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "publicCloudConnector" and "endpointName".
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:382:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:383:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:384:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:387:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:96:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:396:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionConfiguration" and "endpointName".
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:397:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionConfiguration" and "endpointName".
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:399:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionConfiguration" and "endpointName".
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:403:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:404:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:407:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:416:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:303:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionConfiguration" and "endpointName".
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:303:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PublicCloud.tsp:417:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionConfiguration" and "endpointName".
+PublicCloud.tsp:179:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+PublicCloud.tsp:422:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:251:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PublicCloud.tsp:251:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionType" and "endpointName".
+PublicCloud.tsp:251:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PublicCloud.tsp:423:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PublicCloud.tsp:424:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 77 warnings.
+

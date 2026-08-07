@@ -1,0 +1,35 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:55:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v4'.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v4'.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-05-31-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:64:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:70:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:76:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:142:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:148:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+models.tsp:154:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+SystemAssignedIdentity.tsp:36:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'SystemAssignedIdentity' must have a put/createOrUpdate operation.
+SystemAssignedIdentity.tsp:13:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'SystemAssignedIdentity' must have patch operation that at least supports the update of tags.
+SystemAssignedIdentity.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Identity.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FederatedIdentityCredential.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FederatedIdentityCredential.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FederatedIdentityCredential.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FederatedIdentityCredential.tsp:62:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+FederatedIdentityCredential.tsp:68:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skiptoken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+FederatedIdentityCredential.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+FederatedIdentityCredential.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+FederatedIdentityCredential.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+FederatedIdentityCredential.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+FederatedIdentityCredential.tsp:68:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+
+Found 28 warnings.
+

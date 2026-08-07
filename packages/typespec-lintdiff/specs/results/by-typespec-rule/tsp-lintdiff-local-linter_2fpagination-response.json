@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/pagination-response",
+  "count": 5,
+  "levels": {
+    "warning": 5
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/pagination-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 220,
+      "column": 4,
+      "message": "Operation might be pageable. Consider adding the x-ms-pageable extension."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/pagination-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 220,
+      "column": 4,
+      "message": "Operation might be pageable. Consider adding the x-ms-pageable extension."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/pagination-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 66,
+      "column": 4,
+      "message": "Operation might be pageable. Consider adding the x-ms-pageable extension."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/pagination-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 201,
+      "column": 4,
+      "message": "Operation might be pageable. Consider adding the x-ms-pageable extension."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/pagination-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 245,
+      "column": 4,
+      "message": "Operation might be pageable. Consider adding the x-ms-pageable extension."
+    }
+  ]
+}

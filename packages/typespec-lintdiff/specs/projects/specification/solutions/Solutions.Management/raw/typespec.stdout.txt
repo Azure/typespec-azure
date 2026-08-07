@@ -1,0 +1,103 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:45:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:45:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-12-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:602:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:980:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:22:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:59:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+Application.tsp:59:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+Application.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+models.tsp:602:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.jitAccessPolicy.jitAccessEnabled.
+models.tsp:667:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customerSupport.email.
+models.tsp:672:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customerSupport.phone.
+models.tsp:831:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+Application.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:136:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+Application.tsp:152:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Application.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:60:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+ApplicationDefinition.tsp:60:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+ApplicationDefinition.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:96:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+ApplicationDefinition.tsp:96:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'getById' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+ApplicationDefinition.tsp:96:3 - warning tsp-lintdiff-local-linter/path-characters: Path contains non-recommended characters.
+ApplicationDefinition.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:105:3 - warning tsp-lintdiff-local-linter/even-segmented-path-for-put-operation: ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}?disambiguation_dummy' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace.
+ApplicationDefinition.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:121:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "applicationDefinitionName" and "provider".
+ApplicationDefinition.tsp:48:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+ApplicationDefinition.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApplicationDefinition.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:51:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+JitRequestDefinition.tsp:51:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+JitRequestDefinition.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "jitRequestName" and "applicationName".
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "jitRequestName" and "applicationName".
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "jitRequestName" and "applicationName".
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify characters allowed (pattern).
+JitRequestDefinition.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+JitRequestDefinition.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:35:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+routes.tsp:35:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'getById' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+routes.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:52:3 - warning tsp-lintdiff-local-linter/even-segmented-path-for-put-operation: ARM PUT path '/{applicationId}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace.
+routes.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:602:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.jitAccessPolicy.jitAccessEnabled.
+models.tsp:667:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customerSupport.email.
+models.tsp:672:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customerSupport.phone.
+models.tsp:831:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+routes.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:115:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 96 warnings.
+

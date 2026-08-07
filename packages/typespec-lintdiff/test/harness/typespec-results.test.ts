@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   aggregateTypeSpecResults,
   compareResults,
+  comparisonMarkdown,
+  coverageBreakdownMarkdown,
+  createCoverageBreakdown,
   injectLocalRuleset,
+  loadValidatorFixtureMetadata,
   loadValidatorMappings,
   parseTypeSpecDiagnostics,
   selectProjects,
@@ -142,7 +146,9 @@ describe("TypeSpec project selection", () => {
 
 describe("validator and TypeSpec comparison", () => {
   it("loads validator-to-TypeSpec mappings from fixture frontmatter", () => {
-    const mappings = loadValidatorMappings(path.resolve(import.meta.dirname, "..", "fixtures"));
+    const fixturesDir = path.resolve(import.meta.dirname, "..", "fixtures");
+    const mappings = loadValidatorMappings(fixturesDir);
+    const metadata = loadValidatorFixtureMetadata(fixturesDir);
 
     expect(mappings.get("DeleteInOperationName")).toEqual(
       new Set(["tsp-lintdiff-local-linter/delete-in-operation-name"]),
@@ -151,6 +157,8 @@ describe("validator and TypeSpec comparison", () => {
     expect(mappings.get("PostResponseCodes")).toEqual(
       new Set(["@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"]),
     );
+    expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
+    expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
   });
 
   it("computes overlap from projects where mapped TypeSpec rules actually fire", () => {
@@ -206,5 +214,152 @@ describe("validator and TypeSpec comparison", () => {
       typeSpecProjectCount: 0,
     });
     expect(comparison.unmappedTypeSpecRules.map((entry) => entry.rule)).toEqual(["unmapped/rule"]);
+  });
+
+  it("excludes failed projects from overlap, gaps, and TypeSpec-only coverage", () => {
+    const aggregate = aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", [
+      diagnostic("local/rule-a", "project-success"),
+      diagnostic("local/rule-a", "project-failed"),
+      diagnostic("unmapped/rule", "project-failed"),
+    ]);
+    const comparison = compareResults(
+      "commit",
+      "2026-08-07T00:00:00.000Z",
+      {
+        ValidatorA: {
+          count: 2,
+          projects: ["project-success", "project-failed"],
+        },
+      },
+      aggregate,
+      new Map([["ValidatorA", new Set(["local/rule-a"])]]),
+      {
+        partial: false,
+        sourceProjectCount: 2,
+        projects: ["project-success", "project-failed"],
+        filters: {},
+      },
+      { failedProjects: new Set(["project-failed"]) },
+    );
+
+    expect(comparison.rules[0]).toMatchObject({
+      validatorProjectCount: 2,
+      assessableValidatorProjectCount: 1,
+      overlapProjectCount: 1,
+      validatorOnlyProjectCount: 0,
+      unassessedProjectCount: 1,
+      typeSpecOnlyProjectCount: 0,
+      observedCoveragePercent: 100,
+      typeSpecDiagnosticCount: 1,
+      unassessedProjects: ["project-failed"],
+    });
+    expect(comparison.unmappedTypeSpecRules).toEqual([]);
+    expect(comparison).toMatchObject({
+      successfulProjectCount: 1,
+      failedProjectCount: 1,
+      unassessedProjects: ["project-failed"],
+    });
+  });
+
+  it("includes catalog, fixture, and dataset rules even when they have zero results", () => {
+    const comparison = compareResults(
+      "commit",
+      "2026-08-07T00:00:00.000Z",
+      {
+        DatasetOnly: { count: 1, projects: ["project-a"] },
+      },
+      aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", []),
+      new Map([["FixtureOnly", new Set(["local/not-fired"])]]),
+      {
+        partial: false,
+        sourceProjectCount: 1,
+        projects: ["project-a"],
+        filters: {},
+      },
+      { knownValidatorRules: ["CatalogOnly"] },
+    );
+
+    expect(comparison.rules.map((entry) => entry.validatorRule)).toEqual([
+      "CatalogOnly",
+      "DatasetOnly",
+      "FixtureOnly",
+    ]);
+    expect(comparison.rules[0]).toMatchObject({
+      validatorProjectCount: 0,
+      validatorDiagnosticCount: 0,
+      mappedTypeSpecRules: [],
+    });
+    expect(comparison.rules[2]).toMatchObject({
+      validatorProjectCount: 0,
+      typeSpecProjectCount: 0,
+      mappedTypeSpecRules: ["local/not-fired"],
+      firedTypeSpecRules: [],
+    });
+  });
+
+  it("categorizes observed coverage and renders the investigation fields", () => {
+    const aggregate = aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", [
+      diagnostic("@azure-tools/official", "project-a"),
+      diagnostic("@azure-tools/official", "project-b"),
+      diagnostic("local/partial", "project-a"),
+      diagnostic("unmapped/type-spec", "project-b"),
+    ]);
+    const mappings = new Map([
+      ["Full", new Set(["@azure-tools/official"])],
+      ["Partial", new Set(["local/partial"])],
+      ["Zero", new Set(["local/not-fired"])],
+      ["Never", new Set(["local/not-fired"])],
+      ["Unmapped", new Set<string>()],
+    ]);
+    const fixtureMetadata = new Map([
+      ["Full", { coverageKind: "lint", tspLints: mappings.get("Full")! }],
+    ]);
+    const comparison = compareResults(
+      "commit",
+      "2026-08-07T00:00:00.000Z",
+      {
+        Full: { count: 2, projects: ["project-a", "project-b"] },
+        Partial: { count: 2, projects: ["project-a", "project-b"] },
+        Zero: { count: 1, projects: ["project-a"] },
+        Unmapped: { count: 1, projects: ["project-a"] },
+      },
+      aggregate,
+      mappings,
+      {
+        partial: true,
+        sourceProjectCount: 3,
+        projects: ["project-a", "project-b"],
+        filters: { limit: 2 },
+      },
+      { durationMs: 1234, fixtureMetadata },
+    );
+    const breakdown = createCoverageBreakdown(comparison);
+
+    expect(breakdown.categories).toMatchObject({
+      hundredPercentObservedCoverage: ["Full"],
+      partialObservedCoverage: ["Partial"],
+      zeroObservedCoverage: ["Zero"],
+      unmappedValidatorRules: ["Unmapped"],
+      validatorRulesNeverFired: ["Never"],
+      typeSpecOnlyRules: ["unmapped/type-spec"],
+    });
+    expect(comparison.rules.find((entry) => entry.validatorRule === "Full")).toMatchObject({
+      coverageKind: "lint",
+      officialMapping: true,
+      firedTypeSpecRules: ["@azure-tools/official"],
+      observedCoveragePercent: 100,
+    });
+    expect(comparison.rules.find((entry) => entry.validatorRule === "Partial")).toMatchObject({
+      observedCoveragePercent: 50,
+    });
+
+    const coverageMarkdown = coverageBreakdownMarkdown(breakdown);
+    expect(coverageMarkdown).toContain("Analysis duration: 1234 ms");
+    expect(coverageMarkdown).toContain("Official mappings and fixture coverage kinds");
+    expect(coverageMarkdown).toContain(
+      "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | Unassessed | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
+    );
+    expect(coverageMarkdown).toContain("## Unassessed projects (0)");
+    expect(comparisonMarkdown(comparison)).toContain("## Column definitions");
   });
 });

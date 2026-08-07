@@ -1,0 +1,18 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:34:11 - warning tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case: The ARM provider namespace "microsoft.insights" must use PascalCase (e.g., Microsoft.Compute).
+models.tsp:63:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+../Common/main.tsp:132:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:83:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ServiceDiagnosticSettingsResource.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceDiagnosticSettingsResource.tsp:61:3 - warning tsp-lintdiff-local-linter/even-segmented-path-for-put-operation: ARM PUT path '/{resourceUri}/providers/microsoft.insights/diagnosticSettings/service' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace.
+ServiceDiagnosticSettingsResource.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ServiceDiagnosticSettingsResource.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Common/main.tsp:179:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+../Common/main.tsp:256:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+
+Found 11 warnings.
+

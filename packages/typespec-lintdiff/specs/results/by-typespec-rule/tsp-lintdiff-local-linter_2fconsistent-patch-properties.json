@@ -1,0 +1,1233 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+  "count": 122,
+  "levels": {
+    "warning": 122
+  },
+  "projectCount": 27,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10585,
+      "column": 3,
+      "message": "The property 'properties.password' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1108,
+      "column": 3,
+      "message": "The property 'principal' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1115,
+      "column": 3,
+      "message": "The property 'resource' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1121,
+      "column": 3,
+      "message": "The property 'recommendation' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1126,
+      "column": 3,
+      "message": "The property 'decision' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1131,
+      "column": 3,
+      "message": "The property 'justification' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1139,
+      "column": 3,
+      "message": "The property 'reviewedDateTime' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1146,
+      "column": 3,
+      "message": "The property 'reviewedBy' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1152,
+      "column": 3,
+      "message": "The property 'applyResult' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1160,
+      "column": 3,
+      "message": "The property 'appliedDateTime' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1167,
+      "column": 3,
+      "message": "The property 'appliedBy' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1172,
+      "column": 3,
+      "message": "The property 'insights' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "models.tsp",
+      "line": 1179,
+      "column": 3,
+      "message": "The property 'principalResourceMembership' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 2052,
+      "column": 3,
+      "message": "The property 'nodeId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3461,
+      "column": 3,
+      "message": "The property 'properties.logProgress' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3291,
+      "column": 3,
+      "message": "The property 'properties.password' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 5808,
+      "column": 3,
+      "message": "The property 'properties.securityToken.accessToken' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 5814,
+      "column": 3,
+      "message": "The property 'properties.securityToken.refreshToken' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 5819,
+      "column": 3,
+      "message": "The property 'properties.securityToken.tokenType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "sourceFile": "models.tsp",
+      "line": 1914,
+      "column": 3,
+      "message": "The property 'tags' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1988,
+      "column": 3,
+      "message": "The property 'properties.data' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1995,
+      "column": 3,
+      "message": "The property 'properties.password' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "models.tsp",
+      "line": 3237,
+      "column": 3,
+      "message": "The property 'properties.allowContributors' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "models.tsp",
+      "line": 3242,
+      "column": 3,
+      "message": "The property 'properties.milestones' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingtrust/resource-manager/Microsoft.BillingTrust/BillingTrust",
+      "sourceFile": "main.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "The property 'kind' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3593,
+      "column": 3,
+      "message": "The property 'keyReferences' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "ConnectedRegistry.models.tsp",
+      "line": 507,
+      "column": 3,
+      "message": "The property 'properties.syncProperties.schedule' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "ConnectedRegistry.models.tsp",
+      "line": 512,
+      "column": 3,
+      "message": "The property 'properties.syncProperties.syncWindow' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "ConnectedRegistry.models.tsp",
+      "line": 517,
+      "column": 3,
+      "message": "The property 'properties.syncProperties.messageTtl' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "Webhook.models.tsp",
+      "line": 137,
+      "column": 3,
+      "message": "The property 'properties.serviceUri' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "Webhook.models.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "The property 'properties.customHeaders' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "sourceFile": "models.tsp",
+      "line": 820,
+      "column": 3,
+      "message": "The property 'isArchiveEnabled' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "sourceFile": "models.tsp",
+      "line": 936,
+      "column": 3,
+      "message": "The property 'tags' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "sourceFile": "models.tsp",
+      "line": 2480,
+      "column": 3,
+      "message": "The property 'properties.details.returnToCustomerPackageDetails.carrierAccountNumber' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "sourceFile": "models.tsp",
+      "line": 2485,
+      "column": 3,
+      "message": "The property 'properties.details.returnToCustomerPackageDetails.carrierName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+      "sourceFile": "models.tsp",
+      "line": 2490,
+      "column": 3,
+      "message": "The property 'properties.details.returnToCustomerPackageDetails.trackingId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "models.tsp",
+      "line": 3985,
+      "column": 3,
+      "message": "The property 'autoUpdate' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "models.tsp",
+      "line": 3990,
+      "column": 3,
+      "message": "The property 'updateDelayOffset' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
+      "sourceFile": "models.tsp",
+      "line": 320,
+      "column": 3,
+      "message": "The property 'dnsResolverOutboundEndpoints' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "sourceFile": "models.tsp",
+      "line": 1115,
+      "column": 3,
+      "message": "The property 'accountName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "sourceFile": "models.tsp",
+      "line": 1120,
+      "column": 3,
+      "message": "The property 'spn' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "sourceFile": "models.tsp",
+      "line": 1126,
+      "column": 3,
+      "message": "The property 'password' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 770,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.addressClassification' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 802,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.streetAddress1' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 807,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.streetAddress2' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 812,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.streetAddress3' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 817,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.city' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 822,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.stateOrProvince' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 827,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.country' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 832,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.postalCode' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 837,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.zipExtendedCode' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 842,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.companyName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 847,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.shippingAddress.addressType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 857,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.contactDetails.contactName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 862,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.contactDetails.phone' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 867,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.contactDetails.phoneExtension' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 872,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.contactDetails.mobile' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 877,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.contactDetails.emailList' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 786,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.addressValidationStatus' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 792,
+      "column": 3,
+      "message": "The property 'properties.forwardAddress.provisioningState' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2168,
+      "column": 3,
+      "message": "The property 'properties.preferences.notificationPreferences' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2213,
+      "column": 3,
+      "message": "The property 'properties.preferences.transportPreferences.preferredShipmentType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2223,
+      "column": 3,
+      "message": "The property 'properties.preferences.encryptionPreferences.doubleEncryptionStatus' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2233,
+      "column": 3,
+      "message": "The property 'properties.preferences.managementResourcePreferences.preferredManagementResourceId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2243,
+      "column": 3,
+      "message": "The property 'properties.preferences.termCommitmentPreferences.preferredTermCommitmentType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2248,
+      "column": 3,
+      "message": "The property 'properties.preferences.termCommitmentPreferences.preferredTermCommitmentDuration' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "models.tsp",
+      "line": 2485,
+      "column": 3,
+      "message": "The property 'properties.notificationEmailList' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "models.tsp",
+      "line": 4324,
+      "column": 3,
+      "message": "The property 'properties.defaultMaximumExpirationTimeInDays' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 174,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.backingStorageClassName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 183,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.azureStorageAccountName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 187,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.azureStorageAccountKey' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 207,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.server' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 210,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.share' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 213,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.subDir' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 216,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.mountPermissions' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 219,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.onDelete' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 228,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.source' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 234,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.username' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 238,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.password' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "storageclass.tsp",
+      "line": 241,
+      "column": 3,
+      "message": "The property 'properties.typeProperties.domain' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4306,
+      "column": 3,
+      "message": "The property 'properties.properties.scaleSettings.maxNodeCount' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4311,
+      "column": 3,
+      "message": "The property 'properties.properties.scaleSettings.minNodeCount' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 4316,
+      "column": 3,
+      "message": "The property 'properties.properties.scaleSettings.nodeIdleTimeBeforeScaleDown' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/L3IsolationDomain.tsp",
+      "line": 85,
+      "column": 3,
+      "message": "The property 'properties.aggregateRouteConfigurationDeprecated.ipv4Routes' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/L3IsolationDomain.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "The property 'properties.aggregateRouteConfigurationDeprecated.ipv6Routes' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/L3IsolationDomain.tsp",
+      "line": 100,
+      "column": 3,
+      "message": "The property 'properties.aggregateRouteConfiguration.ipv4RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/L3IsolationDomain.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "The property 'properties.aggregateRouteConfiguration.ipv6RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/InternalNetwork.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "The property 'properties.connectedIPv4SubnetsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/InternalNetwork.tsp",
+      "line": 338,
+      "column": 3,
+      "message": "The property 'properties.connectedIPv6SubnetsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/InternalNetwork.tsp",
+      "line": 613,
+      "column": 3,
+      "message": "The property 'properties.bgpConfiguration.bmpConfiguration.neighborIpExclusionsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 1085,
+      "column": 3,
+      "message": "The property 'properties.nativeIpv4PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 1110,
+      "column": 3,
+      "message": "The property 'properties.nativeIpv6PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 1085,
+      "column": 3,
+      "message": "The property 'properties.optionAProperties.nativeIpv4PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 1110,
+      "column": 3,
+      "message": "The property 'properties.optionAProperties.nativeIpv6PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/NetworkToNetworkInterconnect.tsp",
+      "line": 262,
+      "column": 3,
+      "message": "The property 'properties.optionBLayer3Configuration.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/NetworkToNetworkInterconnect.tsp",
+      "line": 333,
+      "column": 3,
+      "message": "The property 'properties.npbStaticRouteConfiguration.ipv4RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/NetworkToNetworkInterconnect.tsp",
+      "line": 345,
+      "column": 3,
+      "message": "The property 'properties.npbStaticRouteConfiguration.ipv6RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/NetworkTapRule.tsp",
+      "line": 225,
+      "column": 3,
+      "message": "The property 'properties.dynamicMatchConfigurationsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "models.tsp",
+      "line": 597,
+      "column": 3,
+      "message": "The property 'displayName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "models.tsp",
+      "line": 602,
+      "column": 3,
+      "message": "The property 'parentGroupId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 1346,
+      "column": 3,
+      "message": "The property 'properties.usageThreshold20250901' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 3335,
+      "column": 3,
+      "message": "The property 'properties.recoveryPointProperties.expiryTime' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 2427,
+      "column": 3,
+      "message": "The property 'properties.recoveryFabricName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 2449,
+      "column": 3,
+      "message": "The property 'properties.fabricSpecificDetails.instanceType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3352,
+      "column": 3,
+      "message": "The property 'properties.recoveryAzureVMName' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3358,
+      "column": 3,
+      "message": "The property 'properties.recoveryAzureVMSize' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3363,
+      "column": 3,
+      "message": "The property 'properties.selectedRecoveryAzureNetworkId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3368,
+      "column": 3,
+      "message": "The property 'properties.selectedTfoAzureNetworkId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3373,
+      "column": 3,
+      "message": "The property 'properties.selectedSourceNicId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3378,
+      "column": 3,
+      "message": "The property 'properties.enableRdpOnTargetOption' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3384,
+      "column": 3,
+      "message": "The property 'properties.vmNics' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3389,
+      "column": 3,
+      "message": "The property 'properties.licenseType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 3394,
+      "column": 3,
+      "message": "The property 'properties.recoveryAvailabilitySetId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 4767,
+      "column": 3,
+      "message": "The property 'properties.providerSpecificInput.instanceType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 5741,
+      "column": 3,
+      "message": "The property 'properties.replicationProviderSettings.instanceType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "models.tsp",
+      "line": 2164,
+      "column": 3,
+      "message": "The property 'properties.name' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "models.tsp",
+      "line": 1032,
+      "column": 3,
+      "message": "The property 'operation' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 795,
+      "column": 3,
+      "message": "The property 'properties.deviceGroupId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "placementPolicies.tsp",
+      "line": 159,
+      "column": 3,
+      "message": "The property 'properties.vmMembers' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "placementPolicies.tsp",
+      "line": 162,
+      "column": 3,
+      "message": "The property 'properties.hostMembers' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "placementPolicies.tsp",
+      "line": 165,
+      "column": 3,
+      "message": "The property 'properties.affinityStrength' in the request body either does not appear in the resource model or is nested at the wrong level."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "placementPolicies.tsp",
+      "line": 168,
+      "column": 3,
+      "message": "The property 'properties.azureHybridBenefitType' in the request body either does not appear in the resource model or is nested at the wrong level."
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:38:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:42:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:46:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:50:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:54:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:58:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:62:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:66:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+schemaRegistries.tsp:109:3 - warning tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources: Proxy resource 'Schema' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required.
+main.tsp:38:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-11-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:42:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-09-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:50:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-07-01-preview' has been in preview for over one year. Move it to GA or retire it.
+assets.tsp:46:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ns_policy.tsp:103:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+properties/ns_assetProperties.tsp:25:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+properties/ns_deviceProperties.tsp:23:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ns_devices.tsp:60:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assets.tsp:373:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assets.tsp:374:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+common/topic.tsp:25:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.defaultTopic.path.
+common/topic.tsp:28:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.defaultTopic.retain.
+assets.tsp:380:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assets.tsp:46:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+assets.tsp:387:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assets.tsp:388:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assets.tsp:389:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:168:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetEndpointProfileName" and "assetName".
+assetEndpointProfiles.tsp:169:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetEndpointProfileName" and "assetName".
+assetEndpointProfiles.tsp:84:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.method.
+assetEndpointProfiles.tsp:84:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.userAuthentication.method.
+assetEndpointProfiles.tsp:97:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.usernamePasswordCredentials.usernameReference.
+assetEndpointProfiles.tsp:101:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.usernamePasswordCredentials.usernameSecretName.
+assetEndpointProfiles.tsp:105:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.usernamePasswordCredentials.passwordReference.
+assetEndpointProfiles.tsp:109:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.usernamePasswordCredentials.passwordSecretName.
+assetEndpointProfiles.tsp:116:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.x509Credentials.certificateReference.
+assetEndpointProfiles.tsp:120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userAuthentication.x509Credentials.certificateSecretName.
+assetEndpointProfiles.tsp:129:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.transportAuthentication.ownCertificates.
+assetEndpointProfiles.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetEndpointProfileName" and "assetName".
+assetEndpointProfiles.tsp:182:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:183:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+assetEndpointProfiles.tsp:184:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+billings.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+billings.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "billingContainerName" and "assetName".
+billings.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "assetName".
+discoveredAssets.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "assetName".
+common/topic.tsp:25:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.defaultTopic.path.
+common/topic.tsp:28:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.defaultTopic.retain.
+discoveredAssets.tsp:163:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "assetName".
+discoveredAssets.tsp:170:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:171:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssets.tsp:172:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetEndpointProfileName" and "assetName".
+discoveredAssetEndpointProfiles.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetEndpointProfileName" and "assetName".
+discoveredAssetEndpointProfiles.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetEndpointProfileName" and "assetName".
+discoveredAssetEndpointProfiles.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredAssetEndpointProfiles.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:153:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+namespaces.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+namespaces.tsp:158:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+namespaces.tsp:165:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:167:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:171:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_credential.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_credential.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_credential.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_credential.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_credential.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_policy.tsp:168:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:170:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:172:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_policy.tsp:66:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.
+ns_policy.tsp:78:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.keyType.
+ns_policy.tsp:103:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.bringYourOwnRoot.enabled.
+ns_policy.tsp:69:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.leafCertificateConfiguration.
+ns_policy.tsp:135:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.leafCertificateConfiguration.validityPeriodInDays.
+ns_policy.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:184:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:187:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_policy.tsp:190:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_policy.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:205:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:207:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_policy.tsp:66:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.
+ns_policy.tsp:78:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.keyType.
+ns_policy.tsp:103:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.certificateAuthorityConfiguration.bringYourOwnRoot.enabled.
+ns_policy.tsp:69:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.leafCertificateConfiguration.
+ns_policy.tsp:135:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.certificate.leafCertificateConfiguration.validityPeriodInDays.
+ns_policy.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_policy.tsp:222:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_credential.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ns_assets.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_assets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetName" and "credentialName".
+ns_assets.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_assets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetName" and "credentialName".
+ns_assets.tsp:103:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+properties/ns_assetProperties.tsp:25:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_assets.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "assetName" and "credentialName".
+ns_assets.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_assets.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_assets.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_devices.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_devices.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "deviceName" and "credentialName".
+ns_devices.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_devices.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "deviceName" and "credentialName".
+properties/ns_deviceProperties.tsp:105:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.endpoints.outbound.assigned.
+ns_devices.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_devices.tsp:51:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_devices.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "deviceName" and "credentialName".
+ns_devices.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_devices.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_devices.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_discoveredAssets.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredAssets.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "credentialName".
+ns_discoveredAssets.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredAssets.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "credentialName".
+common/deviceRef.tsp:12:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.deviceRef.deviceName.
+common/deviceRef.tsp:15:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.deviceRef.endpointName.
+ns_discoveredAssets.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredAssets.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredAssetName" and "credentialName".
+ns_discoveredAssets.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_discoveredAssets.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredDevices.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredDevices.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredDeviceName" and "credentialName".
+ns_discoveredDevices.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredDevices.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredDeviceName" and "credentialName".
+properties/ns_discoveredDeviceProperties.tsp:69:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.endpoints.outbound.assigned.
+ns_discoveredDevices.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+ns_discoveredDevices.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "discoveredDeviceName" and "credentialName".
+ns_discoveredDevices.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ns_discoveredDevices.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+namespaces.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "namespaceName" and "assetName".
+schemaRegistries.tsp:183:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:184:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:188:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:195:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:196:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:197:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:205:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:206:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:213:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:217:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:218:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'Schemas' should not appear after the underscore.
+schemaRegistries.tsp:218:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:226:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:227:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+schemaRegistries.tsp:234:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:238:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:239:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+schemaRegistries.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "schemaRegistryName" and "assetName".
+
+Found 211 warnings.
+

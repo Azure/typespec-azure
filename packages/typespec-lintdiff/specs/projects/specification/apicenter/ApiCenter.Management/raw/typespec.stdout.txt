@@ -1,0 +1,200 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:38:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:41:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:41:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-03-15-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:240:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:275:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:278:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Service.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Service.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:240:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.restore.
+Service.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:240:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Service.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Service.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Service.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Service.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DeletedService.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DeletedService.tsp:31:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DeletedService.tsp:31:10 - occurred while instantiating template
+DeletedService.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DeletedService.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DeletedService.tsp:35:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  DeletedService.tsp:35:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  DeletedService.tsp:35:11 - occurred while instantiating template
+DeletedService.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MetadataSchema.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  MetadataSchema.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  MetadataSchema.tsp:28:10 - occurred while instantiating template
+MetadataSchema.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MetadataSchema.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  MetadataSchema.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  MetadataSchema.tsp:38:21 - occurred while instantiating template
+MetadataSchema.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+MetadataSchema.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MetadataSchema.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  MetadataSchema.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  MetadataSchema.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  MetadataSchema.tsp:42:11 - occurred while instantiating template
+Workspace.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Workspace.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Workspace.tsp:28:10 - occurred while instantiating template
+Workspace.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Workspace.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Workspace.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Workspace.tsp:38:21 - occurred while instantiating template
+Workspace.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+Workspace.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Workspace.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Workspace.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Workspace.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Workspace.tsp:42:11 - occurred while instantiating template
+Api.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Api.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Api.tsp:28:10 - occurred while instantiating template
+Api.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Api.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Api.tsp:35:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Api.tsp:35:21 - occurred while instantiating template
+Api.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+Api.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Api.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Api.tsp:39:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Api.tsp:39:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Api.tsp:39:11 - occurred while instantiating template
+ApiVersion.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiVersion.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiVersion.tsp:28:10 - occurred while instantiating template
+ApiVersion.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiVersion.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiVersion.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiVersion.tsp:38:21 - occurred while instantiating template
+ApiVersion.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+ApiVersion.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiVersion.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiVersion.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiVersion.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiVersion.tsp:42:11 - occurred while instantiating template
+ApiDefinition.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiDefinition.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiDefinition.tsp:28:10 - occurred while instantiating template
+ApiDefinition.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiDefinition.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiDefinition.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiDefinition.tsp:38:21 - occurred while instantiating template
+ApiDefinition.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+ApiDefinition.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiDefinition.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiDefinition.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiDefinition.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiDefinition.tsp:42:11 - occurred while instantiating template
+ApiDefinition.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiDefinition.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiSource.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiSource.tsp:32:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiSource.tsp:32:10 - occurred while instantiating template
+ApiSource.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiSource.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiSource.tsp:42:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiSource.tsp:42:21 - occurred while instantiating template
+ApiSource.tsp:17:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+ApiSource.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ApiSource.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiSource.tsp:46:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  ApiSource.tsp:46:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  ApiSource.tsp:46:11 - occurred while instantiating template
+Deployment.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Deployment.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Deployment.tsp:28:10 - occurred while instantiating template
+Deployment.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Deployment.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Deployment.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Deployment.tsp:38:21 - occurred while instantiating template
+Deployment.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+Deployment.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Deployment.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Deployment.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Deployment.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Deployment.tsp:42:11 - occurred while instantiating template
+Environment.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Environment.tsp:28:10 - occurred while instantiating template
+main.tsp:173:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Environment.tsp:28:10 - occurred while instantiating template
+Environment.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Environment.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Environment.tsp:38:21 - occurred while instantiating template
+main.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Environment.tsp:38:21 - occurred while instantiating template
+Environment.tsp:14:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+Environment.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Environment.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Environment.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Environment.tsp:42:11 - occurred while instantiating template
+main.tsp:152:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Environment.tsp:42:11 - occurred while instantiating template
+
+Found 132 warnings.
+

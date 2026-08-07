@@ -1,0 +1,37 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:27:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:30:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+offer.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+offer.tsp:32:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+offer.tsp:36:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+offer.tsp:40:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'maxpagesize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+offer.tsp:48:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+offer.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+offer.tsp:32:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+offer.tsp:44:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+offer.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+offer.tsp:32:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+offer.tsp:44:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+offer.tsp:48:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+offer.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+offer.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+offer.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+publisher.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+publisher.tsp:30:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+publisher.tsp:34:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'skip' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+publisher.tsp:38:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'maxpagesize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+publisher.tsp:46:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+publisher.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+publisher.tsp:30:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+publisher.tsp:42:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+publisher.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+publisher.tsp:30:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+publisher.tsp:42:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+publisher.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+publisher.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 30 warnings.
+

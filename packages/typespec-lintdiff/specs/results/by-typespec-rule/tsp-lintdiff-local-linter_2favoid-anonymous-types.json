@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/avoid-anonymous-types",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/avoid-anonymous-types",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
+      "sourceFile": "client.tsp",
+      "line": 154,
+      "column": 5,
+      "message": "Operation response body should use a named model instead of an anonymous inline model expression."
+    }
+  ]
+}

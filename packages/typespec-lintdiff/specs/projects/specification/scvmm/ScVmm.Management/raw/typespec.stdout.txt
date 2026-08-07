@@ -1,0 +1,119 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:35:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:39:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+VmmServer.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VmmServer.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VmmServer.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VmmServer.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VmmServer.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VmmServer.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Cloud.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Cloud.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudResourceName" and "vmmServerName".
+Cloud.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Cloud.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudResourceName" and "vmmServerName".
+Cloud.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Cloud.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudResourceName" and "vmmServerName".
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Cloud.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Cloud.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Cloud.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "vmmServerName".
+VirtualNetwork.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "vmmServerName".
+VirtualNetwork.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualNetworkName" and "vmmServerName".
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualNetwork.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualNetwork.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualNetwork.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineTemplate.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineTemplate.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineTemplateName" and "vmmServerName".
+VirtualMachineTemplate.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineTemplate.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineTemplateName" and "vmmServerName".
+VirtualMachineTemplate.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineTemplate.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "virtualMachineTemplateName" and "vmmServerName".
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineTemplate.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineTemplate.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AvailabilitySet.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AvailabilitySet.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "availabilitySetResourceName" and "vmmServerName".
+AvailabilitySet.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AvailabilitySet.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "availabilitySetResourceName" and "vmmServerName".
+AvailabilitySet.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AvailabilitySet.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "availabilitySetResourceName" and "vmmServerName".
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+AvailabilitySet.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+AvailabilitySet.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AvailabilitySet.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+InventoryItem.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+InventoryItem.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InventoryItem.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InventoryItem.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+InventoryItem.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InventoryItem.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InventoryItem.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+InventoryItem.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+InventoryItem.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+VirtualMachineInstance.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+VirtualMachineInstance.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineInstance.tsp:96:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteFromHost' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineInstance.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineInstance.tsp:96:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteFromHost' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+models.tsp:33:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineInstance.tsp:96:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteFromHost' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+VirtualMachineInstance.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+custom.tsp:20:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'CustomizedArmResourceActionNoResponseContentAsync' should contain the action verb 'default' from the route path. Consider updating the operation name.
+  VirtualMachineInstance.tsp:104:11 - occurred while instantiating template
+custom.tsp:20:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  VirtualMachineInstance.tsp:104:11 - occurred while instantiating template
+custom.tsp:54:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'CustomizedArmResourceActionAsyncBase' should contain the action verb 'default' from the route path. Consider updating the operation name.
+  custom.tsp:32:6 - occurred while instantiating template
+  VirtualMachineInstance.tsp:104:11 - occurred while instantiating template
+custom.tsp:54:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  custom.tsp:32:6 - occurred while instantiating template
+  VirtualMachineInstance.tsp:104:11 - occurred while instantiating template
+VirtualMachineInstance.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:134:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VmInstanceHybridIdentityMetadata.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+VmInstanceHybridIdentityMetadata.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+GuestAgent.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+GuestAgent.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "guestAgentName" and "vmInstanceHybridIdentityMetadataName".
+GuestAgent.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+GuestAgent.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "guestAgentName" and "vmInstanceHybridIdentityMetadataName".
+GuestAgent.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GuestAgent.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+VirtualMachineInstance.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "vmmServerName".
+
+Found 106 warnings.
+

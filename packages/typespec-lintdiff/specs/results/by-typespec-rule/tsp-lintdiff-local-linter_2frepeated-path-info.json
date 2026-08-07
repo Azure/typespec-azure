@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+  "count": 62,
+  "levels": {
+    "warning": 62
+  },
+  "projectCount": 25,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2595,
+      "column": 3,
+      "message": "Request body property 'apiId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2595,
+      "column": 3,
+      "message": "Request body property 'apiId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3529,
+      "column": 3,
+      "message": "Request body property 'apiId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "sourceFile": "models.tsp",
+      "line": 101,
+      "column": 3,
+      "message": "Request body property 'sourceId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "sourceFile": "models.tsp",
+      "line": 757,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "sourceFile": "models.tsp",
+      "line": 1061,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
+      "sourceFile": "models.tsp",
+      "line": 1352,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
+      "sourceFile": "models.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "sourceFile": "models.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "models.tsp",
+      "line": 894,
+      "column": 3,
+      "message": "Request body property 'channelName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 2701,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 2848,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 2950,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3085,
+      "column": 3,
+      "message": "Request body property 'originGroupName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3242,
+      "column": 3,
+      "message": "Request body property 'endpointName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3383,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3435,
+      "column": 3,
+      "message": "Request body property 'ruleSetName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3504,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3555,
+      "column": 3,
+      "message": "Request body property 'profileName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "sourceFile": "models.tsp",
+      "line": 225,
+      "column": 3,
+      "message": "Request body property 'ledgerName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
+      "sourceFile": "models.tsp",
+      "line": 449,
+      "column": 3,
+      "message": "Request body property 'appName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "models.tsp",
+      "line": 5815,
+      "column": 3,
+      "message": "Request body property 'jobName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "models.tsp",
+      "line": 2775,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "models.tsp",
+      "line": 4298,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "models.tsp",
+      "line": 2059,
+      "column": 3,
+      "message": "Request body property 'name' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 3,
+      "message": "Request body property 'projectName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
+      "sourceFile": "main.tsp",
+      "line": 285,
+      "column": 3,
+      "message": "Request body property 'clusterName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "models.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "Request body property 'privateStoreId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "models.tsp",
+      "line": 603,
+      "column": 3,
+      "message": "Request body property 'collectionId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "models.tsp",
+      "line": 369,
+      "column": 3,
+      "message": "Request body property 'privateStoreId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "sourceFile": "models.tsp",
+      "line": 1062,
+      "column": 3,
+      "message": "Request body property 'subscriptionId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 1508,
+      "column": 3,
+      "message": "Request body property 'dataSourceType' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 1695,
+      "column": 3,
+      "message": "Request body property 'id' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 845,
+      "column": 3,
+      "message": "Request body property 'priority' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 845,
+      "column": 3,
+      "message": "Request body property 'priority' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "models.tsp",
+      "line": 845,
+      "column": 3,
+      "message": "Request body property 'priority' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "sourceFile": "models.tsp",
+      "line": 4910,
+      "column": 3,
+      "message": "Request body property 'providerNamespace' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2075,
+      "column": 3,
+      "message": "Request body property 'subscriptionId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2361,
+      "column": 3,
+      "message": "Request body property 'containerName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "sourceFile": "models.tsp",
+      "line": 403,
+      "column": 3,
+      "message": "Request body property 'scope' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "models.tsp",
+      "line": 8482,
+      "column": 3,
+      "message": "Request body property 'watchlistAlias' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "models.tsp",
+      "line": 8555,
+      "column": 3,
+      "message": "Request body property 'watchlistItemId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 464,
+      "column": 3,
+      "message": "Request body property 'imageName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11834,
+      "column": 3,
+      "message": "Request body property 'schemaName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11840,
+      "column": 3,
+      "message": "Request body property 'tableName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11846,
+      "column": 3,
+      "message": "Request body property 'columnName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 7491,
+      "column": 3,
+      "message": "Request body property 'distributedAvailabilityGroupName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11834,
+      "column": 3,
+      "message": "Request body property 'schemaName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11840,
+      "column": 3,
+      "message": "Request body property 'tableName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 11846,
+      "column": 3,
+      "message": "Request body property 'columnName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 14600,
+      "column": 3,
+      "message": "Request body property 'certificateName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 15352,
+      "column": 3,
+      "message": "Request body property 'serverName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 15357,
+      "column": 3,
+      "message": "Request body property 'databaseName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "models.tsp",
+      "line": 5710,
+      "column": 3,
+      "message": "Request body property 'tableName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "models.tsp",
+      "line": 2401,
+      "column": 3,
+      "message": "Request body property 'serverId' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 5057,
+      "column": 3,
+      "message": "Request body property 'relayName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 5057,
+      "column": 3,
+      "message": "Request body property 'relayName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 5235,
+      "column": 3,
+      "message": "Request body property 'vnetName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 5235,
+      "column": 3,
+      "message": "Request body property 'vnetName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 5235,
+      "column": 3,
+      "message": "Request body property 'vnetName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 12198,
+      "column": 3,
+      "message": "Request body property 'entityName' repeats information already carried in the path or query."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/repeated-path-info",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 12198,
+      "column": 3,
+      "message": "Request body property 'entityName' repeats information already carried in the path or query."
+    }
+  ]
+}

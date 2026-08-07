@@ -1,0 +1,2803 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+  "count": 279,
+  "levels": {
+    "warning": 279
+  },
+  "projectCount": 56,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 30,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateLinkResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateLinkResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 104,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Certificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Certificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 124,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Certificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 134,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Certificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 141,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Certificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "AutomationAccount.tsp",
+      "line": 224,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AutomationAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "AutomationAccount.tsp",
+      "line": 246,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AutomationAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "AutomationAccount.tsp",
+      "line": 257,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AutomationAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "AutomationAccount.tsp",
+      "line": 272,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AutomationAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "HybridRunbookWorker.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HybridRunbookWorkers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Job.tsp",
+      "line": 216,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Jobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 134,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Modules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "sourceFile": "Cluster.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Clusters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Invoice.tsp",
+      "line": 190,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Invoices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Invoice.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Invoices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Invoice.tsp",
+      "line": 254,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Invoices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Reservation.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Reservations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Reservation.tsp",
+      "line": 86,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Reservations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 175,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 191,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 242,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 256,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 271,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 322,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 342,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 102,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 196,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 210,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 227,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 291,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 342,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 395,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BillingProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 176,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 189,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 205,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 256,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 270,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 286,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 302,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Department.tsp",
+      "line": 100,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Departments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Department.tsp",
+      "line": 114,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Departments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 128,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 158,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 209,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 268,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 321,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InvoiceSections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "Bot.tsp",
+      "line": 127,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Bots' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "Rule.tsp",
+      "line": 89,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Rules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "privateEndpointConnection.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "privateEndpointConnection.tsp",
+      "line": 30,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "privateEndpointConnection.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "CapacityReservation.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CapacityReservations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 27,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateLinkResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "PrivateLinkResource.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateLinkResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "AgentPool.tsp",
+      "line": 159,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AgentPools' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "MeshRevisionProfile.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'MeshRevisionProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "MeshRevisionProfile.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'MeshRevisionProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "MeshUpgradeProfile.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'MeshUpgradeProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "MeshUpgradeProfile.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'MeshUpgradeProfiles' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GraphResourceGetResults.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'GraphResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DataBoxEdgeDevice.tsp",
+      "line": 243,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DataBoxEdgeDevices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DeviceCapacityInfo.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DeviceCapacityInfos' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "BackupInstanceResource.tsp",
+      "line": 330,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'BackupInstances' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "DppBaseResource.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ResourceGuards' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "DppBaseResource.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ResourceGuards' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "DevCenter.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DevCenters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "Project.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Projects' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceregistry/DeviceRegistry.Management",
+      "sourceFile": "schemaRegistries.tsp",
+      "line": 218,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Schemas' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "sourceFile": "Zone.tsp",
+      "line": 138,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Zones' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "sourceFile": "Zone.tsp",
+      "line": 165,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Zones' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+      "sourceFile": "ElasticSan.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ElasticSans' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+      "sourceFile": "Volume.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Volumes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 92,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "ApplicationGroup.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ApplicationGroups' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "sourceFile": "CloudHsmCluster.tsp",
+      "line": 179,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CloudHsmClusters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
+      "sourceFile": "PaymentHsmCluster.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PaymentHsmClusters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "Machine.tsp",
+      "line": 230,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Machines' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder",
+      "sourceFile": "RunOutput.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'RunOutputs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder",
+      "sourceFile": "RunOutput.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'RunOutputs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/informatica/resource-manager/Informatica.DataManagement/Informatica",
+      "sourceFile": "main.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ServerlessRuntimes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Vault.tsp",
+      "line": 155,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Vaults' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "Workspace.tsp",
+      "line": 274,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Workspaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "sourceFile": "ServiceGroup.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ServiceGroups' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "sourceFile": "ServiceGroup.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ServiceGroups' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "sourceFile": "ServiceGroup.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ServiceGroups' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "Collection.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Collections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "Offer.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Offers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "WebAppSite.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'WebAppSites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "WebAppSite.tsp",
+      "line": 168,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'WebAppSites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
+      "sourceFile": "Server.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi",
+      "sourceFile": "ActionGroupResource.tsp",
+      "line": 118,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ActionGroupResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi",
+      "sourceFile": "ActionGroupResource.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ActionGroupResources' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 1012,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetAppAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 2741,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Volumes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkInterface.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkInterfaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkInterface.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkInterfaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PublicIPAddress.tsp",
+      "line": 102,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicIPAddresses' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 25,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "RouteFilter.tsp",
+      "line": 207,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'RouteFilters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 483,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VirtualNetworkGateways' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualWAN.tsp",
+      "line": 168,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VirtualWans' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualHub.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VirtualHubs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VpnGateway.tsp",
+      "line": 304,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VpnGateways' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "sourceFile": "NetworkInterface.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkInterfaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "sourceFile": "NetworkInterface.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkInterfaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+      "sourceFile": "PublicIPAddress.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicIPAddresses' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "Workspace.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Workspaces' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "sourceFile": "Peering.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Peerings' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "sourceFile": "Server.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "sourceFile": "Server.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock",
+      "sourceFile": "main.tsp",
+      "line": 1451,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Volumes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "Vault.tsp",
+      "line": 260,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Vaults' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "RecoveryPointResource.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'RecoveryPoints' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 115,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Clusters' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "AuthorizationRule.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AuthorizationRules' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ResourceGroups' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "SearchService.tsp",
+      "line": 381,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SearchServices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 153,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 178,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 209,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 239,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 137,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 124,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 322,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 520,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 262,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 348,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 292,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 495,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 397,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 426,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 462,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 374,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 576,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 607,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 654,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 552,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 59,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 39,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 85,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 102,
+      "column": 4,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Customizations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/TasksAPI",
+      "sourceFile": "SecurityTask.tsp",
+      "line": 177,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Tasks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/TasksAPI",
+      "sourceFile": "SecurityTask.tsp",
+      "line": 202,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Tasks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "Recommendation.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Recommendations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "Recommendation.tsp",
+      "line": 73,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Recommendations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'NetworkRuleSets' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "Replica.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Replicas' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "device.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Devices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 189,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 277,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 343,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 396,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 432,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 478,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 526,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 548,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Databases' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 176,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 191,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 232,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Servers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedInstance.tsp",
+      "line": 184,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ManagedInstances' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedInstance.tsp",
+      "line": 249,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ManagedInstances' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ElasticPool.tsp",
+      "line": 129,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ElasticPools' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ElasticPool.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ElasticPools' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "InstancePool.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InstancePools' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "InstancePool.tsp",
+      "line": 134,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'InstancePools' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/standbypool/resource-manager/Microsoft.StandbyPool/StandbyPool",
+      "sourceFile": "standbyVM.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'StandbyVirtualMachines' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 297,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'StorageAccounts' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagediscovery/resource-manager/Microsoft.StorageDiscovery/StorageDiscovery",
+      "sourceFile": "report.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Report' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "StorageSyncService.tsp",
+      "line": 173,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'StorageSyncServices' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/terraform/resource-manager/Microsoft.AzureTerraform/AzureTerraform",
+      "sourceFile": "routes.tsp",
+      "line": 27,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Terraform' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 157,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Recommendations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CustomDnsSuffixConfigurations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CustomDnsSuffixConfigurations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CustomDnsSuffixConfigurations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AseV3NetworkingConfiguration.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AseV3NetworkingConfigurations' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HybridConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HybridConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HybridConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 105,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HybridConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VnetGateways' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VnetGateways' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VnetRoutes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VnetRoutes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 110,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'VnetRoutes' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DetectorResponses' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DetectorResponses' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DiagnosticCategory.tsp",
+      "line": 73,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DiagnosticCategories' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 429,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 441,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 454,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 676,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 817,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 850,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 888,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 971,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1008,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Sites' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 105,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 114,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DatabaseConnection.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'DatabaseConnections' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ApiKVReference.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AppSettingKeyVaultReference' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ApiKVReference.tsp",
+      "line": 129,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteConnectionStringKeyVaultReference' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ApiKVReference.tsp",
+      "line": 139,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteConnectionStringKeyVaultReference' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ApiKVReference.tsp",
+      "line": 189,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'AppSettingKeyVaultReferenceSlot' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ApiKVReference.tsp",
+      "line": 249,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteConnectionStringKeyVaultReferenceSlot' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ContinuousWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ContinuousWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 85,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ContinuousWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ContinuousWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 113,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'ContinuousWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Deployment.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Deployments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Deployment.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Deployments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Deployment.tsp",
+      "line": 85,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Deployments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Deployment.tsp",
+      "line": 94,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Deployments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Deployment.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Deployments' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Identifier.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Identifiers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Identifier.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Identifiers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Identifier.tsp",
+      "line": 87,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Identifiers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Identifier.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Identifiers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Identifier.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Identifiers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HostNameBinding.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HostNameBindings' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HostNameBinding.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HostNameBindings' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HostNameBinding.tsp",
+      "line": 86,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HostNameBindings' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HostNameBinding.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'HostNameBindings' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SwiftVirtualNetworks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SwiftVirtualNetworks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SwiftVirtualNetworks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 101,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SwiftVirtualNetworks' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PremierAddOns' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PremierAddOns' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 87,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PremierAddOns' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PremierAddOns' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PublicCertificate.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicCertificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PublicCertificate.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicCertificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PublicCertificate.tsp",
+      "line": 86,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicCertificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PublicCertificate.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'PublicCertificates' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteContainer.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteContainers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteContainer.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteContainers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteContainer.tsp",
+      "line": 85,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteContainers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteContainer.tsp",
+      "line": 94,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'SiteContainers' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'TriggeredWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'TriggeredWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'TriggeredWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 103,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'TriggeredWebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WebJob.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'WebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WebJob.tsp",
+      "line": 80,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'WebJobs' should not appear after the underscore."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "Replica.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Replicas' should not appear after the underscore."
+    }
+  ]
+}

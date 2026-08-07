@@ -1,0 +1,853 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+  "count": 84,
+  "levels": {
+    "warning": 84
+  },
+  "projectCount": 20,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 246,
+      "column": 3,
+      "message": "'DELETE' operation 'detachFromApi' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 118,
+      "column": 3,
+      "message": "'DELETE' operation 'detachFromOperation' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 358,
+      "column": 3,
+      "message": "'DELETE' operation 'detachFromProduct' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "DeletedServiceContract.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GatewayContract.tsp",
+      "line": 333,
+      "column": 3,
+      "message": "'DELETE' operation 'gatewayApiDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 358,
+      "column": 3,
+      "message": "'DELETE' operation 'groupUserDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 607,
+      "column": 3,
+      "message": "'DELETE' operation 'workspaceGroupUserDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 360,
+      "column": 3,
+      "message": "'DELETE' operation 'notificationRecipientEmailDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 549,
+      "column": 3,
+      "message": "'DELETE' operation 'workspaceNotificationRecipientEmailDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 369,
+      "column": 3,
+      "message": "'DELETE' operation 'productApiDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 448,
+      "column": 3,
+      "message": "'DELETE' operation 'productGroupDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "Account.tsp",
+      "line": 311,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 162,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteSync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 162,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteSync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 162,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteSync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 162,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteSync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 162,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteSync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 180,
+      "column": 4,
+      "message": "'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 319,
+      "column": 3,
+      "message": "'DELETE' operation 'restore' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 352,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 449,
+      "column": 3,
+      "message": "'DELETE' operation 'restore' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 489,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 607,
+      "column": 3,
+      "message": "'DELETE' operation 'restore' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 654,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "IntegrationRuntimeResource.tsp",
+      "line": 326,
+      "column": 3,
+      "message": "'DELETE' operation 'integrationRuntimeNodesDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 185,
+      "column": 3,
+      "message": "'DELETE' operation 'disableMonitoring' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 225,
+      "column": 3,
+      "message": "'DELETE' operation 'disableAzureMonitor' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 265,
+      "column": 3,
+      "message": "'DELETE' operation 'disableAzureMonitorAgent' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "loadbalancer.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "'DELETE' operation 'oldDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+      "sourceFile": "bgppeer.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'DELETE' operation 'oldDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "back-compatible.tsp",
+      "line": 221,
+      "column": 3,
+      "message": "'DELETE' operation 'ArmDeleteOperation' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkVirtualAppliance.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "'DELETE' operation 'networkVirtualApplianceConnectionsDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkWatcher.tsp",
+      "line": 381,
+      "column": 3,
+      "message": "'DELETE' operation 'packetCapturesDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpoint.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "'DELETE' operation 'privateDnsZoneGroupsDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "RouteFilter.tsp",
+      "line": 148,
+      "column": 3,
+      "message": "'DELETE' operation 'routeFilterRulesDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualHub.tsp",
+      "line": 224,
+      "column": 3,
+      "message": "'DELETE' operation 'hubVirtualNetworkConnectionsDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualHub.tsp",
+      "line": 301,
+      "column": 3,
+      "message": "'DELETE' operation 'virtualHubRouteTableV2sDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VpnGateway.tsp",
+      "line": 249,
+      "column": 3,
+      "message": "'DELETE' operation 'vpnConnectionsDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 205,
+      "column": 3,
+      "message": "'DELETE' operation 'expressRouteConnectionsDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "Workspace.tsp",
+      "line": 251,
+      "column": 3,
+      "message": "'DELETE' operation 'gatewaysDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "sourceFile": "Migration.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'DELETE' operation 'cancel' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "Vault.tsp",
+      "line": 236,
+      "column": 3,
+      "message": "'DELETE' operation 'registeredIdentitiesDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "'DELETE' operation 'unregister' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "Fabric.tsp",
+      "line": 103,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ReplicationProtectedItem.tsp",
+      "line": 119,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ReplicationProtectionCluster.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ProtectionContainerMapping.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "RecoveryServicesProvider.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "'DELETE' operation 'purge' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "SearchService.tsp",
+      "line": 411,
+      "column": 3,
+      "message": "'DELETE' operation 'queryKeysDelete' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 239,
+      "column": 4,
+      "message": "'DELETE' operation 'searchDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 292,
+      "column": 4,
+      "message": "'DELETE' operation 'queryKeysDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 462,
+      "column": 4,
+      "message": "'DELETE' operation 'privateEndpointConnectionsDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 654,
+      "column": 4,
+      "message": "'DELETE' operation 'SharedPrivateLinkResourcesDeleteCustomization' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/ApiCollectionsAPI",
+      "sourceFile": "ApiCollection.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "'DELETE' operation 'offboardAzureApiManagementApi' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "PackageModel.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'DELETE' operation 'uninstall' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 108,
+      "column": 3,
+      "message": "'DELETE' operation 'detachUserProvidedFunctionAppFromStaticSiteBuild' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 190,
+      "column": 3,
+      "message": "'DELETE' operation 'detachUserProvidedFunctionAppFromStaticSite' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 92,
+      "column": 3,
+      "message": "'DELETE' operation 'unlinkBackend' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/delete-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 192,
+      "column": 3,
+      "message": "'DELETE' operation 'unlinkBackendFromBuild' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    }
+  ]
+}

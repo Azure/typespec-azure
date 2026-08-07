@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+  "count": 62,
+  "levels": {
+    "warning": 62
+  },
+  "projectCount": 41,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Certificate.tsp",
+      "line": 54,
+      "column": 11,
+      "message": "Tracked resource 'Certificate' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ManagedCertificate.tsp",
+      "line": 53,
+      "column": 11,
+      "message": "Tracked resource 'ManagedCertificate' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "sourceFile": "Workbook.tsp",
+      "line": 61,
+      "column": 11,
+      "message": "Tracked resource 'Workbook' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 278,
+      "column": 11,
+      "message": "Tracked resource 'Module' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "client.tsp",
+      "line": 668,
+      "column": 9,
+      "message": "Tracked resource 'BatchAccountData' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Reservation.tsp",
+      "line": 49,
+      "column": 11,
+      "message": "Tracked resource 'Reservation' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "BotChannel.tsp",
+      "line": 126,
+      "column": 11,
+      "message": "Tracked resource 'BotChannel' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "privateEndpointConnection.models.tsp",
+      "line": 118,
+      "column": 7,
+      "message": "Tracked resource 'PrivateLinkResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "Account.tsp",
+      "line": 292,
+      "column": 11,
+      "message": "Tracked resource 'Account' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "CommitmentPlan.tsp",
+      "line": 84,
+      "column": 11,
+      "message": "Tracked resource 'CommitmentPlan' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineRunCommand.tsp",
+      "line": 58,
+      "column": 11,
+      "message": "Tracked resource 'VirtualMachineRunCommand' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "RollingUpgradeStatusInfo.tsp",
+      "line": 32,
+      "column": 11,
+      "message": "Tracked resource 'RollingUpgradeStatusInfo' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineExtensionImage.tsp",
+      "line": 63,
+      "column": 11,
+      "message": "Tracked resource 'VirtualMachineExtensionImage' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
+      "sourceFile": "OrganizationResource.tsp",
+      "line": 157,
+      "column": 11,
+      "message": "Tracked resource 'OrganizationResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "sourceFile": "ContainerGroupProfile.tsp",
+      "line": 55,
+      "column": 11,
+      "message": "Tracked resource 'ContainerGroupProfile' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+      "sourceFile": "models.tsp",
+      "line": 2100,
+      "column": 7,
+      "message": "Tracked resource 'Registry' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "DatabaseAccountGetResults.tsp",
+      "line": 48,
+      "column": 11,
+      "message": "Tracked resource 'DatabaseAccountGetResults' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 80,
+      "column": 11,
+      "message": "Tracked resource 'ThroughputSettingsGetResults' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "sourceFile": "Project.tsp",
+      "line": 73,
+      "column": 11,
+      "message": "Tracked resource 'Project' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "sourceFile": "DataMigrationService.tsp",
+      "line": 78,
+      "column": 11,
+      "message": "Tracked resource 'DataMigrationService' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "BackupVaultResource.tsp",
+      "line": 247,
+      "column": 11,
+      "message": "Tracked resource 'BackupVaultResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "DevBoxDefinition.tsp",
+      "line": 58,
+      "column": 11,
+      "message": "Tracked resource 'DevBoxDefinition' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Schedule.tsp",
+      "line": 439,
+      "column": 11,
+      "message": "Tracked resource 'Schedule' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "ArmTemplate.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Tracked resource 'ArmTemplate' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Artifact.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Tracked resource 'Artifact' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "CustomImage.tsp",
+      "line": 57,
+      "column": 11,
+      "message": "Tracked resource 'CustomImage' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "GalleryImage.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Tracked resource 'GalleryImage' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "Policy.tsp",
+      "line": 57,
+      "column": 11,
+      "message": "Tracked resource 'Policy' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/disconnectedOperations",
+      "sourceFile": "client.tsp",
+      "line": 111,
+      "column": 9,
+      "message": "Tracked resource 'DisconnectedOperationCreateOrUpdate' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 91,
+      "column": 11,
+      "message": "Tracked resource 'ElasticMonitorResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "client.tsp",
+      "line": 504,
+      "column": 9,
+      "message": "Tracked resource 'EventHubsCluster' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "client.tsp",
+      "line": 521,
+      "column": 9,
+      "message": "Tracked resource 'EventHubsNamespace' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "LicenseProfile.tsp",
+      "line": 57,
+      "column": 11,
+      "message": "Tracked resource 'LicenseProfile' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Key.tsp",
+      "line": 69,
+      "column": 11,
+      "message": "Tracked resource 'Key' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "InferenceEndpoint.tsp",
+      "line": 100,
+      "column": 11,
+      "message": "Tracked resource 'InferenceEndpoint' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "InferenceGroup.tsp",
+      "line": 100,
+      "column": 11,
+      "message": "Tracked resource 'InferenceGroup' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
+      "sourceFile": "MaintenanceConfiguration.tsp",
+      "line": 106,
+      "column": 11,
+      "message": "Tracked resource 'MaintenanceConfiguration' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AKSAssessments",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AvsAssessments",
+      "sourceFile": "NormalizedContract/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/BusinessCases",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/Collectors",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/HeterogenousAssessments",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/MachineAssessments",
+      "sourceFile": "Normalized Contract/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/SqlAssessments",
+      "sourceFile": "Normalized Contract/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/Waves",
+      "sourceFile": "routes.tsp",
+      "line": 24,
+      "column": 11,
+      "message": "Tracked resource 'MigrateProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppAssessments",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppCompoundAssessments",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
+      "sourceFile": "SystemAssignedIdentity.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "Tracked resource 'SystemAssignedIdentity' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "sourceFile": "SharedAccessAuthorizationRuleResource.tsp",
+      "line": 79,
+      "column": 11,
+      "message": "Tracked resource 'SharedAccessAuthorizationRuleResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "RecoveryPointResource.tsp",
+      "line": 41,
+      "column": 11,
+      "message": "Tracked resource 'RecoveryPointResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Tracked resource 'JobResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupEngineBaseResource.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Tracked resource 'BackupEngineBaseResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 19614,
+      "column": 7,
+      "message": "Tracked resource 'Vault' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "RedisResource.tsp",
+      "line": 51,
+      "column": 11,
+      "message": "Tracked resource 'RedisResource' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 49,
+      "column": 11,
+      "message": "Tracked resource 'RestorableDroppedDatabase' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "RestorableDroppedManagedDatabase.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Tracked resource 'RestorableDroppedManagedDatabase' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1550,
+      "column": 11,
+      "message": "Tracked resource 'Site' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Certificate.tsp",
+      "line": 147,
+      "column": 11,
+      "message": "Tracked resource 'Certificate' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowRunActionRepetitionDefinition.tsp",
+      "line": 186,
+      "column": 11,
+      "message": "Tracked resource 'WorkflowRunActionRepetitionDefinition' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 61,
+      "column": 11,
+      "message": "Tracked resource 'PremierAddOn' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RequestHistory.tsp",
+      "line": 98,
+      "column": 11,
+      "message": "Tracked resource 'RequestHistory' must have a put/createOrUpdate operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowVersion.tsp",
+      "line": 78,
+      "column": 11,
+      "message": "Tracked resource 'WorkflowVersion' must have a put/createOrUpdate operation."
+    }
+  ]
+}

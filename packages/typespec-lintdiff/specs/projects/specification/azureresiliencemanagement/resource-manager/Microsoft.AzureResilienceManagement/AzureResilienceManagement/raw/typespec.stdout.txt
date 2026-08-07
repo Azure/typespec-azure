@@ -1,0 +1,790 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:30:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-02-01-preview' has been in preview for over one year. Move it to GA or retire it.
+goal.tsp:26:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+goal.tsp:106:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+recoveryPlans.tsp:39:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+drill.tsp:26:3 - warning tsp-lintdiff-local-linter/tenant-level-apis-not-allowed: 'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models/recoveryPlan/recoveryResource.tsp:48:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/recoveryPlan/resourceProtection.tsp:107:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+goal.tsp:23:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:26:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:35:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/goals/goalAssignment.tsp:30:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.goalTemplateId.
+models/goals/goalAssignment.tsp:33:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.goalAssignmentType.
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+goal.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:48:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}/updateGoalResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:62:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}/refreshGoalResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:73:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:86:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}/recommendCapacity' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:97:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+goal.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+goal.tsp:103:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalTemplates/{goalTemplateName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:103:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "goalTemplateName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:106:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalTemplates/{goalTemplateName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "goalTemplateName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:112:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalTemplates/{goalTemplateName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/goals/goalTemplate.tsp:36:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.goalType.
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+goal.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "goalTemplateName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:122:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalTemplates/{goalTemplateName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalTemplate.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:128:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalTemplates' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+goal.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+goal.tsp:134:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}/goalResources/{goalResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+goal.tsp:134:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalResource.tsp:82:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalResource.tsp:82:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+goal.tsp:137:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/goalAssignments/{goalAssignmentName}/goalResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+goal.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/goals/goalAssignment.tsp:56:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+recoveryPlans.tsp:36:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:39:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:45:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/recoveryPlan/recoveryPlan.tsp:88:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.planType.
+models/recoveryPlan/recoveryPlan.tsp:97:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.planDescription.
+models/recoveryPlan/recoveryPlan.tsp:100:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.
+models/recoveryPlan/recoveryGroup.tsp:120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.defaultGroup.
+models/recoveryPlan/recoveryGroup.tsp:81:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.defaultGroup.properties.groupUniqueId.
+models/recoveryPlan/recoveryGroup.tsp:86:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.defaultGroup.properties.orderId.
+models/recoveryPlan/recoveryGroup.tsp:91:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.defaultGroup.properties.description.
+models/recoveryPlan/recoveryGroup.tsp:114:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryGroupsSetting.defaultGroup.name.
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+recoveryPlans.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:52:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:58:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+recoveryPlans.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+recoveryPlans.tsp:74:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/finalize' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:84:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/updateResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:94:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForOperation' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:104:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForFailover' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:114:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForFailoverCommit' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:124:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForTestFailover' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:134:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForTestFailoverCleanup' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:134:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:147:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForReprotectOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:147:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:159:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/validateForReprotect' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:170:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/checkReadiness' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:170:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:183:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/failover' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:183:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:193:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/failoverCommit' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:193:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:206:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/reprotectOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:206:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:218:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/reprotect' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:218:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:229:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/testFailover' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:229:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:239:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/testFailoverCleanup' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:239:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:253:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryResources/{recoveryResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:253:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryResource.tsp:90:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryResource.tsp:90:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:256:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:256:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:263:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:263:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobName" and "recoveryResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:266:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:266:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:274:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/cancelOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:274:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:286:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/cancel' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:286:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:299:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/resumeOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:299:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:311:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/resume' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:311:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:321:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/retry' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:321:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:334:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/recoveryChildJobs/{recoveryChildJobName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:334:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryChildJob.tsp:48:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobName" and "recoveryResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryChildJob.tsp:48:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:337:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/recoveryChildJobs' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:337:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobName" and "recoveryResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:344:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/recoveryJobResources/{recoveryJobResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:344:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJobResource.tsp:79:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobName" and "recoveryResourceName".
+models/recoveryPlan/recoveryJobResource.tsp:79:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobResourceName" and "recoveryChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJobResource.tsp:79:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+recoveryPlans.tsp:347:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/recoveryPlans/{recoveryPlanName}/recoveryJobs/{recoveryJobName}/recoveryJobResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+recoveryPlans.tsp:347:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryPlanName" and "goalAssignmentName".
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "recoveryJobName" and "recoveryResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryPlan.tsp:125:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/recoveryPlan/recoveryJob.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:23:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:26:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:31:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/drill/drill.models.tsp:202:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.metricsProperties.identity.
+models/common/common.tsp:22:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.metricsProperties.identity.type.
+models/drill/drill.models.tsp:206:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.metricsProperties.metricsToTrack.
+models/drill/drill.models.tsp:305:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.recoveryPlanProperties.identity.
+models/drill/drill.models.tsp:387:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.drillAssetProperties.subscription.
+models/drill/drill.models.tsp:391:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.drillAssetProperties.region.
+models/drill/drill.models.tsp:360:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.chaosResourceProperties.identity.
+models/drill/drill.models.tsp:364:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.chaosResourceProperties.chaosResourceIdentityForFaults.
+models/drill/drill.models.tsp:216:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.healthModelProperties.identity.
+models/drill/drill.models.tsp:219:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.healthModelProperties.healthModelId.
+drill.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:44:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:47:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+drill.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+drill.tsp:57:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/validateForExecution' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:74:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/start' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:88:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/end' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:105:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/addOrUpdateResourcesOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:122:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/addOrUpdateResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:138:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/refreshReadinessState' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drill.tsp:154:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/resyncReadinessCheck' should use {scope}/providers/... instead of hardcoding the parent scope.
+drill.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillResource.tsp:25:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillResources/{drillResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillResource.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillResource.models.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillResource.models.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillResource.tsp:28:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+drillResource.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+drillRun.tsp:25:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:28:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:40:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/failOverOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:56:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/failOver' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:72:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/testFailOver' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:87:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/testFailOverCleanup' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:104:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/reprotectOld' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:120:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/reprotect' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:135:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/addNotes' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:149:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/resume' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:163:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/markAsComplete' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:163:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:179:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/drillRunChildJobs/{drillRunChildJobName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:179:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChildJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChildJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:182:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/drillRunChildJobs' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:182:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:189:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/drillRunResources/{drillRunResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunResources.models.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunResources.models.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunResourceName" and "drillRunChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunResources.models.tsp:30:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:192:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/drillRunResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:192:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:200:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs/{chaosJobName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:200:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobName" and "drillRunChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:203:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:211:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs/{chaosJobName}/chaosJobResources/{chaosJobResourceName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:211:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJobResources.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobName" and "drillRunChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJobResources.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:214:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs/{chaosJobName}/chaosJobResources' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobName" and "drillRunChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:222:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs/{chaosJobName}/chaosJobChildJobs/{chaosJobChildJobName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:222:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJobChildJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobName" and "drillRunChildJobName".
+models/drill/drillRunChaosJobChildJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobChildJobName" and "chaosJobResourceName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJobChildJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+drillRun.tsp:225:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/drills/{drillName}/drillRuns/{drillRunName}/chaosJobs/{chaosJobName}/chaosJobChildJobs' should use {scope}/providers/... instead of hardcoding the parent scope.
+drillRun.tsp:225:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillName" and "goalAssignmentName".
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "drillRunName" and "drillResourceName".
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "chaosJobName" and "drillRunChildJobName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drill.models.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRun.models.tsp:33:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/drill/drillRunChaosJob.models.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+partnersolution.tsp:18:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/unifiedResilienceItems/{unifiedResilienceItemName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+partnersolution.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/partnersolution/unifiedresilienceitem.tsp:149:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/partnersolution/unifiedresilienceitem.tsp:149:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "unifiedResilienceItemName" and "goalAssignmentName".
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/partnersolution/unifiedresilienceitem.tsp:149:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+partnersolution.tsp:21:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.AzureResilienceManagement/unifiedResilienceItems' should use {scope}/providers/... instead of hardcoding the parent scope.
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+partnersolution.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models/common/common.tsp:74:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common/common.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+models/common/common.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+usagePlan.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+usagePlan.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+usagePlan.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/enrollment.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+usagePlan.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "usagePlanName" and "goalAssignmentName".
+models/usage/usagePlan.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+
+Found 783 warnings.
+

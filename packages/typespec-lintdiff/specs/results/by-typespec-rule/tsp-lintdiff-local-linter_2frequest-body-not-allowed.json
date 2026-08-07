@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+  "count": 11,
+  "levels": {
+    "warning": 11
+  },
+  "projectCount": 2,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "SourceControl.tsp",
+      "line": 114,
+      "column": 7,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 153,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 239,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 292,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 495,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 397,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 462,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 374,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 576,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 654,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 552,
+      "column": 4,
+      "message": "GET and DELETE operations must not accept a request body."
+    }
+  ]
+}

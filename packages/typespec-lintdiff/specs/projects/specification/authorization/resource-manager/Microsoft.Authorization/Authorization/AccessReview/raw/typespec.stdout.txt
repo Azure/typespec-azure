@@ -1,0 +1,246 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:45:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2021-12-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models.tsp:1108:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'principal' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1115:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'resource' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1121:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'recommendation' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1126:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'decision' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1131:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'justification' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1139:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'reviewedDateTime' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1146:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'reviewedBy' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1152:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'applyResult' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1160:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'appliedDateTime' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1167:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'appliedBy' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1172:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'insights' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1179:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'principalResourceMembership' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:527:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:737:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:742:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:747:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:977:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:982:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:987:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:992:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1002:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1007:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+AccessReviewHistoryDefinition.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:65:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewHistoryDefinition.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:92:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewHistoryDefinition.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:111:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:123:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'accessReviewHistoryDefinitionInstancesList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewHistoryDefinition.tsp:123:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'accessReviewHistoryDefinitionInstancesList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewHistoryDefinition.tsp:123:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:162:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:152:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:173:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewHistoryDefinition.tsp:173:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:152:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:184:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:152:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:193:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:200:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewHistoryDefinition.tsp:209:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:152:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:219:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:231:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'scopeAccessReviewHistoryDefinitionInstancesList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewHistoryDefinition.tsp:231:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'scopeAccessReviewHistoryDefinitionInstancesList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewHistoryDefinition.tsp:231:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewHistoryDefinition.tsp:138:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewHistoryDefinition.tsp:152:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:84:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewScheduleDefinition.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewScheduleDefinition.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:135:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:149:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:169:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewScheduleDefinition.tsp:169:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:135:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:149:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:180:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:135:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:149:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:135:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:196:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewScheduleDefinition.tsp:205:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:135:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:149:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewScheduleDefinition.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewScheduleDefinition.tsp:223:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:72:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:90:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:121:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:148:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'accessReviewInstanceDecisionsList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:148:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'accessReviewInstanceDecisionsList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:148:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:157:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:169:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'accessReviewInstanceContactedReviewersList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:169:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'accessReviewInstanceContactedReviewersList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:169:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:224:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:224:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:235:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:242:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:251:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:262:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:273:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:284:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:295:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:311:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'scopeAccessReviewInstanceDecisionsList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:311:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'scopeAccessReviewInstanceDecisionsList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:311:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:320:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:332:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'scopeAccessReviewInstanceContactedReviewersList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:332:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'scopeAccessReviewInstanceContactedReviewersList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:332:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:196:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:204:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:371:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:353:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:380:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:353:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:393:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:353:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:400:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewInstance.tsp:412:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'reviewersList' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:412:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'reviewersList' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:412:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "id" and "instanceId".
+AccessReviewInstance.tsp:353:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewInstance.tsp:361:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewDefaultSettings.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDefaultSettings.tsp:62:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewDefaultSettings.tsp:62:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewDefaultSettings.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDefaultSettings.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDefaultSettings.tsp:77:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewDefaultSettings.tsp:107:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewDefaultSettings.tsp:107:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+AccessReviewDefaultSettings.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDefaultSettings.tsp:77:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AccessReviewDecision.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDecision.tsp:46:3 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AccessReviewDecision.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDecision.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AccessReviewDecision.tsp:65:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AccessReviewDecision.tsp:65:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+
+Found 239 warnings.
+

@@ -1,0 +1,93 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:48:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+HierarchySettings.tsp:28:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'HierarchySettings' should define a list operation.
+models.tsp:597:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'displayName' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:602:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'parentGroupId' in the request body either does not appear in the resource model or is nested at the wrong level.
+ManagementGroup.tsp:14:7 - warning tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group: Top-level resource 'ManagementGroup' should define a list by resource group operation.
+back-compatible.tsp:144:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:137:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+back-compatible.tsp:144:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:163:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'putSubscriptionCustomized' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+back-compatible.tsp:163:4 - warning tsp-lintdiff-local-linter/put-request-response-scheme: PUT request body schema should match the 200 response schema.
+back-compatible.tsp:170:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:163:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SubscriptionUnderManagementGroup.tsp:16:7 - warning tsp-lintdiff-local-linter/xms-resource-in-put-response: PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.
+back-compatible.tsp:170:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:197:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:190:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+back-compatible.tsp:221:3 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ArmDeleteOperation' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  back-compatible.tsp:190:36 - occurred while instantiating template
+back-compatible.tsp:197:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:122:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+back-compatible.tsp:221:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  back-compatible.tsp:190:36 - occurred while instantiating template
+models.tsp:753:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:779:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:856:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:116:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:124:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:129:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:29:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$recurse' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:41:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$filter' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ManagementGroup.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$recurse' should not begin with '$' or '@'.
+ManagementGroup.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ManagementGroup.tsp:29:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$recurse' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:41:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$filter' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ManagementGroup.tsp:29:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$recurse' should not begin with '$' or '@'.
+ManagementGroup.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+ManagementGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ManagementGroup.tsp:81:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+ManagementGroup.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:137:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'getDescendants' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+ManagementGroup.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:149:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+ManagementGroup.tsp:155:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+models.tsp:709:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+ManagementGroup.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagementGroup.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-pageable-for-list-calls: ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata.
+SubscriptionUnderManagementGroup.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SubscriptionUnderManagementGroup.tsp:53:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+SubscriptionUnderManagementGroup.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SubscriptionUnderManagementGroup.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SubscriptionUnderManagementGroup.tsp:77:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'getSubscriptionsUnderManagementGroup' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+SubscriptionUnderManagementGroup.tsp:87:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skiptoken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SubscriptionUnderManagementGroup.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SubscriptionUnderManagementGroup.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+SubscriptionUnderManagementGroup.tsp:87:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+HierarchySettings.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchySettings.tsp:42:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+HierarchySettings.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchySettings.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchySettings.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:198:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+routes.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:27:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+routes.tsp:141:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'list' should contain the action verb 'getentities' from the route path. Consider updating the operation name.
+routes.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:37:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
+routes.tsp:43:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
+routes.tsp:49:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+routes.tsp:55:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+routes.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$search' should not begin with '$' or '@'.
+routes.tsp:72:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+routes.tsp:78:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$view' should not begin with '$' or '@'.
+
+Found 84 warnings.
+

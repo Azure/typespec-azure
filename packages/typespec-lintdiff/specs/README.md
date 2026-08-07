@@ -79,6 +79,12 @@ pnpm specs:typespec `
   --concurrency 6
 ```
 
+For the pinned 468-project corpus at
+`f6b53f105b95da05276530a0754a1c71b4f16397`, the full run with concurrency 6
+took 695,905 ms (11 minutes 35.9 seconds) inside the harness and 699,740 ms
+(11 minutes 39.7 seconds) wall-clock. Six projects had compile errors and were
+recorded as unassessed.
+
 For a scoped run that writes to the same standard result locations:
 
 ```powershell
@@ -110,15 +116,35 @@ The additive files are:
 - `results/by-typespec-rule/<encoded-rule>.json`: normalized diagnostics,
   including origin, severity, source location and full message.
 - `comparison-results.json` and `comparison-results.md`: project-level overlap
-  between validator rules and the `tspLints` mappings in fixture frontmatter,
-  plus TypeSpec rules that have no mapping.
+  between every known validator rule and the `tspLints` mappings in fixture
+  frontmatter, plus TypeSpec rules that have no mapping. The known-rule set is
+  the union of the validator metadata catalog, fixtures, and dataset results, so
+  rules that did not fire are retained with zero counts.
+- `coverage-breakdown.json` and `coverage-breakdown.md`: an observed full-rule
+  coverage summary grouped into 100%, partial, zero, unmapped, never-fired,
+  TypeSpec-only, and unassessed sections. Fixture `coverageKind` and official
+  `@azure-tools/` mappings are shown as context, but mappings receive no
+  coverage credit unless a mapped diagnostic overlaps the validator rule in the
+  same successfully compiled project.
 - `projects/<spec-path>/raw/typespec.stdout.txt` and
   `typespec.stderr.txt`: complete TypeSpec CLI output for each project.
+
+Validator projects are **assessable** only when their TypeSpec compilation
+succeeds. A failed project is listed as **unassessed** for each validator rule
+that fired there and is excluded from overlap, gap, TypeSpec-only, and observed
+coverage calculations. Observed coverage is overlap divided by assessable
+validator projects; it is unavailable when no validator projects are
+assessable. Diagnostics from failed projects remain available in raw output and
+normalized TypeSpec shards for debugging.
 
 `_meta.json` keeps schema version 4 and receives a separate
 `typespecAnalysis` object. It records the analysis schema version, counts,
 selected-project filters, generated files, local git revision, and a SHA-256
 fingerprint over the local linter's source and package/TypeScript configuration.
+The complete analysis duration, including local build/link, compilation,
+aggregation, and report writing as closely as practical, is persisted as
+`durationMs` in both `typespec-results.json` and `_meta.json`'s
+`typespecAnalysis` object and is displayed in the Markdown reports.
 The original dataset cache remains reusable; compare the fingerprint before
 reusing TypeSpec results after local linter changes. Only
 `results/by-typespec-rule` is removed before shards are rewritten, so validator

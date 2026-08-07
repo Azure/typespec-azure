@@ -1,0 +1,2183 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+  "count": 217,
+  "levels": {
+    "warning": 217
+  },
+  "projectCount": 26,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "sourceFile": "Alert.tsp",
+      "line": 82,
+      "column": 7,
+      "message": "Query parameter 'newState' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "sourceFile": "Alert.tsp",
+      "line": 384,
+      "column": 7,
+      "message": "Query parameter 'newState' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 193,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 200,
+      "column": 7,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 378,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 385,
+      "column": 7,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "UserContract.tsp",
+      "line": 267,
+      "column": 7,
+      "message": "Query parameter 'appType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ContainerApp.tsp",
+      "line": 133,
+      "column": 7,
+      "message": "Query parameter 'customHostname' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "sourceFile": "ConfigurationStore.tsp",
+      "line": 128,
+      "column": 7,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Invoice.tsp",
+      "line": 164,
+      "column": 7,
+      "message": "Query parameter 'documentName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 135,
+      "column": 7,
+      "message": "Query parameter 'filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 468,
+      "column": 3,
+      "message": "Query parameter 'resolveScopeDisplayNames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccount.tsp",
+      "line": 474,
+      "column": 3,
+      "message": "Query parameter 'filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 507,
+      "column": 3,
+      "message": "Query parameter 'resolveScopeDisplayNames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 513,
+      "column": 3,
+      "message": "Query parameter 'filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 595,
+      "column": 3,
+      "message": "Query parameter 'resolveScopeDisplayNames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 601,
+      "column": 3,
+      "message": "Query parameter 'filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Invoice.tsp",
+      "line": 394,
+      "column": 7,
+      "message": "Query parameter 'documentName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 389,
+      "column": 3,
+      "message": "Query parameter 'resolveScopeDisplayNames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 395,
+      "column": 3,
+      "message": "Query parameter 'filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 216,
+      "column": 7,
+      "message": "Query parameter 'hibernate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 237,
+      "column": 7,
+      "message": "Query parameter 'forceDeletion' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 255,
+      "column": 7,
+      "message": "Query parameter 'platformUpdateDomain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 261,
+      "column": 7,
+      "message": "Query parameter 'zone' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 267,
+      "column": 7,
+      "message": "Query parameter 'placementGroupId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 337,
+      "column": 7,
+      "message": "Query parameter 'skipShutdown' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 311,
+      "column": 7,
+      "message": "Query parameter 'skipShutdown' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 354,
+      "column": 7,
+      "message": "Query parameter 'sasUriExpirationTimeInMinutes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 254,
+      "column": 7,
+      "message": "Query parameter 'hibernate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 261,
+      "column": 7,
+      "message": "Query parameter 'forceDeallocate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 312,
+      "column": 7,
+      "message": "Query parameter 'skipShutdown' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 371,
+      "column": 7,
+      "message": "Query parameter 'sasUriExpirationTimeInMinutes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 380,
+      "column": 7,
+      "message": "Query parameter 'server-fqdn' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 399,
+      "column": 7,
+      "message": "Query parameter 'server-fqdn' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 405,
+      "column": 7,
+      "message": "Query parameter 'format' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 424,
+      "column": 7,
+      "message": "Query parameter 'server-fqdn' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DataBoxEdgeDevice.tsp",
+      "line": 230,
+      "column": 7,
+      "message": "Query parameter 'capacityName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "Factory.tsp",
+      "line": 240,
+      "column": 7,
+      "message": "Query parameter 'isRecursive' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 98,
+      "column": 7,
+      "message": "Query parameter 'referencePipelineRunId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 104,
+      "column": 7,
+      "message": "Query parameter 'isRecovery' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 110,
+      "column": 7,
+      "message": "Query parameter 'startActivityName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 116,
+      "column": 7,
+      "message": "Query parameter 'startFromFailure' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Query parameter 'certificate.name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 182,
+      "column": 7,
+      "message": "Query parameter 'certificate.rawBytes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 188,
+      "column": 7,
+      "message": "Query parameter 'certificate.isVerified' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 194,
+      "column": 7,
+      "message": "Query parameter 'certificate.purpose' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "Query parameter 'certificate.created' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Query parameter 'certificate.lastUpdated' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 203,
+      "column": 7,
+      "message": "Query parameter 'certificate.hasPrivateKey' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 209,
+      "column": 7,
+      "message": "Query parameter 'certificate.nonce' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Query parameter 'certificate.name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 235,
+      "column": 7,
+      "message": "Query parameter 'certificate.rawBytes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 241,
+      "column": 7,
+      "message": "Query parameter 'certificate.isVerified' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 247,
+      "column": 7,
+      "message": "Query parameter 'certificate.purpose' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "Query parameter 'certificate.created' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Query parameter 'certificate.lastUpdated' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 256,
+      "column": 7,
+      "message": "Query parameter 'certificate.hasPrivateKey' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "CertificateResponse.tsp",
+      "line": 262,
+      "column": 7,
+      "message": "Query parameter 'certificate.nonce' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
+      "sourceFile": "routes.tsp",
+      "line": 47,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
+      "sourceFile": "routes.tsp",
+      "line": 70,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/education/resource-manager/Microsoft.Education/Education",
+      "sourceFile": "LabDetails.tsp",
+      "line": 184,
+      "column": 7,
+      "message": "Query parameter 'onlyUpdateStudentCountParameter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 320,
+      "column": 7,
+      "message": "Query parameter 'ips' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 326,
+      "column": 7,
+      "message": "Query parameter 'name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 351,
+      "column": 7,
+      "message": "Query parameter 'name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 357,
+      "column": 7,
+      "message": "Query parameter 'privateEndpointGuid' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 363,
+      "column": 7,
+      "message": "Query parameter 'privateEndpointName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 382,
+      "column": 7,
+      "message": "Query parameter 'rulesetId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 400,
+      "column": 7,
+      "message": "Query parameter 'rulesetId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 419,
+      "column": 7,
+      "message": "Query parameter 'rulesetId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
+      "sourceFile": "ElasticMonitorResource.tsp",
+      "line": 437,
+      "column": 7,
+      "message": "Query parameter 'rulesetId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridconnectivity/HybridConnectivity.Management",
+      "sourceFile": "EndpointResource.tsp",
+      "line": 135,
+      "column": 7,
+      "message": "Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridconnectivity/HybridConnectivity.Management",
+      "sourceFile": "EndpointResource.tsp",
+      "line": 163,
+      "column": 7,
+      "message": "Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGateway.tsp",
+      "line": 150,
+      "column": 7,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGateway.tsp",
+      "line": 169,
+      "column": 7,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 135,
+      "column": 7,
+      "message": "Query parameter 'failoverTestType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 141,
+      "column": 7,
+      "message": "Query parameter 'fetchLatest' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 166,
+      "column": 7,
+      "message": "Query parameter 'linkType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 172,
+      "column": 7,
+      "message": "Query parameter 'circuitTestCategory' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 178,
+      "column": 7,
+      "message": "Query parameter 'failoverTestId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 203,
+      "column": 7,
+      "message": "Query parameter 'linkType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCircuit.tsp",
+      "line": 209,
+      "column": 7,
+      "message": "Query parameter 'circuitTestCategory' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkManager.tsp",
+      "line": 162,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkManager.tsp",
+      "line": 184,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkManager.tsp",
+      "line": 225,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetwork.tsp",
+      "line": 130,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetwork.tsp",
+      "line": 136,
+      "column": 7,
+      "message": "Query parameter 'skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetwork.tsp",
+      "line": 163,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetwork.tsp",
+      "line": 185,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 133,
+      "column": 7,
+      "message": "Query parameter 'gatewayVip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 214,
+      "column": 7,
+      "message": "Query parameter 'peer' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 269,
+      "column": 7,
+      "message": "Query parameter 'peer' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 287,
+      "column": 7,
+      "message": "Query parameter 'attemptRefresh' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 305,
+      "column": 7,
+      "message": "Query parameter 'attemptRefresh' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 386,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 392,
+      "column": 7,
+      "message": "Query parameter 'fetchLatest' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 415,
+      "column": 7,
+      "message": "Query parameter 'peeringLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 421,
+      "column": 7,
+      "message": "Query parameter 'failoverTestId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGateway.tsp",
+      "line": 444,
+      "column": 7,
+      "message": "Query parameter 'peeringLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VpnGateway.tsp",
+      "line": 170,
+      "column": 7,
+      "message": "Query parameter 'ipConfigurationId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 250,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 256,
+      "column": 7,
+      "message": "Query parameter 'fetchLatest' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 280,
+      "column": 7,
+      "message": "Query parameter 'peeringLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 286,
+      "column": 7,
+      "message": "Query parameter 'failoverTestId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 310,
+      "column": 7,
+      "message": "Query parameter 'peeringLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 352,
+      "column": 7,
+      "message": "Query parameter 'attemptRefresh' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 374,
+      "column": 7,
+      "message": "Query parameter 'attemptRefresh' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "LogAnalyticsQueryPack.tsp",
+      "line": 82,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "LogAnalyticsQueryPack.tsp",
+      "line": 88,
+      "column": 7,
+      "message": "Query parameter 'includeBody' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "LogAnalyticsQueryPack.tsp",
+      "line": 94,
+      "column": 7,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 129,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 133,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 137,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 154,
+      "column": 7,
+      "message": "Query parameter 'appIdVersion' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 158,
+      "column": 7,
+      "message": "Query parameter 'appPrefix' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 162,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 166,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 183,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 187,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 216,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 220,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 237,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 241,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 245,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PostRulesResource.tsp",
+      "line": 73,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PostRulesResource.tsp",
+      "line": 89,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PostRulesResource.tsp",
+      "line": 105,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PreRulesResource.tsp",
+      "line": 73,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PreRulesResource.tsp",
+      "line": 89,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PreRulesResource.tsp",
+      "line": 105,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "FirewallResource.tsp",
+      "line": 115,
+      "column": 7,
+      "message": "Query parameter 'email' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 116,
+      "column": 7,
+      "message": "Query parameter 'email' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 132,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 136,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 140,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 157,
+      "column": 7,
+      "message": "Query parameter 'appIdVersion' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 161,
+      "column": 7,
+      "message": "Query parameter 'appPrefix' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 165,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 169,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 186,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 190,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 218,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 222,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 238,
+      "column": 7,
+      "message": "Query parameter 'skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 242,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulestackResource.tsp",
+      "line": 246,
+      "column": 7,
+      "message": "Query parameter 'type' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulesResource.tsp",
+      "line": 73,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulesResource.tsp",
+      "line": 89,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "LocalRulesResource.tsp",
+      "line": 105,
+      "column": 7,
+      "message": "Query parameter 'firewallName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "Remediation.tsp",
+      "line": 238,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "Remediation.tsp",
+      "line": 320,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "Remediation.tsp",
+      "line": 400,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 86,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
+      "sourceFile": "Appliance.tsp",
+      "line": 109,
+      "column": 7,
+      "message": "Query parameter 'artifactType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "sourceFile": "Event.tsp",
+      "line": 109,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "sourceFile": "Event.tsp",
+      "line": 225,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+      "sourceFile": "RuleResults.tsp",
+      "line": 151,
+      "column": 7,
+      "message": "Query parameter 'databaseName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+      "sourceFile": "SqlVulnerabilityAssessmentSettings.tsp",
+      "line": 166,
+      "column": 7,
+      "message": "Query parameter 'databaseName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 835,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 857,
+      "column": 3,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "Query parameter '$maxpagesize' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 835,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 857,
+      "column": 3,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "Query parameter '$maxpagesize' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 835,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 857,
+      "column": 3,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "Query parameter '$maxpagesize' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 835,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 857,
+      "column": 3,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "Query parameter '$maxpagesize' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 332,
+      "column": 7,
+      "message": "Query parameter 'replicaType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "SqlVulnerabilityAssessment.tsp",
+      "line": 221,
+      "column": 7,
+      "message": "Query parameter 'systemDatabaseName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedInstance.tsp",
+      "line": 171,
+      "column": 7,
+      "message": "Query parameter 'replicaType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 73,
+      "column": 3,
+      "message": "Query parameter 'failoverType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 227,
+      "column": 7,
+      "message": "Query parameter 'requestType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 475,
+      "column": 7,
+      "message": "Query parameter 'environmentName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 499,
+      "column": 7,
+      "message": "Query parameter 'environmentName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2184,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2190,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2197,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2222,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2228,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2235,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2448,
+      "column": 7,
+      "message": "Query parameter 'softRestart' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2454,
+      "column": 7,
+      "message": "Query parameter 'synchronous' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2600,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2606,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2613,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServicePlan.tsp",
+      "line": 234,
+      "column": 7,
+      "message": "Query parameter 'softRestart' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 101,
+      "column": 7,
+      "message": "Query parameter 'startTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 107,
+      "column": 7,
+      "message": "Query parameter 'endTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 114,
+      "column": 7,
+      "message": "Query parameter 'timeGrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 192,
+      "column": 7,
+      "message": "Query parameter 'startTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 198,
+      "column": 7,
+      "message": "Query parameter 'endTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AnalysisDefinition.tsp",
+      "line": 205,
+      "column": 7,
+      "message": "Query parameter 'timeGrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 101,
+      "column": 7,
+      "message": "Query parameter 'startTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 107,
+      "column": 7,
+      "message": "Query parameter 'endTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 114,
+      "column": 7,
+      "message": "Query parameter 'timeGrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 192,
+      "column": 7,
+      "message": "Query parameter 'startTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 198,
+      "column": 7,
+      "message": "Query parameter 'endTime' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "DetectorDefinitionResource.tsp",
+      "line": 205,
+      "column": 7,
+      "message": "Query parameter 'timeGrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 98,
+      "column": 7,
+      "message": "Query parameter 'environmentName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 826,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 832,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 839,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 864,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 870,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 877,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1092,
+      "column": 7,
+      "message": "Query parameter 'softRestart' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1098,
+      "column": 7,
+      "message": "Query parameter 'synchronous' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1241,
+      "column": 7,
+      "message": "Query parameter 'durationInSeconds' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1247,
+      "column": 7,
+      "message": "Query parameter 'maxFrameLength' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1254,
+      "column": 7,
+      "message": "Query parameter 'sasUrl' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    }
+  ]
+}

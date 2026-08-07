@@ -1,0 +1,173 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+privateEndpointConnection.tsp:17:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Chaos/privateAccesses/{privateAccessName}/privateLinkResources is missing.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:57:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:63:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+privateEndpointConnection.models.tsp:118:7 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'PrivateLinkResource' must have a put/createOrUpdate operation.
+action.models.tsp:123:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+scenario.models.tsp:96:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+scenarioConfiguration.models.tsp:699:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+scenarioConfiguration.models.tsp:513:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+connection.models.tsp:53:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+connection.models.tsp:58:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+capability.tsp:21:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}/capabilities/{capabilityName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+capability.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+capability.tsp:26:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}/capabilities/{capabilityName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+capability.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+capability.tsp:34:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}/capabilities/{capabilityName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+capability.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+capability.tsp:42:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}/capabilities' should use {scope}/providers/... instead of hardcoding the parent scope.
+capability.tsp:51:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+capability.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+target.tsp:21:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+target.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+target.tsp:26:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+target.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+target.tsp:34:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets/{targetName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+target.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+target.tsp:39:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{parentProviderNamespace}/{parentResourceType}/{parentResourceName}/providers/Microsoft.Chaos/targets' should use {scope}/providers/... instead of hardcoding the parent scope.
+target.tsp:48:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+target.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+capabilityType.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+capabilityType.tsp:31:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+capabilityType.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:47:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'running' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+experiment.tsp:53:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+experiment.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:47:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:47:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:47:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:68:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'running' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+experiment.tsp:74:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+experiment.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:68:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:68:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:68:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+experiment.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experiment.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experimentExecution.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experimentExecution.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+experimentExecution.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:22:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:50:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+privateAccess.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:65:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+privateAccess.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateAccess.tsp:77:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'privateLinkResources' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+privateAccess.tsp:77:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'privateLinkResources' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+privateAccess.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateEndpointConnection.tsp:23:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+privateEndpointConnection.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateEndpointConnection.tsp:30:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+privateEndpointConnection.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+privateEndpointConnection.tsp:36:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+privateEndpointConnection.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+action.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+action.tsp:37:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+action.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+action.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+action.tsp:65:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+action.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+targetType.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+targetType.tsp:35:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+targetType.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operationStatus.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:52:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+workspace.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+workspace.tsp:67:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+workspace.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  workspace.tsp:77:29 - occurred while instantiating template
+workspace.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  workspace.tsp:77:29 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'workspaces' from the route path. Consider updating the operation name.
+  workspace.tsp:77:29 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  workspace.tsp:77:29 - occurred while instantiating template
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  workspace.tsp:88:15 - occurred while instantiating template
+workspace.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  workspace.tsp:88:15 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'workspaces' from the route path. Consider updating the operation name.
+  workspace.tsp:88:15 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  workspace.tsp:88:15 - occurred while instantiating template
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  workspace.tsp:77:29 - occurred while instantiating template
+workspace.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredResource.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+discoveredResource.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenario.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenario.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenario.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenario.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenarioConfiguration.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenarioConfiguration.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenarioConfiguration.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenarioConfiguration.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:51:14 - occurred while instantiating template
+scenarioConfiguration.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:51:14 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'configurations' from the route path. Consider updating the operation name.
+  scenarioConfiguration.tsp:51:14 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  scenarioConfiguration.tsp:51:14 - occurred while instantiating template
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:61:13 - occurred while instantiating template
+scenarioConfiguration.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:61:13 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'configurations' from the route path. Consider updating the operation name.
+  scenarioConfiguration.tsp:61:13 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  scenarioConfiguration.tsp:61:13 - occurred while instantiating template
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:70:15 - occurred while instantiating template
+scenarioConfiguration.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioConfiguration.tsp:70:15 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'configurations' from the route path. Consider updating the operation name.
+  scenarioConfiguration.tsp:70:15 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  scenarioConfiguration.tsp:70:15 - occurred while instantiating template
+scenarioConfiguration.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'configurations' from the route path. Consider updating the operation name.
+  scenarioConfiguration.tsp:79:29 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  scenarioConfiguration.tsp:79:29 - occurred while instantiating template
+scenarioRun.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+scenarioRun.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioRun.tsp:48:13 - occurred while instantiating template
+scenarioRun.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+lro-helpers.tsp:74:13 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+  scenarioRun.tsp:48:13 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionNoContentAsyncWithLocationResult' should contain the action verb 'runs' from the route path. Consider updating the operation name.
+  scenarioRun.tsp:48:13 - occurred while instantiating template
+lro-helpers.tsp:67:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  scenarioRun.tsp:48:13 - occurred while instantiating template
+connection.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+connection.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+connection.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+connection.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 139 warnings.
+

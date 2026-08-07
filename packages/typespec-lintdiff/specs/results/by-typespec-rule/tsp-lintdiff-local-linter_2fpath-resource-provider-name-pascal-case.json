@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+  "count": 13,
+  "levels": {
+    "warning": 13
+  },
+  "projectCount": 12,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "sourceFile": "main.tsp",
+      "line": 34,
+      "column": 21,
+      "message": "The ARM provider namespace \"Microsoft.AAD\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/github-network/GitHub.Network.Management",
+      "sourceFile": "main.tsp",
+      "line": 21,
+      "column": 18,
+      "message": "The ARM provider namespace \"GitHub.Network\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/liftrarize/resource-manager/ArizeAi.ObservabilityEval/ObservabilityEval",
+      "sourceFile": "main.tsp",
+      "line": 20,
+      "column": 19,
+      "message": "The ARM provider namespace \"ArizeAi.ObservabilityEval\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/liftrhyperexecute/resource-manager/LambdaTest.HyperExecute/HyperExecute",
+      "sourceFile": "main.tsp",
+      "line": 20,
+      "column": 22,
+      "message": "The ARM provider namespace \"LambdaTest.HyperExecute\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
+      "sourceFile": "main.tsp",
+      "line": 21,
+      "column": 19,
+      "message": "The ARM provider namespace \"MongoDB.Atlas\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
+      "sourceFile": "main.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "The ARM provider namespace \"microsoft.insights\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
+      "sourceFile": "main.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "The ARM provider namespace \"microsoft.insights\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/newrelic/NewRelicObservability.Management",
+      "sourceFile": "main.tsp",
+      "line": 33,
+      "column": 20,
+      "message": "The ARM provider namespace \"NewRelic.Observability\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "main.tsp",
+      "line": 45,
+      "column": 28,
+      "message": "The ARM provider namespace \"PaloAltoNetworks.Cloudngfw\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock",
+      "sourceFile": "main.tsp",
+      "line": 11,
+      "column": 23,
+      "message": "The ARM provider namespace \"PureStorage.Block\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock",
+      "sourceFile": "LiftrBase.Storage/main.tsp",
+      "line": 17,
+      "column": 21,
+      "message": "The ARM provider namespace \"PureStorage.Block\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/splitio/SplitIO.Experimentation.Management",
+      "sourceFile": "main.tsp",
+      "line": 24,
+      "column": 19,
+      "message": "The ARM provider namespace \"SplitIO.Experimentation\" must use PascalCase (e.g., Microsoft.Compute)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "main.tsp",
+      "line": 53,
+      "column": 21,
+      "message": "The ARM provider namespace \"Microsoft.AVS\" must use PascalCase (e.g., Microsoft.Compute)."
+    }
+  ]
+}

@@ -1,0 +1,1323 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+  "count": 131,
+  "levels": {
+    "warning": 131
+  },
+  "projectCount": 24,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1873,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1879,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1885,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1873,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1879,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 1885,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 2334,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3492,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3704,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3642,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 2979,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3087,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 3271,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 5055,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 5403,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 6257,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 6349,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 6488,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "models/goals/goalAssignment.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "models/goals/goalTemplate.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "models/recoveryPlan/recoveryPlan.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1419,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1425,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1431,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 590,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 596,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 607,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 590,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 596,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+      "sourceFile": "models.tsp",
+      "line": 607,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 629,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 635,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "models.tsp",
+      "line": 921,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "models.tsp",
+      "line": 927,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "models.tsp",
+      "line": 938,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "DynamicSchema.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "SolutionVersion.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "Instance.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "Workflow.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "WorkflowVersion.tsp",
+      "line": 143,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "WorkflowV2.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "WorkflowVersionV2.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "ExecutionV2.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+      "sourceFile": "Execution.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurations",
+      "sourceFile": "Configuration.tsp",
+      "line": 31,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edge/resource-manager/Microsoft.Edge/configurations",
+      "sourceFile": "DynamicConfiguration.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/github-network/GitHub.Network.Management",
+      "sourceFile": "NetworkSettingsResource.tsp",
+      "line": 25,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/impact/Impact.Management",
+      "sourceFile": "connectors.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 760,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "sourceFile": "models/common.tsp",
+      "line": 764,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AssessmentProjects",
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 19,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/PipelineGroups",
+      "sourceFile": "typespec/pipelineGroup.tsp",
+      "line": 31,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "CapacityPool.tsp",
+      "line": 147,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "CapacityPool.tsp",
+      "line": 153,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "CapacityPool.tsp",
+      "line": 159,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 1292,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 1298,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 1304,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "SnapshotPolicy.tsp",
+      "line": 191,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "SnapshotPolicy.tsp",
+      "line": 197,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "SnapshotPolicy.tsp",
+      "line": 203,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "BackupPolicy.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "BackupPolicy.tsp",
+      "line": 136,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "BackupPolicy.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2385,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2391,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2397,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 1175,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 1181,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 1187,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2063,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2069,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "models.tsp",
+      "line": 2075,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "models.tsp",
+      "line": 173,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "models.tsp",
+      "line": 179,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "models.tsp",
+      "line": 185,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign",
+      "sourceFile": "main.tsp",
+      "line": 37,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign",
+      "sourceFile": "main.tsp",
+      "line": 73,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign",
+      "sourceFile": "main.tsp",
+      "line": 136,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/splitio/SplitIO.Experimentation.Management",
+      "sourceFile": "main.tsp",
+      "line": 116,
+      "column": 5,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-dhcpConfigurations.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-dnsServices.tsp",
+      "line": 108,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-dnsZones.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-portMirroringProfiles.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-segments.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "workloadNetworks-vmGroups.tsp",
+      "line": 83,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1809,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1815,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1826,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1809,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1815,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1826,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1809,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1815,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1826,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1809,
+      "column": 3,
+      "message": "PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1815,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 1826,
+      "column": 3,
+      "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/workloads/Workloads.SAPMonitor.Management",
+      "sourceFile": "SapLandscapeMonitor.tsp",
+      "line": 29,
+      "column": 3,
+      "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    }
+  ]
+}

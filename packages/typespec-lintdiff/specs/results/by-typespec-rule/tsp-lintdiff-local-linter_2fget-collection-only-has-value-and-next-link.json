@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
-  "count": 1,
+  "count": 283,
   "levels": {
-    "warning": 1
+    "warning": 283
   },
-  "projectCount": 1,
+  "projectCount": 62,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
@@ -17,6 +17,2826 @@
       "sourceFile": "models.tsp",
       "line": 1035,
       "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "sourceFile": "models.tsp",
+      "line": 730,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "sourceFile": "models.tsp",
+      "line": 868,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2079,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2494,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3080,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3741,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2079,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2494,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3741,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7878,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8269,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8869,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3741,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9349,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3741,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2577,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2577,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2922,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2960,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2960,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2960,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2960,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2960,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2996,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3197,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3197,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3264,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3264,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3264,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3264,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3479,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3479,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3577,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3623,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3667,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4041,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4041,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4305,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4405,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4448,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4688,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 4688,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 5203,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 5294,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 5294,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 6665,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 6920,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2079,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7196,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7328,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7196,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7328,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7421,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7621,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7621,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7713,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7713,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7945,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8004,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8046,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7945,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8004,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8046,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8089,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8314,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 8314,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3080,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 2079,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7196,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9086,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 3080,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9198,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9198,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9231,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9231,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9676,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9676,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9086,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9086,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 9086,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10176,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10176,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10209,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10209,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10242,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10242,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10276,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10456,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7328,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 7196,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10625,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "models.tsp",
+      "line": 10789,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "models.tsp",
+      "line": 8483,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "models.tsp",
+      "line": 2422,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "models.tsp",
+      "line": 3700,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "models.tsp",
+      "line": 1804,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "models.tsp",
+      "line": 390,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "models.tsp",
+      "line": 451,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "models.tsp",
+      "line": 477,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "models.tsp",
+      "line": 595,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "models.tsp",
+      "line": 828,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "models.tsp",
+      "line": 428,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "models.tsp",
+      "line": 428,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "models.tsp",
+      "line": 428,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 1714,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 1917,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 4100,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 32,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 4817,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "models.tsp",
+      "line": 1802,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "models.tsp",
+      "line": 1690,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 8523,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 5144,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9061,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9061,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "models.tsp",
+      "line": 9082,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "models.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "models.tsp",
+      "line": 1623,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
+      "sourceFile": "models.tsp",
+      "line": 1525,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3718,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3773,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3820,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3845,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3893,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "models.tsp",
+      "line": 3948,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 2249,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 3030,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 3019,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/commerce/resource-manager/Microsoft.Commerce/Commerce",
+      "sourceFile": "models.tsp",
+      "line": 177,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "models.tsp",
+      "line": 4525,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "models.tsp",
+      "line": 5164,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "models.tsp",
+      "line": 6228,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "models.tsp",
+      "line": 6580,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "models.tsp",
+      "line": 7045,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "models.tsp",
+      "line": 1356,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 1718,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "models.tsp",
+      "line": 1718,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "models.tsp",
+      "line": 923,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "models.tsp",
+      "line": 923,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "models.tsp",
+      "line": 2187,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "models.tsp",
+      "line": 2187,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "sourceFile": "models.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
+      "sourceFile": "models.tsp",
+      "line": 2068,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "Registry.models.tsp",
+      "line": 880,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 21,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 213,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 187,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "CommonModels.tsp",
+      "line": 1644,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "models.tsp",
+      "line": 2901,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "models.tsp",
+      "line": 6555,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+      "sourceFile": "models.tsp",
+      "line": 1278,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "models.tsp",
+      "line": 5951,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "models.tsp",
+      "line": 4037,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 1377,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 582,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 582,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 1320,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 1825,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 2267,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 2461,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 2516,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 2516,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "models.tsp",
+      "line": 2603,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+      "sourceFile": "models.tsp",
+      "line": 892,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "models.tsp",
+      "line": 723,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "models.tsp",
+      "line": 905,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "models.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "models.tsp",
+      "line": 696,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "models.tsp",
+      "line": 1130,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "models.tsp",
+      "line": 452,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "sourceFile": "models.tsp",
+      "line": 3436,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
+      "sourceFile": "models.tsp",
+      "line": 3648,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "models.tsp",
+      "line": 2786,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "models.tsp",
+      "line": 2061,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "models.tsp",
+      "line": 2174,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "models.tsp",
+      "line": 2231,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "models.tsp",
+      "line": 2077,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "models.tsp",
+      "line": 1970,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "models.tsp",
+      "line": 2582,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "models.tsp",
+      "line": 2766,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "models.tsp",
+      "line": 1608,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "models.tsp",
+      "line": 2027,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 9741,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "models.tsp",
+      "line": 3882,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "models.tsp",
+      "line": 709,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "models.tsp",
+      "line": 198,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AutoScaleApi",
+      "sourceFile": "models.tsp",
+      "line": 754,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
+      "sourceFile": "models.tsp",
+      "line": 468,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "models.tsp",
+      "line": 490,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/PrivateLinkScopesApi",
+      "sourceFile": "models.tsp",
+      "line": 270,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "Volume.tsp",
+      "line": 1560,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "models.tsp",
+      "line": 665,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 10405,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 11040,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 11040,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 12789,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 19619,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 21896,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 22399,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 24006,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 24006,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 24172,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 8858,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 10384,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "models.tsp",
+      "line": 19375,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 1910,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 2202,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "sourceFile": "models.tsp",
+      "line": 284,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
+      "sourceFile": "models.tsp",
+      "line": 273,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "sourceFile": "models.tsp",
+      "line": 1178,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2995,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2455,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2547,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2582,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2766,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 3240,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 1824,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 1847,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2682,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 2895,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 3104,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 3161,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "models.tsp",
+      "line": 3161,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 1734,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 6252,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "models.tsp",
+      "line": 6332,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "Cluster.tsp",
+      "line": 180,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "Cluster.tsp",
+      "line": 231,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "Cluster.tsp",
+      "line": 207,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "models.tsp",
+      "line": 1156,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "models.tsp",
+      "line": 1316,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "models.tsp",
+      "line": 3106,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
+      "sourceFile": "models.tsp",
+      "line": 456,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "models.tsp",
+      "line": 222,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/MdeOnboardingAPI",
+      "sourceFile": "models.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityOperatorsAPI",
+      "sourceFile": "models.tsp",
+      "line": 19,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "models.tsp",
+      "line": 626,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "models.tsp",
+      "line": 571,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "models.tsp",
+      "line": 571,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
+      "sourceFile": "models.tsp",
+      "line": 187,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "models.tsp",
+      "line": 7022,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "models.tsp",
+      "line": 8030,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "models.tsp",
+      "line": 231,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "models.tsp",
+      "line": 231,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "models.tsp",
+      "line": 9176,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "models.tsp",
+      "line": 5303,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "models.tsp",
+      "line": 1911,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "models.tsp",
+      "line": 2552,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "models.tsp",
+      "line": 5683,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "models.tsp",
+      "line": 1242,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "models.tsp",
+      "line": 490,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 7914,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 8184,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 4581,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 9883,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 13314,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 4581,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 9883,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 13314,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 4581,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 4581,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 11943,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 11943,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 11943,
+      "column": 3,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "models.tsp",
+      "line": 11943,
+      "column": 3,
       "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
     }
   ]

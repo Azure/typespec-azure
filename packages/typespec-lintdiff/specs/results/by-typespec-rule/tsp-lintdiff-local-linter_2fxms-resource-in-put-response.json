@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+  "count": 10,
+  "levels": {
+    "warning": 10
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "MetadataSchema.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "Workspace.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "Api.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "ApiVersion.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "ApiDefinition.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "ApiSource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "Deployment.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "Environment.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "SubscriptionUnderManagementGroup.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
+      "sourceFile": "PolicyAssignment.tsp",
+      "line": 18,
+      "column": 7,
+      "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
+    }
+  ]
+}

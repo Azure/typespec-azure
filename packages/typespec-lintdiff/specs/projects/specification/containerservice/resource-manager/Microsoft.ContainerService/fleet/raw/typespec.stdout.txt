@@ -1,0 +1,136 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:31:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:34:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:37:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:40:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:46:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:49:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:56:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:64:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:68:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:72:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:76:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:31:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2022-09-02-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:34:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-03-15-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:37:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-06-15-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:40:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2023-08-15-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:46:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-02-02-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-05-02-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:60:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-04-01-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:64:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-08-01-preview' has been in preview for over one year. Move it to GA or retire it.
+fleet.tsp:111:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+fleet.tsp:118:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+kubefleet/apis/placement/v1/types.tsp:58:7 - warning tsp-lintdiff-local-linter/description-must-not-be-node-name: Description must not match the name of the node it describes. Node name:'ClusterSelector' Description:'ClusterSelector'
+kubefleet/apis/placement/v1/types.tsp:65:7 - warning tsp-lintdiff-local-linter/description-must-not-be-node-name: Description must not match the name of the node it describes. Node name:'ClusterSelectorTerm' Description:'ClusterSelectorTerm'
+k8s.io/api/core/v1/types.tsp:15:7 - warning tsp-lintdiff-local-linter/description-must-not-be-node-name: Description must not match the name of the node it describes. Node name:'TaintEffect' Description:'TaintEffect'
+update/autoupgradeprofile.tsp:66:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+update/autoupgradeprofile.tsp:89:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+clustermeshprofile.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+clustermeshprofile.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+clustermeshprofile.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+clustermeshprofile.tsp:124:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+clustermeshprofile.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:204:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:211:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:222:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:237:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:248:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleet.tsp:255:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+fleet.tsp:258:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+fleet.tsp:264:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetmember.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetmember.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "fleetMemberName" and "clusterMeshProfileName".
+fleetmember.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetmember.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "fleetMemberName" and "clusterMeshProfileName".
+fleetmember.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetmember.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "fleetMemberName" and "clusterMeshProfileName".
+fleetmember.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetmember.tsp:26:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "fleetMemberName" and "clusterMeshProfileName".
+fleetmember.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+fleetmember.tsp:161:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:47:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:47:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+fleetnamespace.tsp:206:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetnamespace.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "managedNamespaceName" and "clusterMeshProfileName".
+fleetnamespace.tsp:208:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetnamespace.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "managedNamespaceName" and "clusterMeshProfileName".
+fleetnamespace.tsp:215:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetnamespace.tsp:221:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetnamespace.tsp:223:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+fleetnamespace.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "managedNamespaceName" and "clusterMeshProfileName".
+gate.tsp:183:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+gate.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "gateName" and "clusterMeshProfileName".
+gate.tsp:170:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.
+gate.tsp:177:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.state.
+gate.tsp:191:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+gate.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "gateName" and "clusterMeshProfileName".
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+gate.tsp:199:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:47:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:47:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+update/run.tsp:419:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/run.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "updateRunName" and "clusterMeshProfileName".
+update/run.tsp:423:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/run.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "updateRunName" and "clusterMeshProfileName".
+update/run.tsp:433:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+update/run.tsp:440:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+update/run.tsp:447:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/run.tsp:457:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/run.tsp:467:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/strategy.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/strategy.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "updateStrategyName" and "clusterMeshProfileName".
+update/strategy.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/strategy.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "updateStrategyName" and "clusterMeshProfileName".
+update/strategy.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+update/strategy.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+update/autoupgradeprofile.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/autoupgradeprofile.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autoUpgradeProfileName" and "clusterMeshProfileName".
+update/autoupgradeprofile.tsp:142:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+update/autoupgradeprofile.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autoUpgradeProfileName" and "clusterMeshProfileName".
+update/autoupgradeprofile.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+update/autoupgradeprofile.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+update/autoupgradeprofile.tsp:198:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 129 warnings.
+

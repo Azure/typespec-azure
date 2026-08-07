@@ -1,0 +1,112 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+OrderResource.tsp:30:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'OrderResource' should define a list operation.
+models.tsp:770:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.addressClassification' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:802:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.streetAddress1' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:807:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.streetAddress2' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:812:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.streetAddress3' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:817:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.city' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:822:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.stateOrProvince' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:827:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.country' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:832:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.postalCode' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:837:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.zipExtendedCode' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:842:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.companyName' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:847:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.shippingAddress.addressType' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:857:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.contactDetails.contactName' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:862:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.contactDetails.phone' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:867:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.contactDetails.phoneExtension' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:872:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.contactDetails.mobile' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:877:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.contactDetails.emailList' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:786:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.addressValidationStatus' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:792:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.forwardAddress.provisioningState' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2168:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.notificationPreferences' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2213:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.transportPreferences.preferredShipmentType' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2223:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.encryptionPreferences.doubleEncryptionStatus' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2233:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.managementResourcePreferences.preferredManagementResourceId' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2243:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.termCommitmentPreferences.preferredTermCommitmentType' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2248:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.preferences.termCommitmentPreferences.preferredTermCommitmentDuration' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:2485:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.notificationEmailList' in the request body either does not appear in the resource model or is nested at the wrong level.
+models.tsp:1254:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2203:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2550:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+AddressResource.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AddressResource.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:827:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.shippingAddress.country.
+AddressResource.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AddressResource.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AddressResource.tsp:86:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+AddressResource.tsp:92:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+AddressResource.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AddressResource.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AddressResource.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+AddressResource.tsp:92:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+AddressResource.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AddressResource.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+AddressResource.tsp:92:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+AddressResource.tsp:113:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+AddressResource.tsp:119:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+AddressResource.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AddressResource.tsp:107:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AddressResource.tsp:113:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+AddressResource.tsp:119:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+AddressResource.tsp:107:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+AddressResource.tsp:113:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+AddressResource.tsp:119:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+OrderItemResource.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+OrderItemResource.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:46:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+OrderItemResource.tsp:46:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:827:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.forwardAddress.shippingAddress.country.
+models.tsp:2213:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.preferences.transportPreferences.preferredShipmentType.
+models.tsp:2243:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.preferences.termCommitmentPreferences.preferredTermCommitmentType.
+models.tsp:1969:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.orderItemDetails.productDetails.parentProvisioningDetails.quantity.
+models.tsp:2127:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.orderItemDetails.siteDetails.siteId.
+models.tsp:2340:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:identity.type.
+OrderItemResource.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:101:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:107:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:113:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:95:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+OrderItemResource.tsp:101:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:107:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+OrderItemResource.tsp:113:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+OrderItemResource.tsp:95:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+OrderItemResource.tsp:101:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:107:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+OrderItemResource.tsp:113:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+OrderItemResource.tsp:134:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:140:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skipToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:146:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+OrderItemResource.tsp:121:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:128:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+OrderItemResource.tsp:134:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:140:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+OrderItemResource.tsp:146:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+OrderItemResource.tsp:128:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+OrderItemResource.tsp:134:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+OrderItemResource.tsp:140:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+OrderItemResource.tsp:146:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+OrderItemResource.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderItemResource.tsp:165:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OrderResource.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:32:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+routes.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+routes.tsp:55:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+routes.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:72:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+routes.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
+routes.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
+routes.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 105 warnings.
+

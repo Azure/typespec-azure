@@ -1,0 +1,1933 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+  "count": 192,
+  "levels": {
+    "warning": 192
+  },
+  "projectCount": 45,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiContract.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiContract.tsp",
+      "line": 395,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 110,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 350,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 453,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 628,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagDescriptionContract.tsp",
+      "line": 102,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "CertificateContract.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "CertificateContract.tsp",
+      "line": 273,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "EmailTemplateContract.tsp",
+      "line": 89,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GatewayContract.tsp",
+      "line": 318,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 188,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 334,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 436,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 583,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "IdentityProviderContract.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NamedValueContract.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NamedValueContract.tsp",
+      "line": 306,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 233,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 298,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 346,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 416,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 477,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 528,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 29,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 344,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 424,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 403,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "AccessInformationContract.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "UserContract.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 308,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "AttestationProvider.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewHistoryDefinition.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewHistoryDefinition.tsp",
+      "line": 173,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewScheduleDefinition.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewScheduleDefinition.tsp",
+      "line": 169,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewInstance.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewInstance.tsp",
+      "line": 224,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewDefaultSettings.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewDefaultSettings.tsp",
+      "line": 107,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "sourceFile": "RoleAssignment.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+      "sourceFile": "RoleAssignment.tsp",
+      "line": 309,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "AutomationAccount.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Certificate.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Connection.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "ConnectionType.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Credential.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "DscConfiguration.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "HybridRunbookWorker.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "HybridRunbookWorkerGroup.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Job.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "JobSchedule.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Module.tsp",
+      "line": 291,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Package.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 260,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Schedule.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "SourceControl.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "SourceControl.tsp",
+      "line": 105,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Variable.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Webhook.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "BatchAccount.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "sourceFile": "Certificate.tsp",
+      "line": 69,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "TransferDetails.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "PartnerTransferDetails.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "ReservationOrderAliasResponse.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "RuleSet.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "CustomDomain.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "ArchiveVersion.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+      "sourceFile": "Webhook.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "DatabaseAccountGetResults.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GraphResourceGetResults.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlDatabaseGetResults.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 211,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 323,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 449,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 566,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 649,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 739,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 829,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 912,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 1002,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ClientEncryptionKeyGetResults.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlContainerGetResults.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlStoredProcedureGetResults.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlUserDefinedFunctionGetResults.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlTriggerGetResults.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlRoleDefinitionGetResults.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SqlRoleAssignmentGetResults.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoDBDatabaseGetResults.tsp",
+      "line": 59,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoDBCollectionGetResults.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoRoleDefinitionGetResults.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "MongoUserDefinitionGetResults.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "TableGetResults.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraKeyspaceGetResults.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraTableGetResults.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "CassandraViewGetResults.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GremlinDatabaseGetResults.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "GremlinGraphGetResults.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "DataTransferJobGetResults.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "NotebookWorkspace.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ServiceResource.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
+      "sourceFile": "DnssecConfig.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+      "sourceFile": "OuContainer.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "DomainTopic.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "Cluster.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
+      "sourceFile": "PrivateEndpointConnectionDescription.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "EventHubConsumerGroupInfo.tsp",
+      "line": 69,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Vault.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Secret.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Key.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "ManagedHsmKey.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "SubscriptionUnderManagementGroup.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "HierarchySettings.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "sourceFile": "ServerBackup.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkWatcher.tsp",
+      "line": 350,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ConnectionMonitorResult.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
+      "sourceFile": "NginxDeploymentApiKeyResponse.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
+      "sourceFile": "NginxConfigurationResponse.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "sourceFile": "DefaultRollout.tsp",
+      "line": 121,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "GroupQuotaSubscriptionId.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "Vault.tsp",
+      "line": 215,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "Alert.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "Fabric.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "NetworkMapping.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ProtectionContainer.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "MigrationItem.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ReplicationProtectedItem.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ProtectionContainerMapping.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "RecoveryServicesProvider.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "StorageClassificationMapping.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "VCenter.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "Policy.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "ReplicationProtectionIntent.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "RecoveryPlan.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+      "sourceFile": "VaultSetting.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "RedisResource.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "RedisLinkedServerWithProperties.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "ReservationOrderResponse.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 85,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 264,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 462,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 654,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 846,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/ApiCollectionsAPI",
+      "sourceFile": "ApiCollection.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/AssessmentAPI",
+      "sourceFile": "SecurityAssessmentResponse.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityOperatorsAPI",
+      "sourceFile": "SecurityOperator.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
+      "sourceFile": "GetSensitivitySettingsResponse.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+      "sourceFile": "RuleResults.tsp",
+      "line": 87,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "ActionResponse.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "ThreatIntelligenceInformation.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "EntityQuery.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ImportExportExtensionsOperationResult.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 146,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 159,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "JobExecution.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedServerDnsAlias.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "OutboundFirewallRule.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ServerDnsAlias.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccount.tsp",
+      "line": 111,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "StorageSyncService.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "SyncGroup.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "CloudEndpoint.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "ServerEndpoint.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "sourceFile": "RegisteredServer.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "SubscriptionAliasResponse.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "GetTenantPolicyResponse.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "TargetDirectoryResult.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/support/resource-manager/Microsoft.Support/Support",
+      "sourceFile": "FileWorkspaceDetails.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/support/resource-manager/Microsoft.Support/Support",
+      "sourceFile": "FileWorkspaceDetails.tsp",
+      "line": 87,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+      "sourceFile": "UserMetricsModel.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 522,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 714,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteCustomDomainOverviewARMResource.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 239,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "PUT request body schema should match the 201 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 165,
+      "column": 3,
+      "message": "PUT request body schema should match the 200 response schema."
+    }
+  ]
+}

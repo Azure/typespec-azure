@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+  "count": 62,
+  "levels": {
+    "warning": 62
+  },
+  "projectCount": 33,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "DeletedServiceContract.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "Nested resource 'DeletedServiceContract' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalSigninSettings.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'PortalSigninSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalSignupSettings.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'PortalSignupSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "PortalDelegationSettings.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'PortalDelegationSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ContainerAppsAuthConfig.tsp",
+      "line": 27,
+      "column": 11,
+      "message": "Nested resource 'AuthConfig' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+      "sourceFile": "KeyValue.tsp",
+      "line": 28,
+      "column": 11,
+      "message": "Nested resource 'KeyValue' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "SoftwareUpdateConfiguration.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "Nested resource 'softwareUpdateConfiguration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Job.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "Nested resource 'Job' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "ComputeOperation.tsp",
+      "line": 44,
+      "column": 11,
+      "message": "Nested resource 'ComputeOperationStatus' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "RestorePoint.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "Nested resource 'RestorePoint' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "RollingUpgradeStatusInfo.tsp",
+      "line": 32,
+      "column": 11,
+      "message": "Nested resource 'RollingUpgradeStatusInfo' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Recommender",
+      "sourceFile": "ComputeDiagnosticBase.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "Nested resource 'ComputeDiagnosticBase' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Recommender",
+      "sourceFile": "SkuMixPlacementBase.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "Nested resource 'SkuMixPlacementBase' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+      "sourceFile": "CreditSummary.tsp",
+      "line": 56,
+      "column": 11,
+      "message": "Nested resource 'CreditSummary' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "ManagedClusterUpgradeProfile.tsp",
+      "line": 42,
+      "column": 11,
+      "message": "Nested resource 'ManagedClusterUpgradeProfile' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "AgentPoolUpgradeProfile.tsp",
+      "line": 42,
+      "column": 11,
+      "message": "Nested resource 'AgentPoolUpgradeProfile' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "NetworkSettings.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "Nested resource 'NetworkSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "UpdateSummary.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "Nested resource 'UpdateSummary' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DeviceCapacityInfo.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "Nested resource 'DeviceCapacityInfo' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DiagnosticProactiveLogCollectionSettings.tsp",
+      "line": 33,
+      "column": 11,
+      "message": "Nested resource 'DiagnosticProactiveLogCollectionSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DiagnosticRemoteSupportSettings.tsp",
+      "line": 33,
+      "column": 11,
+      "message": "Nested resource 'DiagnosticRemoteSupportSettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "ActiveSessionHostConfiguration.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Nested resource 'ActiveSessionHostConfiguration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "ServiceRunner.tsp",
+      "line": 41,
+      "column": 11,
+      "message": "Nested resource 'ServiceRunner' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+      "sourceFile": "LabCost.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "Nested resource 'LabCost' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "OrderResource.tsp",
+      "line": 30,
+      "column": 11,
+      "message": "Nested resource 'OrderResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "UpgradePreferences.tsp",
+      "line": 178,
+      "column": 11,
+      "message": "Nested resource 'UpgradePreferences' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "DeletedVault.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "Nested resource 'DeletedVault' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "DeletedManagedHsm.tsp",
+      "line": 27,
+      "column": 11,
+      "message": "Nested resource 'DeletedManagedHsm' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting",
+      "sourceFile": "routes.tsp",
+      "line": 137,
+      "column": 11,
+      "message": "Nested resource 'MaxMonthlyVirtualUserHoursResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "CapabilityHost.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'CapabilityHost' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "HierarchySettings.tsp",
+      "line": 28,
+      "column": 11,
+      "message": "Nested resource 'HierarchySettings' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+      "sourceFile": "main.tsp",
+      "line": 197,
+      "column": 11,
+      "message": "Nested resource 'ProductSingle' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "sourceFile": "VolumeGroupDetails.tsp",
+      "line": 198,
+      "column": 11,
+      "message": "Nested resource 'VolumeGroupDetails' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
+      "sourceFile": "NginxDeploymentWafPolicy.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'NginxDeploymentWafPolicy' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/providerhub/ProviderHub.Management",
+      "sourceFile": "OperationsPutContent.tsp",
+      "line": 28,
+      "column": 11,
+      "message": "Nested resource 'OperationsPutContent' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "VaultExtendedInfoResource.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Nested resource 'VaultExtendedInfoResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionIntentResource.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Nested resource 'ProtectionIntentResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceVaultConfigResource.tsp",
+      "line": 41,
+      "column": 11,
+      "message": "Nested resource 'BackupResourceVaultConfigResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 62,
+      "column": 11,
+      "message": "Nested resource 'BackupResourceEncryptionConfigExtendedResource' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "NetworkRuleSet.tsp",
+      "line": 31,
+      "column": 11,
+      "message": "Nested resource 'NetworkRuleSet' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 71,
+      "column": 11,
+      "message": "Nested resource 'ScriptLog' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "SecuritySolution.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Nested resource 'SecuritySolution' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "routes.tsp",
+      "line": 189,
+      "column": 11,
+      "message": "Nested resource 'ThreatIntelligenceMain' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DatabaseAutomaticTuning.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "Nested resource 'DatabaseAutomaticTuning' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "MaintenanceWindowOptions.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "Nested resource 'MaintenanceWindowOptions' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "MaintenanceWindows.tsp",
+      "line": 35,
+      "column": 11,
+      "message": "Nested resource 'MaintenanceWindows' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedInstanceQuery.tsp",
+      "line": 33,
+      "column": 11,
+      "message": "Nested resource 'ManagedInstanceQuery' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedDatabaseRestoreDetailsResult.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "Nested resource 'ManagedDatabaseRestoreDetailsResult' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ServerAutomaticTuning.tsp",
+      "line": 34,
+      "column": 11,
+      "message": "Nested resource 'ServerAutomaticTuning' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "SqlAgentConfiguration.tsp",
+      "line": 35,
+      "column": 11,
+      "message": "Nested resource 'SqlAgentConfiguration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "BlobContainer.tsp",
+      "line": 36,
+      "column": 11,
+      "message": "Nested resource 'BlobContainer' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "FileShare.tsp",
+      "line": 35,
+      "column": 11,
+      "message": "Nested resource 'FileShare' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageQueue.tsp",
+      "line": 26,
+      "column": 11,
+      "message": "Nested resource 'StorageQueue' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "StorageAccountMigration.tsp",
+      "line": 32,
+      "column": 11,
+      "message": "Nested resource 'StorageAccountMigration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "DeletedAccount.tsp",
+      "line": 29,
+      "column": 11,
+      "message": "Nested resource 'DeletedAccount' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "BillingAccountPoliciesResponse.tsp",
+      "line": 35,
+      "column": 11,
+      "message": "Nested resource 'BillingAccountPoliciesResponse' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "serviceComponents.tsp",
+      "line": 10,
+      "column": 11,
+      "message": "Nested resource 'ServiceComponent' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Nested resource 'CustomDnsSuffixConfiguration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AseV3NetworkingConfiguration.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Nested resource 'AseV3NetworkingConfiguration' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AddressResponse.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Nested resource 'AddressResponse' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnectionLimits.tsp",
+      "line": 37,
+      "column": 11,
+      "message": "Nested resource 'HybridConnectionLimits' should define a list operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SlotConfigNamesResource.tsp",
+      "line": 38,
+      "column": 11,
+      "message": "Nested resource 'SlotConfigNamesResource' should define a list operation."
+    }
+  ]
+}

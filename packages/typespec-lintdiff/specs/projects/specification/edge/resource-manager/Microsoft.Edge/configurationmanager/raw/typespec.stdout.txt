@@ -1,0 +1,484 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:62:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:65:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:68:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:71:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+Workflow.tsp:40:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+ExecutionV2.tsp:72:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+Execution.tsp:95:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+AvailableSolutionTemplateVersion.tsp:26:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+SolutionTemplate.tsp:40:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+SolutionTemplate.tsp:59:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DynamicSchema.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+DynamicSchema.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SchemaVersion.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaVersion.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaVersion.tsp:22:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.value.
+SchemaVersion.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaVersion.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaVersion.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:46:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.specification.
+State.tsp:86:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.currentStage.displayState.
+State.tsp:90:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.currentStage.stage.
+State.tsp:94:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.currentStage.status.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+SolutionVersion.tsp:152:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:116:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionVersionName" and "schemaVersionName".
+SolutionVersion.tsp:158:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Job.tsp:240:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Job.tsp:243:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:263:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Target.tsp:266:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Target.tsp:269:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceDelete' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Target.tsp:272:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceDelete' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceDelete' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Target.tsp:242:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Target.tsp:281:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:284:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:287:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:293:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:299:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:305:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:312:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:319:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:326:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:334:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DynamicSchemaVersion.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchemaVersion.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaVersion.tsp:22:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.value.
+DynamicSchemaVersion.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchemaVersion.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchemaVersion.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Schema.tsp:68:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DynamicSchema.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SchemaReference.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SchemaReference.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SchemaReference.tsp:21:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.schemaId.
+SchemaReference.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SchemaReference.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SchemaReference.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Solution.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Solution.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Solution.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Solution.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Solution.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+SolutionMetadata.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionMetadata.tsp:60:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionMetadataName" and "schemaName".
+SolutionMetadata.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionMetadataVersion.tsp:87:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionMetadataVersionName" and "schemaVersionName".
+SolutionMetadataVersion.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionMetadataVersion.tsp:87:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionMetadataVersionName" and "schemaVersionName".
+SolutionMetadata.tsp:60:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionMetadataName" and "schemaName".
+SolutionMetadataVersion.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionMetadata.tsp:60:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionMetadataName" and "schemaName".
+TargetTemplate.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TargetTemplate.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TargetTemplate.tsp:23:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.description.
+TargetTemplate.tsp:28:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.targetSpec.
+TargetTemplate.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TargetTemplate.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TargetTemplate.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+TargetTemplate.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplateVersion.tsp:197:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplateVersion.tsp:201:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplateVersion.tsp:29:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.configurations.
+SolutionTemplateVersion.tsp:34:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.specification.
+SolutionTemplateVersion.tsp:205:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplateVersion.tsp:212:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplateVersion.tsp:215:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplateVersion.tsp:218:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplateVersion.tsp:224:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplateVersion.tsp:231:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplate.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplate.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionTemplate.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:123:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Instance.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "instanceName" and "solutionVersionName".
+Instance.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "instanceName" and "solutionVersionName".
+Instance.tsp:54:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.solutionVersionId.
+Instance.tsp:57:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.targetId.
+Instance.tsp:45:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.reconciliationPolicy.state.
+Instance.tsp:48:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.reconciliationPolicy.interval.
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+Instance.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "instanceName" and "solutionVersionName".
+Instance.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Instance.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+InstanceHistory.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "instanceName" and "solutionVersionName".
+InstanceHistory.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Target.tsp:254:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetName" and "schemaName".
+Instance.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "instanceName" and "solutionVersionName".
+ConfigTemplate.tsp:103:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:133:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:143:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplate.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateVersion.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateVersion.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateVersion.tsp:21:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.configurations.
+ConfigTemplateVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateVersion.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateVersion.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:27:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.description.
+ConfigurationTemplate.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplate.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplateVersion.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigurationTemplateVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Workflow.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Workflow.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Workflow.tsp:40:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+Workflow.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Workflow.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Workflow.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:152:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:111:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.stageSpec.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+WorkflowVersion.tsp:158:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:161:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:164:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowTemplate.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplate.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplate.tsp:22:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.description.
+WorkflowTemplate.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplate.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplate.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplate.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowV2.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+WorkflowV2.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowV2.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:33:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.stageSpec.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+WorkflowVersionV2.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+ExecutionV2.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+ExecutionV2.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+ExecutionV2.tsp:72:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+ExecutionV2.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+ExecutionV2.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+ExecutionV2.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersionV2.tsp:67:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowV2.tsp:45:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "workflowName" and "schemaName".
+WorkflowTemplateVersion.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+WorkflowTemplateVersion.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
+WorkflowTemplateVersion.tsp:43:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.stageSpecTemplate.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version.
+WorkflowTemplateVersion.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version.
+UpdateType.tsp:35:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version.
+WorkflowTemplateVersion.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowTemplateVersion.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Execution.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Execution.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Execution.tsp:69:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.workflowVersionId.
+Execution.tsp:95:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
+Execution.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Execution.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Execution.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+WorkflowVersion.tsp:143:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "versionName" and "schemaVersionName".
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Diagnostics.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Diagnostics.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "diagnosticName" and "schemaName".
+Diagnostics.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Diagnostics.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "diagnosticName" and "schemaName".
+Diagnostics.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Diagnostics.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "diagnosticName" and "schemaName".
+Diagnostics.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Diagnostics.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Diagnostics.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Context.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Context.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+Context.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SiteReference.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+SiteReference.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+SiteReference.tsp:23:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.siteId.
+SiteReference.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+SiteReference.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SiteReference.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+EventGridFilters.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+EventGridFilters.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+EventGridFilters.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+EventGridFilters.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+EventGridFilters.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Context.tsp:89:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "contextName" and "schemaName".
+SolutionSchema.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionSchema.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+SolutionSchema.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+SolutionSchema.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SolutionTemplate.tsp:80:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "solutionTemplateName" and "schemaName".
+ConfigTemplateSchema.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateSchema.tsp:46:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateSchema.tsp:46:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateSchema.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateMetadata.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "configTemplateMetadataName" and "configTemplateVersionName".
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "configTemplateMetadataName" and "configTemplateVersionName".
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "configTemplateMetadataName" and "configTemplateVersionName".
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:102:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ConfigTemplateMetadata.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchyConfigurationMetadata.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchyConfigurationMetadata.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "hierarchyConfigurationMetadataName" and "schemaName".
+HierarchyConfigurationMetadata.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchyConfigurationMetadataVersion.tsp:86:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "hierarchyConfigurationMetadataVersionName" and "schemaVersionName".
+HierarchyConfigurationMetadataVersion.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchyConfigurationMetadataVersion.tsp:86:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "hierarchyConfigurationMetadataVersionName" and "schemaVersionName".
+HierarchyConfigurationMetadata.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "hierarchyConfigurationMetadataName" and "schemaName".
+HierarchyConfigurationMetadataVersion.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+HierarchyConfigurationMetadata.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "hierarchyConfigurationMetadataName" and "schemaName".
+
+Found 477 warnings.
+

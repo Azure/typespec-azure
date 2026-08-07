@@ -1,0 +1,229 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+OperationsPutContent.tsp:28:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'OperationsPutContent' should define a list operation.
+models.tsp:4249:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1282:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1284:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1259:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1264:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1431:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1568:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1937:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1978:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1991:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2627:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2317:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2328:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2338:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2984:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3048:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3053:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3058:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3082:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3111:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2480:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3324:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3347:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2574:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2589:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3532:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3647:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3735:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3740:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4169:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4329:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4988:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CustomRollout.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomRollout.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomRollout.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomRollout.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CustomRollout.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:98:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:107:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DefaultRollout.tsp:121:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
+models.tsp:4910:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'providerNamespace' repeats information already carried in the path or query.
+DefaultRollout.tsp:121:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:98:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:107:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DefaultRollout.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:98:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:107:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+ProviderRegistration.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderRegistration.tsp:123:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'newRegionFrontloadReleaseGenerateManifest' should contain the action verb 'generatenewregionfrontloadmanifest' from the route path. Consider updating the operation name.
+ProviderRegistration.tsp:123:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DefaultRollout.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DefaultRollout.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+NotificationRegistration.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationRegistration.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationRegistration.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+NotificationRegistration.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OperationsPutContent.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OperationsPutContent.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+OperationsPutContent.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ResourceTypeRegistration.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ResourceTypeRegistration.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ResourceTypeRegistration.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ResourceTypeRegistration.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:97:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:103:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:117:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:97:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:103:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:117:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:97:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:103:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:117:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:145:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:97:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:103:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:109:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:44:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:52:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:44:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:52:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:44:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:52:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:38:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:44:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:197:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:162:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:168:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:188:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:162:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:168:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:188:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:211:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:162:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:168:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:188:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:216:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:162:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:168:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:174:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:180:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:274:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:233:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:239:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:265:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:280:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:233:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:239:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:265:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:288:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:233:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:239:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:265:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:293:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeFirst" and "resourceType".
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeSecond" and "resourceType".
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "nestedResourceTypeThird" and "resourceType".
+SkuResource.tsp:233:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:239:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:245:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:251:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+SkuResource.tsp:257:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+AuthorizedApplication.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AuthorizedApplication.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AuthorizedApplication.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AuthorizedApplication.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProviderMonitorSetting.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 222 warnings.
+

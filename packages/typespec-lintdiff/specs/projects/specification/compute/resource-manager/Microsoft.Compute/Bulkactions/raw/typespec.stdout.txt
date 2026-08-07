@@ -1,0 +1,162 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+virtualMachineProfile.tsp:76:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:82:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:94:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:103:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:342:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:189:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:425:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:441:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:485:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:488:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:547:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:552:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:614:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:640:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:747:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:758:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:823:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:769:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:531:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:536:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:914:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:936:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:942:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:945:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:948:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:952:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:998:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1331:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1334:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1314:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1350:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1365:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1300:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1274:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1284:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1244:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineProfile.tsp:1247:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineExtension.tsp:32:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineExtension.tsp:35:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+virtualMachineExtension.tsp:47:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:359:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+common.tsp:138:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:732:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+launchBulkInstancesOperation.tsp:264:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'LocationBasedLaunchBulkInstancesOperation' must have patch operation that at least supports the update of tags.
+bulkCreateCustom.tsp:89:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'LocationBasedBulkCreateCustom' must have patch operation that at least supports the update of tags.
+recurringScheduledActions.tsp:236:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+recurringScheduledActions.tsp:483:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+recurringScheduledActions.tsp:515:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+recurringScheduledActions.tsp:483:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:111:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkDeallocate' should contain the action verb 'virtualmachinesbulkdeallocate' from the route path. Consider updating the operation name.
+routes.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:126:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkHibernate' should contain the action verb 'virtualmachinesbulkhibernate' from the route path. Consider updating the operation name.
+routes.tsp:126:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:142:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkStart' should contain the action verb 'virtualmachinesbulkstart' from the route path. Consider updating the operation name.
+routes.tsp:142:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:160:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkCreate' should contain the action verb 'virtualmachinesbulkcreate' from the route path. Consider updating the operation name.
+routes.tsp:160:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:178:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkVdiFlexCreate' should contain the action verb 'virtualmachinesbulkvdiflexcreate' from the route path. Consider updating the operation name.
+routes.tsp:178:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:194:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkDelete' should contain the action verb 'virtualmachinesbulkdelete' from the route path. Consider updating the operation name.
+routes.tsp:194:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:210:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkGetOperationsStatus' should contain the action verb 'virtualmachinesbulkgetoperationstatus' from the route path. Consider updating the operation name.
+routes.tsp:210:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:226:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkCancel' should contain the action verb 'virtualmachinesbulkcancel' from the route path. Consider updating the operation name.
+routes.tsp:226:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:244:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkReimage' should contain the action verb 'virtualmachinesbulkreimage' from the route path. Consider updating the operation name.
+routes.tsp:244:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:261:3 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'bulkListOperationErrors' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+routes.tsp:261:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'bulkListOperationErrors' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+routes.tsp:261:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:278:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'bulkAcknowledgeOperationErrors' should contain the action verb 'acknowledgebulkoperationerrors' from the route path. Consider updating the operation name.
+routes.tsp:278:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:335:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:344:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:363:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+launchBulkInstancesOperation.tsp:369:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+launchBulkInstancesOperation.tsp:48:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+launchBulkInstancesOperation.tsp:375:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:272:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+launchBulkInstancesOperation.tsp:42:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+launchBulkInstancesOperation.tsp:388:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:401:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+launchBulkInstancesOperation.tsp:422:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$skiptoken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+launchBulkInstancesOperation.tsp:413:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:257:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:266:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:285:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+bulkCreateCustom.tsp:291:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteInstances' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+bulkCreateCustom.tsp:49:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+bulkCreateCustom.tsp:297:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:97:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+bulkCreateCustom.tsp:43:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+bulkCreateCustom.tsp:310:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+bulkCreateCustom.tsp:323:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:698:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:700:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:702:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:515:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+recurringScheduledActions.tsp:711:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:716:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:718:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:726:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:731:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:740:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:748:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:755:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:762:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:769:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:778:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:790:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:799:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:823:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:824:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:832:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:837:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:846:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+recurringScheduledActions.tsp:858:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 155 warnings.
+

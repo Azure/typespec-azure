@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
-  "count": 1,
+  "count": 66,
   "levels": {
-    "warning": 1
+    "warning": 66
   },
-  "projectCount": 1,
+  "projectCount": 25,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
@@ -16,6 +16,656 @@
       "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
       "sourceFile": "ResourceRecommendationBase.tsp",
       "line": 45,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 482,
+      "column": 3,
+      "message": "'PATCH' operation 'quotaByCounterKeysUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 511,
+      "column": 3,
+      "message": "'PATCH' operation 'quotaByPeriodKeysUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewDecision.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "HybridRunbookWorker.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "sourceFile": "DataControllerResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'PATCH' operation 'patchDataController' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "sourceFile": "SecurityPolicy.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "ManagedNetworkSettingsPropertiesBasicResource.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 145,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchSync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 119,
+      "column": 4,
+      "message": "'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "Alert.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "'PATCH' operation 'dismiss' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "IntegrationRuntimeResource.tsp",
+      "line": 349,
+      "column": 3,
+      "message": "'PATCH' operation 'integrationRuntimeNodesUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "ResourceGuardResource.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 27,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchSyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "CustomOperations.tsp",
+      "line": 56,
+      "column": 4,
+      "message": "'PATCH' operation 'ArmCustomPatchAsyncWithOptionalBody' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+      "sourceFile": "Catalog.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "Cluster.tsp",
+      "line": 122,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "Settings.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "ManagedNetworkSettingsPropertiesBasicResource.tsp",
+      "line": 73,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkManager.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkSecurityPerimeter.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 209,
+      "column": 4,
+      "message": "'PATCH' operation 'searchUpdateCustomization' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "Recommendation.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "'PATCH' operation 'recommendation' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 463,
+      "column": 3,
+      "message": "'PATCH' operation 'sensitivityLabelsUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Database.tsp",
+      "line": 511,
+      "column": 3,
+      "message": "'PATCH' operation 'recommendedSensitivityLabelsUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedDatabase.tsp",
+      "line": 284,
+      "column": 3,
+      "message": "'PATCH' operation 'managedDatabaseSensitivityLabelsUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "ManagedDatabase.tsp",
+      "line": 336,
+      "column": 3,
+      "message": "'PATCH' operation 'managedDatabaseRecommendedSensitivityLabelsUpdate' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "EncryptionScope.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AIGateway.tsp",
+      "line": 42,
       "column": 3,
       "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
     }

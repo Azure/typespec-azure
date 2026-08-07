@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+  "count": 9,
+  "levels": {
+    "warning": 9
+  },
+  "projectCount": 8,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
+      "sourceFile": "routes.tsp",
+      "line": 21,
+      "column": 7,
+      "message": "Top-level resource 'VirtualNetwork' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
+      "sourceFile": "SapMonitor.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Top-level resource 'SapMonitor' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "Top-level resource 'ManagementGroup' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/Waves",
+      "sourceFile": "Common/ArmModels/MigrateProject.tsp",
+      "line": 12,
+      "column": 7,
+      "message": "Top-level resource 'MigrateProject' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud",
+      "sourceFile": "rackskus/RackSku.tsp",
+      "line": 24,
+      "column": 7,
+      "message": "Top-level resource 'RackSku' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "VirtualResource.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "Top-level resource 'VaultResource' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 43,
+      "column": 7,
+      "message": "Top-level resource 'DeploymentScript' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "models.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Top-level resource 'DeploymentStack' should define a list by resource group operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "models-whatIf.tsp",
+      "line": 16,
+      "column": 7,
+      "message": "Top-level resource 'DeploymentStacksWhatIfResult' should define a list by resource group operation."
+    }
+  ]
+}

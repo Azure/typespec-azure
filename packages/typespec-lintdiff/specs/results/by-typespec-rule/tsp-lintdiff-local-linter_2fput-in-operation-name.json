@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
-  "count": 1,
+  "count": 199,
   "levels": {
-    "warning": 1
+    "warning": 199
   },
-  "projectCount": 1,
+  "projectCount": 56,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
@@ -18,6 +18,1986 @@
       "line": 36,
       "column": 3,
       "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apicenter/ApiCenter.Management",
+      "sourceFile": "main.tsp",
+      "line": 191,
+      "column": 4,
+      "message": "'PUT' operation 'ArmResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "'PUT' operation 'assignToApi' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 110,
+      "column": 3,
+      "message": "'PUT' operation 'assignToOperation' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "TagContract.tsp",
+      "line": 350,
+      "column": 3,
+      "message": "'PUT' operation 'assignToProduct' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GatewayContract.tsp",
+      "line": 318,
+      "column": 3,
+      "message": "'PUT' operation 'gatewayApiCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 298,
+      "column": 3,
+      "message": "'PUT' operation 'notificationRecipientUserCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 346,
+      "column": 3,
+      "message": "'PUT' operation 'notificationRecipientEmailCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 477,
+      "column": 3,
+      "message": "'PUT' operation 'workspaceNotificationRecipientUserCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 528,
+      "column": 3,
+      "message": "'PUT' operation 'workspaceNotificationRecipientEmailCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 344,
+      "column": 3,
+      "message": "'PUT' operation 'productApiCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "ProductContract.tsp",
+      "line": 424,
+      "column": 3,
+      "message": "'PUT' operation 'productGroupCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems",
+      "sourceFile": "routes.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 308,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 361,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+      "sourceFile": "routes.tsp",
+      "line": 501,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Favorites",
+      "sourceFile": "routes.tsp",
+      "line": 91,
+      "column": 3,
+      "message": "'PUT' operation 'add' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewDefaultSettings.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+      "sourceFile": "AccessReviewDefaultSettings.tsp",
+      "line": 107,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 127,
+      "column": 3,
+      "message": "'PUT' operation 'replaceContent' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
+      "sourceFile": "DataControllerResource.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'putDataController' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "sourceFile": "UpdateRun.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "sourceFile": "Update.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+      "sourceFile": "UpdateSummaries.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "TransferDetails.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "'PUT' operation 'initiate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "PartnerTransferDetails.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'PUT' operation 'initiate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cognitiveservices/CognitiveServices.Management",
+      "sourceFile": "ManagedNetworkSettingsPropertiesBasicResource.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 128,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 75,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceSync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "'PUT' operation 'updateAPrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+      "sourceFile": "../common/operations.tsp",
+      "line": 24,
+      "column": 4,
+      "message": "'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ChaosFaultResource.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "'PUT' operation 'enableDisable' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "'PUT' operation 'updateSqlDatabaseThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 211,
+      "column": 3,
+      "message": "'PUT' operation 'updateSqlContainerThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 323,
+      "column": 3,
+      "message": "'PUT' operation 'updateMongoDBDatabaseThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 449,
+      "column": 3,
+      "message": "'PUT' operation 'updateMongoDBCollectionThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 566,
+      "column": 3,
+      "message": "'PUT' operation 'updateTableThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 649,
+      "column": 3,
+      "message": "'PUT' operation 'updateCassandraKeyspaceThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 739,
+      "column": 3,
+      "message": "'PUT' operation 'updateCassandraTableThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 829,
+      "column": 3,
+      "message": "'PUT' operation 'updateCassandraViewThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 912,
+      "column": 3,
+      "message": "'PUT' operation 'updateGremlinDatabaseThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "ThroughputSettingsGetResults.tsp",
+      "line": 1002,
+      "column": 3,
+      "message": "'PUT' operation 'updateGremlinGraphThroughput' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "'PUT' operation 'approve' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DiagnosticProactiveLogCollectionSettings.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "'PUT' operation 'updateDiagnosticProactiveLogCollectionSettings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "DiagnosticRemoteSupportSettings.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "'PUT' operation 'updateDiagnosticRemoteSupportSettings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "ResourceGuardResource.tsp",
+      "line": 37,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "'PUT' operation 'updateByHostPool' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "'PUT' operation 'updateByWorkspace' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "'PUT' operation 'transferOut' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 160,
+      "column": 3,
+      "message": "'PUT' operation 'enableMonitoring' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 200,
+      "column": 3,
+      "message": "'PUT' operation 'enableAzureMonitor' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "routes.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "'PUT' operation 'enableAzureMonitorAgent' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "Settings.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "Vault.tsp",
+      "line": 141,
+      "column": 3,
+      "message": "'PUT' operation 'updateAccessPolicy' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "MhsmPrivateEndpointConnection.tsp",
+      "line": 69,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/machinelearningservices/MachineLearningServices.Management",
+      "sourceFile": "ManagedNetworkSettingsPropertiesBasicResource.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "back-compatible.tsp",
+      "line": 163,
+      "column": 4,
+      "message": "'PUT' operation 'putSubscriptionCustomized' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "AdminRequestApprovalsResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'PUT' operation 'updateAdminRequestApproval' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/migrate/resource-manager/Microsoft.Migrate/AssessmentProjects",
+      "sourceFile": "asmprojectroutes.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "sourceFile": "ServerBackup.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "sourceFile": "AdvancedThreatProtection.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'updatePut' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayPrivateEndpointConnection.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteCrossConnection.tsp",
+      "line": 273,
+      "column": 3,
+      "message": "'PUT' operation 'expressRouteCrossConnectionPeeringsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 80,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "NetworkVirtualAppliance.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "'PUT' operation 'networkVirtualApplianceConnectionsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpoint.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "'PUT' operation 'privateDnsZoneGroupsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "'PUT' operation 'updatePrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "RouteFilter.tsp",
+      "line": 185,
+      "column": 3,
+      "message": "'PUT' operation 'routeFilterRulesCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualNetworkGatewayConnection.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "'PUT' operation 'setSharedKey' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualHub.tsp",
+      "line": 205,
+      "column": 3,
+      "message": "'PUT' operation 'hubVirtualNetworkConnectionsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VirtualHub.tsp",
+      "line": 283,
+      "column": 3,
+      "message": "'PUT' operation 'virtualHubRouteTableV2sCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "VpnGateway.tsp",
+      "line": 230,
+      "column": 3,
+      "message": "'PUT' operation 'vpnConnectionsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ConnectionSharedKeyResult.tsp",
+      "line": 89,
+      "column": 3,
+      "message": "'PUT' operation 'setOrInitDefaultSharedKey' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ExpressRouteGateway.tsp",
+      "line": 172,
+      "column": 3,
+      "message": "'PUT' operation 'expressRouteConnectionsCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/onlineexperimentation/OnlineExperimentation.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "LogAnalyticsQueryPackQuery.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "sourceFile": "Configuration.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresql/DBforPostgreSQL.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc",
+      "sourceFile": "ServerConfiguration.tsp",
+      "line": 42,
+      "column": 3,
+      "message": "'PUT' operation 'updateOnNode' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc",
+      "sourceFile": "ServerConfiguration.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "'PUT' operation 'updateOnCoordinator' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceConfigResource.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceVaultConfigResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "PrivateEndpointConnectionResource.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "'PUT' operation 'register' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ResourceGuardProxyBaseResource.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 30,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 31,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Migration.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "'PUT' operation 'start' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "ReservationOrderResponse.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "'PUT' operation 'purchase' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/databoundaries",
+      "sourceFile": "DataBoundaryDefinition.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 178,
+      "column": 4,
+      "message": "'PUT' operation 'searchCreateOrUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 426,
+      "column": 4,
+      "message": "'PUT' operation 'privateEndpointConnectionsUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 607,
+      "column": 4,
+      "message": "'PUT' operation 'SharedPrivateLinkResourcesCreateOrUpdateCustomization' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/AlertsSuppressionRulesAPI",
+      "sourceFile": "AlertsSuppressionRule.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/ApiCollectionsAPI",
+      "sourceFile": "ApiCollection.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "'PUT' operation 'onboardAzureApiManagementApi' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/PricingsAPI",
+      "sourceFile": "Pricing.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SettingsAPI",
+      "sourceFile": "Setting.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "PackageModel.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'install' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "TemplateModel.tsp",
+      "line": 47,
+      "column": 3,
+      "message": "'PUT' operation 'install' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "sourceFile": "Settings.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "'PUT' operation 'replace' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "DataMaskingPolicy.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "'PUT' operation 'dataMaskingRulesCreateOrUpdate' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "BlobServiceProperties.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "FileServiceProperties.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "QueueServiceProperties.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "EncryptionScope.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'put' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storage/Storage.Management",
+      "sourceFile": "TableServiceProperties.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'PUT' operation 'setServiceProperties' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "GetTenantPolicyResponse.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "'PUT' operation 'addUpdatePolicyForTenant' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "TargetDirectoryResult.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'PUT' operation 'putTargetDirectory' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CustomDnsSuffixConfiguration.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'PUT' operation 'updateAseCustomDnsSuffixConfiguration' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AseV3NetworkingConfiguration.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "'PUT' operation 'updateAseNetworkingConfiguration' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RemotePrivateEndpointConnectionARMResource.tsp",
+      "line": 80,
+      "column": 3,
+      "message": "'PUT' operation 'approveOrRejectPrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RemotePrivateEndpointConnectionARMResource.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "'PUT' operation 'approveOrRejectPrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1704,
+      "column": 3,
+      "message": "'PUT' operation 'updateApplicationSettingsSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1730,
+      "column": 3,
+      "message": "'PUT' operation 'updateAuthSettingsSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1756,
+      "column": 3,
+      "message": "'PUT' operation 'updateAzureStorageAccountsSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1782,
+      "column": 3,
+      "message": "'PUT' operation 'updateBackupConfigurationSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1823,
+      "column": 3,
+      "message": "'PUT' operation 'updateConnectionStringsSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1849,
+      "column": 3,
+      "message": "'PUT' operation 'updateMetadataSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1897,
+      "column": 3,
+      "message": "'PUT' operation 'updateSitePushSettingsSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RemotePrivateEndpointConnectionARMResource.tsp",
+      "line": 254,
+      "column": 3,
+      "message": "'PUT' operation 'approveOrRejectPrivateEndpointConnection' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RemotePrivateEndpointConnectionARMResource.tsp",
+      "line": 347,
+      "column": 3,
+      "message": "'PUT' operation 'approveOrRejectPrivateEndpointConnectionSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "'PUT' operation 'updateVnetGateway' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 244,
+      "column": 3,
+      "message": "'PUT' operation 'updateApplicationSettings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 270,
+      "column": 3,
+      "message": "'PUT' operation 'updateAuthSettings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 296,
+      "column": 3,
+      "message": "'PUT' operation 'updateAzureStorageAccounts' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 322,
+      "column": 3,
+      "message": "'PUT' operation 'updateBackupConfiguration' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 363,
+      "column": 3,
+      "message": "'PUT' operation 'updateConnectionStrings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 389,
+      "column": 3,
+      "message": "'PUT' operation 'updateMetadata' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 429,
+      "column": 3,
+      "message": "'PUT' operation 'updateSitePushSettings' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 714,
+      "column": 3,
+      "message": "'PUT' operation 'migrateStorage' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "User.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'PUT' operation 'updatePublishingUser' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SourceControl.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'PUT' operation 'updateSourceControl' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 86,
+      "column": 3,
+      "message": "'PUT' operation 'registerUserProvidedFunctionAppWithStaticSiteBuild' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 168,
+      "column": 3,
+      "message": "'PUT' operation 'registerUserProvidedFunctionAppWithStaticSite' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "'PUT' operation 'linkBackend' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 179,
+      "column": 3,
+      "message": "'PUT' operation 'linkBackendToBuild' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "'PUT' operation 'updateFtpAllowed' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 136,
+      "column": 3,
+      "message": "'PUT' operation 'updateScmAllowed' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 190,
+      "column": 3,
+      "message": "'PUT' operation 'updateFtpAllowedSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "CsmPublishingCredentialsPoliciesEntity.tsp",
+      "line": 256,
+      "column": 3,
+      "message": "'PUT' operation 'updateScmAllowedSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteAuthSettingsV2.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "'PUT' operation 'updateAuthSettingsV2' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteAuthSettingsV2.tsp",
+      "line": 143,
+      "column": 3,
+      "message": "'PUT' operation 'updateAuthSettingsV2Slot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteLogsConfig.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "'PUT' operation 'updateDiagnosticLogsConfig' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteLogsConfig.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "'PUT' operation 'updateDiagnosticLogsConfigSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SlotConfigNamesResource.tsp",
+      "line": 53,
+      "column": 3,
+      "message": "'PUT' operation 'updateSlotConfigurationNames' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 76,
+      "column": 3,
+      "message": "'PUT' operation 'addPremierAddOn' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PremierAddOn.tsp",
+      "line": 152,
+      "column": 3,
+      "message": "'PUT' operation 'addPremierAddOnSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PrivateAccess.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "'PUT' operation 'putPrivateAccessVnet' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "PrivateAccess.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "'PUT' operation 'putPrivateAccessVnetSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "'PUT' operation 'installSiteExtension' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 165,
+      "column": 3,
+      "message": "'PUT' operation 'installSiteExtensionSlot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
     }
   ]
 }

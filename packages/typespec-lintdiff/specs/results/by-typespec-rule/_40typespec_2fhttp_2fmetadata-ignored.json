@@ -1,0 +1,1203 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "@typespec/http/metadata-ignored",
+  "count": 119,
+  "levels": {
+    "warning": 119
+  },
+  "projectCount": 6,
+  "results": [
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    },
+    {
+      "rule": "@typespec/http/metadata-ignored",
+      "level": "warning",
+      "origin": "official",
+      "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/models.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "path property will be ignored as it is inside of a @body property. Use @bodyRoot instead if wanting to mix."
+    }
+  ]
+}

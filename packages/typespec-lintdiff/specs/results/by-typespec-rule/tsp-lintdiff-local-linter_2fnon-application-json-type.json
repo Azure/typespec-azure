@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+  "count": 19,
+  "levels": {
+    "warning": 19
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "DscNode.tsp",
+      "line": 148,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "DscConfiguration.tsp",
+      "line": 120,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Job.tsp",
+      "line": 80,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Job.tsp",
+      "line": 108,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 108,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 134,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 201,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "routes.tsp",
+      "line": 43,
+      "column": 5,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "routes.tsp",
+      "line": 79,
+      "column": 5,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1928,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1950,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2407,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 459,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 480,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1052,
+      "column": 7,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 111,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 206,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 314,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/non-application-json-type",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 415,
+      "column": 9,
+      "message": "Only content-type 'application/json' is supported by ARM"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:43:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2019-01-01-preview' has been in preview for over one year. Move it to GA or retire it.
+AlertsSuppressionRule.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AlertsSuppressionRule.tsp:44:3 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'update' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+AlertsSuppressionRule.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AlertsSuppressionRule.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AlertsSuppressionRule.tsp:74:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'AlertType' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+AlertsSuppressionRule.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+AlertsSuppressionRule.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'AlertType' should be camel case.
+AlertsSuppressionRule.tsp:74:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'AlertType' should be camel case.
+
+Found 10 warnings.
+

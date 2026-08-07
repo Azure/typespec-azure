@@ -1,0 +1,543 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:61:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:66:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:71:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:629:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models.tsp:635:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable.
+models.tsp:641:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models.tsp:518:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:534:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:735:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:989:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:925:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1229:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1241:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1266:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:890:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1542:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1628:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:1950:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2184:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2397:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2672:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$select' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Gallery.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:38:10 - occurred while instantiating template
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$select' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:38:10 - occurred while instantiating template
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$select' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+Gallery.tsp:45:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+Gallery.tsp:51:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+Gallery.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Gallery.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:61:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:61:21 - occurred while instantiating template
+Gallery.tsp:82:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Gallery.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:82:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:82:13 - occurred while instantiating template
+Gallery.tsp:95:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Gallery.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:95:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:95:13 - occurred while instantiating template
+models.tsp:1718:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+Gallery.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:107:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:107:26 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:107:26 - occurred while instantiating template
+models.tsp:1718:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+Gallery.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeListBySubscription' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:116:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeListBySubscription' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:116:11 - occurred while instantiating template
+../common/operations.tsp:92:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:116:11 - occurred while instantiating template
+Gallery.tsp:131:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceActionSync' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  Gallery.tsp:131:25 - occurred while instantiating template
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionSync' should contain the action verb 'artifacts' from the route path. Consider updating the operation name.
+  Gallery.tsp:131:25 - occurred while instantiating template
+Gallery.tsp:142:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Gallery.tsp:150:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:201:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:131:25 - occurred while instantiating template
+Gallery.tsp:142:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Gallery.tsp:150:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Gallery.tsp:162:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+Gallery.tsp:162:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'gallerySharingProfileUpdate' should contain the action verb 'share' from the route path. Consider updating the operation name.
+Gallery.tsp:162:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/pagination-response: Operation might be pageable. Consider adding the x-ms-pageable extension.
+  Gallery.tsp:162:34 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsyncBase' should contain the action verb 'galleries' from the route path. Consider updating the operation name.
+  Gallery.tsp:162:34 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  Gallery.tsp:162:34 - occurred while instantiating template
+GalleryImage.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImage.tsp:34:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImage.tsp:34:10 - occurred while instantiating template
+GalleryImage.tsp:41:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryImage.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImage.tsp:41:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImage.tsp:41:21 - occurred while instantiating template
+GalleryImage.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:677:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.osType.
+models.tsp:682:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.osState.
+models.tsp:698:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identifier.
+models.tsp:745:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identifier.publisher.
+models.tsp:750:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identifier.offer.
+models.tsp:755:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identifier.sku.
+GalleryImage.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryImage.tsp:74:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryImage.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImage.tsp:74:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImage.tsp:74:13 - occurred while instantiating template
+GalleryImage.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImage.tsp:85:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImage.tsp:85:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImage.tsp:85:20 - occurred while instantiating template
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+GalleryImageVersion.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:34:10 - occurred while instantiating template
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImageVersion.tsp:34:10 - occurred while instantiating template
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+GalleryImageVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryImageVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryImageVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:50:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImageVersion.tsp:50:21 - occurred while instantiating template
+GalleryImageVersion.tsp:70:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:869:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.storageProfile.
+GalleryImageVersion.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:70:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImageVersion.tsp:70:13 - occurred while instantiating template
+GalleryImageVersion.tsp:82:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryImageVersion.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:82:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImageVersion.tsp:82:13 - occurred while instantiating template
+GalleryImageVersion.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:93:25 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryImageVersion.tsp:93:25 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryImageVersion.tsp:93:25 - occurred while instantiating template
+GalleryApplication.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:34:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplication.tsp:34:10 - occurred while instantiating template
+GalleryApplication.tsp:41:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryApplication.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:41:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplication.tsp:41:21 - occurred while instantiating template
+GalleryApplication.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:1495:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.supportedOSType.
+GalleryApplication.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:61:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplication.tsp:61:13 - occurred while instantiating template
+GalleryApplication.tsp:73:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryApplication.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:73:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplication.tsp:73:13 - occurred while instantiating template
+GalleryApplication.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:84:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplication.tsp:84:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplication.tsp:84:20 - occurred while instantiating template
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+GalleryApplicationVersion.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplicationVersion.tsp:34:10 - occurred while instantiating template
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplicationVersion.tsp:34:10 - occurred while instantiating template
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+GalleryApplicationVersion.tsp:41:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+GalleryApplicationVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryApplicationVersion.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplicationVersion.tsp:50:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplicationVersion.tsp:50:21 - occurred while instantiating template
+GalleryApplicationVersion.tsp:70:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:1580:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.
+models.tsp:1609:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.source.
+models.tsp:1644:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.source.mediaLink.
+models.tsp:1657:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.manageActions.install.
+models.tsp:1662:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.manageActions.remove.
+GalleryApplicationVersion.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GalleryApplicationVersion.tsp:83:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryApplicationVersion.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplicationVersion.tsp:83:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplicationVersion.tsp:83:13 - occurred while instantiating template
+GalleryApplicationVersion.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplicationVersion.tsp:94:31 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryApplicationVersion.tsp:94:31 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryApplicationVersion.tsp:94:31 - occurred while instantiating template
+GalleryScript.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:43:10 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScript.tsp:43:10 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:51:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryScript.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:51:21 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScript.tsp:51:21 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:67:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:1821:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.supportedOSType.
+GalleryScript.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:67:13 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScript.tsp:67:13 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:81:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryScript.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:81:13 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScript.tsp:81:13 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:91:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScript.tsp:91:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScript.tsp:91:20 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScriptVersion.tsp:43:5 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:43:12 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScriptVersion.tsp:43:12 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:52:5 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScriptVersion.tsp:52:5 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:52:23 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScriptVersion.tsp:52:23 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:70:5 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+models.tsp:1852:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.
+models.tsp:1882:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.source.
+models.tsp:1902:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.publishingProfile.source.scriptLink.
+GalleryScriptVersion.tsp:70:5 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:70:15 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScriptVersion.tsp:70:15 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:89:5 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScriptVersion.tsp:89:5 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:89:15 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScriptVersion.tsp:89:15 - occurred while instantiating template
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptVersionName" and "galleryImageVersionName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:30:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScriptVersion.tsp:103:5 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:103:28 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryScriptVersion.tsp:103:28 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryScriptVersion.tsp:103:28 - occurred while instantiating template
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "galleryScriptName" and "galleryImageName".
+GalleryScript.tsp:34:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+GalleryInVMAccessControlProfile.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:36:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfile.tsp:36:10 - occurred while instantiating template
+GalleryInVMAccessControlProfile.tsp:43:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryInVMAccessControlProfile.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:43:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfile.tsp:43:21 - occurred while instantiating template
+GalleryInVMAccessControlProfile.tsp:55:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:2008:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.osType.
+models.tsp:2013:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.applicableHostEndpoint.
+GalleryInVMAccessControlProfile.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:55:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfile.tsp:55:13 - occurred while instantiating template
+GalleryInVMAccessControlProfile.tsp:69:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryInVMAccessControlProfile.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:69:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfile.tsp:69:13 - occurred while instantiating template
+GalleryInVMAccessControlProfile.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:82:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfile.tsp:82:20 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfile.tsp:82:20 - occurred while instantiating template
+GalleryInVMAccessControlProfileVersion.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:36:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfileVersion.tsp:36:10 - occurred while instantiating template
+GalleryInVMAccessControlProfileVersion.tsp:43:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryInVMAccessControlProfileVersion.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/put-in-operation-name: 'PUT' operation 'ComputeResourceCreateOrReplaceAsync' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:43:21 - occurred while instantiating template
+../common/operations.tsp:24:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfileVersion.tsp:43:21 - occurred while instantiating template
+GalleryInVMAccessControlProfileVersion.tsp:55:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+models.tsp:2048:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.mode.
+models.tsp:2053:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.defaultAccess.
+GalleryInVMAccessControlProfileVersion.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'ComputeCustomPatchAsync' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:55:13 - occurred while instantiating template
+../common/operations.tsp:119:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfileVersion.tsp:55:13 - occurred while instantiating template
+GalleryInVMAccessControlProfileVersion.tsp:69:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+GalleryInVMAccessControlProfileVersion.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/delete-in-operation-name: 'DELETE' operation 'ComputeResourceDeleteAsync' should use method name 'delete'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:69:13 - occurred while instantiating template
+../common/operations.tsp:180:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfileVersion.tsp:69:13 - occurred while instantiating template
+GalleryInVMAccessControlProfileVersion.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:82:44 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  GalleryInVMAccessControlProfileVersion.tsp:82:44 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  GalleryInVMAccessControlProfileVersion.tsp:82:44 - occurred while instantiating template
+SharedGallery.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGallery.tsp:34:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGallery.tsp:34:10 - occurred while instantiating template
+SharedGallery.tsp:50:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'sharedTo' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SharedGallery.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGallery.tsp:42:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGallery.tsp:42:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGallery.tsp:42:11 - occurred while instantiating template
+SharedGalleryImage.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImage.tsp:34:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryImage.tsp:34:10 - occurred while instantiating template
+SharedGalleryImage.tsp:46:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'sharedTo' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SharedGalleryImage.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImage.tsp:39:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImage.tsp:39:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryImage.tsp:39:11 - occurred while instantiating template
+SharedGalleryImageVersion.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImageVersion.tsp:35:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryImageVersion.tsp:35:10 - occurred while instantiating template
+SharedGalleryImageVersion.tsp:47:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'sharedTo' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+SharedGalleryImageVersion.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  SharedGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+CommunityGallery.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGallery.tsp:34:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  CommunityGallery.tsp:34:10 - occurred while instantiating template
+CommunityGalleryImage.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImage.tsp:35:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  CommunityGalleryImage.tsp:35:10 - occurred while instantiating template
+CommunityGalleryImage.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImage.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImage.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  CommunityGalleryImage.tsp:40:11 - occurred while instantiating template
+CommunityGalleryImageVersion.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceRead' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImageVersion.tsp:35:10 - occurred while instantiating template
+../common/operations.tsp:15:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  CommunityGalleryImageVersion.tsp:35:10 - occurred while instantiating template
+CommunityGalleryImageVersion.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ComputeResourceListByParent' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ComputeResourceListByParent' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  CommunityGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+../common/operations.tsp:100:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  CommunityGalleryImageVersion.tsp:40:11 - occurred while instantiating template
+SharedGalleryInvite.tsp:43:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SharedGalleryInvite.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsyncBase' should contain the action verb 'sharedgalleries' from the route path. Consider updating the operation name.
+  SharedGalleryInvite.tsp:43:27 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryInvite.tsp:43:27 - occurred while instantiating template
+SharedGalleryInvite.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+SharedGalleryInvite.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsyncBase' should contain the action verb 'sharedgalleries' from the route path. Consider updating the operation name.
+  SharedGalleryInvite.tsp:61:27 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  SharedGalleryInvite.tsp:61:27 - occurred while instantiating template
+TenantLevelSharedGalleryInvite.tsp:43:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+TenantLevelSharedGalleryInvite.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsyncBase' should contain the action verb 'sharedgalleries' from the route path. Consider updating the operation name.
+  TenantLevelSharedGalleryInvite.tsp:43:38 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  TenantLevelSharedGalleryInvite.tsp:43:38 - occurred while instantiating template
+TenantLevelSharedGalleryInvite.tsp:61:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+TenantLevelSharedGalleryInvite.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ComputeResourceActionAsyncBase' should contain the action verb 'sharedgalleries' from the route path. Consider updating the operation name.
+  TenantLevelSharedGalleryInvite.tsp:61:38 - occurred while instantiating template
+../common/operations.tsp:245:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  TenantLevelSharedGalleryInvite.tsp:61:38 - occurred while instantiating template
+
+Found 397 warnings.
+

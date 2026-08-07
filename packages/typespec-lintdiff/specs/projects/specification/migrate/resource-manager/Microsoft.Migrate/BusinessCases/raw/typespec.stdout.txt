@@ -1,0 +1,160 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+BusinessCaseApiVersions.tsp:12:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-03-03-preview' has been in preview for over one year. Move it to GA or retire it.
+Common/ArmModels/AssessmentProjectV2.tsp:12:7 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation.
+businesscaseroutes.tsp:15:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:17:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:26:58 - warning tsp-lintdiff-local-linter/avoid-anonymous-parameter: Operation request body should use a named model instead of an anonymous inline model expression.
+businesscaseroutes.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:33:5 - warning tsp-lintdiff-local-linter/avoid-anonymous-parameter: Operation request body should use a named model instead of an anonymous inline model expression.
+businesscaseroutes.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/IaasSummary.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/IaasSummary.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/PaasSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/PaasSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "paasSummaryName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/PaasSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/OverviewSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/OverviewSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "overviewSummaryName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/OverviewSummary.tsp:28:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/AvsSummary.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/AvsSummary.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "avsSummaryName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/Summaries/AvsSummary.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evaluatedMachineName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:84:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'pageSize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:88:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:92:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'totalRecordCount' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:80:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+businesscaseroutes.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedSqlEntity.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedSqlEntity.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evaluatedSqlEntityName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedSqlEntity.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:115:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'pageSize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:119:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:123:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'totalRecordCount' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:111:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+businesscaseroutes.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedWebApp.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedWebApp.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evaluatedWebAppName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedWebApp.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:146:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'pageSize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:150:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:154:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'totalRecordCount' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:142:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:142:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+businesscaseroutes.tsp:161:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedAVSMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedAVSMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "evaluatedAvsMachineName" and "iaasSummaryName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/EvaluatedEntities/EvaluatedAVSMachine.tsp:27:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:177:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'pageSize' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:181:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:185:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'totalRecordCount' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+businesscaseroutes.tsp:163:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:173:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/BusinessCases/BusinessCase.tsp:40:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+businesscaseroutes.tsp:173:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+
+Found 153 warnings.
+

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "@typespec/http/missing-uri-param",
+  "count": 14,
+  "levels": {
+    "error": 14
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'subscriptionId' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'resourceGroupName' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'serviceName' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'quotaCounterKey' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'subscriptionId' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'resourceGroupName' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'serviceName' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'quotaCounterKey' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'applicationGatewayAvailableSslOption' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "../../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'applicationGatewayAvailableSslOption' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'subscriptionId' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'resourceGroupName' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'subscriptionId' but wasn't found in operation parameters"
+    },
+    {
+      "rule": "@typespec/http/missing-uri-param",
+      "level": "error",
+      "origin": "official",
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "sourceFile": "../../../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/legacy-types/operations.tsp",
+      "line": 368,
+      "column": 3,
+      "message": "Route reference parameter 'resourceGroupName' but wasn't found in operation parameters"
+    }
+  ]
+}

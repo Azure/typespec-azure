@@ -1,0 +1,133 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+CollectorApiVersions.tsp:12:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-03-03-preview' has been in preview for over one year. Move it to GA or retire it.
+Common/ArmModels/AssessmentProjectV2.tsp:12:7 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'AssessmentProject' must have a put/createOrUpdate operation.
+collectorroutes.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/HyperVCollector.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/HyperVCollector.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:24:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/HyperVCollector.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/HyperVCollector.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/HyperVCollector.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "vmWareCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "vmWareCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/VmwareCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "serverCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "serverCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ServerCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "importCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "importCollectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "collectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "collectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/SqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "importSqlCollectorsName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "importSqlCollectorsName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/ImportSqlCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "collectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "collectorName" and "hypervCollectorName".
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+collectorroutes.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Common/ArmModels/AssessmentProjectV2.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+WebModels/WebAppCollector.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+
+Found 126 warnings.
+

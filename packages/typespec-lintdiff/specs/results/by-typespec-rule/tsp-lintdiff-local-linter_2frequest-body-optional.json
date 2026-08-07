@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/request-body-optional",
+  "count": 5,
+  "levels": {
+    "warning": 5
+  },
+  "projectCount": 3,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-optional",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer",
+      "sourceFile": "Pipeline.tsp",
+      "line": 103,
+      "column": 7,
+      "message": "The body parameter is not marked as required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-optional",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+      "sourceFile": "UserSession.tsp",
+      "line": 138,
+      "column": 13,
+      "message": "The body parameter is not marked as required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-optional",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 143,
+      "column": 3,
+      "message": "The body parameter is not marked as required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-optional",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 129,
+      "column": 3,
+      "message": "The body parameter is not marked as required."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/request-body-optional",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "client.tsp",
+      "line": 114,
+      "column": 3,
+      "message": "The body parameter is not marked as required."
+    }
+  ]
+}

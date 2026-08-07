@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+  "count": 32,
+  "levels": {
+    "warning": 32
+  },
+  "projectCount": 4,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "BackupInstanceResource.tsp",
+      "line": 288,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayWafDynamicManifestResult.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SwapResource.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "ApplicationGatewayAvailableSslOptions.tsp",
+      "line": 34,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "SignaturesOverrides.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "sourceFile": "FirewallPolicyDraft.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 17,
+      "column": 7,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "BackupResourceEncryptionConfigExtendedResource.tsp",
+      "line": 42,
+      "column": 7,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ResourceGuardProxyBaseResource.tsp",
+      "line": 15,
+      "column": 7,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/descriptive-description-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+      "sourceFile": "models.tsp",
+      "line": 1456,
+      "column": 3,
+      "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+    }
+  ]
+}

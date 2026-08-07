@@ -1,0 +1,233 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:469:57 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+client.tsp:534:50 - error @typespec/http/duplicate-body: Operation has a @body and an unannotated parameter. There can only be one representing the body
+main.tsp:47:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:52:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
+main.tsp:47:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-02-01-preview' has been in preview for over one year. Move it to GA or retire it.
+client.tsp:599:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'CertificateResponseGetCustomized' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:606:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:612:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:599:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:316:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:428:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:432:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CertificateResponse.tsp:50:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+client.tsp:438:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+client.tsp:442:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+client.tsp:446:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+client.tsp:453:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+client.tsp:457:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+client.tsp:418:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:442:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:453:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:522:3 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+client.tsp:476:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:484:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+client.tsp:492:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+client.tsp:498:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+client.tsp:504:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+client.tsp:513:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+client.tsp:519:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+client.tsp:469:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:498:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:513:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:838:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:534:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'CertificateResponseVerifyCertificateCustomized' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:541:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:549:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+client.tsp:557:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+client.tsp:563:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+client.tsp:569:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+client.tsp:578:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+client.tsp:584:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+client.tsp:534:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:563:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:578:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:322:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'IotDpsResourceGetOperationResultCustomized' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:329:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "operationId" and "certificateName".
+client.tsp:329:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:335:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:322:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'IotDpsResourceGetCustomized' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:404:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "provisioningServiceName" and "certificateName".
+client.tsp:404:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:397:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:501:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:414:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+client.tsp:274:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'IotDpsResourceDeleteCustomized' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:274:4 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
+client.tsp:281:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "provisioningServiceName" and "certificateName".
+client.tsp:281:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:274:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:375:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'IotDpsResourceListValidSkusCustomized' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:377:9 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+client.tsp:383:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "provisioningServiceName" and "certificateName".
+client.tsp:383:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:375:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:300:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'IotDpsResourceListKeysCustomized' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+client.tsp:302:9 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+client.tsp:308:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "provisioningServiceName" and "certificateName".
+client.tsp:308:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:300:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+client.tsp:351:9 - warning tsp-lintdiff-local-linter/parameters-schema-as-type-object: Request bodies must resolve to object schemas. Replace this non-object body type with a model.
+client.tsp:357:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "provisioningServiceName" and "certificateName".
+client.tsp:361:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "keyName" and "certificateName".
+client.tsp:357:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:361:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+client.tsp:349:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:883:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:946:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:50:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.name' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:121:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.rawBytes' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:127:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.isVerified' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:133:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.purpose' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.created' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.lastUpdated' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:142:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.hasPrivateKey' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:148:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.nonce' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:127:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:142:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:50:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+CertificateResponse.tsp:121:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+CertificateResponse.tsp:127:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+CertificateResponse.tsp:133:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+CertificateResponse.tsp:142:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+CertificateResponse.tsp:148:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+CertificateResponse.tsp:50:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.name' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:121:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.rawBytes' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:127:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.isVerified' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:133:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.purpose' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.created' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.lastUpdated' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:142:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.hasPrivateKey' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:148:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'certificate.nonce' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+CertificateResponse.tsp:127:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:142:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:723:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+CertificateResponse.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:182:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.rawBytes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:188:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.isVerified' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:194:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.purpose' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.created' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.lastUpdated' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:203:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.hasPrivateKey' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:209:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.nonce' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:165:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:188:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:203:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+CertificateResponse.tsp:182:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+CertificateResponse.tsp:188:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+CertificateResponse.tsp:194:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+CertificateResponse.tsp:203:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+CertificateResponse.tsp:209:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+CertificateResponse.tsp:188:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:203:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.name' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:235:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.rawBytes' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:241:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.isVerified' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:247:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.purpose' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.created' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.lastUpdated' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:256:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.hasPrivateKey' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:262:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'certificate.nonce' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+CertificateResponse.tsp:218:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+CertificateResponse.tsp:241:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:256:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:41:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.name' should be camel case.
+CertificateResponse.tsp:235:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.rawBytes' should be camel case.
+CertificateResponse.tsp:241:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.isVerified' should be camel case.
+CertificateResponse.tsp:247:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.purpose' should be camel case.
+CertificateResponse.tsp:58:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.created' should be camel case.
+CertificateResponse.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.lastUpdated' should be camel case.
+CertificateResponse.tsp:256:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.hasPrivateKey' should be camel case.
+CertificateResponse.tsp:262:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'certificate.nonce' should be camel case.
+CertificateResponse.tsp:241:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+CertificateResponse.tsp:256:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProvisioningServiceDescription.tsp:93:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'asyncinfo' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProvisioningServiceDescription.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:75:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProvisioningServiceDescription.tsp:83:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProvisioningServiceDescription.tsp:93:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'asyncinfo' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProvisioningServiceDescription.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:118:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+ProvisioningServiceDescription.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:140:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+ProvisioningServiceDescription.tsp:140:3 - warning tsp-lintdiff-local-linter/no-error-code-responses: Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead.
+ProvisioningServiceDescription.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:153:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:161:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:174:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:186:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:197:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProvisioningServiceDescription.tsp:207:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+GroupIdInformation.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+GroupIdInformation.tsp:51:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+models.tsp:905:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+GroupIdInformation.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+GroupIdInformation.tsp:43:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:60:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:50:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:65:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+PrivateEndpointConnection.tsp:65:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:50:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:76:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+PrivateEndpointConnection.tsp:76:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+PrivateEndpointConnection.tsp:50:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+models.tsp:15:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
+PrivateEndpointConnection.tsp:91:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per the Noun_Verb convention for Operation Ids, the noun 'PrivateEndpointConnections' should not appear after the underscore.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "resourceName" and "provisioningServiceName".
+PrivateEndpointConnection.tsp:42:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 12 errors, 214 warnings.
+

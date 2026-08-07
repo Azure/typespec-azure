@@ -1,0 +1,507 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:53:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+models.tsp:2955:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2133:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2456:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2461:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2472:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2719:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2725:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2623:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:2905:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3525:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:3872:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Project.tsp:73:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'Project' must have a put/createOrUpdate operation.
+Project.tsp:18:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'Project' must have patch operation that at least supports the update of tags.
+DataMigrationService.tsp:78:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'DataMigrationService' must have a put/createOrUpdate operation.
+DataMigrationService.tsp:16:7 - warning tsp-lintdiff-local-linter/tracked-resource-patch-operation: Tracked resource 'DataMigrationService' must have patch operation that at least supports the update of tags.
+models.tsp:3777:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4170:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4190:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4194:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4259:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4269:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4304:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4389:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4394:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4488:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4548:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4568:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4573:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4578:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4583:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4588:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4779:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4801:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4831:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4928:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:4979:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5065:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5070:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5075:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5234:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5447:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:5927:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6353:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6573:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6578:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6583:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6744:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:6930:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:7647:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:7917:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8210:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8582:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8587:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8592:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8623:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8602:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8566:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8539:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8790:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8817:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:8876:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:9375:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10303:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10363:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10477:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10441:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10566:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10821:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:10827:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models.tsp:11153:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationCosmosDbMongo.tsp:67:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:73:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:83:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:90:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationCosmosDbMongo.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:90:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationCosmosDbMongo.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:90:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationCosmosDbMongo.tsp:90:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationCosmosDbMongo.tsp:98:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:98:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'getForScope' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+DatabaseMigrationCosmosDbMongo.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:44:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:143:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/mongoClusters/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:143:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:120:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:133:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:149:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/mongoClusters/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:149:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:120:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:133:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:159:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/mongoClusters/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations/{migrationName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:166:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationCosmosDbMongo.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:166:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationCosmosDbMongo.tsp:120:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:133:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationCosmosDbMongo.tsp:166:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationCosmosDbMongo.tsp:166:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationCosmosDbMongo.tsp:174:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/mongoClusters/{targetResourceName}/providers/Microsoft.DataMigration/databaseMigrations' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationCosmosDbMongo.tsp:174:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'getForScope' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+DatabaseMigrationCosmosDbMongo.tsp:174:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationCosmosDbMongo.tsp:120:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationSqlDb.tsp:98:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{sqlDbInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:106:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:112:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlDb.tsp:106:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:112:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DatabaseMigrationSqlDb.tsp:106:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:112:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:106:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlDb.tsp:120:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{sqlDbInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:131:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{sqlDbInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:138:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:131:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlDb.tsp:138:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:138:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlDb.tsp:138:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlDb.tsp:152:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{sqlDbInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/cancel' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:152:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:54:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlDb.tsp:166:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{sqlDbInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/retry' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlDb.tsp:88:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:166:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlDb.tsp:88:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlDb.tsp:76:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationSqlDb.tsp:88:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DatabaseMigrationSqlMi.tsp:63:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:71:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:77:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlMi.tsp:71:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:77:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DatabaseMigrationSqlMi.tsp:71:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:77:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:71:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlMi.tsp:85:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:95:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:102:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlMi.tsp:102:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:102:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlMi.tsp:102:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlMi.tsp:117:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/cancel' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:130:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/managedInstances/{managedInstanceName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/cutover' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlMi.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlMi.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:63:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:71:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:77:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlVm.tsp:71:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:77:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+DatabaseMigrationSqlVm.tsp:71:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'migrationOperationId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:77:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:71:7 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
+DatabaseMigrationSqlVm.tsp:85:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:95:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:102:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:95:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlVm.tsp:102:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:102:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DatabaseMigrationSqlVm.tsp:102:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DatabaseMigrationSqlVm.tsp:117:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/cancel' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:130:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SqlVirtualMachine/sqlVirtualMachines/{sqlVirtualMachineName}/providers/Microsoft.DataMigration/databaseMigrations/{targetDbName}/cutover' should use {scope}/providers/... instead of hardcoding the parent scope.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "targetDbName" and "migrationName".
+DatabaseMigrationSqlVm.tsp:42:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DatabaseMigrationSqlVm.tsp:53:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+MigrationService.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+MigrationService.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:121:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:134:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+SqlMigrationService.tsp:145:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:96:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:116:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:129:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:136:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DataMigrationService.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:136:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:136:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+DataMigrationService.tsp:136:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:151:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:163:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:189:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:203:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:203:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:220:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:233:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'checkChildrenNameAvailability' should contain the action verb 'checknameavailability' from the route path. Consider updating the operation name.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:233:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+DataMigrationService.tsp:63:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+DataMigrationService.tsp:72:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:86:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProjectTask.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:86:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ProjectTask.tsp:86:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+models.tsp:3679:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.taskType.
+ProjectTask.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:126:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+ProjectTask.tsp:119:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:126:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:126:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+ProjectTask.tsp:126:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:144:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'taskType' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ProjectTask.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:169:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:221:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProjectTask.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:199:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:221:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+ProjectTask.tsp:221:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:232:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:199:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+models.tsp:3679:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.taskType.
+ProjectTask.tsp:242:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:199:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:261:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+ProjectTask.tsp:254:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:261:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:199:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:261:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+ProjectTask.tsp:261:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:279:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'taskType' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+ProjectTask.tsp:272:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:291:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectTask.tsp:184:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:192:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectTask.tsp:199:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:60:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:67:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:60:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:67:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+models.tsp:3807:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sourcePlatform.
+models.tsp:3817:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.targetPlatform.
+models.tsp:3884:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sourceConnectionInfo.type.
+Project.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:60:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:67:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:116:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Project.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Project.tsp:116:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:60:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:67:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:116:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'deleteRunningTasks' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
+Project.tsp:116:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+Project.tsp:52:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+Project.tsp:60:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:127:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "groupName" and "resourceGroupName".
+ProjectFile.tsp:43:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:51:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:57:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+ProjectFile.tsp:64:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+routes.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+
+Found 500 warnings.
+

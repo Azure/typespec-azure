@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/path-characters",
+  "count": 20,
+  "levels": {
+    "warning": 20
+  },
+  "projectCount": 10,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "routes.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "routes.tsp",
+      "line": 122,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Diagnostic.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Diagnostic.tsp",
+      "line": 131,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Diagnostic.tsp",
+      "line": 237,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
+      "sourceFile": "routes.tsp",
+      "line": 104,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+      "sourceFile": "routes.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "sourceFile": "routes.tsp",
+      "line": 462,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 319,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 352,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 449,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 489,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 607,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 654,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "NetworkSecurityPerimeterConfiguration.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "NetworkSecurityPerimeterConfiguration.tsp",
+      "line": 101,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "IotHubDescription.tsp",
+      "line": 233,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "IotHubDescription.tsp",
+      "line": 246,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
+      "sourceFile": "routes.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-characters",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "Path contains non-recommended characters."
+    }
+  ]
+}

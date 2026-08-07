@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+  "count": 11,
+  "levels": {
+    "warning": 11
+  },
+  "projectCount": 4,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "IotHubDescription.tsp",
+      "line": 123,
+      "column": 9,
+      "message": "ARM DELETE response 404 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "models.tsp",
+      "line": 3176,
+      "column": 7,
+      "message": "ARM DELETE response 404 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 156,
+      "column": 9,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 311,
+      "column": 9,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 533,
+      "column": 9,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 725,
+      "column": 9,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 903,
+      "column": 9,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routeTypes.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routeTypes.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routeTypes.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/missing-xms-error-response",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routeTypes.tsp",
+      "line": 14,
+      "column": 7,
+      "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+    }
+  ]
+}

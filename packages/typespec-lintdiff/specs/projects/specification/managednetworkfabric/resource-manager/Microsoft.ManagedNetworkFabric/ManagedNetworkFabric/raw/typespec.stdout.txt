@@ -1,0 +1,896 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:79:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:82:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:85:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:79:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-02-15-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:82:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-06-15-preview' has been in preview for over one year. Move it to GA or retire it.
+models/L3IsolationDomain.tsp:85:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.aggregateRouteConfigurationDeprecated.ipv4Routes' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/L3IsolationDomain.tsp:90:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.aggregateRouteConfigurationDeprecated.ipv6Routes' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/L3IsolationDomain.tsp:100:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.aggregateRouteConfiguration.ipv4RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/L3IsolationDomain.tsp:112:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.aggregateRouteConfiguration.ipv6RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/InternalNetwork.tsp:324:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.connectedIPv4SubnetsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/InternalNetwork.tsp:338:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.connectedIPv6SubnetsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/InternalNetwork.tsp:613:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.bgpConfiguration.bmpConfiguration.neighborIpExclusionsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/common.tsp:1085:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.nativeIpv4PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/common.tsp:1110:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.nativeIpv6PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/common.tsp:1085:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.optionAProperties.nativeIpv4PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/common.tsp:1110:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.optionAProperties.nativeIpv6PrefixLimit.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/NetworkToNetworkInterconnect.tsp:262:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.optionBLayer3Configuration.prefixLimitsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/NetworkToNetworkInterconnect.tsp:333:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.npbStaticRouteConfiguration.ipv4RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/NetworkToNetworkInterconnect.tsp:345:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.npbStaticRouteConfiguration.ipv6RoutesDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/NetworkTapRule.tsp:225:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.dynamicMatchConfigurationsDeprecated' in the request body either does not appear in the resource model or is nested at the wrong level.
+models/common.tsp:760:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'id' is not patchable and should be removed or made read-only/immutable.
+models/common.tsp:764:3 - warning tsp-lintdiff-local-linter/unsupported-patch-properties: PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable.
+models/NetworkFabricController.tsp:35:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+resources/AccessControlList.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/AccessControlList.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayRuleName" and "accessControlListName".
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayRuleName" and "accessControlListName".
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayRuleName" and "accessControlListName".
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGatewayRule.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGatewayRule.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayName" and "accessControlListName".
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayName" and "accessControlListName".
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "internetGatewayName" and "accessControlListName".
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternetGateway.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/InternetGateway.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipCommunityName" and "accessControlListName".
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipCommunityName" and "accessControlListName".
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipCommunityName" and "accessControlListName".
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpCommunity.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpCommunity.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipExtendedCommunityName" and "accessControlListName".
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipExtendedCommunityName" and "accessControlListName".
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipExtendedCommunityName" and "accessControlListName".
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpExtendedCommunity.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpExtendedCommunity.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipPrefixName" and "accessControlListName".
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipPrefixName" and "accessControlListName".
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "ipPrefixName" and "accessControlListName".
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/IpPrefix.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/IpPrefix.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l2IsolationDomainName" and "accessControlListName".
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l2IsolationDomainName" and "accessControlListName".
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l2IsolationDomainName" and "accessControlListName".
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L2IsolationDomain.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/InternalNetwork.tsp:23:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "externalNetworkName" and "internalNetworkName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "externalNetworkName" and "internalNetworkName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "externalNetworkName" and "internalNetworkName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "l3IsolationDomainName" and "accessControlListName".
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/L3IsolationDomain.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/ExternalNetwork.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "neighborGroupName" and "accessControlListName".
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "neighborGroupName" and "accessControlListName".
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "neighborGroupName" and "accessControlListName".
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NeighborGroup.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDeviceSku.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDeviceSku.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDeviceSku.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceSkuName" and "accessControlListName".
+resources/NetworkDeviceSku.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDeviceSku.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:104:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:125:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:146:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:167:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:186:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:195:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkDeviceName" and "accessControlListName".
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkInterface.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricControllerName" and "accessControlListName".
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricControllerName" and "accessControlListName".
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricControllerName" and "accessControlListName".
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricController.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricController.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricSku.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabricSku.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricSku.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricSkuName" and "accessControlListName".
+resources/NetworkFabricSku.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabricSku.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:120:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:137:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:147:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:168:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:178:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:189:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:199:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:210:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:220:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:231:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:241:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:252:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:262:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:270:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:280:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:291:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:301:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:312:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:322:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:335:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:345:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:357:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:367:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:379:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:389:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:401:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:411:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:423:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:47:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:433:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:449:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:462:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:471:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:480:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkFabricName" and "accessControlListName".
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkFabric.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkToNetworkInterconnect.tsp:24:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkPacketBrokerName" and "accessControlListName".
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkPacketBrokerName" and "accessControlListName".
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkPacketBrokerName" and "accessControlListName".
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkPacketBroker.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkPacketBroker.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkRackName" and "accessControlListName".
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkRackName" and "accessControlListName".
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkRackName" and "accessControlListName".
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkRack.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkRack.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapRuleName" and "accessControlListName".
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapRuleName" and "accessControlListName".
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapRuleName" and "accessControlListName".
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTapRule.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapName" and "accessControlListName".
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapName" and "accessControlListName".
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkTapName" and "accessControlListName".
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkTap.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "routePolicyName" and "accessControlListName".
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "routePolicyName" and "accessControlListName".
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "routePolicyName" and "accessControlListName".
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:41:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/RoutePolicy.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkMonitorName" and "accessControlListName".
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkMonitorName" and "accessControlListName".
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkMonitorName" and "accessControlListName".
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkMonitor.tsp:22:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "networkBootstrapDeviceName" and "accessControlListName".
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapDevice.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+resources/NetworkBootstrapInterface.tsp:21:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+
+Found 889 warnings.
+

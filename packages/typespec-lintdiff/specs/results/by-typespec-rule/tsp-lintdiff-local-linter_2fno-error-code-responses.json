@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
-  "count": 3,
+  "count": 157,
   "levels": {
-    "warning": 3
+    "warning": 157
   },
-  "projectCount": 1,
+  "projectCount": 22,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
@@ -38,6 +38,1546 @@
       "line": 45,
       "column": 3,
       "message": "Operation 'create' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "Operation 'checkEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "GroupContract.tsp",
+      "line": 572,
+      "column": 3,
+      "message": "Operation 'checkEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 286,
+      "column": 3,
+      "message": "Operation 'checkEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 334,
+      "column": 3,
+      "message": "Operation 'notificationRecipientEmailCheckEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 468,
+      "column": 3,
+      "message": "Operation 'checkEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "NotificationContract.tsp",
+      "line": 520,
+      "column": 3,
+      "message": "Operation 'workspaceNotificationRecipientEmailCheckEntityExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ContainerApp.tsp",
+      "line": 71,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ContainerApp.tsp",
+      "line": 153,
+      "column": 3,
+      "message": "Operation 'getAuthToken' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "ManagedCertificate.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Operation 'createOrUpdate' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "Diagnostic.tsp",
+      "line": 131,
+      "column": 3,
+      "message": "Operation 'getRoot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Schedule.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Operation 'createOrUpdate' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "SavingsPlanModel.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "Operation 'update' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "sourceFile": "routes.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Operation 'checkNameExists' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "Factory.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "IntegrationRuntimeResource.tsp",
+      "line": 68,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "LinkedServiceResource.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "DatasetResource.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "PipelineResource.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "TriggerResource.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "sourceFile": "CredentialResource.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '304'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "ProvisioningServiceDescription.tsp",
+      "line": 140,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 130,
+      "column": 3,
+      "message": "Operation 'transferOut' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
+      "sourceFile": "Cluster.tsp",
+      "line": 206,
+      "column": 3,
+      "message": "Operation 'executeScriptActions' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
+      "sourceFile": "IotHubDescription.tsp",
+      "line": 115,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi",
+      "sourceFile": "ActionGroupResource.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "Operation 'enableReceiver' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "DataExport.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "routes.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Operation 'listProductSerialNumberStatus' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Operation 'checkExistenceAtScope' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 149,
+      "column": 3,
+      "message": "Operation 'validateAtScope' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 253,
+      "column": 3,
+      "message": "Operation 'checkExistenceAtTenantScope' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 304,
+      "column": 3,
+      "message": "Operation 'validateAtTenantScope' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 451,
+      "column": 3,
+      "message": "Operation 'checkExistenceAtManagementGroupScope' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 526,
+      "column": 3,
+      "message": "Operation 'validateAtManagementGroupScope' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 643,
+      "column": 3,
+      "message": "Operation 'checkExistenceAtSubscriptionScope' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 718,
+      "column": 3,
+      "message": "Operation 'validateAtSubscriptionScope' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 839,
+      "column": 3,
+      "message": "Operation 'checkExistence' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "sourceFile": "DeploymentExtended.tsp",
+      "line": 897,
+      "column": 3,
+      "message": "Operation 'validate' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routes.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Operation 'validateStack' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routes.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Operation 'validateStack' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routes.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Operation 'validateStack' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+      "sourceFile": "routes.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "Operation 'validateStack' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "ResourceGroup.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Operation 'checkExistence' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Operation 'checkExistenceById' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "sourceFile": "GenericResource.tsp",
+      "line": 180,
+      "column": 3,
+      "message": "Operation 'checkExistence' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "SearchService.tsp",
+      "line": 411,
+      "column": 3,
+      "message": "Operation 'queryKeysDelete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/search/resource-manager/Microsoft.Search/Search",
+      "sourceFile": "SharedPrivateLinkResource.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 4,
+      "message": "Operation 'getConsoleStatus' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "routes.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "Operation 'disableConsole' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
+      "sourceFile": "routes.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Operation 'enableConsole' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "Application.tsp",
+      "line": 59,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 60,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "ApplicationDefinition.tsp",
+      "line": 96,
+      "column": 3,
+      "message": "Operation 'getById' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "JitRequestDefinition.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/solutions/Solutions.Management",
+      "sourceFile": "routes.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Operation 'getById' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 4,
+      "message": "Operation 'checkAmlFSSubnets' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1563,
+      "column": 3,
+      "message": "Operation 'getSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1609,
+      "column": 3,
+      "message": "Operation 'deleteSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 2057,
+      "column": 3,
+      "message": "Operation 'deleteHostSecretSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServicePlan.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 183,
+      "column": 3,
+      "message": "Operation 'deleteHybridConnection' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "HybridConnection.tsp",
+      "line": 265,
+      "column": 3,
+      "message": "Operation 'deleteHybridConnectionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetInfoResource.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Operation 'getVnetFromServerFarm' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetInfoResource.tsp",
+      "line": 151,
+      "column": 3,
+      "message": "Operation 'deleteVnetConnectionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetInfoResource.tsp",
+      "line": 231,
+      "column": 3,
+      "message": "Operation 'deleteVnetConnection' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "Operation 'getVnetConnectionGatewaySlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetGateway.tsp",
+      "line": 199,
+      "column": 3,
+      "message": "Operation 'getVnetConnectionGateway' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 70,
+      "column": 3,
+      "message": "Operation 'getRouteForVnet' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "Operation 'createOrUpdateVnetRoute' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "Operation 'createOrUpdateVnetRoute' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Operation 'updateVnetRoute' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 95,
+      "column": 3,
+      "message": "Operation 'updateVnetRoute' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "VnetRoute.tsp",
+      "line": 110,
+      "column": 3,
+      "message": "Operation 'deleteVnetRoute' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 111,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 157,
+      "column": 3,
+      "message": "Operation 'delete' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 610,
+      "column": 3,
+      "message": "Operation 'deleteHostSecret' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "BackupItem.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "Operation 'deleteBackup' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "BackupItem.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "Operation 'deleteBackupSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Operation 'getContinuousWebJob' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 97,
+      "column": 3,
+      "message": "Operation 'startContinuousWebJob' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 113,
+      "column": 3,
+      "message": "Operation 'stopContinuousWebJob' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "Operation 'getContinuousWebJobSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 192,
+      "column": 3,
+      "message": "Operation 'startContinuousWebJobSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ContinuousWebJob.tsp",
+      "line": 208,
+      "column": 3,
+      "message": "Operation 'stopContinuousWebJobSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Operation 'createMSDeployOperation' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 102,
+      "column": 3,
+      "message": "Operation 'getMSDeployLog' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "Operation 'createInstanceMSDeployOperation' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 181,
+      "column": 3,
+      "message": "Operation 'getInstanceMSDeployLog' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 239,
+      "column": 3,
+      "message": "Operation 'createMSDeployOperationSlot' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 258,
+      "column": 3,
+      "message": "Operation 'getMSDeployLogSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 324,
+      "column": 3,
+      "message": "Operation 'createInstanceMSDeployOperationSlot' defines explicit error status code '409'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "MSDeployStatus.tsp",
+      "line": 344,
+      "column": 3,
+      "message": "Operation 'getInstanceMSDeployLogSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 158,
+      "column": 3,
+      "message": "Operation 'getFunction' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 185,
+      "column": 3,
+      "message": "Operation 'deleteFunction' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 195,
+      "column": 3,
+      "message": "Operation 'listFunctions' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 225,
+      "column": 3,
+      "message": "Operation 'deleteFunctionSecret' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 299,
+      "column": 3,
+      "message": "Operation 'getInstanceFunctionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 326,
+      "column": 3,
+      "message": "Operation 'deleteInstanceFunctionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 336,
+      "column": 3,
+      "message": "Operation 'listInstanceFunctionsSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "FunctionEnvelope.tsp",
+      "line": 363,
+      "column": 3,
+      "message": "Operation 'deleteFunctionSecretSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RelayServiceConnectionEntity.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "Operation 'deleteRelayServiceConnection' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "RelayServiceConnectionEntity.tsp",
+      "line": 174,
+      "column": 3,
+      "message": "Operation 'deleteRelayServiceConnectionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Operation 'getInstanceProcess' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Operation 'deleteInstanceProcess' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 94,
+      "column": 3,
+      "message": "Operation 'listInstanceProcesses' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "Operation 'getInstanceProcessDump' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 128,
+      "column": 3,
+      "message": "Operation 'listInstanceProcessThreads' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 167,
+      "column": 3,
+      "message": "Operation 'getProcess' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 179,
+      "column": 3,
+      "message": "Operation 'deleteProcess' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 189,
+      "column": 3,
+      "message": "Operation 'listProcesses' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 201,
+      "column": 3,
+      "message": "Operation 'getProcessDump' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 223,
+      "column": 3,
+      "message": "Operation 'listProcessThreads' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 274,
+      "column": 3,
+      "message": "Operation 'getInstanceProcessSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 286,
+      "column": 3,
+      "message": "Operation 'deleteInstanceProcessSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 297,
+      "column": 3,
+      "message": "Operation 'listInstanceProcessesSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 309,
+      "column": 3,
+      "message": "Operation 'getInstanceProcessDumpSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 331,
+      "column": 3,
+      "message": "Operation 'listInstanceProcessThreadsSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 376,
+      "column": 3,
+      "message": "Operation 'getProcessSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 388,
+      "column": 3,
+      "message": "Operation 'deleteProcessSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 398,
+      "column": 3,
+      "message": "Operation 'listProcessesSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 410,
+      "column": 3,
+      "message": "Operation 'getProcessDumpSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessInfo.tsp",
+      "line": 432,
+      "column": 3,
+      "message": "Operation 'listProcessThreadsSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "Operation 'getInstanceProcessModule' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "Operation 'listInstanceProcessModules' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 132,
+      "column": 3,
+      "message": "Operation 'getProcessModule' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "Operation 'listProcessModules' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 198,
+      "column": 3,
+      "message": "Operation 'getInstanceProcessModuleSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 209,
+      "column": 3,
+      "message": "Operation 'listInstanceProcessModulesSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 259,
+      "column": 3,
+      "message": "Operation 'getProcessModuleSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "ProcessModuleInfo.tsp",
+      "line": 269,
+      "column": 3,
+      "message": "Operation 'listProcessModulesSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 101,
+      "column": 3,
+      "message": "Operation 'deleteSwiftVirtualNetwork' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SwiftVirtualNetwork.tsp",
+      "line": 179,
+      "column": 3,
+      "message": "Operation 'deleteSwiftVirtualNetworkSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "NetworkFeatures.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Operation 'listNetworkFeatures' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "NetworkFeatures.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "Operation 'listNetworkFeaturesSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Operation 'getSiteExtension' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "Operation 'installSiteExtension' defines explicit error status code '429'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "Operation 'deleteSiteExtension' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 109,
+      "column": 3,
+      "message": "Operation 'listSiteExtensions' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 153,
+      "column": 3,
+      "message": "Operation 'getSiteExtensionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 165,
+      "column": 3,
+      "message": "Operation 'installSiteExtensionSlot' defines explicit error status code '429'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 186,
+      "column": 3,
+      "message": "Operation 'deleteSiteExtensionSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteExtensionInfo.tsp",
+      "line": 196,
+      "column": 3,
+      "message": "Operation 'listSiteExtensionsSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 135,
+      "column": 3,
+      "message": "Operation 'deleteSourceControlSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "Operation 'deleteSourceControl' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Operation 'getTriggeredWebJobSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 103,
+      "column": 3,
+      "message": "Operation 'runTriggeredWebJobSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 145,
+      "column": 3,
+      "message": "Operation 'getTriggeredWebJob' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredWebJob.tsp",
+      "line": 176,
+      "column": 3,
+      "message": "Operation 'runTriggeredWebJob' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "Operation 'getTriggeredWebJobHistorySlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 88,
+      "column": 3,
+      "message": "Operation 'listTriggeredWebJobHistorySlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 134,
+      "column": 3,
+      "message": "Operation 'getTriggeredWebJobHistory' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "TriggeredJobHistory.tsp",
+      "line": 144,
+      "column": 3,
+      "message": "Operation 'listTriggeredWebJobHistory' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowEnvelope.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Operation 'getInstanceWorkflowSlot' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkflowEnvelope.tsp",
+      "line": 133,
+      "column": 3,
+      "message": "Operation 'getWorkflow' defines explicit error status code '404'. Remove it and use the default response for errors instead."
     }
   ]
 }

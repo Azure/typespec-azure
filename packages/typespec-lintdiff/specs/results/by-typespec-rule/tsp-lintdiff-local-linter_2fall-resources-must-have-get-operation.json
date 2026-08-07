@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/all-resources-must-have-get-operation",
+  "count": 3,
+  "levels": {
+    "warning": 3
+  },
+  "projectCount": 2,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/all-resources-must-have-get-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "DaprComponent.tsp",
+      "line": 76,
+      "column": 11,
+      "message": "Resource 'DaprComponent' must have a get/read operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/all-resources-must-have-get-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "sourceFile": "HttpRouteConfig.tsp",
+      "line": 60,
+      "column": 11,
+      "message": "Resource 'HttpRouteConfig' must have a get/read operation."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/all-resources-must-have-get-operation",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
+      "sourceFile": "Vault.tsp",
+      "line": 155,
+      "column": 11,
+      "message": "Resource 'Vault' must have a get/read operation."
+    }
+  ]
+}

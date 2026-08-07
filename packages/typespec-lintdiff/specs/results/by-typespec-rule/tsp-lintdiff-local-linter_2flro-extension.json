@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
   "rule": "tsp-lintdiff-local-linter/lro-extension",
-  "count": 1,
+  "count": 39,
   "levels": {
-    "warning": 1
+    "warning": 39
   },
-  "projectCount": 1,
+  "projectCount": 14,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/lro-extension",
@@ -18,6 +18,386 @@
       "line": 116,
       "column": 3,
       "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "sourceFile": "BackendContract.tsp",
+      "line": 191,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Components",
+      "sourceFile": "ApplicationInsightsComponent.tsp",
+      "line": 110,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+      "sourceFile": "AttestationProvider.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "ARM DELETE operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 63,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+      "sourceFile": "Domain.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "Cluster.tsp",
+      "line": 122,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "EHNamespace.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/newrelic/NewRelicObservability.Management",
+      "sourceFile": "NewRelicMonitorResource.tsp",
+      "line": 117,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+      "sourceFile": "Workspace.tsp",
+      "line": 365,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectedItemResource.tsp",
+      "line": 81,
+      "column": 3,
+      "message": "ARM DELETE operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectedItemResource.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "ARM DELETE operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionContainerResource.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "RecoveryPointResource.tsp",
+      "line": 124,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "RecoveryPointResource.tsp",
+      "line": 137,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "ProtectionPolicyResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "JobResource.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 185,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 444,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "JitNetworkAccessPolicy.tsp",
+      "line": 127,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
+      "sourceFile": "ServerVulnerabilityAssessment.tsp",
+      "line": 93,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "SBNamespace.tsp",
+      "line": 75,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
+      "sourceFile": "Server.tsp",
+      "line": 161,
+      "column": 3,
+      "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkerPoolResource.tsp",
+      "line": 288,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 289,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "WorkerPoolResource.tsp",
+      "line": 142,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 1593,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "AppServicePlan.tsp",
+      "line": 147,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "Site.tsp",
+      "line": 140,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "StaticSiteARMResource.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 135,
+      "column": 3,
+      "message": "ARM DELETE operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 221,
+      "column": 3,
+      "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SiteSourceControl.tsp",
+      "line": 240,
+      "column": 3,
+      "message": "ARM DELETE operations with a 202 response must set `x-ms-long-running-operation` to `true`."
     }
   ]
 }

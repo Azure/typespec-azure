@@ -1,0 +1,331 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+versions.tsp:8:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:11:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:15:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:18:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:21:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:24:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:27:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:30:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:33:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:36:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:39:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:42:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:45:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:48:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+versions.tsp:11:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:18:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-08-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:21:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-10-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:24:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-12-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:27:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-01-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:33:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-04-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:36:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:39:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-07-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:42:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-08-01-preview' has been in preview for over one year. Move it to GA or retire it.
+models/exadata/exadatainfra.tsp:80:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/exadatainfra.tsp:83:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/exadatainfra.tsp:125:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/exadatainfra.tsp:129:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/common.tsp:147:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/common.tsp:150:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/common.tsp:153:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/common.tsp:256:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/vmcluster.tsp:237:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/vmcluster.tsp:245:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/systemVersions.tsp:27:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/oraclesubscription/oracleSubscription.tsp:131:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/oraclesubscription/oracleSubscription.tsp:135:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/dbSystemShapes.tsp:96:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/dnsPrivateViews.tsp:29:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/dnsPrivateZones.tsp:27:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:928:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:932:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:946:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:950:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:1235:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:1238:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:976:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:980:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:524:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:435:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:1098:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:677:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:681:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:691:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:695:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:1212:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:773:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:777:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:823:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabase.tsp:851:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:84:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:88:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:34:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:37:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:40:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:43:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/anchors/networkAnchor.tsp:55:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/anchors/networkAnchor.tsp:60:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/anchors/networkAnchor.tsp:65:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:42:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:46:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:49:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:52:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/exadatainfrastructureOperations.tsp:12:11 - occurred while instantiating template
+operations/exadata/exadatainfrastructureOperations.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/exadatainfrastructureOperations.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/dbServersOperations.tsp:11:29 - occurred while instantiating template
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/dbServersOperations.tsp:17:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/exadatainfra.tsp:168:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/common.tsp:147:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.dataCollectionOptions.isDiagnosticsEventsEnabled.
+models/common.tsp:150:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.dataCollectionOptions.isHealthMonitoringEnabled.
+models/common.tsp:153:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.dataCollectionOptions.isIncidentLogsEnabled.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/vmclusterOperations.tsp:12:11 - occurred while instantiating template
+operations/exadata/vmclusterOperations.tsp:19:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/vmclusterOperations.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/vmclusterOperations.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/virtualNetworkAddressOperations.tsp:22:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/exadata/systemVersionOperations.tsp:9:34 - occurred while instantiating template
+models/exadata/systemVersions.tsp:15:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/systemVersions.tsp:15:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/systemVersionOperations.tsp:9:34 - occurred while instantiating template
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "oraclesubscriptionname" and "cloudexadatainfrastructurename".
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "oraclesubscriptionname" and "cloudexadatainfrastructurename".
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+operations/oraclesubscription/oracleSubscriptionOperations.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "oraclesubscriptionname" and "cloudexadatainfrastructurename".
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+models/oraclesubscription/oracleSubscription.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:11:24 - occurred while instantiating template
+operations/oraclesubscription/oracleSubscriptionOperations.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceGetActionAsync' should contain the action verb 'default' from the route path. Consider updating the operation name.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:23:30 - occurred while instantiating template
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:23:30 - occurred while instantiating template
+operations/oraclesubscription/oracleSubscriptionOperations.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceGetActionAsync' should contain the action verb 'default' from the route path. Consider updating the operation name.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:34:34 - occurred while instantiating template
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:34:34 - occurred while instantiating template
+operations/oraclesubscription/oracleSubscriptionOperations.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceGetActionAsync' should contain the action verb 'default' from the route path. Consider updating the operation name.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:45:26 - occurred while instantiating template
+operations/commons.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/oraclesubscription/oracleSubscriptionOperations.tsp:45:26 - occurred while instantiating template
+operations/oraclesubscription/oracleSubscriptionOperations.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/dbNodesOperations.tsp:11:27 - occurred while instantiating template
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/dbNodes.tsp:17:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dbnodeocid" and "virtualnetworkaddressname".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/dbNodesOperations.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "cloudvmclustername" and "cloudexadatainfrastructurename".
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/dbNodesOperations.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/vmcluster.tsp:145:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/exadata/giVersionOperations.tsp:11:30 - occurred while instantiating template
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "giversionname" and "systemversionname".
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/giVersions.tsp:35:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shape' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/exadata/giVersions.tsp:39:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'zone' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/exadata/giVersions.tsp:44:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shapeAttribute' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+operations/exadata/giVersionOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exadata/giVersionOperations.tsp:16:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/giMinorVersions.tsp:35:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shapeFamily' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/exadata/giMinorVersions.tsp:39:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'zone' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+operations/exadata/giMinorVersionOperations.tsp:12:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "giversionname" and "systemversionname".
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/exadata/giMinorVersionOperations.tsp:16:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "giversionname" and "systemversionname".
+models/exadata/giVersions.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/exadata/dbSystemShapeOperations.tsp:11:34 - occurred while instantiating template
+models/exadata/dbSystemShapes.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/dbSystemShapes.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dbsystemshapename" and "systemversionname".
+models/exadata/dbSystemShapes.tsp:16:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/dbSystemShapes.tsp:118:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'zone' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/exadata/dbSystemShapes.tsp:123:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shapeAttribute' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+operations/exadata/dbSystemShapeOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exadata/dbSystemShapeOperations.tsp:16:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/exadata/dnsPrivateViewsOperations.tsp:9:35 - occurred while instantiating template
+models/exadata/dnsPrivateViews.tsp:17:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dnsprivateviewocid" and "systemversionname".
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/dnsPrivateViewsOperations.tsp:9:35 - occurred while instantiating template
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/exadata/dnsPrivateZonesOperations.tsp:9:35 - occurred while instantiating template
+models/exadata/dnsPrivateZones.tsp:18:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/exadata/dnsPrivateZones.tsp:18:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dnsprivatezonename" and "systemversionname".
+models/exadata/dnsPrivateZones.tsp:18:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exadata/dnsPrivateZonesOperations.tsp:9:35 - occurred while instantiating template
+operations/exadata/flexComponentOperations.tsp:12:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/exadata/flexComponents.tsp:84:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shape' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+operations/exadata/flexComponentOperations.tsp:13:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:15:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:17:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/autonomousdatabase/autonomousDatabaseOperations.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/autonomousdatabase/autonomousDatabaseBackupOperations.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+models/autonomousdatabase/autonomousDatabaseBackup.tsp:57:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/autonomousdatabase/autonomousDatabaseBackupOperations.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/autonomousdatabase/autonomousDatabase.tsp:613:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdatabasename" and "cloudexadatainfrastructurename".
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/autonomousdatabase/autonomousDatabaseCharacterSetOperations.tsp:11:11 - occurred while instantiating template
+models/autonomousdatabase/autonomousDatabaseCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "adbscharsetname" and "systemversionname".
+models/autonomousdatabase/autonomousDatabaseCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/autonomousdatabase/autonomousDatabaseCharacterSetOperations.tsp:11:11 - occurred while instantiating template
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/autonomousdatabase/autonomousDatabaseNationalCharacterSetOperations.tsp:11:11 - occurred while instantiating template
+models/autonomousdatabase/autonomousDatabaseNationalCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseNationalCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "adbsncharsetname" and "systemversionname".
+models/autonomousdatabase/autonomousDatabaseNationalCharacterSet.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/autonomousdatabase/autonomousDatabaseNationalCharacterSetOperations.tsp:11:11 - occurred while instantiating template
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/autonomousdatabase/autonomousDatabaseVersionOperations.tsp:12:11 - occurred while instantiating template
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "autonomousdbversionsname" and "systemversionname".
+models/autonomousdatabase/autonomousDatabaseVersion.tsp:19:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+operations/commons.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/autonomousdatabase/autonomousDatabaseVersionOperations.tsp:12:11 - occurred while instantiating template
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exascale/exadbVmClusterOperations.tsp:13:11 - occurred while instantiating template
+operations/exascale/exadbVmClusterOperations.tsp:15:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/exascale/exascaleDbNodesOperations.tsp:12:35 - occurred while instantiating template
+operations/exascale/exascaleDbNodesOperations.tsp:13:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbNodesOperations.tsp:16:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:13:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:14:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:15:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:16:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:17:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+operations/exascale/exascaleDbStorageVaultOperations.tsp:18:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/anchors/networkAnchor.tsp:55:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.isOracleToAzureDnsZoneSyncEnabled.
+models/anchors/networkAnchor.tsp:60:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.isOracleDnsListeningEndpointEnabled.
+models/anchors/networkAnchor.tsp:65:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.isOracleDnsForwardingEndpointEnabled.
+models/anchors/networkAnchor.tsp:55:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/anchors/networkAnchor.tsp:60:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/anchors/networkAnchor.tsp:65:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/anchors/networkAnchorOperations.tsp:13:11 - occurred while instantiating template
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/anchors/resourceAnchorOperations.tsp:13:11 - occurred while instantiating template
+operations/commons.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/basedb/dbSystemOperations.tsp:12:11 - occurred while instantiating template
+operations/commons.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  operations/commons.tsp:41:11 - occurred while instantiating template
+  operations/basedb/dbVersionOperations.tsp:11:30 - occurred while instantiating template
+models/basedb/dbVersion.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/basedb/dbVersion.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dbversionsname" and "systemversionname".
+models/basedb/dbVersion.tsp:29:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models/basedb/dbVersion.tsp:64:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'dbSystemShape' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/basedb/dbVersion.tsp:69:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'dbSystemId' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/basedb/dbVersion.tsp:73:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'storageManagement' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'isUpgradeSupported' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'isDatabaseSoftwareImageSupported' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+models/basedb/dbVersion.tsp:85:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'shapeFamily' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+operations/basedb/dbVersionOperations.tsp:12:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+
+Found 279 warnings.
+

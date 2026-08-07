@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+  "count": 48,
+  "levels": {
+    "warning": 48
+  },
+  "projectCount": 15,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "sourceFile": "resources/ReportResource.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "sourceFile": "resources/WebhookResource.tsp",
+      "line": 61,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "sourceFile": "resources/ScopingConfigurationResource.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+      "sourceFile": "resources/EvidenceResource.tsp",
+      "line": 62,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "goal.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "goal.tsp",
+      "line": 106,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "recoveryPlans.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "drill.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfile.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "AssociatedTenant.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingRequest.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingRoleAssignment.tsp",
+      "line": 347,
+      "column": 3,
+      "message": "'createOrUpdateByBillingAccount' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingRoleAssignment.tsp",
+      "line": 443,
+      "column": 3,
+      "message": "'createOrUpdateByDepartment' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingRoleAssignment.tsp",
+      "line": 520,
+      "column": 3,
+      "message": "'createOrUpdateByEnrollmentAccount' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingSubscriptionAlias.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "Customer.tsp",
+      "line": 302,
+      "column": 3,
+      "message": "'createOrUpdateByCustomer' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "PartnerTransferDetails.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "'initiate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "TransferDetails.tsp",
+      "line": 50,
+      "column": 3,
+      "message": "'initiate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "CustomerPolicy.tsp",
+      "line": 141,
+      "column": 3,
+      "message": "'createOrUpdateByCustomerAtBillingAccount' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingProfilePolicy.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "'createOrUpdateByBillingProfile' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "BillingAccountPolicy.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "'createOrUpdateByBillingAccount' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "SavingsPlanOrderAliasModel.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "sourceFile": "ReservationOrderAliasResponse.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "CostAllocationRuleDefinition.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "ScheduledAction.tsp",
+      "line": 77,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "View.tsp",
+      "line": 69,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
+      "sourceFile": "ServiceGroup.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'createOrUpdateServiceGroup' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "PrivateStore.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "Collection.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "Offer.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "RequestApprovalResource.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "'createApprovalRequest' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "AdminRequestApprovalsResource.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "'updateAdminRequestApproval' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "GlobalRulestackResource.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "CertificateObjectGlobalRulestackResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "FqdnListGlobalRulestackResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PostRulesResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PrefixListGlobalRulestackResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
+      "sourceFile": "PreRulesResource.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/portal/TenantConfiguration.Management",
+      "sourceFile": "TenantConfiguration.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/portalservices/CopilotSettings.Management",
+      "sourceFile": "CopilotSettings.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+      "sourceFile": "ReservationOrderResponse.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "'purchase' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/resources/resource-manager/Microsoft.Resources/databoundaries",
+      "sourceFile": "DataBoundaryDefinition.tsp",
+      "line": 41,
+      "column": 3,
+      "message": "'put' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
+      "sourceFile": "GetSensitivitySettingsResponse.tsp",
+      "line": 48,
+      "column": 3,
+      "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "SubscriptionAliasResponse.tsp",
+      "line": 40,
+      "column": 3,
+      "message": "'create' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "sourceFile": "GetTenantPolicyResponse.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "'addUpdatePolicyForTenant' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "SourceControl.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'updateSourceControl' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "User.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "'updatePublishingUser' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    }
+  ]
+}

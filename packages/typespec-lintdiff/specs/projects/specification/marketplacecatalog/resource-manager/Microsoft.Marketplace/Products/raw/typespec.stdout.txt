@@ -1,0 +1,168 @@
+TypeSpec compiler v1.14.0
+
+Diagnostics were reported during compilation:
+
+main.tsp:23:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
+main.tsp:197:11 - warning tsp-lintdiff-local-linter/nested-resources-must-have-list-operation: Nested resource 'ProductSingle' should define a list operation.
+product.tsp:112:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:115:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:112:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:115:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:261:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:285:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:288:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:112:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:115:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:155:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:167:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:170:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:200:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:206:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:209:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:261:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:285:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:288:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:705:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:656:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:690:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:312:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:315:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:327:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:338:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:394:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:397:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:400:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+product.tsp:225:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:49:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'market' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:53:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'language' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:57:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'excludePublicOffersAndPublicPlans' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:65:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:69:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:73:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderBy' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:77:5 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$search' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:57:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:88:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'language' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:92:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'excludePublicOffersAndPublicPlans' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:100:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:104:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:108:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderBy' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:112:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$search' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:92:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:352:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmListBySubscriptionCustom' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:83:25 - occurred while instantiating template
+main.tsp:352:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmListBySubscriptionCustom' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:83:25 - occurred while instantiating template
+main.tsp:352:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  main.tsp:83:25 - occurred while instantiating template
+main.tsp:92:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:96:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+main.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+main.tsp:104:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+main.tsp:108:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderBy' should not begin with '$' or '@'.
+main.tsp:112:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$search' should not begin with '$' or '@'.
+main.tsp:92:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:118:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Marketplace/products' should use {scope}/providers/... instead of hardcoding the parent scope.
+main.tsp:123:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'language' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:127:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'excludePublicOffersAndPublicPlans' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:131:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'locations' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:139:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:143:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:147:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderBy' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:151:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$search' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:118:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:127:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:368:4 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Marketplace/products' should use {scope}/providers/... instead of hardcoding the parent scope.
+  main.tsp:118:27 - occurred while instantiating template
+main.tsp:368:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmListByBillingAccount' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:118:27 - occurred while instantiating template
+main.tsp:368:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmListByBillingAccount' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:118:27 - occurred while instantiating template
+main.tsp:368:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  main.tsp:118:27 - occurred while instantiating template
+main.tsp:127:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+parameters.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+main.tsp:135:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+main.tsp:139:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+main.tsp:143:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+main.tsp:147:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderBy' should not begin with '$' or '@'.
+main.tsp:151:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$search' should not begin with '$' or '@'.
+main.tsp:127:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:157:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products' should use {scope}/providers/... instead of hardcoding the parent scope.
+main.tsp:162:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'language' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:166:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'excludePublicOffersAndPublicPlans' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:170:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'locations' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:178:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$select' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:182:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:186:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$orderBy' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:190:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$search' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
+main.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:166:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:384:4 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products' should use {scope}/providers/... instead of hardcoding the parent scope.
+  main.tsp:157:27 - occurred while instantiating template
+main.tsp:384:4 - warning tsp-lintdiff-local-linter/get-in-operation-name: 'GET' operation 'ArmListByBillingProfile' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:157:27 - occurred while instantiating template
+main.tsp:384:4 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'ArmListByBillingProfile' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
+  main.tsp:157:27 - occurred while instantiating template
+main.tsp:384:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+  main.tsp:157:27 - occurred while instantiating template
+main.tsp:166:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+parameters.tsp:60:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "billingProfileId" and "provider".
+parameters.tsp:49:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+parameters.tsp:60:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
+main.tsp:174:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
+main.tsp:178:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$select' should not begin with '$' or '@'.
+main.tsp:182:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
+main.tsp:186:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$orderBy' should not begin with '$' or '@'.
+main.tsp:190:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$search' should not begin with '$' or '@'.
+main.tsp:166:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:208:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'market' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:212:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeStopSoldPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:216:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'language' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:220:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'pricingAudience' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:224:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeHiddenPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:228:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeServiceInstructionTemplates' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:232:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'planId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:236:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'skuId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:202:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:212:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:224:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:228:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:250:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeStopSoldPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:254:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'language' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:258:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeHiddenPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:262:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeServiceInstructionTemplates' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:266:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'planId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:270:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'skuId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:274:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'lookUpOfferInTenantLevel' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:243:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:250:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:258:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:262:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:274:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:281:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.Marketplace/products/{productId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+main.tsp:288:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeStopSoldPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:292:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'language' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:296:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeHiddenPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:300:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeServiceInstructionTemplates' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:304:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'planId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:308:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'skuId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:281:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:288:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:296:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:300:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:315:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}/providers/Microsoft.Marketplace/products/{productId}' should use {scope}/providers/... instead of hardcoding the parent scope.
+main.tsp:323:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeStopSoldPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:327:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'language' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:331:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeHiddenPlans' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:335:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'includeServiceInstructionTemplates' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:339:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'planId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:343:5 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'skuId' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
+main.tsp:315:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+main.tsp:323:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:331:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+main.tsp:335:5 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+
+Found 150 warnings.
+

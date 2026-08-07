@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 2,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+  "count": 67,
+  "levels": {
+    "warning": 67
+  },
+  "projectCount": 11,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 138,
+      "column": 7,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/automation/Automation.Management",
+      "sourceFile": "Runbook.tsp",
+      "line": 138,
+      "column": 7,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
+      "sourceFile": "routes.tsp",
+      "line": 70,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
+      "sourceFile": "lro-helpers.tsp",
+      "line": 74,
+      "column": 13,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1604,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1464,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1628,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1412,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1486,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 1319,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 783,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 546,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
+      "sourceFile": "client.tsp",
+      "line": 652,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 522,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 377,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 302,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "sourceFile": "client.tsp",
+      "line": 351,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "client.tsp",
+      "line": 361,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "client.tsp",
+      "line": 330,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "client.tsp",
+      "line": 513,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "sourceFile": "client.tsp",
+      "line": 478,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "back-compatible.tsp",
+      "line": 247,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
+      "sourceFile": "back-compatible.tsp",
+      "line": 297,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting",
+      "sourceFile": "customOperation.tsp",
+      "line": 39,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting",
+      "sourceFile": "customOperation.tsp",
+      "line": 39,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "routes.tsp",
+      "line": 43,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "sourceFile": "routes.tsp",
+      "line": 79,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
+      "sourceFile": "scriptExecutions.tsp",
+      "line": 38,
+      "column": 5,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1170,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1910,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 3569,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1979,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1945,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2004,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 3489,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 157,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 205,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 257,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 469,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 3527,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 3447,
+      "column": 9,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2741,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2803,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2836,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2425,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2454,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2483,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1736,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2594,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 1778,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2627,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2085,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2682,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 636,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
+      "sourceFile": "client.tsp",
+      "line": 2770,
+      "column": 3,
+      "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+    }
+  ]
+}
