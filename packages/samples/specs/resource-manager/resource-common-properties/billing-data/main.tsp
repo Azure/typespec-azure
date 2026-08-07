@@ -19,7 +19,7 @@ namespace Microsoft.BillingDataExample;
 /** UpdateTests API versions */
 enum Versions {
   /** 2023-03-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2023-03-01-preview`,
 }
 
