@@ -43,6 +43,7 @@ model ResponseProperty<Name extends valueof string> {}
  * @template StatusResult Model describing the status result object. If not specified, the default is the resource type.
  * @template StatusError Model describing the status error object. If not specified, the default is the Foundations.Error.
  */
+@doc("Provides status details for long running operations.")
 @resource("operations")
 @parentResource(Resource)
 model ResourceOperationStatus<
