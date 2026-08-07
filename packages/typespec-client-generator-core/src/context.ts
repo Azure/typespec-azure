@@ -9,6 +9,7 @@ import {
   type Model,
   type ModelProperty,
   type Namespace,
+  NoTarget,
   normalizePath,
   type Operation,
   type Program,
@@ -190,6 +191,38 @@ export async function createSdkContext<
     context.options["generate-protocol-methods"] ?? tcgcContext.generateProtocolMethods;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? tcgcContext.generateConvenienceMethods;
+
+  // Warn if non-java/csharp emitter sets convenience/protocol options
+  const resolvedEmitterName = emitterName ?? context.options["emitter-name"] ?? "";
+  const [parsedLanguage] = parseEmitterName(context.program, resolvedEmitterName);
+  const isJavaOrCsharp = parsedLanguage === "java" || parsedLanguage === "csharp";
+  if (!isJavaOrCsharp) {
+    if (context.options["generate-convenience-methods"] !== undefined) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unnecessary-emitter-option",
+          format: {
+            optionName: "generate-convenience-methods",
+            emitterName: resolvedEmitterName || "unknown",
+          },
+          target: NoTarget,
+        }),
+      );
+    }
+    if (context.options["generate-protocol-methods"] !== undefined) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unnecessary-emitter-option",
+          format: {
+            optionName: "generate-protocol-methods",
+            emitterName: resolvedEmitterName || "unknown",
+          },
+          target: NoTarget,
+        }),
+      );
+    }
+  }
+
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
