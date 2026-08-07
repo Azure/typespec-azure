@@ -1,7 +1,9 @@
 name: Package Size
 
-# Measures the published npm tarball size of every publishable package and reports the
-# change introduced by the PR. This workflow only has a read-only token (it may run for
+# Measures the published npm tarball size of every publishable package in `packages/` and
+# reports the change introduced by the PR. Packages from the `core/` submodule are not
+# measured: they are published from `microsoft/typespec`, not from this repo.
+# This workflow only has a read-only token (it may run for
 # fork PRs); the actual PR comment is posted by the `package-size-comment.yml` workflow
 # which runs with `pull-requests: write` after this one completes.
 # See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
@@ -13,7 +15,6 @@ on:
       - release/*
     paths:
       - "packages/**"
-      - "core/packages/**"
       - "eng/scripts/bundle-size/**"
       - ".github/workflows/package-size.yml"
 
