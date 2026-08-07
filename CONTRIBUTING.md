@@ -302,7 +302,7 @@ Do the following to publish a new release:
 2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
 
 3. Make sure your working copy is clean and you are up-to-date and core submodules are both up to date with `upstream/main`.
-      1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
+   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
    1. In your fork of the core (typespec) repo, run `pnpm exec chronus ai-release-notes --policy typespec-stable --policy typespec-preview > out.md`.
@@ -325,8 +325,8 @@ Do the following to publish a new release:
 8. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
 9. Make sure release pipeline completed and packages are on NPM.
-    - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
-    - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+   - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
+   - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
 ### Followups
 
