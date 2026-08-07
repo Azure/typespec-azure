@@ -167,7 +167,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   const diagnostics = createDiagnosticCollector();
 
   const baseServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client, false),
   );
 
   // If the response body type itself is nullable (e.g., {@body body: Type | null}), unwrap it for paging/LRO processing
@@ -610,10 +610,12 @@ function getSdkMethodResponse(
   operation: Operation,
   sdkOperation: SdkServiceOperation,
   client: SdkClientType<SdkServiceOperation>,
+  useResponseOverride = true,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
-  const overriddenOperation = getOverriddenClientMethod(context, operation);
-  const responseOverride = overriddenOperation?.returnType;
+  const responseOverride = useResponseOverride
+    ? getOverriddenClientMethod(context, operation)?.returnType
+    : undefined;
 
   const allResponseBodies: SdkType[] = [];
   let containsResponseWithoutBody = false;
@@ -687,6 +689,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
+  useResponseOverride = true,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const methodParameters: SdkMethodParameter[] = [];
@@ -731,7 +734,13 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
   );
-  const response = getSdkMethodResponse(context, operation, serviceOperation, client);
+  const response = getSdkMethodResponse(
+    context,
+    operation,
+    serviceOperation,
+    client,
+    useResponseOverride,
+  );
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
