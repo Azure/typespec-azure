@@ -84,8 +84,6 @@ alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> =
  */
 model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.CreatedResponse {
-  /** The location of the created resource. */
-  @doc("The location of an instance of {name}", Resource)
   @finalLocation
   @TypeSpec.Http.header("Location")
   location: ResourceLocation<Resource>;
@@ -97,8 +95,6 @@ model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Mod
  */
 model LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.AcceptedResponse {
-  /** The location of the created resource. */
-  @doc("The location of an instance of {name}", Resource)
   @finalLocation
   @TypeSpec.Http.header("Location")
   location: ResourceLocation<Resource>;
