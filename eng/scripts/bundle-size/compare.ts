@@ -11,7 +11,14 @@ import { appendFile, mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
 import { pathToFileURL } from "url";
 import type { PackageSize, SizeReport } from "./measure.ts";
-import { colored, formatBytes, formatDelta, formatPercent, trendOf } from "./utils.ts";
+import {
+  changeIndicator,
+  formatBytes,
+  formatDelta,
+  formatPercent,
+  isNotableSizeChange,
+  LEGEND,
+} from "./utils.ts";
 
 /** Hidden marker so the comment workflow can find & update its own comment. */
 export const COMMENT_MARKER = "<!-- bundle-size-report -->";
@@ -61,8 +68,8 @@ function unpackedCell(size: PackageSize | undefined): string {
 
 export function renderMarkdown(base: SizeReport, head: SizeReport): string {
   const rows = buildRows(base, head);
-  const changed = rows.filter((r) => r.packedDelta !== 0 || r.unpackedDelta !== 0);
-  const unchanged = rows.filter((r) => r.packedDelta === 0 && r.unpackedDelta === 0);
+  const notable = rows.filter(isNotableRow);
+  const rest = rows.filter((row) => !isNotableRow(row));
 
   const lines: string[] = [];
   lines.push(COMMENT_MARKER);
@@ -74,46 +81,64 @@ export function renderMarkdown(base: SizeReport, head: SizeReport): string {
     return lines.join("\n");
   }
 
-  if (changed.length === 0) {
-    lines.push("✅ No package size changes compared to the base branch.");
+  if (notable.length === 0) {
+    lines.push("✅ No notable package size changes compared to the base branch.");
   } else {
     const totalBase = sum(rows, (r) => r.base?.size ?? 0);
     const totalHead = sum(rows, (r) => r.head?.size ?? 0);
     lines.push(
-      `${changed.length} package${changed.length === 1 ? "" : "s"} changed size, ` +
+      `${notable.length} package${notable.length === 1 ? "" : "s"} changed size, ` +
         `${deltaCell(totalHead - totalBase, totalBase, totalHead)} packed overall.`,
     );
     lines.push("");
-    lines.push(...renderTable(changed));
+    lines.push(...renderTable(notable));
   }
   lines.push("");
 
-  if (unchanged.length > 0) {
+  if (rest.length > 0) {
     lines.push("<details>");
-    lines.push(`<summary>${unchanged.length} unchanged package(s)</summary>`);
+    lines.push(`<summary>${rest.length} package(s) with no notable change</summary>`);
     lines.push("");
-    lines.push(...renderTable(unchanged));
+    lines.push(...renderTable(rest));
     lines.push("</details>");
     lines.push("");
   }
 
   lines.push(
     "<sub>Packed = gzipped `.tgz` published to npm. Unpacked = total extracted size. " +
-      "🆕 added, 🗑️ removed. Packages from the `core/` submodule are not included.</sub>",
+      "🆕 added, 🗑️ removed. Packages from the `core/` submodule are not included.<br>" +
+      LEGEND +
+      "</sub>",
   );
   return lines.join("\n");
+}
+
+/**
+ * Whether a package moved enough to be worth a reviewer's attention.
+ *
+ * Anything below the thresholds is grouped away: rebuilding the same sources does not always
+ * produce a byte-identical tarball. `@azure-tools/typespec-java`, for instance, ships a Maven
+ * jar whose zip entries carry wall-clock build timestamps, so the head and base builds compress
+ * to slightly different sizes even when nothing about the package changed.
+ */
+function isNotableRow(row: Row): boolean {
+  return (
+    isNotableSizeChange(row.packedDelta, row.base?.size ?? 0) ||
+    isNotableSizeChange(row.unpackedDelta, row.base?.unpackedSize ?? 0)
+  );
 }
 
 function sum(rows: Row[], select: (row: Row) => number): number {
   return rows.reduce((total, row) => total + select(row), 0);
 }
 
-/** A colored, signed delta with its percentage, e.g. a red "+1.02 KB (+0.1%)". */
-function deltaCell(delta: number, base: number, head: number): string {
+/** A signed delta with its percentage and, when notable, a 🔴/🟢 marker. */
+function deltaCell(delta: number, base: number, head: number, marker = true): string {
   if (delta === 0) {
     return "—";
   }
-  return colored(`${formatDelta(delta)} (${formatPercent(base, head)})`, trendOf(delta));
+  const indicator = marker ? changeIndicator(delta, base) : "";
+  return `${formatDelta(delta)} (${formatPercent(base, head)}) ${indicator}`.trim();
 }
 
 function renderTable(rows: Row[]): string[] {
@@ -123,11 +148,19 @@ function renderTable(rows: Row[]): string[] {
   for (const row of rows) {
     const packed = `${sizeCell(row.base)} → ${sizeCell(row.head)}`;
     const unpacked = `${unpackedCell(row.base)} → ${unpackedCell(row.head)}`;
-    const packedDelta = deltaCell(row.packedDelta, row.base?.size ?? 0, row.head?.size ?? 0);
+    // An added or removed package is already called out by 🆕/🗑️; a marker would just be noise.
+    const marker = Boolean(row.base && row.head);
+    const packedDelta = deltaCell(
+      row.packedDelta,
+      row.base?.size ?? 0,
+      row.head?.size ?? 0,
+      marker,
+    );
     const unpackedDelta = deltaCell(
       row.unpackedDelta,
       row.base?.unpackedSize ?? 0,
       row.head?.unpackedSize ?? 0,
+      marker,
     );
     lines.push(
       `| \`${row.name}\`${statusLabel(row)} | ${packed} | ${packedDelta} | ${unpacked} | ${unpackedDelta} |`,

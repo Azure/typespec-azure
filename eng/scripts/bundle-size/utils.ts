@@ -50,31 +50,36 @@ export function isRepoPackage(pkg: WorkspacePackage): boolean {
 }
 
 /**
- * Colors for size trends, picked to stay legible on both the light and dark GitHub themes.
+ * A size change is only worth flagging when it is both big enough in absolute terms and big
+ * enough relative to the package. Anything smaller is build noise (timestamps, compiler banners
+ * captured in generated files, gzip jitter) rather than something a reviewer should act on.
  */
-const trendColors = {
-  increase: "#e5534b",
-  decrease: "#2da44e",
-  neutral: "#8b949e",
-} as const;
+const MIN_NOTABLE_BYTES = 512;
+const MIN_NOTABLE_PERCENT = 0.5;
 
-export type SizeTrend = keyof typeof trendColors;
-
-/** Pick the trend for a delta: growing is bad (red), shrinking is good (green). */
-export function trendOf(delta: number): SizeTrend {
-  return delta > 0 ? "increase" : delta < 0 ? "decrease" : "neutral";
+/** Mirrors `isNotableMetricChange` in the benchmark comment: both thresholds must be crossed. */
+export function isNotableSizeChange(
+  delta: number,
+  base: number,
+  minBytes: number = MIN_NOTABLE_BYTES,
+  minPercent: number = MIN_NOTABLE_PERCENT,
+): boolean {
+  if (base === 0) {
+    return delta !== 0; // A brand new package is always worth pointing out.
+  }
+  return Math.abs(delta) >= minBytes && Math.abs((delta / base) * 100) >= minPercent;
 }
 
-/**
- * Render `text` in color. GitHub renders `$...$` in comments as inline math, which is the only
- * way to get colored text inside a markdown table.
- */
-export function colored(text: string, trend: SizeTrend): string {
-  // `%` starts a comment in TeX so it has to reach the math renderer as `\%`. GitHub's markdown
-  // pass eats one level of backslash escaping first, hence the doubled backslash here.
-  const escaped = text.replace(/%/g, "\\\\%");
-  return `$\\textcolor{${trendColors[trend]}}{\\textsf{${escaped}}}$`;
+/** 🔴 grew, 🟢 shrank, nothing when the change is below the notability thresholds. */
+export function changeIndicator(delta: number, base: number): string {
+  if (!isNotableSizeChange(delta, base)) {
+    return "";
+  }
+  return delta > 0 ? "🔴" : "🟢";
 }
+
+/** Explains the indicators and the threshold behind them. */
+export const LEGEND = `🔴 grew · 🟢 shrank — only changes of at least ${MIN_NOTABLE_BYTES} B *and* ${MIN_NOTABLE_PERCENT}% are marked.`;
 
 /** Format a byte count as a human readable string (B, KB, MB). */
 export function formatBytes(bytes: number): string {
