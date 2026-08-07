@@ -578,4 +578,48 @@ describe("@convenientAPI requires scope diagnostic", () => {
 
     strictEqual(diagnostics.length, 0);
   });
+
+  it("should warn when scoped to 'javascript' (not a valid scope)", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "javascript")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 1);
+  });
+
+  it("should warn javascript emitter when using generate-convenience-methods option", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op test(): void;
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-ts",
+      "generate-convenience-methods": true,
+    });
+    const diagnostics = context.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/unnecessary-emitter-option",
+    );
+    strictEqual(diagnostics.length, 1);
+  });
+
+  it("should not warn java emitter when using generate-convenience-methods option", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op test(): void;
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+      "generate-convenience-methods": true,
+    });
+    const diagnostics = context.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/unnecessary-emitter-option",
+    );
+    strictEqual(diagnostics.length, 0);
+  });
 });
