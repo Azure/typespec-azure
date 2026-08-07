@@ -68,3 +68,52 @@ Raw AutoRest stdout and stderr are preserved unchanged. The normalized
 rule shards contain only messages whose level is `warning`, `error`, or `fatal`
 and which have a validator rule code. Results are sharded because the full ARM
 corpus exceeds GitHub's per-file size limit as one JSON document.
+
+## Add TypeSpec results
+
+Run the additive TypeSpec analysis only after a spec dataset exists:
+
+```powershell
+pnpm specs:generate `
+  --specs-repo C:\dev\azure-rest-api-specs `
+  --commit <commit> `
+  --filter specification\contoso `
+  --output C:\dev\lintdiff-pilot
+
+pnpm specs:typespec `
+  --specs-repo C:\dev\azure-rest-api-specs `
+  --output C:\dev\lintdiff-pilot `
+  --concurrency 2
+```
+
+For a pilot, generate a one-project dataset with `--filter` first; the TypeSpec
+command intentionally consumes exactly the projects and `specsCommit` recorded
+in that dataset and does not provide another filter.
+
+The command verifies that the specs clone is clean, temporarily checks out the
+recorded commit, builds and links this package as
+`tsp-lintdiff-local-linter`, and adds
+`tsp-lintdiff-local-linter/all` to a temporary copy of each project's existing
+`tspconfig.yaml`. Official rulesets and other linter settings remain enabled.
+Compilation uses `--no-emit`, so Swagger generation and validation are not
+repeated. Temporary configs are deleted and the specs clone's original ref is
+restored.
+
+The additive files are:
+
+- `typespec-results.json`: rule index and per-project compile status.
+- `results/by-typespec-rule/<encoded-rule>.json`: normalized diagnostics,
+  including origin, severity, source location and full message.
+- `comparison-results.json` and `comparison-results.md`: project-level overlap
+  between validator rules and the `tspLints` mappings in fixture frontmatter,
+  plus TypeSpec rules that have no mapping.
+- `projects/<spec-path>/raw/typespec.stdout.txt` and
+  `typespec.stderr.txt`: complete TypeSpec CLI output for each project.
+
+`_meta.json` keeps schema version 4 and receives a separate
+`typespecAnalysis` object. It records the analysis schema version, counts,
+generated files, local git revision, and a SHA-256 fingerprint over the local
+linter's source and package/TypeScript configuration. The original dataset
+cache remains reusable; compare the fingerprint before reusing TypeSpec results
+after local linter changes. Only `results/by-typespec-rule` is removed before
+shards are rewritten, so validator results are left untouched.
