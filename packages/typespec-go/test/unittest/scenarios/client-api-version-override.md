@@ -23,7 +23,7 @@ namespace VersionedService {
     name: "LegacyOperationsClient",
     service: VersionedService,
   })
-  @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
+  @Azure.Core.Legacy.overrideApiVersion("opaque-legacy-version")
   interface LegacyOperations {
     getLegacy(@query("api-version") @apiVersion apiVersion: Versions): void;
   }
@@ -166,7 +166,7 @@ import (
 // VersionedServiceLegacyOperationsClient contains the methods for the VersionedServiceLegacyOperations group.
 // Don't use this type directly, use [VersionedServiceClient.NewVersionedServiceLegacyOperationsClient] instead.
 //
-// Generated from API version 2021-11-01
+// Generated from API version opaque-legacy-version
 type VersionedServiceLegacyOperationsClient struct {
 	internal *azcore.Client
 	endpoint string
@@ -201,7 +201,7 @@ func (client *VersionedServiceLegacyOperationsClient) getLegacyCreateRequest(ctx
 		return nil, err
 	}
 	reqQP := req.Raw().URL.Query()
-	reqQP.Set("api-version", version20211101)
+	reqQP.Set("api-version", versionOpaqueLegacyVersion)
 	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
 	return req, nil
 }
@@ -279,7 +279,7 @@ func (client *VersionedServiceCurrentOperationsClient) getCurrentCreateRequest(c
 package testmodule
 
 const (
-	version20211101 string = "2021-11-01"
-	version20250101 string = "2025-01-01"
+	version20250101            string = "2025-01-01"
+	versionOpaqueLegacyVersion string = "opaque-legacy-version"
 )
 ```

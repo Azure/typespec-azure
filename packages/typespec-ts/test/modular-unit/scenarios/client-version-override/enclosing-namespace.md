@@ -1,4 +1,4 @@
-# An explicit interface child can use a distinct client API version
+# An enclosing namespace can set a distinct client API version
 
 ## TypeSpec
 
@@ -18,14 +18,16 @@ namespace VersionedService {
   @route("/parent")
   op getParent(@query("api-version") @apiVersion serviceVersion: Versions = Versions.v2): void;
 
-  @route("/legacy")
-  @client({
-    name: "LegacyOperationsClient",
-    service: VersionedService,
-  })
-  @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
-  interface LegacyOperations {
-    getLegacy(@query("api-version") @apiVersion apiVersion: Versions = Versions.v2): void;
+  @Azure.Core.Legacy.overrideApiVersion("opaque-legacy-version")
+  namespace Legacy {
+    @route("/legacy")
+    @client({
+      name: "LegacyOperationsClient",
+      service: VersionedService,
+    })
+    interface LegacyOperations {
+      getLegacy(@query("api-version") @apiVersion apiVersion: Versions = Versions.v2): void;
+    }
   }
 
   @route("/current")
@@ -42,6 +44,7 @@ namespace VersionedService {
 ## Config
 
 ```yaml
+needAzureCore: true
 needTCGC: true
 ```
 
@@ -81,8 +84,8 @@ import { VersionedServiceContext as Client } from "./index.js";
 import { expandUrlTemplate } from "../static-helpers/urlTemplate.js";
 import {
   GetParentOptionalParams,
-  GetCurrentOptionalParams,
   GetLegacyOptionalParams,
+  GetCurrentOptionalParams,
 } from "./options.js";
 import {
   StreamableMethod,
@@ -123,6 +126,38 @@ export async function getParent(
   return _getParentDeserialize(result);
 }
 
+export function _getLegacySend(
+  context: Client,
+  options: GetLegacyOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  const path = expandUrlTemplate(
+    "/legacy{?api%2Dversion}",
+    {
+      "api%2Dversion": "opaque-legacy-version",
+    },
+    {
+      allowReserved: options?.requestOptions?.skipUrlEncoding,
+    },
+  );
+  return context.path(path).get({ ...operationOptionsToRequestParameters(options) });
+}
+
+export async function _getLegacyDeserialize(result: PathUncheckedResponse): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+export async function getLegacy(
+  context: Client,
+  options: GetLegacyOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _getLegacySend(context, options);
+  return _getLegacyDeserialize(result);
+}
+
 export function _getCurrentSend(
   context: Client,
   options: GetCurrentOptionalParams = { requestOptions: {} },
@@ -153,37 +188,5 @@ export async function getCurrent(
 ): Promise<void> {
   const result = await _getCurrentSend(context, options);
   return _getCurrentDeserialize(result);
-}
-
-export function _getLegacySend(
-  context: Client,
-  options: GetLegacyOptionalParams = { requestOptions: {} },
-): StreamableMethod {
-  const path = expandUrlTemplate(
-    "/legacy{?api%2Dversion}",
-    {
-      "api%2Dversion": "2021-11-01",
-    },
-    {
-      allowReserved: options?.requestOptions?.skipUrlEncoding,
-    },
-  );
-  return context.path(path).get({ ...operationOptionsToRequestParameters(options) });
-}
-
-export async function _getLegacyDeserialize(result: PathUncheckedResponse): Promise<void> {
-  const expectedStatuses = ["204"];
-  if (!expectedStatuses.includes(result.status)) {
-    throw createRestError(result);
-  }
-
-  return;
-}
-export async function getLegacy(
-  context: Client,
-  options: GetLegacyOptionalParams = { requestOptions: {} },
-): Promise<void> {
-  const result = await _getLegacySend(context, options);
-  return _getLegacyDeserialize(result);
 }
 ```

@@ -1,6 +1,9 @@
-using TypeSpec.Reflection;
-
-namespace Azure.Core.Legacy;
+import type {
+  DecoratorContext,
+  DecoratorValidatorCallbacks,
+  Interface,
+  Namespace,
+} from "@typespec/compiler";
 
 /**
  * Overrides the API-version wire value used for operations within a namespace or interface.
@@ -15,7 +18,6 @@ namespace Azure.Core.Legacy;
  * @param target The namespace or interface whose operations use the API-version override.
  * @param version The non-empty API-version wire value.
  * @param scope The language emitters to which the override applies.
- *
  * @example Override an interface API version
  * ```typespec
  * @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
@@ -24,29 +26,13 @@ namespace Azure.Core.Legacy;
  * }
  * ```
  */
-extern dec overrideApiVersion(
+export type OverrideApiVersionDecorator = (
+  context: DecoratorContext,
   target: Namespace | Interface,
-  version: valueof string,
-  scope?: valueof string
-);
+  version: string,
+  scope?: string,
+) => DecoratorValidatorCallbacks | void;
 
-/**
- * A scalar type representing a next link that requires formatting with parameters to be used.
- *
- * @example
- * ```typespec
- * model ListCertificateOptions {
- *   includePending?: string;
- * }
- * model Certificate {
- *   name: string;
- * }
- * model Page {
- *   @pageItems items: Certificate[];
- *   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
- * }
- * ```
- */
-@Azure.Core.Foundations.Private.parameterizedNextLinkConfig(ParameterizedParams)
-scalar parameterizedNextLink<ParameterizedParams extends TypeSpec.Reflection.ModelProperty[]>
-  extends url;
+export type AzureCoreLegacyDecorators = {
+  overrideApiVersion: OverrideApiVersionDecorator;
+};

@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, fileRef, paramMessage } from "@typespec/compiler";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
@@ -263,6 +263,13 @@ export const $lib = createTypeSpecLibrary({
         default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
       },
     },
+    "invalid-api-version-override": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-api-version-override.md"),
+      severity: "error",
+      messages: {
+        default: "The API version override must be a non-empty string.",
+      },
+    },
     "experimental-feature": {
       severity: "warning",
       messages: {
@@ -304,6 +311,9 @@ export const $lib = createTypeSpecLibrary({
     },
     previewVersion: {
       description: "Data for `@previewVersion` decorator",
+    },
+    apiVersionOverride: {
+      description: "Data for `@overrideApiVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

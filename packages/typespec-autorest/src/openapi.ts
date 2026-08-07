@@ -5,6 +5,7 @@ import {
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   getUnionAsEnum,
   hasUniqueItems,
@@ -27,7 +28,6 @@ import {
 import {
   getClientDefaultValue,
   getClientNameOverride,
-  getEffectiveClientApiVersionOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
   isInScope,
@@ -3416,7 +3416,11 @@ function applyClientApiVersionOverride(
   if (operations.length === 0) return;
 
   const overrides = operations.map((operation) =>
-    getEffectiveClientApiVersionOverride(context.tcgcSdkContext, operation.operation),
+    getEffectiveApiVersionOverride(
+      context.program,
+      operation.operation,
+      "@azure-tools/typespec-autorest",
+    ),
   );
   if (overrides.every((value) => value === undefined)) return;
 
