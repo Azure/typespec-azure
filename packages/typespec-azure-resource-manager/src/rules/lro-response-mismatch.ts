@@ -2,18 +2,23 @@ import {
   createRule,
   getNamespaceFullName,
   isVoidType,
-  Model,
-  Operation,
+  type Model,
+  type Operation,
   paramMessage,
-  Program,
-  Type,
+  type Program,
+  type Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { HttpOperationResponse, HttpPayloadBody, isHeader, isStatusCode } from "@typespec/http";
-import { ArmResourceOperation } from "../operations.js";
-import { resolveArmResources, ResolvedResource } from "../resource.js";
+import {
+  type HttpOperationResponse,
+  type HttpPayloadBody,
+  isHeader,
+  isStatusCode,
+} from "@typespec/http";
+import type { ArmResourceOperation } from "../operations.js";
+import { resolveArmResources, type ResolvedResource } from "../resource.js";
 
 /**
  * Get the Response type from an operation's template parameter.
