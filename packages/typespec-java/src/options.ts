@@ -2,7 +2,7 @@ import {
   BrandedSdkEmitterOptions,
   UnbrandedSdkEmitterOptions,
 } from "@azure-tools/typespec-client-generator-core";
-import { JSONSchemaType } from "@typespec/compiler";
+import type { JSONSchemaType } from "@typespec/compiler";
 
 export const LIB_NAME = "@azure-tools/typespec-java";
 export const DIAGNOSTIC_DOCS_BASE_PATH = "src/diagnostics";
