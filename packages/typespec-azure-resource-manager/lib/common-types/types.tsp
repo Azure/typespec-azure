@@ -80,10 +80,14 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
   @visibility(Lifecycle.Read)
   etag?: string;
 
+  /** The identity of the resource. */
   @typeChangedFrom(Versions.v6, Identity)
   identity?: ManagedServiceIdentity;
 
+  /** The SKU of the resource. */
   sku?: Sku;
+
+  /** The plan of the resource. */
   plan?: Plan;
 }
 
@@ -346,6 +350,7 @@ union createdByType {
 
 /** Resource Identity Type */
 union ResourceIdentityType {
+  /** The identity is assigned by the system. */
   SystemAssigned: "SystemAssigned",
 }
 

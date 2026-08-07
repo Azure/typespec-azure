@@ -38,7 +38,7 @@ model RequestParameter<Name extends valueof string> {}
 model ResponseProperty<Name extends valueof string> {}
 
 /**
- * @dev Provides the status of a resource operation.
+ * Provides the status of a resource operation.
  * @template Resource The resource type.
  * @template StatusResult Model describing the status result object. If not specified, the default is the resource type.
  * @template StatusError Model describing the status error object. If not specified, the default is the Foundations.Error.
@@ -383,6 +383,7 @@ scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierA
   extends string;
 
 // Consider replacing `*`
+/** The deployment scopes in which an Azure Resource Manager resource identifier may be used. */
 union ArmResourceDeploymentScope {
   "Tenant",
   "Subscription",
@@ -401,6 +402,7 @@ alias AllArmResourceDeploymentScopes = [
   "Extension"
 ];
 
+/** Describes a resource type, and the scopes it applies to, that an `armResourceIdentifier` is allowed to refer to. */
 model ArmResourceIdentifierAllowedResource {
   /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
   type: armResourceType;

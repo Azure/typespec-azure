@@ -742,9 +742,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 #### Properties
 
-| Name              | Type                                                                                     | Description |
-| ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
+| Name              | Type                                                                                     | Description                            |
+| ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------- |
+| extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) | The extended location of the resource. |
 
 ### `ExtensionActionScope` {#Azure.ResourceManager.ExtensionActionScope}
 
@@ -1221,7 +1221,7 @@ Spread this model into ARM resource models to specify resource name parameter fo
 is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
 automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
 
-For additional decorators such as
+For additional decorators such as `@minLength`, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
 
 ```typespec
 model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName, NamePattern, Type>
@@ -2054,10 +2054,10 @@ model Azure.ResourceManager.CommonTypes.AccessRule
 
 #### Properties
 
-| Name        | Type                                                                                             | Description             |
-| ----------- | ------------------------------------------------------------------------------------------------ | ----------------------- |
-| name?       | `string`                                                                                         | Name of the access rule |
-| properties? | [`AccessRuleProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleProperties) |                         |
+| Name        | Type                                                                                             | Description                   |
+| ----------- | ------------------------------------------------------------------------------------------------ | ----------------------------- |
+| name?       | `string`                                                                                         | Name of the access rule       |
+| properties? | [`AccessRuleProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleProperties) | Properties of the access rule |
 
 ### `AccessRuleProperties` {#Azure.ResourceManager.CommonTypes.AccessRuleProperties}
 
@@ -2071,7 +2071,7 @@ model Azure.ResourceManager.CommonTypes.AccessRuleProperties
 
 | Name                       | Type                                                                                           | Description                                            |
 | -------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) |                                                        |
+| direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) | Direction of the access rule                           |
 | addressPrefixes?           | `string[]`                                                                                     | Address prefixes in the CIDR format for inbound rules  |
 | subscriptions?             | `Azure.ResourceManager.CommonTypes.{ id: Azure.Core.armResourceIdentifier }[]`                 | Subscriptions for inbound rules                        |
 | networkSecurityPerimeters? | `Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter[]`                                 | Network security perimeters for inbound rules          |
@@ -2514,9 +2514,9 @@ model Azure.ResourceManager.CommonTypes.ManagedServiceIdentityWithDelegation
 
 #### Properties
 
-| Name                | Type                                                                                         | Description |
-| ------------------- | -------------------------------------------------------------------------------------------- | ----------- |
-| delegatedResources? | [`DelegatedResources`](./data-types.md#Azure.ResourceManager.CommonTypes.DelegatedResources) |             |
+| Name                | Type                                                                                         | Description                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| delegatedResources? | [`DelegatedResources`](./data-types.md#Azure.ResourceManager.CommonTypes.DelegatedResources) | The delegated resources of the identity - internal use only. |
 
 ### `ManagementGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter}
 
@@ -2572,9 +2572,9 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfiguration
 
 #### Properties
 
-| Name        | Type                                                                                                                                                   | Description |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+| Name        | Type                                                                                                                                                   | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) | Network security configuration properties. |
 
 ### `NetworkSecurityPerimeterConfigurationListResult` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationListResult}
 
@@ -2615,13 +2615,13 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationPro
 
 #### Properties
 
-| Name                      | Type                                                                                                                                                                 | Description                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| provisioningState?        | [`NetworkSecurityPerimeterConfigurationProvisioningState`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProvisioningState) |                                     |
-| provisioningIssues?       | `Azure.ResourceManager.CommonTypes.ProvisioningIssue[]`                                                                                                              | List of provisioning issues, if any |
-| networkSecurityPerimeter? | [`NetworkSecurityPerimeter`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter)                                                             |                                     |
-| resourceAssociation?      | [`ResourceAssociation`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociation)                                                                       |                                     |
-| profile?                  | [`NetworkSecurityProfile`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile)                                                                 |                                     |
+| Name                      | Type                                                                                                                                                                 | Description                                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| provisioningState?        | [`NetworkSecurityPerimeterConfigurationProvisioningState`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProvisioningState) | Provisioning state of the network security perimeter configuration |
+| provisioningIssues?       | `Azure.ResourceManager.CommonTypes.ProvisioningIssue[]`                                                                                                              | List of provisioning issues, if any                                |
+| networkSecurityPerimeter? | [`NetworkSecurityPerimeter`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter)                                                             | Information about the network security perimeter (NSP)             |
+| resourceAssociation?      | [`ResourceAssociation`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociation)                                                                       | Information about the resource association                         |
+| profile?                  | [`NetworkSecurityProfile`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile)                                                                 | Network security perimeter configuration profile                   |
 
 ### `NetworkSecurityProfile` {#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile}
 
@@ -2695,9 +2695,9 @@ interface Employees {
 
 #### Properties
 
-| Name        | Type                                                                                                                                                   | Description |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+| Name        | Type                                                                                                                                                   | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) | Network security configuration properties. |
 
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
@@ -3110,10 +3110,10 @@ model Azure.ResourceManager.CommonTypes.ProvisioningIssue
 
 #### Properties
 
-| Name        | Type                                                                                                           | Description       |
-| ----------- | -------------------------------------------------------------------------------------------------------------- | ----------------- |
-| name?       | `string`                                                                                                       | Name of the issue |
-| properties? | [`ProvisioningIssueProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties) |                   |
+| Name        | Type                                                                                                           | Description                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| name?       | `string`                                                                                                       | Name of the issue                 |
+| properties? | [`ProvisioningIssueProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties) | Details of the provisioning issue |
 
 ### `ProvisioningIssueProperties` {#Azure.ResourceManager.CommonTypes.ProvisioningIssueProperties}
 
@@ -3172,10 +3172,10 @@ model Azure.ResourceManager.CommonTypes.ResourceAssociation
 
 #### Properties
 
-| Name        | Type                                                                                                               | Description                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| name?       | `string`                                                                                                           | Name of the resource association |
-| accessMode? | [`ResourceAssociationAccessMode`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociationAccessMode) |                                  |
+| Name        | Type                                                                                                               | Description                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| name?       | `string`                                                                                                           | Name of the resource association        |
+| accessMode? | [`ResourceAssociationAccessMode`](./data-types.md#Azure.ResourceManager.CommonTypes.ResourceAssociationAccessMode) | Access mode of the resource association |
 
 ### `ResourceGroupNameParameter` {#Azure.ResourceManager.CommonTypes.ResourceGroupNameParameter}
 
@@ -3206,9 +3206,9 @@ model Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
 | managedBy? | `string`                                                                                             | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.<br />If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.                                                                                                        |
 | kind?      | `string`                                                                                             | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.<br />If supported, the resource provider must validate and persist this value.                                                                                                                                                                     |
 | etag?      | `string`                                                                                             | The etag field is _not_ required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.<br />Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),<br />If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
-| identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) | The identity of the resource.                                                                                                                                                                                                                                                                                                                                                                                  |
+| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       | The SKU of the resource.                                                                                                                                                                                                                                                                                                                                                                                       |
+| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     | The plan of the resource.                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### `ScopeParameter` {#Azure.ResourceManager.CommonTypes.ScopeParameter}
 
@@ -3622,15 +3622,15 @@ union Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationPro
 
 #### Variants
 
-| Name      | Type          | Description |
-| --------- | ------------- | ----------- |
-| Succeeded | `"Succeeded"` |             |
-| Creating  | `"Creating"`  |             |
-| Updating  | `"Updating"`  |             |
-| Deleting  | `"Deleting"`  |             |
-| Accepted  | `"Accepted"`  |             |
-| Failed    | `"Failed"`    |             |
-| Canceled  | `"Canceled"`  |             |
+| Name      | Type          | Description                                                                  |
+| --------- | ------------- | ---------------------------------------------------------------------------- |
+| Succeeded | `"Succeeded"` | The configuration was provisioned successfully.                              |
+| Creating  | `"Creating"`  | The configuration is being created.                                          |
+| Updating  | `"Updating"`  | The configuration is being updated.                                          |
+| Deleting  | `"Deleting"`  | The configuration is being deleted.                                          |
+| Accepted  | `"Accepted"`  | The configuration request was accepted and provisioning has not started yet. |
+| Failed    | `"Failed"`    | The configuration failed to provision.                                       |
+| Canceled  | `"Canceled"`  | The configuration provisioning was canceled.                                 |
 
 ### `Origin` {#Azure.ResourceManager.CommonTypes.Origin}
 
@@ -3723,9 +3723,9 @@ union Azure.ResourceManager.CommonTypes.ResourceIdentityType
 
 #### Variants
 
-| Name           | Type               | Description |
-| -------------- | ------------------ | ----------- |
-| SystemAssigned | `"SystemAssigned"` |             |
+| Name           | Type               | Description                             |
+| -------------- | ------------------ | --------------------------------------- |
+| SystemAssigned | `"SystemAssigned"` | The identity is assigned by the system. |
 
 ### `Severity` {#Azure.ResourceManager.CommonTypes.Severity}
 
@@ -3737,10 +3737,10 @@ union Azure.ResourceManager.CommonTypes.Severity
 
 #### Variants
 
-| Name    | Type        | Description |
-| ------- | ----------- | ----------- |
-| Warning | `"Warning"` |             |
-| Error   | `"Error"`   |             |
+| Name    | Type        | Description                                                                       |
+| ------- | ----------- | --------------------------------------------------------------------------------- |
+| Warning | `"Warning"` | The issue is a warning and does not prevent the configuration from being applied. |
+| Error   | `"Error"`   | The issue is an error and prevents the configuration from being applied.          |
 
 ### `SkuTier` {#Azure.ResourceManager.CommonTypes.SkuTier}
 
@@ -3887,9 +3887,9 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 
 #### Properties
 
-| Name | Type       | Description |
-| ---- | ---------- | ----------- |
-| name | `NameType` |             |
+| Name | Type       | Description               |
+| ---- | ---------- | ------------------------- |
+| name | `NameType` | The name of the resource. |
 
 ### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
 
@@ -3927,9 +3927,9 @@ alias Scaleset = Extension.ExternalResource<
 
 #### Properties
 
-| Name | Type       | Description |
-| ---- | ---------- | ----------- |
-| name | `NameType` |             |
+| Name | Type       | Description               |
+| ---- | ---------- | ------------------------- |
+| name | `NameType` | The name of the resource. |
 
 ### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
 
@@ -4237,9 +4237,9 @@ model Azure.ResourceManager.Foundations.ProxyResourceUpdateModel<Resource, Prope
 
 #### Properties
 
-| Name        | Type                                                                                    | Description |
-| ----------- | --------------------------------------------------------------------------------------- | ----------- |
-| properties? | `Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` |             |
+| Name        | Type                                                                                    | Description                                         |
+| ----------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| properties? | `Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, Properties>` | The resource-specific properties for this resource. |
 
 ### `ResourceGroupBaseParameters` {#Azure.ResourceManager.Foundations.ResourceGroupBaseParameters}
 
@@ -4658,9 +4658,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 #### Properties
 
-| Name              | Type                                                                                                | Description |
-| ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
-| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
+| Name              | Type                                                                                                | Description                            |
+| ----------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) | The extended location of the resource. |
 
 ### `GenericResource` {#Azure.ResourceManager.Legacy.GenericResource}
 

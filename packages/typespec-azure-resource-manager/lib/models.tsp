@@ -11,7 +11,7 @@ namespace Azure.ResourceManager;
  * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
  * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
  *
- * For additional decorators such as @minLength, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
+ * For additional decorators such as `@minLength`, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
  *
  * @template Resource The ARM resource this name parameter is applying to.
  * @template KeyName Override default key name of the resource.
@@ -229,6 +229,7 @@ model DefaultProvisioningStateProperty {
  * ```
  */
 model ExtendedLocationProperty {
+  /** The extended location of the resource. */
   @visibility(Lifecycle.Read, Lifecycle.Create)
   extendedLocation?: Foundations.ExtendedLocation;
 }
