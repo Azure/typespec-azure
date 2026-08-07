@@ -15,7 +15,7 @@ import {
  * collapsing N re-parses into 1.
  *
  * The batch is reference-counted so nested begin/flush pairs compose safely.
- * Statements flush in insertion order and preserve declaration spacing.
+ * Statements flush in insertion order and produce byte-identical output.
  */
 
 let batchDepth = 0;
@@ -60,38 +60,16 @@ export function flushSourceFileBatch(): void {
  * @param structure - The statement structure to add.
  */
 export function enqueueStatement(sourceFile: SourceFile, structure: StatementStructures): void {
-  const separatedStructure = withDeclarationLeadingBlankLine(structure);
   if (batchDepth > 0) {
     let pending = pendingByFile.get(sourceFile);
     if (!pending) {
       pending = [];
       pendingByFile.set(sourceFile, pending);
     }
-    pending.push(separatedStructure);
+    pending.push(structure);
     return;
   }
-  sourceFile.addStatements([separatedStructure]);
-}
-
-function withDeclarationLeadingBlankLine(structure: StatementStructures): StatementStructures {
-  if (
-    structure.kind !== StructureKind.Class &&
-    structure.kind !== StructureKind.Enum &&
-    structure.kind !== StructureKind.Function &&
-    structure.kind !== StructureKind.Interface &&
-    structure.kind !== StructureKind.TypeAlias
-  ) {
-    return structure;
-  }
-
-  const existingTrivia = structure.leadingTrivia;
-  return {
-    ...structure,
-    leadingTrivia:
-      existingTrivia === undefined
-        ? "\n"
-        : ["\n", ...(Array.isArray(existingTrivia) ? existingTrivia : [existingTrivia])],
-  } as StatementStructures;
+  sourceFile.addStatements([structure]);
 }
 
 /**
