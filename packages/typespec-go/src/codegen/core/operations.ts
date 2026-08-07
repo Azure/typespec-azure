@@ -20,6 +20,18 @@ export class OperationGroupContent {
   }
 }
 
+function supportsPathAPIVersionOverride(client: go.Client): boolean {
+  return (
+    client.instance?.kind === "constructable" &&
+    client.parameters.some(
+      (param) =>
+        param.kind === "pathScalarParam" &&
+        param.isApiVersion &&
+        go.isLiteralParameter(param.style),
+    )
+  );
+}
+
 /**
  * Creates the content for all the *_client.go files.
  *
@@ -94,9 +106,13 @@ export function generateOperations(
     }
 
     const indent = new helpers.Indentation();
+    const pathAPIVersionOverride = supportsPathAPIVersionOverride(client);
 
     clientText += `type ${client.name} struct {\n`;
     clientText += `${indent.get()}internal *${azureARM ? "arm" : "azcore"}.Client\n`;
+    if (pathAPIVersionOverride) {
+      clientText += `${indent.get()}apiVersion string\n`;
+    }
 
     // check for any optional host params
     const optionalParams = new Array<go.ClientParameter>();
@@ -135,7 +151,13 @@ export function generateOperations(
     // end of client definition
     clientText += "}\n\n";
 
-    clientText += generateConstructors(client, target, imports, indent);
+    clientText += generateConstructors(
+      client,
+      target,
+      imports,
+      indent,
+      pathAPIVersionOverride,
+    );
 
     // generate client accessors and operations
     let opText = "";
@@ -225,6 +247,7 @@ function generateConstructors(
   type: go.CodeModelType,
   imports: ImportManager,
   indent: helpers.Indentation,
+  pathAPIVersionOverride: boolean,
 ): string {
   if (client.instance?.kind !== "constructable") {
     return "";
@@ -233,6 +256,12 @@ function generateConstructors(
   const clientOptions = client.instance.options;
 
   let ctorText = "";
+  const emitDefaultOptions = (optionsTypeName: string): string => {
+    let text = `${indent.get()}if options == nil {\n`;
+    text += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
+    text += `${indent.pop().get()}}\n`;
+    return text;
+  };
 
   if (clientOptions.kind === "clientOptions") {
     // for non-ARM, the options type will always be a parameter group
@@ -294,9 +323,7 @@ function generateConstructors(
       plOpts?: string,
     ): string {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
-      let bodyText = `${indent.get()}if options == nil {\n`;
-      bodyText += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
-      bodyText += `${indent.pop().get()}}\n`;
+      let bodyText = emitDefaultOptions(optionsTypeName);
       let apiVersionConfig = "";
       // check if there's an api version parameter
       let apiVersionParam:
@@ -312,7 +339,7 @@ function generateConstructors(
           case "queryScalarParam":
           case "uriParam":
             if (param.isApiVersion) {
-              apiVersionParam = param;
+              apiVersionParam ??= param;
             }
         }
       }
@@ -409,7 +436,11 @@ function generateConstructors(
             case "armClientOptions":
               // this is the ARM case
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/arm");
-              prolog = `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
+              prolog = "";
+              if (pathAPIVersionOverride) {
+                prolog += emitDefaultOptions(go.getTypeDeclaration(clientOptions, client.pkg));
+              }
+              prolog += `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
               break;
           }
           break;
@@ -487,6 +518,9 @@ function generateConstructors(
     // as any supplemental endpoint params are ephemeral and
     // consumed during client construction.
     indent.push();
+    if (pathAPIVersionOverride) {
+      ctorText += `${indent.get()}apiVersion: options.APIVersion,\n`;
+    }
     for (const parameter of client.parameters) {
       if (go.isLiteralParameter(parameter.style)) {
         continue;
@@ -1147,6 +1181,17 @@ function createProtocolRequest(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
+        if (
+          pp.kind === "pathScalarParam" &&
+          pp.isApiVersion &&
+          supportsPathAPIVersionOverride(method.receiver.type)
+        ) {
+          text += `${indent.get()}apiVersion := ${paramValue}\n`;
+          text += `${indent.get()}if client.apiVersion != "" {\n`;
+          text += `${indent.push().get()}apiVersion = client.apiVersion\n`;
+          text += `${indent.pop().get()}}\n`;
+          paramValue = "apiVersion";
+        }
       } else if (pp.style === "required" || pp.location === "client") {
         // NOTE: we include client params here since they behave
         // like required params (i.e. not grouped).
