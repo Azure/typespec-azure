@@ -126,7 +126,10 @@ internal model AgentProperties {
 
 /**
  * Appliance deployment model of AgentProperties.
- * All properties are read-only (the appliance owns and reports state).
+ * All properties are read-only (the appliance owns and reports state), except the `definition`
+ * container itself: it stays writable so the client can send the fields the agent definition
+ * marks as writable, such as `modelDeploymentRef`. Every service-owned field inside the
+ * definition remains read-only.
  * @template AgentDefinitionType The user-defined agent definition model (must extend AgentDefinition).
  */
 model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
@@ -142,8 +145,7 @@ model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
   @visibility(Lifecycle.Read)
   description: string;
 
-  /** Inline agent definition. */
-  @visibility(Lifecycle.Read)
+  /** Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned. */
   definition: AgentDefinitionType;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */

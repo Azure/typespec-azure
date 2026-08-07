@@ -1680,7 +1680,10 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform<HasModelDep
 ### `AgentPropertiesAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance}
 
 Appliance deployment model of AgentProperties.
-All properties are read-only (the appliance owns and reports state).
+All properties are read-only (the appliance owns and reports state), except the `definition`
+container itself: it stays writable so the client can send the fields the agent definition
+marks as writable, such as `modelDeploymentRef`. Every service-owned field inside the
+definition remains read-only.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<AgentDefinitionType>
@@ -1694,13 +1697,13 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<AgentDefin
 
 #### Properties
 
-| Name        | Type                                                              | Description                                                           |
-| ----------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
-| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                  | ARM-managed. Must include the base type descriptor for this resource. |
-| displayName | `string`                                                          | Human-friendly name.                                                  |
-| description | `string`                                                          | Purpose/behavior summary.                                             |
-| definition  | `AgentDefinitionType`                                             | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]` | Tool bindings. Read-only in the Appliance deployment model.           |
+| Name        | Type                                                              | Description                                                                                                                |
+| ----------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                  | ARM-managed. Must include the base type descriptor for this resource.                                                      |
+| displayName | `string`                                                          | Human-friendly name.                                                                                                       |
+| description | `string`                                                          | Purpose/behavior summary.                                                                                                  |
+| definition  | `AgentDefinitionType`                                             | Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned. |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]` | Tool bindings. Read-only in the Appliance deployment model.                                                                |
 
 ### `AgentPropertiesPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform}
 

@@ -2285,7 +2285,7 @@
     },
     "ContosoApplianceAgentProperties": {
       "type": "object",
-      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state).",
+      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state), except the `definition`\ncontainer itself: it stays writable so the client can send the fields the agent definition\nmarks as writable, such as `modelDeploymentRef`. Every service-owned field inside the\ndefinition remains read-only.",
       "properties": {
         "baseTypes": {
           "type": "array",
@@ -2307,8 +2307,7 @@
         },
         "definition": {
           "$ref": "#/definitions/ContosoApplianceDefinition",
-          "description": "Inline agent definition.",
-          "readOnly": true
+          "description": "Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned."
         },
         "tools": {
           "type": "array",

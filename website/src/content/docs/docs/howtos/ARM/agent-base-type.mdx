@@ -26,7 +26,8 @@ using Azure.ResourceManager.BaseTypes.Agents;
 Every agent shape comes in two variants that differ only in property visibility:
 
 - **Appliance** — the service owns and reports the agent configuration. Definition and agent
-  properties are **read-only**.
+  properties are **read-only**, except `modelDeploymentRef`: the `definition` container stays
+  writable so the client can select the underlying model deployment.
 - **Platform** — the client owns and manages the agent configuration. Definition and agent
   properties are **writable** (except `baseTypes`, which is always ARM-managed and read-only).
 
@@ -58,7 +59,9 @@ model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;
 ```
 
 `modelDeploymentRef` is writable in both deployment models: even when the service owns the rest of
-the appliance definition, the client selects the underlying model deployment.
+the appliance definition, the client selects the underlying model deployment. For this to work on
+the wire, `AgentPropertiesAppliance` also leaves the `definition` container itself writable — a
+read-only container would make every field inside it unsettable, including `modelDeploymentRef`.
 
 ## Defining the agent properties
 
