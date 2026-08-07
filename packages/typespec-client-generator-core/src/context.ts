@@ -193,8 +193,9 @@ export async function createSdkContext<
     context.options["generate-convenience-methods"] ?? tcgcContext.generateConvenienceMethods;
 
   // Warn if non-java/csharp emitter sets convenience/protocol options
-  const resolvedEmitterName = (emitterName ?? context.options["emitter-name"] ?? "").toLowerCase();
-  const isJavaOrCsharp = ["java", "csharp"].some((lang) => resolvedEmitterName.includes(lang));
+  const resolvedEmitterName = emitterName ?? context.options["emitter-name"] ?? "";
+  const [parsedLanguage] = parseEmitterName(context.program, resolvedEmitterName);
+  const isJavaOrCsharp = parsedLanguage === "java" || parsedLanguage === "csharp";
   if (!isJavaOrCsharp) {
     if (context.options["generate-convenience-methods"] !== undefined) {
       diagnostics.add(

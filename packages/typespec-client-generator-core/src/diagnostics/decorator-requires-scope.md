@@ -4,18 +4,22 @@ This diagnostic is issued when a TCGC decorator that requires a language scope i
 
 - **Area:** Language-scoped decorator behavior. The decorator may apply globally or to unintended emitters without a proper scope.
 - **Decorators checked:**
-  - `@convenientAPI(true)` — must be scoped to `"java"` and/or `"csharp"`. `@convenientAPI(false)` is always allowed without scope since opting out of convenience methods is safe for any language.
+  - `@convenientAPI` — must be scoped to `"java"` and/or `"csharp"` (both `true` and `false` values require a scope)
+  - `@protocolAPI` — must be scoped to `"java"` and/or `"csharp"` (both `true` and `false` values require a scope)
   - `@clientOption` — must be scoped to any specific language
 
 ## ❌ Incorrect Usage
 
 ```typespec
-// @convenientAPI(true) without scope or with wrong scope
+// @convenientAPI without scope or with wrong scope
 @convenientAPI(true)
 op myOperation(): void;
 
 @convenientAPI(true, "python")
 op anotherOperation(): void;
+
+@convenientAPI(false)
+op yetAnotherOperation(): void;
 
 // @clientOption without scope
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
@@ -29,7 +33,8 @@ TCGC reports:
 
 ```text
 @convenientAPI should be applied with a language scope of "java" or "csharp".
-@clientOption should be applied with a language scope of a specific language.
+@protocolAPI should be applied with a language scope of "java" or "csharp".
+@clientOption should be applied with a language scope of a language scope.
 ```
 
 ## ✅ How to Fix
@@ -43,9 +48,11 @@ op myOperation(): void;
 @convenientAPI(true, "csharp")
 op anotherOperation(): void;
 
-// @convenientAPI(false) is fine without scope
-@convenientAPI(false)
+@convenientAPI(false, "java")
 op yetAnotherOperation(): void;
+
+@protocolAPI(true, "java")
+op protocolOperation(): void;
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
 @clientOption("enableFeatureFoo", true, "python")

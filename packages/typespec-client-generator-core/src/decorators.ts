@@ -432,7 +432,7 @@ function validateJavaCsharpScope(
           .split(",")
           .map((s) => s.trim().toLowerCase());
         const hasValidScope = parsedScopes.some((s) =>
-          VALID_SCOPES.some((allowed) => s.includes(allowed)),
+          VALID_SCOPES.includes(s),
         );
         if (!hasValidScope) {
           diagnostics.push(
