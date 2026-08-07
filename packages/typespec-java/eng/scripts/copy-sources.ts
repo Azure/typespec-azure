@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { execa } from "execa";
-import { cp, mkdir, readdir, rm } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getCoreSourceRoot, removeCoreSourceRoot } from "./core-commit.ts";
@@ -22,6 +22,18 @@ async function main() {
       recursive: true,
       force: true,
     });
+
+    const diagnosticsRoot = join(packageRoot, "src", "diagnostics");
+    for (const entry of await readdir(diagnosticsRoot, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith(".md")) {
+        const path = join(diagnosticsRoot, entry.name);
+        const content = await readFile(path, "utf8");
+        await writeFile(
+          path,
+          content.replaceAll("@typespec/http-client-java", "@azure-tools/typespec-java"),
+        );
+      }
+    }
 
     const sourceGenerator = join(core.root, "generator");
     const destinationGenerator = join(packageRoot, "generator");
