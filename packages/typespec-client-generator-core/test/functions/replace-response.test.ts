@@ -84,6 +84,31 @@ it("replaces a response with bytes", async () => {
   strictEqual(method.operation.responses[0].type?.kind, "model");
 });
 
+it("replaces a response with an anonymous bytes body", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model Metadata {
+      name: string;
+    }
+
+    @get op download(): Metadata;
+
+    alias BytesResponse = {
+      @body body: bytes;
+    };
+
+    #suppress "experimental-feature" "testing replaceResponse"
+    @@override(TestService.download, replaceResponse(TestService.download, BytesResponse));
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+
+  ok(method.response.type);
+  strictEqual(method.response.type.kind, "model");
+  strictEqual(method.response.type.properties[0].type.kind, "bytes");
+  strictEqual(method.operation.responses[0].type?.kind, "model");
+});
+
 it("removes pageable behavior when overriding a list operation with bytes", async () => {
   const { program } = await SimpleTesterWithService.compile(`
     model BlobPage {
