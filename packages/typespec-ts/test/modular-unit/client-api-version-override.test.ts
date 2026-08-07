@@ -21,18 +21,18 @@ it("isolates a child API-version override from parent options", async () => {
 
         @route("/legacy")
         @client({ name: "LegacyOperationsClient", service: VersionedService })
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
+        @Azure.Core.Legacy.overrideApiVersion("opaque-legacy-version")
         interface LegacyOperations {
           getLegacy(@query("api-version") @apiVersion apiVersion: Versions = Versions.v2): void;
         }
       }
     `,
-    { needTCGC: true },
+    { needAzureCore: true, needTCGC: true },
   );
 
   expect(operations).toBeDefined();
   const text = [...operations!].map((file) => file.getFullText()).join("\n");
-  expect(text).toContain('"api%2Dversion": "2021-11-01"');
+  expect(text).toContain('"api%2Dversion": "opaque-legacy-version"');
   expect(text).toContain('"api%2Dversion": context.apiVersion ?? "2025-01-01"');
 });
 
@@ -53,17 +53,19 @@ it("initializes an optional custom-named API-version context property", async ()
           @query("api-version") @apiVersion serviceVersion?: Versions
         ): void;
 
-        @route("/legacy")
-        @client({ name: "LegacyOperationsClient", service: VersionedService })
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-11-01")
-        interface LegacyOperations {
-          getLegacy(
-            @query("api-version") @apiVersion apiVersion: Versions = Versions.v2
-          ): void;
+        @Azure.Core.Legacy.overrideApiVersion("opaque-legacy-version")
+        namespace Legacy {
+          @route("/legacy")
+          @client({ name: "LegacyOperationsClient", service: VersionedService })
+          interface LegacyOperations {
+            getLegacy(
+              @query("api-version") @apiVersion apiVersion: Versions = Versions.v2
+            ): void;
+          }
         }
       }
     `,
-    { needTCGC: true },
+    { needAzureCore: true, needTCGC: true },
   );
 
   const text = context!.getFullText();
@@ -89,7 +91,7 @@ it("preserves enum typing for normal version options", async () => {
         op getItem(@query("api-version") @apiVersion version: Versions = Versions.v2): void;
       }
     `,
-    { needTCGC: true },
+    { needAzureCore: true, needTCGC: true },
   );
 
   const text = context!.getFullText();

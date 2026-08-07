@@ -192,15 +192,6 @@ export const $lib = createTypeSpecLibrary({
         default: `Access value must be "public" or "internal".`,
       },
     },
-    "invalid-client-api-version-override": {
-      ...doc("invalid-client-api-version-override"),
-      severity: "error",
-      messages: {
-        default: "API version override must be a non-empty, non-whitespace string.",
-        requiresSubclient:
-          "@overrideClientApiVersion can only be applied to an interface that resolves to a subclient.",
-      },
-    },
     "invalid-usage": {
       ...doc("invalid-usage"),
       severity: "error",

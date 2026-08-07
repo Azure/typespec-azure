@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add the legacy `@overrideClientApiVersion` decorator and expose per-client API-version defaults to emitters.
+Populate per-client API-version defaults from `Azure.Core.Legacy.overrideApiVersion` for downstream emitters.

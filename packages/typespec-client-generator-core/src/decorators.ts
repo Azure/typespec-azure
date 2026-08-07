@@ -64,7 +64,6 @@ import type {
   MarkAsLroDecorator,
   MarkAsPageableDecorator,
   NextLinkVerbDecorator,
-  OverrideClientApiVersionDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   type AccessFlags,
@@ -72,8 +71,6 @@ import {
   type ExternalTypeInfo,
   type LanguageScopes,
   type SdkClient,
-  type SdkClientType,
-  type SdkServiceOperation,
   type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -1918,80 +1915,6 @@ export function getClientDefaultValue(
   entity: ModelProperty,
 ): string | boolean | Numeric | undefined {
   return getScopedDecoratorData(context, clientDefaultValueKey, entity);
-}
-
-const overrideClientApiVersionKey = createStateSymbol("overrideClientApiVersion");
-
-export const $overrideClientApiVersion: OverrideClientApiVersionDecorator = (
-  context: DecoratorContext,
-  target: Interface,
-  version: string,
-  scope?: LanguageScopes,
-) => {
-  if (version.trim().length === 0) {
-    reportDiagnostic(context.program, {
-      code: "invalid-client-api-version-override",
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
-  setScopedDecoratorData(
-    context,
-    $overrideClientApiVersion,
-    overrideClientApiVersionKey,
-    target,
-    version,
-    scope,
-  );
-};
-
-/** Returns the API-version wire default configured directly on an interface. */
-export function getClientApiVersionOverride(
-  context: TCGCContext | Program,
-  target: Interface,
-  emitterName?: string,
-): string | undefined {
-  const tcgcContext =
-    "stateMap" in context
-      ? ({ program: context, emitterName: emitterName ?? AllScopes } as TCGCContext)
-      : context;
-  return getScopedDecoratorData(tcgcContext, overrideClientApiVersionKey, target);
-}
-
-type ClientApiVersionOverrideTarget =
-  Interface | Operation | SdkClient | SdkClientType<SdkServiceOperation>;
-
-/**
- * Returns the interface-local API-version override effective for an operation or generated client.
- */
-export function getEffectiveClientApiVersionOverride(
-  context: TCGCContext | Program,
-  target: ClientApiVersionOverrideTarget,
-  emitterName?: string,
-): string | undefined {
-  let clientType: Namespace | Interface | undefined;
-  if (target.kind === "Interface") {
-    clientType = target;
-  } else if (target.kind === "Operation") {
-    let operation: Operation | undefined = target;
-    while (operation) {
-      if (operation.interface) {
-        const value = getClientApiVersionOverride(context, operation.interface, emitterName);
-        if (value !== undefined) return value;
-      }
-      operation = operation.sourceOperation;
-    }
-    return undefined;
-  } else if (target.kind === "client") {
-    clientType = target.__raw.type;
-  } else {
-    clientType = target.type;
-  }
-
-  return clientType?.kind === "Interface"
-    ? getClientApiVersionOverride(context, clientType, emitterName)
-    : undefined;
 }
 
 /**

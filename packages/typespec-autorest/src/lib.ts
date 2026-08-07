@@ -467,7 +467,7 @@ export const $lib = createTypeSpecLibrary({
     "inconsistent-client-api-version-override": {
       severity: "warning",
       messages: {
-        default: paramMessage`Operations emitted to the same OpenAPI document must specify one consistent \`@overrideClientApiVersion\` value. Found values: ${"values"}. The normal document version ${"fallback"} will be retained.`,
+        default: paramMessage`Operations emitted to the same OpenAPI document must specify one consistent \`@overrideApiVersion\` value. Found values: ${"values"}. The normal document version ${"fallback"} will be retained.`,
       },
     },
   },

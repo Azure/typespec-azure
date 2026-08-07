@@ -1,3 +1,4 @@
+import { getEffectiveApiVersionOverride } from "@azure-tools/typespec-azure-core";
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, type HttpServer } from "@typespec/http";
@@ -5,7 +6,6 @@ import {
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
-  getEffectiveClientApiVersionOverride,
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
@@ -204,7 +204,11 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
-  const apiVersionDefaultValue = getEffectiveClientApiVersionOverride(context, client);
+  const apiVersionDefaultValue = getEffectiveApiVersionOverride(
+    context.program,
+    clientType,
+    context.emitterName,
+  );
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",

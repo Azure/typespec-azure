@@ -58,18 +58,17 @@ const suppressStandardOperations =
   '#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Test operation."';
 
 describe("client API version inference", () => {
-  it("infers a default document version when all interface clients use the same override", async () => {
+  it("infers a default document version from an enclosing namespace override", async () => {
     const [openapi, diagnostics] = await emitDefault(`
       @service
       @info(#{version: "fallback-version"})
+      @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
       namespace Microsoft.Test {
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
         interface Widgets {
           ${suppressStandardOperations}
           @get @route("/widgets") op list(): string[];
         }
 
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
         interface Gadgets {
           ${suppressStandardOperations}
           @get @route("/gadgets") op list(): string[];
@@ -79,6 +78,23 @@ describe("client API version inference", () => {
 
     expectDiagnosticEmpty(diagnostics);
     expect(openapi.info.version).toBe("2020-01-01");
+  });
+
+  it("ignores overrides scoped to another emitter", async () => {
+    const [openapi, diagnostics] = await emitDefault(`
+      @service
+      @info(#{version: "fallback-version"})
+      @Azure.Core.Legacy.overrideApiVersion("2020-01-01", "python")
+      namespace Microsoft.Test {
+        interface Widgets {
+          ${suppressStandardOperations}
+          @get @route("/widgets") op list(): string[];
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    expect(openapi.info.version).toBe("fallback-version");
   });
 
   it("infers each feature document independently and leaves common on the fallback", async () => {
@@ -96,14 +112,14 @@ describe("client API version inference", () => {
       }
 
       @Azure.ResourceManager.featureFile(Features.FeatureA)
-      @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
+      @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
       interface FeatureAOperations {
         ${suppressStandardOperations}
         @get @route("/feature-a") op get(): string;
       }
 
       @Azure.ResourceManager.featureFile(Features.FeatureB)
-      @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-02-02")
+      @Azure.Core.Legacy.overrideApiVersion("2021-02-02")
       interface FeatureBOperations {
         ${suppressStandardOperations}
         @get @route("/feature-b") op get(): string;
@@ -121,7 +137,7 @@ describe("client API version inference", () => {
       @service
       @info(#{version: "fallback-version"})
       namespace Microsoft.Test {
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
+        @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
         interface Overridden {
           ${suppressStandardOperations}
           @get @route("/overridden") op get(): string;
@@ -138,7 +154,7 @@ describe("client API version inference", () => {
       code: "@azure-tools/typespec-autorest/inconsistent-client-api-version-override",
       severity: "warning",
       message:
-        "Operations emitted to the same OpenAPI document must specify one consistent `@overrideClientApiVersion` value. Found values: 2020-01-01, <none>. The normal document version fallback-version will be retained.",
+        "Operations emitted to the same OpenAPI document must specify one consistent `@overrideApiVersion` value. Found values: 2020-01-01, <none>. The normal document version fallback-version will be retained.",
     });
     expect(diagnostics[0].target.kind).toBe("Namespace");
     expect(openapi.info.version).toBe("fallback-version");
@@ -149,13 +165,13 @@ describe("client API version inference", () => {
       @service
       @info(#{version: "fallback-version"})
       namespace Microsoft.Test {
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
+        @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
         interface First {
           ${suppressStandardOperations}
           @get @route("/first") op get(): string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-02-02")
+        @Azure.Core.Legacy.overrideApiVersion("2021-02-02")
         interface Second {
           ${suppressStandardOperations}
           @get @route("/second") op get(): string;
@@ -167,7 +183,7 @@ describe("client API version inference", () => {
       code: "@azure-tools/typespec-autorest/inconsistent-client-api-version-override",
       severity: "warning",
       message:
-        "Operations emitted to the same OpenAPI document must specify one consistent `@overrideClientApiVersion` value. Found values: 2020-01-01, 2021-02-02. The normal document version fallback-version will be retained.",
+        "Operations emitted to the same OpenAPI document must specify one consistent `@overrideApiVersion` value. Found values: 2020-01-01, 2021-02-02. The normal document version fallback-version will be retained.",
     });
     expect(diagnostics[0].target.kind).toBe("Namespace");
     expect(openapi.info.version).toBe("fallback-version");
@@ -194,14 +210,14 @@ describe("client API version inference", () => {
       }
 
       @Azure.ResourceManager.featureFile(Features.FeatureA)
-      @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2020-01-01")
+      @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
       interface First {
         ${suppressStandardOperations}
         @get @route("/first") op get(): string;
       }
 
       @Azure.ResourceManager.featureFile(Features.FeatureA)
-      @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("2021-02-02")
+      @Azure.Core.Legacy.overrideApiVersion("2021-02-02")
       interface Second {
         ${suppressStandardOperations}
         @get @route("/second") op get(): string;
@@ -260,14 +276,14 @@ describe("client API version inference", () => {
 
         @removed(Versions.v2)
         @renamedFrom(Versions.v2, "Operations")
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("legacy-version")
+        @Azure.Core.Legacy.overrideApiVersion("legacy-version")
         interface OperationsV1 {
           @sharedRoute
           @get @route("/widgets") op get(): string;
         }
 
         @added(Versions.v2)
-        @Azure.ClientGenerator.Core.Legacy.overrideClientApiVersion("replacement-version")
+        @Azure.Core.Legacy.overrideApiVersion("replacement-version")
         interface Operations {
           @sharedRoute
           @get @route("/widgets") op get(): string;
