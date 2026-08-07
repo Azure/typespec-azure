@@ -45,6 +45,11 @@ export default {
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
 
+    // Azure core not enabled - ARM APIs intentionally use the OData spelling of the
+    // standard list query options (see `ArmTopParameter`, `ArmFilterParameter`,
+    // `ArmSkipParameter` in typespec-azure-resource-manager/lib/parameters.tsp)
+    "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params": false,
+
     // Not applicable for Arm
     "@azure-tools/typespec-azure-core/use-standard-names": false,
 

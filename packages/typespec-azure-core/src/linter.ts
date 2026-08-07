@@ -9,6 +9,7 @@ import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
+import { noDollarPrefixedQueryParamsRule } from "./rules/no-dollar-prefixed-query-params.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
@@ -83,6 +84,7 @@ const rules = [
   noLegacyUsage,
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
+  noDollarPrefixedQueryParamsRule,
 ];
 
 export const $linter = defineLinter({
