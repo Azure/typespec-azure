@@ -90,8 +90,7 @@ func (client *RegressionsClient) WithClientDefaultValues(ctx context.Context, op
 		return RegressionsClientWithClientDefaultValuesResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientWithClientDefaultValuesResponse{}, err
+		return RegressionsClientWithClientDefaultValuesResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientWithClientDefaultValuesResponse{}, nil
 }

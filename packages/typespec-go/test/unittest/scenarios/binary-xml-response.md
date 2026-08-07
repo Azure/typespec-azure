@@ -79,12 +79,7 @@ func (client *RegressionsClient) BinaryResponseWithXMLContentType(ctx context.Co
 	if err != nil {
 		return RegressionsClientBinaryResponseWithXMLContentTypeResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientBinaryResponseWithXMLContentTypeResponse{}, err
-	}
-	resp, err := client.binaryResponseWithXMLContentTypeHandleResponse(httpResp)
-	return resp, err
+	return client.binaryResponseWithXMLContentTypeHandleResponse(httpResp, http.StatusOK)
 }
 
 // binaryResponseWithXMLContentTypeCreateRequest creates the BinaryResponseWithXMLContentType request.
@@ -100,11 +95,15 @@ func (client *RegressionsClient) binaryResponseWithXMLContentTypeCreateRequest(c
 }
 
 // binaryResponseWithXMLContentTypeHandleResponse handles the BinaryResponseWithXMLContentType response.
-func (client *RegressionsClient) binaryResponseWithXMLContentTypeHandleResponse(resp *http.Response) (RegressionsClientBinaryResponseWithXMLContentTypeResponse, error) {
-	result := RegressionsClientBinaryResponseWithXMLContentTypeResponse{Body: resp.Body}
+func (client *RegressionsClient) binaryResponseWithXMLContentTypeHandleResponse(resp *http.Response, successCodes ...int) (RegressionsClientBinaryResponseWithXMLContentTypeResponse, error) {
+	result := RegressionsClientBinaryResponseWithXMLContentTypeResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if val := resp.Header.Get("Content-Type"); val != "" {
 		result.ContentType = &val
 	}
+	result.Body = resp.Body
 	return result, nil
 }
 ```

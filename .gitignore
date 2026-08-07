@@ -242,6 +242,8 @@ packages/typespec-go/test/**/testdata
 # time (only src/options.ts is committed).
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
+!packages/typespec-java/src/diagnostics/
+!packages/typespec-java/src/diagnostics/dpg-*.md
 packages/typespec-java/test/**
 # Java emitter.jar + assets staged from the core generator build.
 packages/typespec-java/generator/**
@@ -262,6 +264,7 @@ packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
 # packages/*/src/rules/*.md and packages/*/src/diagnostics/*.md.
 website/src/content/docs/docs/libraries/*/rules/
 website/src/content/docs/docs/libraries/*/reference/diagnostics/
+website/src/content/docs/docs/emitters/**/reference/diagnostics/
 
 # Empty
 prs.external-reviewers.generated.yml

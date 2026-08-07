@@ -89,12 +89,7 @@ func (client *RegressionsClient) GetBool(ctx context.Context, options *Regressio
 	if err != nil {
 		return RegressionsClientGetBoolResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientGetBoolResponse{}, err
-	}
-	resp, err := client.getBoolHandleResponse(httpResp)
-	return resp, err
+	return client.getBoolHandleResponse(httpResp, http.StatusOK)
 }
 
 // getBoolCreateRequest creates the GetBool request.
@@ -109,8 +104,11 @@ func (client *RegressionsClient) getBoolCreateRequest(ctx context.Context, _ *Re
 }
 
 // getBoolHandleResponse handles the GetBool response.
-func (client *RegressionsClient) getBoolHandleResponse(resp *http.Response) (RegressionsClientGetBoolResponse, error) {
+func (client *RegressionsClient) getBoolHandleResponse(resp *http.Response, successCodes ...int) (RegressionsClientGetBoolResponse, error) {
 	result := RegressionsClientGetBoolResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	body, err := runtime.Payload(resp)
 	if err != nil {
 		return RegressionsClientGetBoolResponse{}, err
@@ -136,12 +134,7 @@ func (client *RegressionsClient) GetFloat(ctx context.Context, options *Regressi
 	if err != nil {
 		return RegressionsClientGetFloatResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientGetFloatResponse{}, err
-	}
-	resp, err := client.getFloatHandleResponse(httpResp)
-	return resp, err
+	return client.getFloatHandleResponse(httpResp, http.StatusOK)
 }
 
 // getFloatCreateRequest creates the GetFloat request.
@@ -156,8 +149,11 @@ func (client *RegressionsClient) getFloatCreateRequest(ctx context.Context, _ *R
 }
 
 // getFloatHandleResponse handles the GetFloat response.
-func (client *RegressionsClient) getFloatHandleResponse(resp *http.Response) (RegressionsClientGetFloatResponse, error) {
+func (client *RegressionsClient) getFloatHandleResponse(resp *http.Response, successCodes ...int) (RegressionsClientGetFloatResponse, error) {
 	result := RegressionsClientGetFloatResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	body, err := runtime.Payload(resp)
 	if err != nil {
 		return RegressionsClientGetFloatResponse{}, err
@@ -183,12 +179,7 @@ func (client *RegressionsClient) GetInteger(ctx context.Context, options *Regres
 	if err != nil {
 		return RegressionsClientGetIntegerResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientGetIntegerResponse{}, err
-	}
-	resp, err := client.getIntegerHandleResponse(httpResp)
-	return resp, err
+	return client.getIntegerHandleResponse(httpResp, http.StatusOK)
 }
 
 // getIntegerCreateRequest creates the GetInteger request.
@@ -203,8 +194,11 @@ func (client *RegressionsClient) getIntegerCreateRequest(ctx context.Context, _ 
 }
 
 // getIntegerHandleResponse handles the GetInteger response.
-func (client *RegressionsClient) getIntegerHandleResponse(resp *http.Response) (RegressionsClientGetIntegerResponse, error) {
+func (client *RegressionsClient) getIntegerHandleResponse(resp *http.Response, successCodes ...int) (RegressionsClientGetIntegerResponse, error) {
 	result := RegressionsClientGetIntegerResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	body, err := runtime.Payload(resp)
 	if err != nil {
 		return RegressionsClientGetIntegerResponse{}, err

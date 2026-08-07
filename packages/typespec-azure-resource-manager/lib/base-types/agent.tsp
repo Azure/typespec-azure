@@ -56,7 +56,8 @@ internal model AgentDefinition {
 /**
  * Appliance deployment model of AgentDefinition.
  * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or read-only when present.
+ * template parameter is false. When present, `instructions` is read-only while
+ * `modelDeploymentRef` stays writable so the client can point the agent at a model deployment.
  * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
  * @template HasInstructions Whether the instructions property is present.
  */
@@ -72,8 +73,8 @@ model AgentDefinitionAppliance<
   @baseTypeOptional(HasInstructions, true)
   instructions: string;
 
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, true)
+  /** Optional RP-specific reference to an underlying model deployment. Writable in both deployment models. */
+  @baseTypeOptional(HasModelDeploymentRef, false)
   modelDeploymentRef?: string;
 }
 
@@ -125,7 +126,10 @@ internal model AgentProperties {
 
 /**
  * Appliance deployment model of AgentProperties.
- * All properties are read-only (the appliance owns and reports state).
+ * All properties are read-only (the appliance owns and reports state), except the `definition`
+ * container itself: it stays writable so the client can send the fields the agent definition
+ * marks as writable, such as `modelDeploymentRef`. Every service-owned field inside the
+ * definition remains read-only.
  * @template AgentDefinitionType The user-defined agent definition model (must extend AgentDefinition).
  */
 model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
@@ -141,8 +145,7 @@ model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
   @visibility(Lifecycle.Read)
   description: string;
 
-  /** Inline agent definition. */
-  @visibility(Lifecycle.Read)
+  /** Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned. */
   definition: AgentDefinitionType;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */

@@ -239,12 +239,7 @@ func (client *TenantItemsClient) Get(ctx context.Context, apiVersion string, ten
 	if err != nil {
 		return TenantItemsClientGetResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return TenantItemsClientGetResponse{}, err
-	}
-	resp, err := client.getHandleResponse(httpResp)
-	return resp, err
+	return client.getHandleResponse(httpResp, http.StatusOK)
 }
 
 // getCreateRequest creates the Get request.
@@ -266,8 +261,11 @@ func (client *TenantItemsClient) getCreateRequest(ctx context.Context, apiVersio
 }
 
 // getHandleResponse handles the Get response.
-func (client *TenantItemsClient) getHandleResponse(resp *http.Response) (TenantItemsClientGetResponse, error) {
+func (client *TenantItemsClient) getHandleResponse(resp *http.Response, successCodes ...int) (TenantItemsClientGetResponse, error) {
 	result := TenantItemsClientGetResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.TenantItem); err != nil {
 		return TenantItemsClientGetResponse{}, err
 	}
@@ -293,7 +291,7 @@ func (client *TenantItemsClient) NewListPager(apiVersion string, options *Tenant
 			if err != nil {
 				return TenantItemsClientListResponse{}, err
 			}
-			return client.listHandleResponse(resp)
+			return client.listHandleResponse(resp, http.StatusOK)
 		},
 	})
 }
@@ -313,8 +311,11 @@ func (client *TenantItemsClient) listCreateRequest(ctx context.Context, apiVersi
 }
 
 // listHandleResponse handles the List response.
-func (client *TenantItemsClient) listHandleResponse(resp *http.Response) (TenantItemsClientListResponse, error) {
+func (client *TenantItemsClient) listHandleResponse(resp *http.Response, successCodes ...int) (TenantItemsClientListResponse, error) {
 	result := TenantItemsClientListResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.TenantItemListResult); err != nil {
 		return TenantItemsClientListResponse{}, err
 	}
