@@ -853,7 +853,6 @@ paths:
           headers:
             Location:
               required: true
-              description: The location of an instance of WidgetPart
               schema:
                 type: string
                 format: uri

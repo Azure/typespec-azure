@@ -857,10 +857,10 @@ model Azure.Core.Foundations.LocationOfCreatedResourceResponse<Resource>
 
 #### Properties
 
-| Name       | Type                             | Description                           |
-| ---------- | -------------------------------- | ------------------------------------- |
-| statusCode | `201`                            | The status code.                      |
-| location   | `TypeSpec.Rest.ResourceLocation` | The location of the created resource. |
+| Name       | Type                             | Description      |
+| ---------- | -------------------------------- | ---------------- |
+| statusCode | `201`                            | The status code. |
+| location   | `TypeSpec.Rest.ResourceLocation` |                  |
 
 ### `LocationOfCreatedResourceWithServiceProvidedNameResponse` {#Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse}
 
@@ -878,10 +878,10 @@ model Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameRes
 
 #### Properties
 
-| Name       | Type                             | Description                           |
-| ---------- | -------------------------------- | ------------------------------------- |
-| statusCode | `202`                            | The status code.                      |
-| location   | `TypeSpec.Rest.ResourceLocation` | The location of the created resource. |
+| Name       | Type                             | Description      |
+| ---------- | -------------------------------- | ---------------- |
+| statusCode | `202`                            | The status code. |
+| location   | `TypeSpec.Rest.ResourceLocation` |                  |
 
 ### `LongRunningStatusLocation` {#Azure.Core.Foundations.LongRunningStatusLocation}
 
