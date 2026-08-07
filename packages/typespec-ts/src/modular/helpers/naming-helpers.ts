@@ -1,6 +1,7 @@
-import type {
-  SdkClientType,
-  SdkServiceOperation,
+import {
+  getClientNameOverride,
+  type SdkClientType,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
 import pluralize from "pluralize";
 import type { SdkContext } from "../../utils/interfaces.js";
@@ -31,7 +32,16 @@ export function getOperationName(
   const name = normalizeName(operation.name, NameType.Method, true);
   const propertyName = normalizeName(operation.name, NameType.Property);
   const isDataplane = dpgContext !== undefined && !dpgContext.emitterOptions?.azureArm;
-  if (isReservedName(operation.name, NameType.Method) && isDataplane) {
+  // An explicit `@clientName` override is an intentional naming choice by the user, so we
+  // honor it verbatim and skip the reserved-word disambiguation (and its `@fixme`). The
+  // public method keeps the reserved word (e.g. `delete`), while the generated API-layer
+  // function stays guarded (e.g. `$delete`) because a reserved word is not a valid function
+  // binding in JavaScript.
+  const hasClientNameOverride =
+    dpgContext !== undefined &&
+    operation.__raw !== undefined &&
+    getClientNameOverride(dpgContext, operation.__raw) !== undefined;
+  if (isReservedName(operation.name, NameType.Method) && isDataplane && !hasClientNameOverride) {
     const suffix = getReservedNameGroupSuffix(prefixes);
     if (suffix) {
       // Disambiguate the reserved word by suffixing the singularized operation group

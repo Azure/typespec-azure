@@ -224,3 +224,75 @@ export async function deleteConversation(
   return _deleteConversationDeserialize(result);
 }
 ```
+
+# should preserve reserved word operation name when an explicit @clientName override is set
+
+When the user explicitly names a reserved-word operation via `@clientName`, the emitter treats
+it as an intentional choice: it does not disambiguate the name with the operation group and does
+not emit a `@fixme`. The public method keeps the reserved word (`delete`), while the generated
+API-layer function stays guarded (`$delete`) because a reserved word is not a valid function
+binding in JavaScript.
+
+## TypeSpec
+
+```tsp
+@route("/conversations")
+interface Conversations {
+  @delete
+  @clientName("delete")
+  delete(@path conversationName: string): void;
+}
+```
+
+```yaml
+enable-operation-group: true
+needTCGC: true
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "../index.js";
+import { expandUrlTemplate } from "../../static-helpers/urlTemplate.js";
+import { ConversationsDeleteOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  PathUncheckedResponse,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+
+export function _$deleteSend(
+  context: Client,
+  conversationName: string,
+  options: ConversationsDeleteOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  const path = expandUrlTemplate(
+    "/conversations/{conversationName}",
+    {
+      conversationName: conversationName,
+    },
+    {
+      allowReserved: options?.requestOptions?.skipUrlEncoding,
+    },
+  );
+  return context.path(path).delete({ ...operationOptionsToRequestParameters(options) });
+}
+
+export async function _$deleteDeserialize(result: PathUncheckedResponse): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+export async function $delete(
+  context: Client,
+  conversationName: string,
+  options: ConversationsDeleteOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _$deleteSend(context, conversationName, options);
+  return _$deleteDeserialize(result);
+}
+```
