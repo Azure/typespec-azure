@@ -823,6 +823,22 @@ export class TypeAdapter {
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
 
+    if (prop.encode && type.kind === "slice") {
+      if (
+        type.elementType.kind === "string" ||
+        (type.elementType.kind === "constant" && type.elementType.type === "string")
+      ) {
+        annotations.arrayEncoding = prop.encode;
+      } else {
+        this.ctx.program.reportDiagnostic({
+          code: "UnsupportedArrayEncoding",
+          severity: "warning",
+          message: `The array property ${prop.name} uses ${prop.encode} encoding with unsupported element type ${prop.type.kind === "array" ? prop.type.valueType.kind : prop.type.kind}. The encoding will be ignored.`,
+          target: prop.__raw?.node ?? tsp.NoTarget,
+        });
+      }
+    }
+
     if (prop.discriminator && modelType.discriminatorValue) {
       // the presence of modelType.discriminatorValue tells us that this
       // property is on a model that's not the root discriminator
