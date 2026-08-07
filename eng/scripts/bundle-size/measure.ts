@@ -1,6 +1,7 @@
-// Measure the published npm package (tarball) size of every publishable workspace
-// package. For each package we run `npm pack --dry-run --json` inside the package
-// directory and record the packed (gzipped) size and the unpacked size.
+// Measure the published npm package (tarball) size of every publishable package owned by
+// this repo (the `core/` submodule is excluded, it publishes from `microsoft/typespec`).
+// For each package we run `npm pack --dry-run --json` inside the package directory and
+// record the packed (gzipped) size and the unpacked size.
 //
 // Usage:
 //   tsx eng/scripts/bundle-size/measure.ts --out <file.json>
@@ -10,7 +11,7 @@
 import { execFileSync } from "child_process";
 import { mkdir, writeFile } from "fs/promises";
 import { dirname } from "path";
-import { listPackages } from "./utils.ts";
+import { isRepoPackage, listPackages } from "./utils.ts";
 
 export interface PackageSize {
   version: string;
@@ -56,8 +57,10 @@ export async function measureAllPackages(): Promise<SizeReport> {
 
   for (const pkg of packages) {
     const name = pkg.name;
-    if (!name || pkg.private) {
-      continue; // Skip unnamed or private (non-publishable) packages.
+    // Skip unnamed or private (non-publishable) packages, and everything from the `core/`
+    // submodule, which is published from `microsoft/typespec` rather than from this repo.
+    if (!name || pkg.private || !isRepoPackage(pkg)) {
+      continue;
     }
     try {
       const result = measurePackage(pkg.path);

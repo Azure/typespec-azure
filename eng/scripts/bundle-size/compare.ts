@@ -9,8 +9,9 @@
 
 import { appendFile, mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
+import { pathToFileURL } from "url";
 import type { PackageSize, SizeReport } from "./measure.ts";
-import { formatBytes, formatDelta, formatPercent } from "./utils.ts";
+import { colored, formatBytes, formatDelta, formatPercent, trendOf } from "./utils.ts";
 
 /** Hidden marker so the comment workflow can find & update its own comment. */
 export const COMMENT_MARKER = "<!-- bundle-size-report -->";
@@ -74,10 +75,13 @@ export function renderMarkdown(base: SizeReport, head: SizeReport): string {
   }
 
   if (changed.length === 0) {
-    lines.push("No package size changes detected compared to the base branch. ✅");
+    lines.push("✅ No package size changes compared to the base branch.");
   } else {
+    const totalBase = sum(rows, (r) => r.base?.size ?? 0);
+    const totalHead = sum(rows, (r) => r.head?.size ?? 0);
     lines.push(
-      `${changed.length} package${changed.length === 1 ? "" : "s"} changed size compared to the base branch.`,
+      `${changed.length} package${changed.length === 1 ? "" : "s"} changed size, ` +
+        `${deltaCell(totalHead - totalBase, totalBase, totalHead)} packed overall.`,
     );
     lines.push("");
     lines.push(...renderTable(changed));
@@ -94,9 +98,22 @@ export function renderMarkdown(base: SizeReport, head: SizeReport): string {
   }
 
   lines.push(
-    "<sub>Packed = gzipped `.tgz` published to npm. Unpacked = total extracted size. 🆕 added, 🗑️ removed.</sub>",
+    "<sub>Packed = gzipped `.tgz` published to npm. Unpacked = total extracted size. " +
+      "🆕 added, 🗑️ removed. Packages from the `core/` submodule are not included.</sub>",
   );
   return lines.join("\n");
+}
+
+function sum(rows: Row[], select: (row: Row) => number): number {
+  return rows.reduce((total, row) => total + select(row), 0);
+}
+
+/** A colored, signed delta with its percentage, e.g. a red "+1.02 KB (+0.1%)". */
+function deltaCell(delta: number, base: number, head: number): string {
+  if (delta === 0) {
+    return "—";
+  }
+  return colored(`${formatDelta(delta)} (${formatPercent(base, head)})`, trendOf(delta));
 }
 
 function renderTable(rows: Row[]): string[] {
@@ -106,14 +123,12 @@ function renderTable(rows: Row[]): string[] {
   for (const row of rows) {
     const packed = `${sizeCell(row.base)} → ${sizeCell(row.head)}`;
     const unpacked = `${unpackedCell(row.base)} → ${unpackedCell(row.head)}`;
-    const packedDelta =
-      row.packedDelta === 0
-        ? "—"
-        : `${formatDelta(row.packedDelta)} (${formatPercent(row.base?.size ?? 0, row.head?.size ?? 0)})`;
-    const unpackedDelta =
-      row.unpackedDelta === 0
-        ? "—"
-        : `${formatDelta(row.unpackedDelta)} (${formatPercent(row.base?.unpackedSize ?? 0, row.head?.unpackedSize ?? 0)})`;
+    const packedDelta = deltaCell(row.packedDelta, row.base?.size ?? 0, row.head?.size ?? 0);
+    const unpackedDelta = deltaCell(
+      row.unpackedDelta,
+      row.base?.unpackedSize ?? 0,
+      row.head?.unpackedSize ?? 0,
+    );
     lines.push(
       `| \`${row.name}\`${statusLabel(row)} | ${packed} | ${packedDelta} | ${unpacked} | ${unpackedDelta} |`,
     );
@@ -151,4 +166,7 @@ async function main() {
   console.log(markdown);
 }
 
-await main();
+// Only run as a CLI, so the rendering helpers above can be imported from tests.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main();
+}
