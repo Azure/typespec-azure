@@ -61,9 +61,9 @@ cp -r dist/src/* /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-chang
 cp lib/decorators.tsp /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-change/lib/
 cp package.json /path/to/azure-rest-api-specs/eng/tools/typespec-breaking-change/
 
-# 4. Commit to main in the specs fork
+# 4. Commit to main in the specs fork (use -f because .gitignore excludes .js)
 cd /path/to/azure-rest-api-specs
-git add eng/tools/typespec-breaking-change/
+git add -f eng/tools/typespec-breaking-change/
 git commit -m "chore: update breaking change tool JS"
 
 # 5. Rebase all PR branches onto main (so JS changes don't appear in PR diffs)
@@ -91,6 +91,8 @@ gh pr diff 5 --repo markcowl/azure-rest-api-specs --name-only
 - **Pushing to wrong branch names** — e.g., `pr4` instead of `versioning-test-unsup`. Always use the actual PR branch names.
 - **Forgetting to rebase** — If you commit JS to main but don't rebase PR branches, the PR diffs will show all the JS changes.
 - **Local vs GitHub diff mismatch** — After force-pushing, always verify on GitHub with `gh pr diff`. Local `git diff` uses a different merge-base.
+- **`.gitignore` blocking `git add`** — The specs repo's `.gitignore` excludes `.js` and `.js.map` files. You must use `git add -f` (force) to stage compiled JS files. Without `-f`, `git add` silently ignores them with no error.
+- **Sparse checkout preventing subdirectory commits** — If the specs repo uses sparse checkout, ensure the tool directory is in the sparse-checkout cone (`git sparse-checkout add eng/tools/typespec-breaking-change`) before adding files. Files outside the cone are silently skipped by `git add`.
 
 ## 4. Demo PRs (markcowl/azure-rest-api-specs)
 

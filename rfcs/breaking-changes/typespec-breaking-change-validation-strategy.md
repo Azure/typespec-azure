@@ -177,7 +177,20 @@ The test runner should:
 - Add performance benchmarks that record latency per comparison pair.
 - Integrate the full suite into CI so these tests run on every PR to the tool package.
 
-## 8. Success Criteria
+## 8. Current Progress
+
+**As of 2026-08-07:**
+
+- **Real-spec evaluation completed:** Network (739 ops, 26 findings), Fleet (42 ops, 70 findings), AppConfiguration (0 findings). All specs compile and analyze successfully within CI budget.
+- **Source tracing validated:** 92% direct resolution on Network, 88.6% on Fleet, 100% on AppConfiguration. Template tracing via `sourceModels`/`templateMapper.args` resolves ARM template boundaries.
+- **400 tests passing:** Includes 9 Resource merge/suppression scenario tests across all diff kinds, Priority 4 merge edge cases, and real-spec integration tests.
+- **4 demo PRs deployed:** PRs #6-#9 in `markcowl/azure-rest-api-specs` demonstrate Phase A and Phase B findings with and without suppressions.
+- **OAD correlation document exists:** `typespec-breaking-change-oad-correlation.md` maps OAD rules to DiffKinds. Phase 1 test conversion has not yet started.
+- **Phase 2 partial coverage:** Many unique DiffKinds have positive/negative tests. Suppression behavior tested for both `@approvedBreakingChange` and `@approvedUnversionedChange`. Phase A same-version tests exist via demo PRs and orchestrator tests.
+
+**Readiness assessment:** The tool is ready to begin Phase 1 (OAD test conversion) and Phase 3 (merged PR analysis) in parallel. Phase 4 (side-by-side) requires CI integration work (Phase 6.4 in comprehensive plan).
+
+## 9. Success Criteria
 
 Validation is complete only when all of the following are true:
 

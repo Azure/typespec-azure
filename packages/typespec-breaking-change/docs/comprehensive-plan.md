@@ -1,11 +1,12 @@
 # Comprehensive Plan: Next Steps for @azure-tools/typespec-breaking-change
 
 **Created:** 2026-08-04
+**Updated:** 2026-08-07
 **Status:** Active planning document
 
 ## Executive Summary
 
-The prototype is functional with 364 tests, real-world performance validation, and 4 demo PRs.
+The prototype is functional with 400 tests, real-world performance validation, and 4 demo PRs.
 This document captures the path from prototype to production-ready tool, organized as:
 (A) resolved questions (design settled, implementation may remain), (B) genuinely open questions, (C) prioritized work items.
 
@@ -128,21 +129,25 @@ These have NO resolved design and genuinely need investigation or decisions.
 
 **Action:** Consult with TypeSpec team. Decision needed before v1 GA.
 
-### B2. Source Tracing Completeness and Unification
+### B2. Source Tracing Completeness and Unification ✅ RESOLVED
 
-**Problem:** Source tracing works for common patterns but needs to be extended and unified. The existing fallback chain (design overview §8.2: headSourceLocation > origin > baseSourceLocation) handles most cases, but:
-- Origin resolution achieves only ~56% on Network, ~70% on AppConfiguration (PROTOTYPE-EVALUATION.md Q3/N1)
-- The gap is primarily ARM template type parameters (`TrackedResource<T>`) — `sourceProperty` chain doesn't extend through template boundaries (see also B5)
-- Source tracing for *source links* and *suppression identity lookup* use different code paths that should be unified
+**Problem:** Source tracing works for common patterns but needs to be extended and unified.
 
-**Desired extension of existing §8.2 algorithm:**
-1. Existing: look for source type in user code via `sourceProperty` chain
-2. **New:** if not found, use `templateMapper`/`templateArguments` to trace through template boundaries
-3. Existing: walk up identity parent chain (property → model → namespace)
-4. **New:** add explicit `sourceTraceLevel` field for debuggability (direct, ancestor, operation, namespace)
-5. Ensure both head and base source locations are resolved (head for "where to fix", base for "what changed")
+**Resolution (implemented in `fleet/improvements`):**
+- 6-level fallback chain implemented in `src/pipeline/resolve-location.ts`:
+  1. headSourceLocation (direct) — set by resolveHeadSourceLocations
+  2. origin.sourceLocation — named declaration via sourceProperty/template chain
+  3. baseSourceLocation — from base compilation
+  4. parentModel — type/sourceProperty/parent container
+  5. operation — operation declaration
+  6. namespace — service namespace + elementPath
+- Scoped namespace lookup: only finds files in the service namespace's directory tree
+- `sourceTraceLevel` field added for debuggability (direct, ancestor, operation, namespace)
+- Template tracing via `sourceModels` + `templateMapper.args` (see B5)
+- Real-spec evaluation: Network 92% direct, Fleet 88.6% direct, AppConfiguration 100%
 
-**Evidence:** Design overview §8.2 (existing fallback principle), PROTOTYPE-EVALUATION.md Q3/N1 (coverage gaps).
+**Evidence:** `src/pipeline/resolve-location.ts`, `docs/source-tracing-deep-dive.md`, design overview §8.2 updated.
+**Residual:** Base source location resolution not yet implemented (plan saved, deferred).
 
 ### B3. Wildcard and Blanket Suppressions
 
@@ -161,28 +166,33 @@ These have NO resolved design and genuinely need investigation or decisions.
 
 **Action:** Defer wildcard paths to post-v1. Validate kind-only behavior. Evaluate report flagging for wide suppressions.
 
-### B4. Output Format Documentation
+### B4. Output Format Documentation ✅ RESOLVED
 
-**Problem:** The JSON and Markdown output formats need formal documentation for the specs team and CI integration authors. Design overview §6.4 provides example markdown snippets but no formal schema.
+**Problem:** The JSON and Markdown output formats need formal documentation for the specs team and CI integration authors.
 
-**Action:**
-1. Create `docs/output-formats.md` with JSON schema for structured output
-2. Document Markdown format with annotated examples
-3. Document CI integration contract (exit codes, output paths, environment variables)
-4. Share with specs team for review
+**Resolution (implemented in `fleet/improvements`):**
+- Created `docs/output-formats.md` with:
+  - JSON schema for structured output (finding objects, metadata fields)
+  - Markdown format with annotated examples (grouped by phase/version pair)
+  - CI integration contract (exit codes, output paths, environment variables)
+  - Source link format documentation
 
-### B5. ARM Template Type Parameter Tracing
+**Evidence:** `docs/output-formats.md`.
 
-**Problem:** Origin resolution gap on properties flowing through ARM template type parameters (`TrackedResource<T>`, `StandardResourceOperations`). Separate from the general source tracing question (B2) because it requires specific investigation of the TypeSpec compiler's template machinery.
+### B5. ARM Template Type Parameter Tracing ✅ RESOLVED
 
-**Investigation plan:**
-1. Investigate `templateMapper` / `templateArguments` on the compiler's type graph
-2. Determine if the compiler preserves a link from template-expanded properties to the original `T`
-3. If yes, extend `resolveOrigin()` to follow template argument chains
-4. If no, evaluate whether the TypeSpec compiler could be extended to preserve this link
-5. Target: 90%+ origin resolution on representative ARM specs
+**Problem:** Origin resolution gap on properties flowing through ARM template type parameters (`TrackedResource<T>`, `StandardResourceOperations`).
 
-**Evidence:** PROTOTYPE-EVALUATION.md P1, N1.
+**Resolution (implemented in `fleet/improvements`):**
+- Investigated TypeSpec compiler internals: `sourceProperty` chain does NOT cross template boundaries
+- However, `model.sourceModels` array preserves links to template base types
+- `model.templateMapper.args` contains the actual type arguments passed to templates
+- Extended `resolveModelPropertyOrigin()` in `src/diff/origin.ts` with two new fallback paths:
+  1. Walk `sourceModels` to find properties in template base types
+  2. Walk `templateMapper.args` to find the original user-defined type argument
+- Results: Network origin resolution 56% → 92%, Fleet 88.6%
+
+**Evidence:** `src/diff/origin.ts`, `docs/source-tracing-evaluation.md`, design overview §8.2 updated with template tracing subsection.
 
 ### B6. Linter Rule Integration and IDE Feedback
 
@@ -256,8 +266,8 @@ Implement resolved designs and validate known gaps.
 | # | Item | Design Ref | Effort |
 |---|------|-----------|--------|
 | 1.1 | Implement new-vs-existing suppression comparison | §6.3 (A9) | 3 days |
-| 1.2 | Extend source tracing with unified fallbacks | §8.2 (B2) | 2 days |
-| 1.3 | ARM template type parameter tracing (higher origin%) | B5 | 2 days |
+| ~~1.2~~ | ~~Extend source tracing with unified fallbacks~~ | ~~§8.2 (B2)~~ | ✅ Done |
+| ~~1.3~~ | ~~ARM template type parameter tracing (higher origin%)~~ | ~~B5~~ | ✅ Done |
 | 1.4 | Catastrophic change detection tests | §6.2 (A13) | 1 day |
 | 1.5 | Verify narrowing/widening implementation matches §5 | §5 (A11) | 1 day |
 | 1.6 | Validate `path` and `since` narrowing | §6.6, §7.3 | 0.5 day |
@@ -281,20 +291,20 @@ See `typespec-breaking-change-test-coverage.md` for detailed scenario list.
 |---|------|--------|
 | 3.1 | Cross-compilation suppression completeness | 0.5 day |
 | 3.2 | Suppression display & hints | 0.5 day |
-| 3.3 | Source link resolution | 0.5 day |
-| 3.4 | Resource merge edge cases | 0.5 day |
+| ~~3.3~~ | ~~Source link resolution~~ | ✅ Done |
+| ~~3.4~~ | ~~Resource merge edge cases~~ | ✅ Done |
 | 3.5 | Reporter & summary messages | 0.5 day |
 | 3.6 | Diff engine edge cases | 0.5 day |
 | 3.7 | Mixed Phase A+B scenarios | 0.5 day |
 | 3.8 | E2E scenarios (25 scenarios) | 1.5 days |
-| 3.9 | Large-spec source tracing validation (100% on AppConfiguration, Fleet) | 1 day |
+| ~~3.9~~ | ~~Large-spec source tracing validation (100% on AppConfiguration, Fleet)~~ | ✅ Done |
 | 3.10 | Mixed new + existing suppression scenarios | 1 day |
 
 ### Phase 4: Documentation and Output (1 week)
 
 | # | Item | Relates To | Effort |
 |---|------|-----------|--------|
-| 4.1 | Output format documentation (JSON schema, Markdown spec) | B4 | 2 days |
+| ~~4.1~~ | ~~Output format documentation (JSON schema, Markdown spec)~~ | ~~B4~~ | ✅ Done |
 | 4.2 | Code documentation (TSDoc for all public APIs) | — | 2 days |
 | 4.3 | CI integration guide (for specs repo team) | B4 | 1 day |
 | 4.4 | Decorator hosting evaluation memo | B1 | 1 day |
@@ -317,12 +327,15 @@ See `typespec-breaking-change-test-coverage.md` for detailed scenario list.
 
 See `typespec-breaking-change-validation-strategy.md` for full details.
 
-| # | Item | Effort |
-|---|------|--------|
-| 6.1 | OAD rule correlation test conversion (Phase 1 of validation strategy) | 1 week |
-| 6.2 | Merged PR historical analysis (Phase 3) | 1 week |
-| 6.3 | Shadow-mode CI integration (Phase 4) | 1 week |
-| 6.4 | Agreement rate dashboard | 0.5 week |
+| # | Item | Validation Strategy Phase | Effort |
+|---|------|--------------------------|--------|
+| 6.1 | OAD rule correlation test conversion | Phase 1 (OAD Test Conversion) | 1 week |
+| 6.2 | Tool-specific gap coverage (unique DiffKinds, suppression, Phase A) | Phase 2 (Gap Coverage) | 1 week |
+| 6.3 | Merged PR historical analysis | Phase 3 (Merged PR Analysis) | 1 week |
+| 6.4 | Shadow-mode CI integration (comment-only) | Phase 4 (Side-by-Side) | 1 week |
+| 6.5 | Agreement rate dashboard and metrics | Phase 4 (Dashboard) | 0.5 week |
+
+**Precursor work completed:** Real-spec evaluation against Network (739 ops), Fleet (42 ops), and AppConfiguration validates that the comparison engine runs correctly at scale. Source tracing achieves 92% direct resolution. These serve as confidence evidence for Phase 3/4 readiness.
 
 ### Phase 7: Graduation (1-2 weeks)
 
@@ -348,6 +361,9 @@ See `typespec-breaking-change-validation-strategy.md` for full details.
 | Blanket suppress-all | Allow / disallow / flag | **Open** | — |
 | Wide suppression reporting | Same section / separate warning / flag | **Open** | — |
 | Scalar transition table scope | Full table / flag uniformly / progressive | **Open** (§7.2) | — |
+| Source tracing algorithm | 6-level fallback + template tracing | **Resolved & Implemented** | See B2, B5 |
+| Output format documentation | JSON schema + Markdown spec | **Resolved & Implemented** | See B4 |
+| Source reorg | Flat files / logical subdirectories | **Resolved & Implemented** | cli/, diff/, pipeline/, suppression/, reporting/ |
 | Source trace target | 100% on N specs / best-effort with fallbacks | **Open** | — |
 | APIs to upstream to core | Operation identity / version utils / none | **Open** | — |
 | Linter rule integration | CLI only / CLI + linter / CLI + LSP | **Open** | — |
