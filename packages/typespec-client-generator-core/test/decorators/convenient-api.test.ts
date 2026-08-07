@@ -595,6 +595,54 @@ describe("@convenientAPI requires scope diagnostic", () => {
     strictEqual(diagnostics.length, 1);
   });
 
+  it("should warn when scoped to 'notjava' (not a valid scope)", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "notjava")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 1);
+  });
+
+  it("should not warn for negation scope that still includes java/csharp", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "!(python)")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 0);
+  });
+
+  it("should warn for negation scope that excludes all valid scopes", async () => {
+    const diagnostics = (
+      await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @convenientAPI(true, "!(java, csharp)")
+        op test(): void;
+      }
+    `)
+    ).filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+    );
+
+    strictEqual(diagnostics.length, 1);
+  });
+
   it("should warn javascript emitter when using generate-convenience-methods option", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       op test(): void;
