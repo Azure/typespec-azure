@@ -347,6 +347,46 @@ Identifies a property on _all_ non-error response models that serve as a linked 
 | ---- | ---------------- | --------------------------- |
 | name | `valueof string` | Property name on the target |
 
+## Azure.Core.Legacy
+
+### `@overrideApiVersion` {#@Azure.Core.Legacy.overrideApiVersion}
+
+Overrides the API-version wire value used for operations within a namespace or interface.
+
+The value is opaque and does not need to be declared by the service version enum. The override
+is inherited by enclosed namespaces, interfaces, and operations, with the nearest override taking
+precedence.
+
+This decorator is considered legacy functionality and should only be used to preserve
+compatibility with an existing SDK.
+
+```typespec
+@Azure.Core.Legacy.overrideApiVersion(version: valueof string, scope?: valueof string)
+```
+
+#### Target
+
+The namespace or interface whose operations use the API-version override.
+`Namespace | Interface`
+
+#### Parameters
+
+| Name    | Type             | Description                                          |
+| ------- | ---------------- | ---------------------------------------------------- |
+| version | `valueof string` | The non-empty API-version wire value.                |
+| scope   | `valueof string` | The language emitters to which the override applies. |
+
+#### Examples
+
+##### Override an interface API version
+
+```typespec
+@Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+interface Widgets {
+  get(): void;
+}
+```
+
 ## Azure.Core.Traits
 
 ### `@trait` {#@Azure.Core.Traits.trait}
