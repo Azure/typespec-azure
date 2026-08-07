@@ -1,0 +1,16 @@
+{
+  "emitterVersion": "0.55.0",
+  "crossLanguageDefinitions": {
+    "CrossLanguagePackageId": "SpreadService",
+    "CrossLanguageDefinitionId": {
+      "@azure-rest/spread!CreateWidgetRequest:interface": "SpreadService.createWidget.Request.anonymous",
+      "@azure-rest/spread!Widget:interface": "SpreadService.Widget",
+      "@azure-rest/spread!CreateContainerRequest:interface": "SpreadService.createContainer.Request.anonymous",
+      "@azure-rest/spread!Detail:interface": "SpreadService.Detail",
+      "@azure-rest/spread!Container:interface": "SpreadService.Container",
+      "@azure-rest/spread!DetailCreate:interface": "SpreadService.Detail",
+      "@azure-rest/spread!SpreadServiceClient#createContainer:member(1)": "SpreadService.createContainer",
+      "@azure-rest/spread!SpreadServiceClient#createWidget:member(1)": "SpreadService.createWidget"
+    }
+  }
+}

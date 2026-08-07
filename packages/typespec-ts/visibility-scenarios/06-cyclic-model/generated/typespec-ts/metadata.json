@@ -1,0 +1,11 @@
+{
+  "emitterVersion": "0.55.0",
+  "crossLanguageDefinitions": {
+    "CrossLanguagePackageId": "CyclicService",
+    "CrossLanguageDefinitionId": {
+      "@azure-rest/cyclic!Node:interface": "CyclicService.Node",
+      "@azure-rest/cyclic!NodeCreate:interface": "CyclicService.Node",
+      "@azure-rest/cyclic!CyclicServiceClient#createNode:member(1)": "CyclicService.createNode"
+    }
+  }
+}
