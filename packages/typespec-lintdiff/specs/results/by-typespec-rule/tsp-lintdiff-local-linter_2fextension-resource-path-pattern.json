@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+  "count": 7,
+  "levels": {
+    "warning": 7
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}/approve' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}/reject' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}/reset' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}/providers/Microsoft.Advisor/triageResources/{recommendationResourceId}' should use {scope}/providers/... instead of hardcoding the parent scope."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Extension resource path '/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/resiliencyReviews/{reviewId}/providers/Microsoft.Advisor/triageRecommendations/{recommendationId}/providers/Microsoft.Advisor/triageResources' should use {scope}/providers/... instead of hardcoding the parent scope."
+    }
+  ]
+}

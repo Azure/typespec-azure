@@ -1,0 +1,2267 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "partial": true,
+  "sourceProjectCount": 468,
+  "projectCount": 1,
+  "projects": [
+    "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+  ],
+  "filters": {
+    "path": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+    "limit": 1
+  },
+  "rules": [
+    {
+      "validatorRule": "AllProxyResourcesShouldHaveDelete",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AllResourcesMustHaveGetOperation",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/all-resources-must-have-get-operation"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AllTrackedResourcesMustHaveDelete",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "APIVersionPattern",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ArmResourcePropertiesBag",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidAdditionalProperties",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-no-record"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 6,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidAnonymousParameter",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/avoid-anonymous-parameter"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidAnonymousTypes",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/avoid-anonymous-types"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidEmptyResponseSchema",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidMsdnReferences",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "AvoidNestedProperties",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "BodyTopLevelProperties",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "CollectionObjectPropertiesNaming",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/collection-object-properties-naming"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ConsistentPatchProperties",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/consistent-patch-properties"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DefaultErrorResponseSchema",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DefinitionsPropertiesNamesCamelCase",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-core/casing-style"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DeleteInOperationName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/delete-in-operation-name"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DeleteOperationResponses",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DeleteResponseBodyEmpty",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DeleteResponseCodes",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
+        "@azure-tools/typespec-azure-resource-manager/no-response-body"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "DescriptionMustNotBeNodeName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/description-must-not-be-node-name"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "EnumInsteadOfBoolean",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/enum-instead-of-boolean"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 2,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "EvenSegmentedPathForPutOperation",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GetCollectionOnlyHasValueAndNextLink",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GetCollectionResponseSchema",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GetInOperationName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/get-in-operation-name"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GetOperationMustNotBeLongRunning",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GetResponseCodes",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/get-response-codes"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 3,
+      "typeSpecDiagnosticCount": 3,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "GuidUsage",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/guid-usage"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "IgnoredPropertyNextToRef",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ImplementPrivateEndpointAPIs",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/implement-private-endpoint-apis"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "IntegerTypeMustHaveFormat",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "InvalidSkuModel",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LatestVersionOfCommonTypesMustBeUsed",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 64,
+      "typeSpecDiagnosticCount": 3,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ListInOperationName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/list-in-operation-name"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LocationMustHaveXmsMutability",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroErrorContent",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/lro-error-content"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroExtension",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/lro-extension"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroLocationHeader",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/lro-location-header"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroPatch202",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroPostMustNotUseOriginalUriAsFinalState",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "LroStatusCodesReturnTypeSchema",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "MissingSegmentsInNestedResourceListOperation",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "MissingXmsErrorResponse",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/missing-xms-error-response"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "NestedResourcesMustHaveListOperation",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "NoDuplicatePathsForScopeParameter",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "NoErrorCodeResponses",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+        "tsp-lintdiff-local-linter/no-error-code-responses"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 3,
+      "typeSpecDiagnosticCount": 3,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "NonApplicationJsonType",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/non-application-json-type"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationIdNounConflictingModelNames",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/operation-id-noun-conflicting-model-names"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationIdNounVerb",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/operation-id-noun-verb"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationsAPIImplementation",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationsApiResponseSchema",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationsApiSchemaUsesCommonTypes",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationsApiTenantLevelOnly",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "OperationSummaryOrDescription",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-core/documentation-required"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PageableOperation",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParameterDescription",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-core/documentation-required"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParameterNotDefinedInGlobalParameters",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParameterNotUsingCommonTypes",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParametersInPointGet",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParametersInPost",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/parameters-in-post"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParametersOrder",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ParametersSchemaAsTypeObject",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/parameters-schema-as-type-object"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PatchBodyParametersSchema",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/patch-body-parameters-schema"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PatchIdentityProperty",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PatchInOperationName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/patch-in-operation-name"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 1,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ]
+    },
+    {
+      "validatorRule": "PatchResponseCodes",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PatchSkuProperty",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathContainsResourceGroup",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 2,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathContainsResourceType",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathForNestedResource",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathForResourceAction",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathForTrackedResourceTypes",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathResourceProviderMatchNamespace",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathResourceProviderNamePascalCase",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PathResourceTypeNameCamelCase",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PostOperationIdContainsUrlVerb",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PostResponseCodes",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PreviewVersionOverOneYear",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/preview-version-over-one-year"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 1,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ]
+    },
+    {
+      "validatorRule": "PrivateEndpointResourceSchemaValidation",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ProvisioningStateMustBeReadOnly",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ProvisioningStateSpecifiedForLROPatch",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ProvisioningStateSpecifiedForLROPut",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ProvisioningStateValidation",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PutGetPatchResponseSchema",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PutInOperationName",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/put-in-operation-name"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PutRequestResponseSchemeArm",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+        "tsp-lintdiff-local-linter/put-request-response-scheme-arm"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "PutResponseCodes",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 3,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "RepeatedPathInfo",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/repeated-path-info"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "RequiredDefaultResponse",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "RequiredPropertiesMissingInResourceModel",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 3,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "RequiredReadOnlySystemData",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ReservedResourceNamesModelAsEnum",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ResourceHasXMsResourceEnabled",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ResourceNameRestriction",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/no-response-body"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "SchemaDescriptionOrTitle",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-core/documentation-required"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 2,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "SubscriptionIdParameterInOperations",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "SubscriptionsAndResourceGroupCasing",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "SummaryAndDescriptionMustNotBeSame",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 4,
+      "typeSpecDiagnosticCount": 4,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "SystemDataDefinitionsCommonTypes",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TenantLevelAPIsNotAllowed",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TopLevelResourcesListByResourceGroup",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TopLevelResourcesListBySubscription",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TrackedExtensionResourcesAreNotAllowed",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TrackedResourceBeyondsThirdLevel",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TrackedResourcePatchOperation",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/tracked-resource-patch-operation"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "TrackedResourcesMustHavePut",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/tracked-resources-must-have-put"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "UniqueXmsExample",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 3,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "UnSupportedPatchProperties",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/unsupported-patch-properties"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "ValidFormats",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsEnumValidation",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsExamplesRequired",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/xms-examples-required"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 1,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 35,
+      "validatorProjects": [],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ]
+    },
+    {
+      "validatorRule": "XmsIdentifierValidation",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XMSLongRunningOperationProperty",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/xms-long-running-operation-property"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 1,
+      "overlapProjectCount": 1,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 1,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "overlapProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsPageableForListCalls",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/xms-pageable-for-list-calls"
+      ],
+      "validatorProjectCount": 1,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 1,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 1,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [
+        "specification/advisor/resource-manager/Microsoft.Advisor/Advisor"
+      ],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsParameterLocation",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsPathsMustOverloadPaths",
+      "mappedTypeSpecRules": [],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XmsResourceInPutResponse",
+      "mappedTypeSpecRules": [
+        "tsp-lintdiff-local-linter/xms-resource-in-put-response"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    },
+    {
+      "validatorRule": "XMSSecretInResponse",
+      "mappedTypeSpecRules": [
+        "@azure-tools/typespec-azure-resource-manager/secret-prop"
+      ],
+      "validatorProjectCount": 0,
+      "typeSpecProjectCount": 0,
+      "overlapProjectCount": 0,
+      "validatorOnlyProjectCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "validatorDiagnosticCount": 0,
+      "typeSpecDiagnosticCount": 0,
+      "validatorProjects": [],
+      "typeSpecProjects": [],
+      "overlapProjects": [],
+      "validatorOnlyProjects": [],
+      "typeSpecOnlyProjects": []
+    }
+  ],
+  "unmappedTypeSpecRules": []
+}

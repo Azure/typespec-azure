@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+  "count": 26,
+  "levels": {
+    "warning": 26
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 79,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 85,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 91,
+      "column": 7,
+      "message": "Parameter name '$skipToken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 79,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 85,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 91,
+      "column": 7,
+      "message": "Parameter name '$skipToken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 108,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 114,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 120,
+      "column": 7,
+      "message": "Parameter name '$skipToken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 108,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 114,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 120,
+      "column": 7,
+      "message": "Parameter name '$skipToken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 60,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 66,
+      "column": 7,
+      "message": "Parameter name '$skiptoken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 60,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 66,
+      "column": 7,
+      "message": "Parameter name '$skiptoken' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 54,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 60,
+      "column": 7,
+      "message": "Parameter name '$skip' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 66,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 54,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 60,
+      "column": 7,
+      "message": "Parameter name '$skip' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 66,
+      "column": 7,
+      "message": "Parameter name '$filter' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 81,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 87,
+      "column": 7,
+      "message": "Parameter name '$skip' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 167,
+      "column": 7,
+      "message": "Parameter name '$top' should not begin with '$' or '@'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameter-names-convention",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 173,
+      "column": 7,
+      "message": "Parameter name '$skipToken' should not begin with '$' or '@'."
+    }
+  ]
+}

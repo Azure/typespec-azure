@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/patch-in-operation-name",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    }
+  ]
+}

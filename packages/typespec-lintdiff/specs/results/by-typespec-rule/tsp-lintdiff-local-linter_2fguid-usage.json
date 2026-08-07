@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/guid-usage",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/guid-usage",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "models.tsp",
+      "line": 653,
+      "column": 3,
+      "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board."
+    }
+  ]
+}

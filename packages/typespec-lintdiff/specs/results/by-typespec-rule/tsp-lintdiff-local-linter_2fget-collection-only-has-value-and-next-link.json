@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "models.tsp",
+      "line": 1035,
+      "column": 7,
+      "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+    }
+  ]
+}

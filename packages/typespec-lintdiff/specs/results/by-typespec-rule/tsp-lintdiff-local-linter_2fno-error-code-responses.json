@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+  "count": 3,
+  "levels": {
+    "warning": 3
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 28,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "SuppressionContract.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "Operation 'get' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/no-error-code-responses",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "SuppressionContract.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Operation 'create' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    }
+  ]
+}

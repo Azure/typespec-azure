@@ -21,9 +21,11 @@ interface Config {
   specsRepo: string;
   datasetDir: string;
   concurrency: number;
+  filter?: string;
+  limit: number;
 }
 
-interface DatasetProject {
+export interface DatasetProject {
   sourcePath: string;
   typespecPath: string;
   rawFiles: string[];
@@ -98,7 +100,13 @@ interface TypeSpecIndex {
   specsCommit: string;
   generatedAt: string;
   ruleset: string;
+  partial: boolean;
+  sourceProjectCount: number;
   projectCount: number;
+  filters: {
+    path?: string;
+    limit?: number;
+  };
   failedProjectCount: number;
   totalDiagnostics: number;
   rules: Record<
@@ -116,6 +124,16 @@ interface TypeSpecIndex {
 export interface ValidatorRuleData {
   count: number;
   projects: string[];
+}
+
+export interface AnalysisScope {
+  partial: boolean;
+  sourceProjectCount: number;
+  projects: string[];
+  filters: {
+    path?: string;
+    limit?: number;
+  };
 }
 
 export interface ComparisonEntry {
@@ -139,6 +157,14 @@ export interface ComparisonResults {
   schemaVersion: number;
   specsCommit: string;
   generatedAt: string;
+  partial: boolean;
+  sourceProjectCount: number;
+  projectCount: number;
+  projects: string[];
+  filters: {
+    path?: string;
+    limit?: number;
+  };
   rules: ComparisonEntry[];
   unmappedTypeSpecRules: Array<{
     rule: string;
@@ -156,7 +182,13 @@ interface TypeSpecAnalysisMetadata {
   localLinterFingerprintFiles: string[];
   localLinterGitCommit?: string;
   localLinterGitBranch?: string;
+  partial: boolean;
+  sourceProjectCount: number;
   projectCount: number;
+  filters: {
+    path?: string;
+    limit?: number;
+  };
   diagnosticCount: number;
   ruleCount: number;
   failedProjectCount: number;
@@ -169,6 +201,8 @@ function parseArgs(): Config {
   let specsRepo = "";
   let datasetDir = path.resolve(import.meta.dirname, "..", "..", "specs");
   let concurrency = 2;
+  let filter: string | undefined;
+  let limit = Number.POSITIVE_INFINITY;
 
   for (let index = 0; index < args.length; index++) {
     switch (args[index]) {
@@ -181,6 +215,12 @@ function parseArgs(): Config {
       case "--concurrency":
         concurrency = Number.parseInt(args[++index], 10);
         break;
+      case "--filter":
+        filter = args[++index].replace(/\\/g, "/");
+        break;
+      case "--limit":
+        limit = Number.parseInt(args[++index], 10);
+        break;
       default:
         throw new Error(`Unknown argument: ${args[index]}`);
     }
@@ -189,14 +229,17 @@ function parseArgs(): Config {
   if (!specsRepo) {
     throw new Error(
       "Usage: npm run specs:typespec -- --specs-repo <path> " +
-        "[--output <path>] [--concurrency N]",
+        "[--output <path>] [--filter <path>] [--limit N] [--concurrency N]",
     );
   }
   if (!Number.isInteger(concurrency) || concurrency < 1) {
     throw new Error("--concurrency must be a positive integer.");
   }
+  if (Number.isFinite(limit) && (!Number.isInteger(limit) || limit < 1)) {
+    throw new Error("--limit must be a positive integer.");
+  }
 
-  return { specsRepo, datasetDir, concurrency };
+  return { specsRepo, datasetDir, concurrency, filter, limit };
 }
 
 function readJson<T>(filePath: string): T {
@@ -501,6 +544,7 @@ export function compareResults(
   validatorRules: Record<string, ValidatorRuleData>,
   aggregate: TypeSpecAggregate,
   mappings: Map<string, Set<string>>,
+  scope: AnalysisScope,
 ): ComparisonResults {
   const rules = Object.entries(validatorRules)
     .sort(([left], [right]) => left.localeCompare(right))
@@ -557,6 +601,11 @@ export function compareResults(
     schemaVersion: ANALYSIS_SCHEMA_VERSION,
     specsCommit,
     generatedAt,
+    partial: scope.partial,
+    sourceProjectCount: scope.sourceProjectCount,
+    projectCount: scope.projects.length,
+    projects: scope.projects,
+    filters: scope.filters,
     rules,
     unmappedTypeSpecRules,
   };
@@ -623,6 +672,7 @@ function assertDatasetPath(datasetDir: string, relativePath: string): string {
 function loadValidatorRuleData(
   datasetDir: string,
   validatorIndex: ValidatorIndex,
+  selectedProjects: Set<string>,
 ): Record<string, ValidatorRuleData> {
   const rules: Record<string, ValidatorRuleData> = {};
   for (const [rule, summary] of Object.entries(validatorIndex.rules)) {
@@ -634,9 +684,10 @@ function loadValidatorRuleData(
     if (!Array.isArray(shard.results)) {
       throw new Error(`Validator result shard has no results array: ${summary.resultsFile}`);
     }
+    const selectedResults = shard.results.filter((result) => selectedProjects.has(result.project));
     rules[rule] = {
-      count: summary.count,
-      projects: [...new Set(shard.results.map((result) => result.project))].sort(),
+      count: selectedResults.length,
+      projects: [...new Set(selectedResults.map((result) => result.project))].sort(),
     };
   }
   return rules;
@@ -842,6 +893,7 @@ function writeTypeSpecResults(
   datasetDir: string,
   aggregate: TypeSpecAggregate,
   projectResults: TypeSpecProjectResult[],
+  scope: AnalysisScope,
 ): string[] {
   const shardRoot = path.join(datasetDir, "results", "by-typespec-rule");
   fs.rmSync(shardRoot, { recursive: true, force: true });
@@ -873,7 +925,10 @@ function writeTypeSpecResults(
     specsCommit: aggregate.specsCommit,
     generatedAt: aggregate.generatedAt,
     ruleset: LOCAL_RULESET,
+    partial: scope.partial,
+    sourceProjectCount: scope.sourceProjectCount,
     projectCount: projectResults.length,
+    filters: scope.filters,
     failedProjectCount: projectResults.filter((project) => project.status === "failed").length,
     totalDiagnostics: aggregate.totalDiagnostics,
     rules,
@@ -889,10 +944,16 @@ function invalidateExistingAnalysis(datasetDir: string, meta: DatasetMetadata): 
     return;
   }
 
+  const previousRawFiles = new Set(previousAnalysis.rawFiles);
+  for (const project of meta.projects) {
+    project.rawFiles = project.rawFiles.filter(
+      (relativePath) => !previousRawFiles.has(relativePath),
+    );
+  }
   delete meta.typespecAnalysis;
   writeJson(path.join(datasetDir, "_meta.json"), meta);
 
-  for (const relativePath of previousAnalysis.resultFiles) {
+  for (const relativePath of [...previousAnalysis.resultFiles, ...previousAnalysis.rawFiles]) {
     fs.rmSync(assertDatasetPath(datasetDir, relativePath), {
       recursive: true,
       force: true,
@@ -910,6 +971,9 @@ function comparisonMarkdown(comparison: ComparisonResults): string {
     "",
     `Specs commit: \`${comparison.specsCommit}\``,
     "",
+    `Scope: ${comparison.partial ? "partial" : "full"} (${comparison.projectCount}/${comparison.sourceProjectCount} projects)`,
+    "",
+    ...(comparison.filters.path ? [`Path filter: \`${comparison.filters.path}\``, ""] : []),
     "| Validator rule | Mapped TypeSpec rules | Validator projects | TypeSpec projects | Overlap | Validator only | TypeSpec only | Validator diagnostics | TypeSpec diagnostics |",
     "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
   ];
@@ -944,8 +1008,31 @@ function comparisonMarkdown(comparison: ComparisonResults): string {
   return lines.join("\n");
 }
 
+export function selectProjects(
+  projects: DatasetProject[],
+  filter: string | undefined,
+  limit: number,
+): DatasetProject[] {
+  const matches = projects.filter((project) => !filter || project.sourcePath.includes(filter));
+  const selected = Number.isFinite(limit) ? matches.slice(0, limit) : matches;
+  if (selected.length === 0) {
+    throw new Error(`No dataset projects matched filter ${JSON.stringify(filter ?? "")}.`);
+  }
+  return selected;
+}
+
 async function run(config: Config): Promise<void> {
   const { meta, validatorIndex } = validateInputs(config);
+  const selectedProjects = selectProjects(meta.projects, config.filter, config.limit);
+  const scope: AnalysisScope = {
+    partial: selectedProjects.length !== meta.projects.length,
+    sourceProjectCount: meta.projects.length,
+    projects: selectedProjects.map((project) => project.sourcePath),
+    filters: {
+      path: config.filter,
+      limit: Number.isFinite(config.limit) ? config.limit : undefined,
+    },
+  };
   const dirty = git(config.specsRepo, ["status", "--porcelain"]);
   if (dirty) {
     throw new Error("The specs repo has local changes. Commit, stash, or remove them first.");
@@ -969,10 +1056,12 @@ async function run(config: Config): Promise<void> {
     const fingerprint = fingerprintLocalLinter(packageDir);
     invalidateExistingAnalysis(config.datasetDir, meta);
     const projectRuns = await mapWithConcurrency(
-      meta.projects,
+      selectedProjects,
       config.concurrency,
       async (project, index) => {
-        process.stdout.write(`[${index + 1}/${meta.projects.length}] ${project.sourcePath} ... `);
+        process.stdout.write(
+          `[${index + 1}/${selectedProjects.length}] ${project.sourcePath} ... `,
+        );
         const result = await compileProject(config, project);
         console.log(`${result.result.status}, ${result.diagnostics.length} diagnostic(s)`);
         return result;
@@ -986,15 +1075,16 @@ async function run(config: Config): Promise<void> {
       generatedAt,
       projectRuns.flatMap((run) => run.diagnostics),
     );
-    const resultFiles = writeTypeSpecResults(config.datasetDir, aggregate, projectResults);
+    const resultFiles = writeTypeSpecResults(config.datasetDir, aggregate, projectResults, scope);
 
     const mappings = loadValidatorMappings(path.resolve(import.meta.dirname, "..", "fixtures"));
     const comparison = compareResults(
       meta.specsCommit,
       generatedAt,
-      loadValidatorRuleData(config.datasetDir, validatorIndex),
+      loadValidatorRuleData(config.datasetDir, validatorIndex, new Set(scope.projects)),
       aggregate,
       mappings,
+      scope,
     );
     writeJson(path.join(config.datasetDir, "comparison-results.json"), comparison);
     fs.writeFileSync(
@@ -1004,6 +1094,15 @@ async function run(config: Config): Promise<void> {
     resultFiles.push("comparison-results.json", "comparison-results.md");
 
     const rawFiles = projectResults.flatMap((project) => project.rawFiles).sort();
+    const rawFilesByProject = new Map(
+      projectResults.map((project) => [project.project, project.rawFiles]),
+    );
+    for (const project of meta.projects) {
+      const generatedRawFiles = rawFilesByProject.get(project.sourcePath);
+      if (generatedRawFiles) {
+        project.rawFiles = [...new Set([...project.rawFiles, ...generatedRawFiles])].sort();
+      }
+    }
     meta.typespecAnalysis = {
       schemaVersion: ANALYSIS_SCHEMA_VERSION,
       generatedAt,
@@ -1012,7 +1111,10 @@ async function run(config: Config): Promise<void> {
       localLinterFingerprintFiles: fingerprint.files,
       localLinterGitCommit: tryGit(packageDir, ["rev-parse", "HEAD"]),
       localLinterGitBranch: tryGit(packageDir, ["branch", "--show-current"]) || undefined,
+      partial: scope.partial,
+      sourceProjectCount: scope.sourceProjectCount,
       projectCount: projectResults.length,
+      filters: scope.filters,
       diagnosticCount: aggregate.totalDiagnostics,
       ruleCount: Object.keys(aggregate.rules).length,
       failedProjectCount: projectResults.filter((project) => project.status === "failed").length,

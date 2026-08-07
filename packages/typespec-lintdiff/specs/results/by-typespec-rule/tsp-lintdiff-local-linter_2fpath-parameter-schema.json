@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+  "count": 14,
+  "levels": {
+    "warning": 14
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 52,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 52,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 52,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 52,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 65,
+      "column": 7,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 73,
+      "column": 7,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 43,
+      "column": 9,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 92,
+      "column": 7,
+      "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
+    }
+  ]
+}

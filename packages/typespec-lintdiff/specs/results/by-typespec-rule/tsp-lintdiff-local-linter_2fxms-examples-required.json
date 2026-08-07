@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+  "count": 35,
+  "levels": {
+    "warning": 35
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 185,
+      "column": 4,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 28,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 32,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 67,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResourceRecommendationBase.tsp",
+      "line": 100,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "SuppressionContract.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "SuppressionContract.tsp",
+      "line": 45,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "SuppressionContract.tsp",
+      "line": 56,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AdvisorScoreEntity.tsp",
+      "line": 33,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AdvisorScoreEntity.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 28,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 36,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 44,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "AssessmentResult.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 35,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "ResiliencyReview.tsp",
+      "line": 46,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 74,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 99,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageRecommendation.tsp",
+      "line": 125,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 57,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "TriageResource.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 26,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 39,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 135,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 159,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 203,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/xms-examples-required",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 220,
+      "column": 3,
+      "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    }
+  ]
+}

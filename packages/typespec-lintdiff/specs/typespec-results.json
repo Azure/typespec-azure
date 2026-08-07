@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "ruleset": "tsp-lintdiff-local-linter/all",
+  "partial": true,
+  "sourceProjectCount": 468,
+  "projectCount": 1,
+  "filters": {
+    "path": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+    "limit": 1
+  },
+  "failedProjectCount": 0,
+  "totalDiagnostics": 115,
+  "rules": {
+    "tsp-lintdiff-local-linter/enum-instead-of-boolean": {
+      "count": 2,
+      "levels": {
+        "warning": 2
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fenum-instead-of-boolean.json"
+    },
+    "tsp-lintdiff-local-linter/extension-resource-path-pattern": {
+      "count": 7,
+      "levels": {
+        "warning": 7
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fextension-resource-path-pattern.json"
+    },
+    "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fget-collection-only-has-value-and-next-link.json"
+    },
+    "tsp-lintdiff-local-linter/get-response-codes": {
+      "count": 3,
+      "levels": {
+        "warning": 3
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fget-response-codes.json"
+    },
+    "tsp-lintdiff-local-linter/guid-usage": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fguid-usage.json"
+    },
+    "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used": {
+      "count": 3,
+      "levels": {
+        "warning": 3
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2flatest-version-of-common-types-must-be-used.json"
+    },
+    "tsp-lintdiff-local-linter/lro-extension": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2flro-extension.json"
+    },
+    "tsp-lintdiff-local-linter/no-error-code-responses": {
+      "count": 3,
+      "levels": {
+        "warning": 3
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fno-error-code-responses.json"
+    },
+    "tsp-lintdiff-local-linter/parameter-names-convention": {
+      "count": 26,
+      "levels": {
+        "warning": 26
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fparameter-names-convention.json"
+    },
+    "tsp-lintdiff-local-linter/patch-in-operation-name": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fpatch-in-operation-name.json"
+    },
+    "tsp-lintdiff-local-linter/path-parameter-schema": {
+      "count": 14,
+      "levels": {
+        "warning": 14
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fpath-parameter-schema.json"
+    },
+    "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fpost-operation-id-contains-url-verb.json"
+    },
+    "tsp-lintdiff-local-linter/preview-version-over-one-year": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fpreview-version-over-one-year.json"
+    },
+    "tsp-lintdiff-local-linter/put-in-operation-name": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fput-in-operation-name.json"
+    },
+    "tsp-lintdiff-local-linter/query-parameters-in-collection-get": {
+      "count": 10,
+      "levels": {
+        "warning": 10
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fquery-parameters-in-collection-get.json"
+    },
+    "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same": {
+      "count": 4,
+      "levels": {
+        "warning": 4
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fsummary-and-description-must-not-be-same.json"
+    },
+    "tsp-lintdiff-local-linter/xms-examples-required": {
+      "count": 35,
+      "levels": {
+        "warning": 35
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fxms-examples-required.json"
+    },
+    "tsp-lintdiff-local-linter/xms-long-running-operation-property": {
+      "count": 1,
+      "levels": {
+        "warning": 1
+      },
+      "projectCount": 1,
+      "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fxms-long-running-operation-property.json"
+    }
+  },
+  "projects": [
+    {
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "status": "success",
+      "durationMs": 5182,
+      "diagnosticCount": 115,
+      "rawFiles": [
+        "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/raw/typespec.stdout.txt",
+        "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/raw/typespec.stderr.txt"
+      ]
+    }
+  ]
+}

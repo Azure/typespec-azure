@@ -74,21 +74,26 @@ corpus exceeds GitHub's per-file size limit as one JSON document.
 Run the additive TypeSpec analysis only after a spec dataset exists:
 
 ```powershell
-pnpm specs:generate `
-  --specs-repo C:\dev\azure-rest-api-specs `
-  --commit <commit> `
-  --filter specification\contoso `
-  --output C:\dev\lintdiff-pilot
-
 pnpm specs:typespec `
   --specs-repo C:\dev\azure-rest-api-specs `
-  --output C:\dev\lintdiff-pilot `
-  --concurrency 2
+  --concurrency 6
 ```
 
-For a pilot, generate a one-project dataset with `--filter` first; the TypeSpec
-command intentionally consumes exactly the projects and `specsCommit` recorded
-in that dataset and does not provide another filter.
+For a scoped run that writes to the same standard result locations:
+
+```powershell
+pnpm specs:typespec `
+  --specs-repo C:\dev\azure-rest-api-specs `
+  --filter specification/advisor/resource-manager/Microsoft.Advisor/Advisor `
+  --limit 1 `
+  --concurrency 1
+```
+
+The command always selects projects from the existing `_meta.json`; it does not
+regenerate Swagger. `--filter` matches the recorded source path and `--limit`
+caps the selected projects. Scoped and full runs use the same files and folder
+structure. A scoped run records `partial: true` and its filters; a later full run
+replaces those TypeSpec results and records `partial: false`.
 
 The command verifies that the specs clone is clean, temporarily checks out the
 recorded commit, builds and links this package as
@@ -112,8 +117,10 @@ The additive files are:
 
 `_meta.json` keeps schema version 4 and receives a separate
 `typespecAnalysis` object. It records the analysis schema version, counts,
-generated files, local git revision, and a SHA-256 fingerprint over the local
-linter's source and package/TypeScript configuration. The original dataset
-cache remains reusable; compare the fingerprint before reusing TypeSpec results
-after local linter changes. Only `results/by-typespec-rule` is removed before
-shards are rewritten, so validator results are left untouched.
+selected-project filters, generated files, local git revision, and a SHA-256
+fingerprint over the local linter's source and package/TypeScript configuration.
+The original dataset cache remains reusable; compare the fingerprint before
+reusing TypeSpec results after local linter changes. Only
+`results/by-typespec-rule` is removed before shards are rewritten, so validator
+results are left untouched. Comparison counts are filtered to the same selected
+projects.

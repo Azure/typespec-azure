@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
+  "count": 2,
+  "levels": {
+    "warning": 2
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "models.tsp",
+      "line": 464,
+      "column": 3,
+      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "models.tsp",
+      "line": 714,
+      "column": 3,
+      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
+    }
+  ]
+}

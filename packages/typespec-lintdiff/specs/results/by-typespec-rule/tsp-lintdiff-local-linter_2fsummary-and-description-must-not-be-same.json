@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same",
+  "count": 4,
+  "levels": {
+    "warning": 4
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 64,
+      "column": 3,
+      "message": "The summary and description values should not be same."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 82,
+      "column": 3,
+      "message": "The summary and description values should not be same."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "The summary and description values should not be same."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 135,
+      "column": 3,
+      "message": "The summary and description values should not be same."
+    }
+  ]
+}

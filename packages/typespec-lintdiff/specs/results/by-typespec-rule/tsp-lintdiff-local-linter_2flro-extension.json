@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/lro-extension",
+  "count": 1,
+  "levels": {
+    "warning": 1
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/lro-extension",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "routes.tsp",
+      "line": 116,
+      "column": 3,
+      "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    }
+  ]
+}

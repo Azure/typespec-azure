@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-08-07T06:23:11.780Z",
+  "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+  "count": 3,
+  "levels": {
+    "warning": 3
+  },
+  "projectCount": 1,
+  "results": [
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "main.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "Use the latest ARM common-types version 'v6' instead of 'v4'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "main.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "Use the latest ARM common-types version 'v6' instead of 'v4'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
+      "sourceFile": "main.tsp",
+      "line": 59,
+      "column": 3,
+      "message": "Use the latest ARM common-types version 'v6' instead of 'v4'."
+    }
+  ]
+}

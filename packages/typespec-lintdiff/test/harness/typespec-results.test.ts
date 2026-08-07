@@ -6,6 +6,7 @@ import {
   injectLocalRuleset,
   loadValidatorMappings,
   parseTypeSpecDiagnostics,
+  selectProjects,
   type TypeSpecDiagnostic,
 } from "./typespec-results.js";
 
@@ -124,6 +125,21 @@ describe("TypeSpec result aggregation", () => {
   });
 });
 
+describe("TypeSpec project selection", () => {
+  it("filters and limits projects from the existing dataset manifest", () => {
+    const projects = ["Advisor", "Compute", "Network"].map((name) => ({
+      sourcePath: `specification/${name.toLowerCase()}/${name}`,
+      typespecPath: `projects/${name}/typespec`,
+      rawFiles: [],
+    }));
+
+    expect(selectProjects(projects, "advisor", 1).map((item) => item.sourcePath)).toEqual([
+      "specification/advisor/Advisor",
+    ]);
+    expect(selectProjects(projects, undefined, Number.POSITIVE_INFINITY)).toEqual(projects);
+  });
+});
+
 describe("validator and TypeSpec comparison", () => {
   it("loads validator-to-TypeSpec mappings from fixture frontmatter", () => {
     const mappings = loadValidatorMappings(path.resolve(import.meta.dirname, "..", "fixtures"));
@@ -154,8 +170,21 @@ describe("validator and TypeSpec comparison", () => {
       },
       aggregate,
       mappings,
+      {
+        partial: true,
+        sourceProjectCount: 2,
+        projects: ["project-a", "project-b"],
+        filters: { path: "project" },
+      },
     );
 
+    expect(comparison).toMatchObject({
+      partial: true,
+      sourceProjectCount: 2,
+      projectCount: 2,
+      projects: ["project-a", "project-b"],
+      filters: { path: "project" },
+    });
     expect(comparison.rules[0]).toMatchObject({
       validatorRule: "ValidatorA",
       mappedTypeSpecRules: ["local/not-fired", "local/rule-a"],
