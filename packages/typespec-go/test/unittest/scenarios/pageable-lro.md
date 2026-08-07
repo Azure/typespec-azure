@@ -104,7 +104,9 @@ func (client *PageableLROsClient) BeginListPrivateEndPoints(ctx context.Context,
 		Fetcher: func(ctx context.Context, page *PageableLROsClientListPrivateEndPointsResponse) (PageableLROsClientListPrivateEndPointsResponse, error) {
 			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), *page.NextLink, func(ctx context.Context) (*policy.Request, error) {
 				return client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, options)
-			}, nil)
+			}, &runtime.FetcherForNextLinkOptions{
+				Endpoint: client.internal.Endpoint(),
+			})
 			if err != nil {
 				return PageableLROsClientListPrivateEndPointsResponse{}, err
 			}

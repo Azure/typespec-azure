@@ -179,9 +179,9 @@ export function generateOperations(
       // it must be done before the imports are written out
       if (go.isLROMethod(method)) {
         // generate Begin method
-        opText += generateLROBeginMethod(method, options, imports, indent);
+        opText += generateLROBeginMethod(method, options, imports, indent, azureARM);
       }
-      opText += generateOperation(method, options, imports, indent);
+      opText += generateOperation(method, options, imports, indent, azureARM);
       opText += createProtocolRequest(azureARM, method, imports, indent);
       if (method.kind !== "lroMethod") {
         // LRO responses are handled elsewhere, with the exception of pageable LROs
@@ -692,12 +692,38 @@ function generateNilChecks(
 }
 
 /**
+ * returns the expression used to obtain the client's service endpoint, or undefined
+ * when the endpoint can't be determined from the client alone.
+ *
+ * @param client the client for which to obtain the endpoint expression
+ * @param azureARM indicates if the client is an ARM client
+ * @returns the endpoint expression or undefined
+ */
+function getClientEndpointExpr(client: go.Client, azureARM: boolean): string | undefined {
+  if (azureARM) {
+    // for ARM, the endpoint is handled via the azcore/arm.Client
+    return "client.internal.Endpoint()";
+  }
+  if (client.instance?.kind === "templatedHost") {
+    // NOTE: this is an Autorest-only compat case. the host is assembled per
+    // method as it can require method params, so there's no client endpoint.
+    return undefined;
+  }
+  const hostParams = client.parameters.filter((param) => param.kind === "uriParam");
+  if (hostParams.length === 1) {
+    return `client.${hostParams[0].name}`;
+  }
+  return undefined;
+}
+
+/**
  * emits code that calls runtime.NewPager
  *
  * @param method the pageable method
  * @param options emitter options
  * @param imports the import manager currently in scope
  * @param indent the indentation helper currently in scope
+ * @param azureARM indicates if the client is an ARM client
  * @returns the complete call to runtime.NewPager(...)
  */
 function emitPagerDefinition(
@@ -705,6 +731,7 @@ function emitPagerDefinition(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   imports.add("context");
   let text = `runtime.NewPager(runtime.PagingHandler[${method.returns.name}]{\n`;
@@ -792,6 +819,11 @@ function emitPagerDefinition(
       }
       case "nextLink": {
         const nextLinkPath = helpers.buildNextLinkPath(method.strategy);
+        // a custom next page operation builds the request itself, so the next
+        // link must be passed through to it unmodified.
+        const endpointExpr = method.strategy.method
+          ? undefined
+          : getClientEndpointExpr(method.receiver.type, azureARM);
         let nextLinkVar: string;
         if (method.kind === "pageableMethod") {
           text += `${indent.get()}nextLink := ""\n`;
@@ -806,30 +838,37 @@ function emitPagerDefinition(
         text += `${indent.push().get()}return client.${method.naming.requestMethod}(${reqParams})\n`;
         text += `${indent.pop().get()}}, `;
         // nextPageMethod might be absent in some cases, see https://github.com/Azure/autorest/issues/4393
-        if (method.strategy.method) {
-          const nextOpParams = helpers
-            .getCreateRequestParametersSig(method.strategy.method)
-            .split(",");
-          // keep the parameter names from the name/type tuples and find nextLink param
-          for (let i = 0; i < nextOpParams.length; ++i) {
-            const paramName = nextOpParams[i].trim().split(" ")[0];
-            const paramType = nextOpParams[i].trim().split(" ")[1];
-            if (paramName.startsWith("next") && paramType === "string") {
-              nextOpParams[i] = "encodedNextLink";
-            } else {
-              nextOpParams[i] = paramName;
-            }
-          }
-          // add a definition for the nextReq func that uses the nextLinkOperation
+        const nextReq = method.strategy.method;
+        const httpVerb =
+          !nextReq && method.nextLinkVerb !== "get"
+            ? `http.Method${naming.capitalize(method.nextLinkVerb)}`
+            : undefined;
+        if (nextReq || httpVerb || endpointExpr) {
+          text += `&runtime.FetcherForNextLinkOptions{\n`;
           indent.push();
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.get()}NextReq: func(ctx context.Context, encodedNextLink string) (*policy.Request, error) {\n`;
-          text += `${indent.push().get()}return client.${method.strategy.method.name}(${nextOpParams.join(", ")})\n`;
-          text += `${indent.pop().get()}},\n`;
-          text += `${indent.pop().get()}})\n`;
-        } else if (method.nextLinkVerb !== "get") {
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.push().get()}HTTPVerb: http.Method${naming.capitalize(method.nextLinkVerb)},\n`;
+          if (nextReq) {
+            const nextOpParams = helpers.getCreateRequestParametersSig(nextReq).split(",");
+            // keep the parameter names from the name/type tuples and find nextLink param
+            for (let i = 0; i < nextOpParams.length; ++i) {
+              const paramName = nextOpParams[i].trim().split(" ")[0];
+              const paramType = nextOpParams[i].trim().split(" ")[1];
+              if (paramName.startsWith("next") && paramType === "string") {
+                nextOpParams[i] = "encodedNextLink";
+              } else {
+                nextOpParams[i] = paramName;
+              }
+            }
+            // add a definition for the nextReq func that uses the nextLinkOperation
+            text += `${indent.get()}NextReq: func(ctx context.Context, encodedNextLink string) (*policy.Request, error) {\n`;
+            text += `${indent.push().get()}return client.${nextReq.name}(${nextOpParams.join(", ")})\n`;
+            text += `${indent.pop().get()}},\n`;
+          }
+          if (httpVerb) {
+            text += `${indent.get()}HTTPVerb: ${httpVerb},\n`;
+          }
+          if (endpointExpr) {
+            text += `${indent.get()}Endpoint: ${endpointExpr},\n`;
+          }
           text += `${indent.pop().get()}})\n`;
         } else {
           text += "nil)\n";
@@ -923,6 +962,7 @@ function generateOperation(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
@@ -951,7 +991,7 @@ function generateOperation(
   text += `func ${getClientReceiverDefinition(method.receiver)} ${methodName}(${params}) (${returns.join(", ")}) {\n`;
   if (method.kind === "pageableMethod") {
     text += `${indent.get()}return `;
-    text += emitPagerDefinition(method, options, imports, indent);
+    text += emitPagerDefinition(method, options, imports, indent, azureARM);
     text += "}\n\n";
     return text;
   }
@@ -2151,6 +2191,7 @@ function generateLROBeginMethod(
   options: go.Options,
   imports: ImportManager,
   indent: helpers.Indentation,
+  azureARM: boolean,
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "api");
@@ -2173,7 +2214,7 @@ function generateLROBeginMethod(
     pollerTypeParam = `[*runtime.Pager${pollerTypeParam}]`;
     pollerType = "&pager";
     text += `${indent.get()}pager := `;
-    text += emitPagerDefinition(method, options, imports, indent);
+    text += emitPagerDefinition(method, options, imports, indent, azureARM);
   }
 
   text += `${indent.get()}if options == nil || options.ResumeToken == "" {\n`;

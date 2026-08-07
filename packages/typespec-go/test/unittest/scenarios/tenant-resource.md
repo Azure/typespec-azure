@@ -287,7 +287,9 @@ func (client *TenantItemsClient) NewListPager(apiVersion string, options *Tenant
 			}
 			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), nextLink, func(ctx context.Context) (*policy.Request, error) {
 				return client.listCreateRequest(ctx, apiVersion, options)
-			}, nil)
+			}, &runtime.FetcherForNextLinkOptions{
+				Endpoint: client.internal.Endpoint(),
+			})
 			if err != nil {
 				return TenantItemsClientListResponse{}, err
 			}
