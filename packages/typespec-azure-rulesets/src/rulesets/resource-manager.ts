@@ -23,6 +23,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
+    "@azure-tools/typespec-azure-core/no-openapi-client-extensions": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
