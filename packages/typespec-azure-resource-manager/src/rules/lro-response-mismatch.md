@@ -43,4 +43,4 @@ Here, the `FinalResult` in the `LroHeaders` matches the response type `GenerateR
 
 ## Suppression
 
-Suppress only when required to match an existing API; otherwise set the intended `FinalResult` in the operation's `LroHeaders` so that it matches the response type.
+This should not be suppressed unless you have validated the correct return type for the operation in generated SDKs.
