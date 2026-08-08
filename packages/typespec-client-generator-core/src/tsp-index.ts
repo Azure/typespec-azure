@@ -39,6 +39,7 @@ import {
   removeParameter,
   reorderParameters,
   replaceParameter,
+  replaceResponse,
 } from "./functions.js";
 
 export { $lib } from "./lib.js";
@@ -91,6 +92,7 @@ export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
     removeParameter: removeParameter as AzureClientGeneratorCoreFunctions["removeParameter"],
     addParameter: addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
     reorderParameters: reorderParameters as AzureClientGeneratorCoreFunctions["reorderParameters"],
+    replaceResponse: replaceResponse as AzureClientGeneratorCoreFunctions["replaceResponse"],
     exact: exact as AzureClientGeneratorCoreFunctions["exact"],
   },
 };
