@@ -12,7 +12,7 @@ Post operations should use the standard `ResourceActionAsync` templates, and if 
 
 - **Area:** API, SDK
 
-The long-running operation encodes a final result type that does not match its response. This produces an incorrect `final-state-schema` in the emitted OpenAPI and causes generated SDK pollers to return the wrong type when the operation completes.
+The long-running operation specifies the wrong return type for the operation.  This can break SDKs or make SDKs difficult to use..
 
 #### ❌ Incorrect
 
