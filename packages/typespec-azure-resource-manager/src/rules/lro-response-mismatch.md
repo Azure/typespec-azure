@@ -12,7 +12,7 @@ Post operations should use the standard `ResourceActionAsync` templates, and if 
 
 - **Area:** API, SDK
 
-The long-running operation specifies the wrong return type for the operation.  This can break SDKs or make SDKs difficult to use..
+The long-running operation specifies the wrong return type for the operation. This can break SDKs or make SDKs difficult to use..
 
 #### ❌ Incorrect
 
