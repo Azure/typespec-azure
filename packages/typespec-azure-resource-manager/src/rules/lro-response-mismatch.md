@@ -8,6 +8,12 @@ title: lro-response-mismatch
 
 Post operations should use the standard `ResourceActionAsync` templates, and if the LRO headers are changed, that change must include the intended final result of the resource action, as shown in the examples below.
 
+## Impact
+
+- **Area:** API, SDK
+
+The long-running operation encodes a final result type that does not match its response. This produces an incorrect `final-state-schema` in the emitted OpenAPI and causes generated SDK pollers to return the wrong type when the operation completes.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -34,3 +40,7 @@ interface Employees {
 ```
 
 Here, the `FinalResult` in the `LroHeaders` matches the response type `GenerateResponse`.
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise set the intended `FinalResult` in the operation's `LroHeaders` so that it matches the response type.
