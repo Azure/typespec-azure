@@ -1,3 +1,7 @@
+---
+title: "no-openapi-client-extensions"
+---
+
 Azure specs should not use the `@typespec/openapi` `@extension` decorator to emit client-altering `x-ms-*` (and `x-nullable`) OpenAPI extensions.
 
 These extensions change how clients, SDKs, and the ARM platform interpret an API — for example whether an operation is long-running, pageable, a secret, or an ARM resource. When they are hand-written with the raw `@extension` decorator they only appear in the OpenAPI (Swagger) output. Every other emitter (client SDK, service, ARM, etc.) works from the semantic TypeSpec model and never sees the extension, so it produces an incorrect representation of the API. Worse, the value is not validated or kept in sync with the rest of the spec.
