@@ -217,6 +217,11 @@ export const AzureCoreDependencies: CoreDependencies = {
     module: "@azure/core-rest-pipeline",
     name: "NodeReadableStream",
   },
+  createSseStream: {
+    kind: "externalDependency",
+    module: "@azure/core-sse",
+    name: "createSseStream",
+  },
 };
 
 export const AzureIdentityDependencies = {
