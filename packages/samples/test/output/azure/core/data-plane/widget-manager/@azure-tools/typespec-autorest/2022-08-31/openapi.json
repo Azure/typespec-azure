@@ -1427,7 +1427,7 @@
               "Location": {
                 "type": "string",
                 "format": "uri",
-                "description": "The location of the created resource."
+                "description": "The location of an instance of WidgetPart"
               },
               "Repeatability-Result": {
                 "type": "string",
