@@ -83,10 +83,13 @@ export function buildOperationFiles(
         prefixes,
         op,
       ]);
-      const deserializeHeadersDeclaration = getDeserializeHeadersPrivateFunction(dpgContext, op);
+      const deserializeHeadersDeclaration = getDeserializeHeadersPrivateFunction(dpgContext, [
+        prefixes,
+        op,
+      ]);
       const deserializeExceptionHeadersDeclaration = getDeserializeExceptionHeadersPrivateFunction(
         dpgContext,
-        op,
+        [prefixes, op],
       );
       const functionsToAdd = [sendOperationDeclaration, deserializeOperationDeclaration];
       if (deserializeHeadersDeclaration) {
@@ -224,7 +227,7 @@ export function buildLroDeserDetailMap(
     map.set(
       `./api/${operationFileName}.js`,
       lroOperations.map((o) => {
-        const { name } = getOperationName(o);
+        const { name } = getOperationName(o, context, prefixes);
         const deserName = `_${name}Deserialize`;
         let renamedDeserName = undefined;
         if (existingNames.has(deserName)) {
