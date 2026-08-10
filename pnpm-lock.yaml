@@ -4194,6 +4194,9 @@ importers:
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:^
+        version: link:../../core/packages/events
       '@typespec/http':
         specifier: workspace:^
         version: link:../../core/packages/http
@@ -4212,6 +4215,12 @@ importers:
       '@typespec/spector':
         specifier: workspace:^
         version: link:../../core/packages/spector
+      '@typespec/sse':
+        specifier: workspace:^
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:^
+        version: link:../../core/packages/streams
       '@typespec/ts-http-runtime':
         specifier: 'catalog:'
         version: 0.3.9
