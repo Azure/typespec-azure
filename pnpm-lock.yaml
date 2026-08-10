@@ -4029,6 +4029,9 @@ importers:
       fast-xml-parser:
         specifier: 'catalog:'
         version: 5.10.1
+      pluralize:
+        specifier: 'catalog:'
+        version: 8.0.0
       prettier:
         specifier: 'catalog:'
         version: 3.9.5
@@ -4084,6 +4087,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@26.1.1)
+      '@types/pluralize':
+        specifier: 'catalog:'
+        version: 0.0.33
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
