@@ -484,6 +484,7 @@
   "rules": [
     {
       "validatorRule": "AdditionalPropertiesAndProperties",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/bad-record-type"
@@ -514,6 +515,7 @@
     },
     {
       "validatorRule": "AdditionalPropertiesObject",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -542,6 +544,7 @@
     },
     {
       "validatorRule": "AllProxyResourcesShouldHaveDelete",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation"
@@ -728,6 +731,7 @@
     },
     {
       "validatorRule": "AllResourcesMustHaveGetOperation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/all-resources-must-have-get-operation"
@@ -802,6 +806,7 @@
     },
     {
       "validatorRule": "AllTrackedResourcesMustHaveDelete",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation"
@@ -910,6 +915,7 @@
     },
     {
       "validatorRule": "ApiHost",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -938,6 +944,7 @@
     },
     {
       "validatorRule": "ApiVersionEnum",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -966,6 +973,7 @@
     },
     {
       "validatorRule": "ApiVersionParameterRequired",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/operation-missing-api-version",
@@ -997,6 +1005,7 @@
     },
     {
       "validatorRule": "APIVersionPattern",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format"
@@ -1039,6 +1048,7 @@
     },
     {
       "validatorRule": "ArmResourcePropertiesBag",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property"
@@ -1210,6 +1220,7 @@
     },
     {
       "validatorRule": "ArrayMustHaveType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -1238,6 +1249,7 @@
     },
     {
       "validatorRule": "ArraySchemaMustHaveItems",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -1266,6 +1278,7 @@
     },
     {
       "validatorRule": "AvoidAdditionalProperties",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-no-record"
@@ -2088,6 +2101,7 @@
     },
     {
       "validatorRule": "AvoidAnonymousParameter",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/avoid-anonymous-parameter"
@@ -2154,6 +2168,7 @@
     },
     {
       "validatorRule": "AvoidAnonymousSchema",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2182,6 +2197,7 @@
     },
     {
       "validatorRule": "AvoidAnonymousTypes",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/avoid-anonymous-types"
@@ -2242,6 +2258,7 @@
     },
     {
       "validatorRule": "AvoidEmptyResponseSchema",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2282,6 +2299,7 @@
     },
     {
       "validatorRule": "AvoidMsdnReferences",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2340,6 +2358,7 @@
     },
     {
       "validatorRule": "AvoidNestedProperties",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2398,6 +2417,7 @@
     },
     {
       "validatorRule": "AzureResourceTagsSchema",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2426,6 +2446,7 @@
     },
     {
       "validatorRule": "BodyParamRepeatedInfo",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2454,6 +2475,7 @@
     },
     {
       "validatorRule": "BodyTopLevelProperties",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
@@ -2649,6 +2671,7 @@
     },
     {
       "validatorRule": "CollectionObjectPropertiesNaming",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/collection-object-properties-naming"
@@ -2688,6 +2711,7 @@
     },
     {
       "validatorRule": "ConsistentPatchProperties",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/consistent-patch-properties"
@@ -2838,6 +2862,7 @@
     },
     {
       "validatorRule": "ConsistentResponseBody",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2866,6 +2891,7 @@
     },
     {
       "validatorRule": "ConsistentResponseSchemaForPut",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/consistent-response-schema-for-put"
@@ -2902,6 +2928,7 @@
     },
     {
       "validatorRule": "ControlCharactersAreNotAllowed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -2930,6 +2957,7 @@
     },
     {
       "validatorRule": "DefaultErrorResponseSchema",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3009,6 +3037,7 @@
     },
     {
       "validatorRule": "DefaultInEnum",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3037,6 +3066,7 @@
     },
     {
       "validatorRule": "DefaultResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3065,6 +3095,7 @@
     },
     {
       "validatorRule": "DefinitionsPropertiesNamesCamelCase",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/casing-style"
@@ -3257,6 +3288,7 @@
     },
     {
       "validatorRule": "Delete204Response",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3285,6 +3317,7 @@
     },
     {
       "validatorRule": "DeleteInOperationName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/delete-in-operation-name"
@@ -3378,6 +3411,7 @@
     },
     {
       "validatorRule": "DeleteMustNotHaveRequestBody",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3406,6 +3440,7 @@
     },
     {
       "validatorRule": "DeleteOperationResponses",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3512,6 +3547,7 @@
     },
     {
       "validatorRule": "DeleteResponseBodyEmpty",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3603,6 +3639,7 @@
     },
     {
       "validatorRule": "DeleteResponseCodes",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
@@ -3955,6 +3992,7 @@
     },
     {
       "validatorRule": "DeprecatedXmsCodeGenerationSetting",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -3983,6 +4021,7 @@
     },
     {
       "validatorRule": "DescriptionMustNotBeNodeName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/description-must-not-be-node-name"
@@ -4344,6 +4383,7 @@
     },
     {
       "validatorRule": "DescriptiveDescriptionRequired",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/descriptive-description-required"
@@ -4384,6 +4424,7 @@
     },
     {
       "validatorRule": "docLinkLocale",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -4412,6 +4453,7 @@
     },
     {
       "validatorRule": "EnumInsteadOfBoolean",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/enum-instead-of-boolean"
@@ -5620,6 +5662,7 @@
     },
     {
       "validatorRule": "EnumMustHaveType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -5648,6 +5691,7 @@
     },
     {
       "validatorRule": "EnumMustNotHaveEmptyValue",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -5676,6 +5720,7 @@
     },
     {
       "validatorRule": "EnumMustRespectType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -5704,6 +5749,7 @@
     },
     {
       "validatorRule": "EnumUniqueValue",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -5732,6 +5778,7 @@
     },
     {
       "validatorRule": "ErrorResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -5760,6 +5807,7 @@
     },
     {
       "validatorRule": "EvenSegmentedPathForPutOperation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation"
@@ -5883,6 +5931,7 @@
     },
     {
       "validatorRule": "ExtensionResourcePathPattern",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/extension-resource-path-pattern"
@@ -5997,6 +6046,7 @@
     },
     {
       "validatorRule": "Formdata",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -6025,6 +6075,7 @@
     },
     {
       "validatorRule": "GetCollectionOnlyHasValueAndNextLink",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link"
@@ -6308,6 +6359,7 @@
     },
     {
       "validatorRule": "GetCollectionResponseSchema",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -6390,6 +6442,7 @@
     },
     {
       "validatorRule": "GetInOperationName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/get-in-operation-name"
@@ -6607,6 +6660,7 @@
     },
     {
       "validatorRule": "GetMustNotHaveRequestBody",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -6635,6 +6689,7 @@
     },
     {
       "validatorRule": "GetOperationMustNotBeLongRunning",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -6672,6 +6727,7 @@
     },
     {
       "validatorRule": "GetResponseCodes",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/get-response-codes"
@@ -6777,6 +6833,7 @@
     },
     {
       "validatorRule": "GuidUsage",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/guid-usage"
@@ -6996,6 +7053,7 @@
     },
     {
       "validatorRule": "HasApiVersionParameter",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7024,6 +7082,7 @@
     },
     {
       "validatorRule": "HeaderDisallowed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7052,6 +7111,7 @@
     },
     {
       "validatorRule": "HostParametersValidation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7080,6 +7140,7 @@
     },
     {
       "validatorRule": "HttpsSupportedScheme",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7108,6 +7169,7 @@
     },
     {
       "validatorRule": "IgnoredPropertyNextToRef",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7442,6 +7504,7 @@
     },
     {
       "validatorRule": "ImplementPrivateEndpointAPIs",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/implement-private-endpoint-apis"
@@ -7541,6 +7604,7 @@
     },
     {
       "validatorRule": "IntegerTypeMustHaveFormat",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7578,6 +7642,7 @@
     },
     {
       "validatorRule": "InvalidSkuModel",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7630,6 +7695,7 @@
     },
     {
       "validatorRule": "InvalidVerbUsed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -7658,6 +7724,7 @@
     },
     {
       "validatorRule": "LatestVersionOfCommonTypesMustBeUsed",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used"
@@ -9255,6 +9322,7 @@
     },
     {
       "validatorRule": "LicenseHeaderMustNotBeSpecified",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -9283,6 +9351,7 @@
     },
     {
       "validatorRule": "ListInOperationName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/list-in-operation-name"
@@ -9575,6 +9644,7 @@
     },
     {
       "validatorRule": "LocationMustHaveXmsMutability",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -9873,6 +9943,7 @@
     },
     {
       "validatorRule": "LongRunningOperationsOptionsValidator",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/long-running-operations-options-validator"
@@ -9903,6 +9974,7 @@
     },
     {
       "validatorRule": "LongRunningResponseStatusCodeDataPlane",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -9931,6 +10003,7 @@
     },
     {
       "validatorRule": "LroErrorContent",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/lro-error-content"
@@ -10186,6 +10259,7 @@
     },
     {
       "validatorRule": "LroExtension",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/lro-extension"
@@ -10278,6 +10352,7 @@
     },
     {
       "validatorRule": "LroHeaders",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10306,6 +10381,7 @@
     },
     {
       "validatorRule": "LroLocationHeader",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/lro-location-header"
@@ -10468,6 +10544,7 @@
     },
     {
       "validatorRule": "LroOriginalUri",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10496,6 +10573,7 @@
     },
     {
       "validatorRule": "LroPatch202",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10593,6 +10671,7 @@
     },
     {
       "validatorRule": "LroPostMustNotUseOriginalUriAsFinalState",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10627,6 +10706,7 @@
     },
     {
       "validatorRule": "LroStatusCodesReturnTypeSchema",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10664,6 +10744,7 @@
     },
     {
       "validatorRule": "LroWithOriginalUriAsFinalState",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10692,6 +10773,7 @@
     },
     {
       "validatorRule": "MissingDefaultResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10720,6 +10802,7 @@
     },
     {
       "validatorRule": "MissingSegmentsInNestedResourceListOperation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10889,6 +10972,7 @@
     },
     {
       "validatorRule": "MissingTypeObject",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -10917,6 +11001,7 @@
     },
     {
       "validatorRule": "MissingXmsErrorResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/missing-xms-error-response"
@@ -10978,6 +11063,7 @@
     },
     {
       "validatorRule": "MsPaths",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11006,6 +11092,7 @@
     },
     {
       "validatorRule": "MutabilityWithReadOnly",
+      "validatorMode": "production",
       "coverageKind": "partial",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/mutability-with-read-only"
@@ -11036,6 +11123,7 @@
     },
     {
       "validatorRule": "NamePropertyDefinitionInParameter",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11064,6 +11152,7 @@
     },
     {
       "validatorRule": "NestedResourcesMustHaveListOperation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/nested-resources-must-have-list-operation"
@@ -11223,6 +11312,7 @@
     },
     {
       "validatorRule": "NextLinkPropertyMustExist",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11251,6 +11341,7 @@
     },
     {
       "validatorRule": "NoDuplicatePathsForScopeParameter",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11291,6 +11382,7 @@
     },
     {
       "validatorRule": "NoErrorCodeResponses",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
@@ -11408,6 +11500,7 @@
     },
     {
       "validatorRule": "NonApplicationJsonType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/non-application-json-type"
@@ -11456,6 +11549,7 @@
     },
     {
       "validatorRule": "NonEmptyClientName",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11484,6 +11578,7 @@
     },
     {
       "validatorRule": "Nullable",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11512,6 +11607,7 @@
     },
     {
       "validatorRule": "OperationId",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11540,6 +11636,7 @@
     },
     {
       "validatorRule": "OperationIdNounConflictingModelNames",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/operation-id-noun-conflicting-model-names"
@@ -11738,6 +11835,7 @@
     },
     {
       "validatorRule": "OperationIdNounVerb",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/operation-id-noun-verb"
@@ -11959,6 +12057,7 @@
     },
     {
       "validatorRule": "OperationIdRequired",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -11987,6 +12086,7 @@
     },
     {
       "validatorRule": "OperationIdSingleUnderscore",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -12015,6 +12115,7 @@
     },
     {
       "validatorRule": "OperationsAPIImplementation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
@@ -12750,6 +12851,7 @@
     },
     {
       "validatorRule": "OperationsApiResponseSchema",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -12886,6 +12988,7 @@
     },
     {
       "validatorRule": "OperationsApiSchemaUsesCommonTypes",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -13169,6 +13272,7 @@
     },
     {
       "validatorRule": "OperationsApiTenantLevelOnly",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -13206,6 +13310,7 @@
     },
     {
       "validatorRule": "OperationSummaryOrDescription",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/documentation-required"
@@ -13242,6 +13347,7 @@
     },
     {
       "validatorRule": "PageableOperation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -13474,6 +13580,7 @@
     },
     {
       "validatorRule": "PageableRequires200Response",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/pageable-requires-200-response"
@@ -13504,6 +13611,7 @@
     },
     {
       "validatorRule": "PaginationResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/pagination-response"
@@ -13544,6 +13652,7 @@
     },
     {
       "validatorRule": "ParameterDefaultNotAllowed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -13572,6 +13681,7 @@
     },
     {
       "validatorRule": "ParameterDescription",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/documentation-required"
@@ -13734,6 +13844,7 @@
     },
     {
       "validatorRule": "ParameterDescriptionRequired",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -13762,6 +13873,7 @@
     },
     {
       "validatorRule": "ParameterNamesConvention",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/parameter-names-convention"
@@ -14012,6 +14124,7 @@
     },
     {
       "validatorRule": "ParameterNamesUnique",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -14040,6 +14153,7 @@
     },
     {
       "validatorRule": "ParameterNotDefinedInGlobalParameters",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -14095,6 +14209,7 @@
     },
     {
       "validatorRule": "ParameterNotUsingCommonTypes",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -14336,6 +14451,7 @@
     },
     {
       "validatorRule": "ParameterOrder",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -14364,6 +14480,7 @@
     },
     {
       "validatorRule": "ParametersInPointGet",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations"
@@ -14605,6 +14722,7 @@
     },
     {
       "validatorRule": "ParametersInPost",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/parameters-in-post"
@@ -14762,6 +14880,7 @@
     },
     {
       "validatorRule": "ParametersOrder",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -14820,6 +14939,7 @@
     },
     {
       "validatorRule": "ParametersSchemaAsTypeObject",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/parameters-schema-as-type-object"
@@ -14901,6 +15021,7 @@
     },
     {
       "validatorRule": "PatchBodyParametersSchema",
+      "validatorMode": "production",
       "coverageKind": "partial",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/patch-body-parameters-schema"
@@ -15385,6 +15506,7 @@
     },
     {
       "validatorRule": "PatchContentType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -15413,6 +15535,7 @@
     },
     {
       "validatorRule": "PatchIdentityProperty",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -15507,6 +15630,7 @@
     },
     {
       "validatorRule": "PatchInOperationName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/patch-in-operation-name"
@@ -15620,6 +15744,7 @@
     },
     {
       "validatorRule": "PatchPropertiesCorrespondToPutProperties",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/consistent-patch-properties"
@@ -15708,6 +15833,7 @@
     },
     {
       "validatorRule": "PatchResponseCodes",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -15922,6 +16048,7 @@
     },
     {
       "validatorRule": "PatchSkuProperty",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16016,6 +16143,7 @@
     },
     {
       "validatorRule": "PathCharacters",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/path-characters"
@@ -16070,6 +16198,7 @@
     },
     {
       "validatorRule": "PathContainsResourceGroup",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16107,6 +16236,7 @@
     },
     {
       "validatorRule": "PathContainsResourceType",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16165,6 +16295,7 @@
     },
     {
       "validatorRule": "PathContainsSubscriptionId",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16193,6 +16324,7 @@
     },
     {
       "validatorRule": "PathForNestedResource",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16284,6 +16416,7 @@
     },
     {
       "validatorRule": "PathForResourceAction",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16396,6 +16529,7 @@
     },
     {
       "validatorRule": "PathForTrackedResourceTypes",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -16499,6 +16633,7 @@
     },
     {
       "validatorRule": "PathParameterNames",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/path-parameter-names"
@@ -16737,6 +16872,7 @@
     },
     {
       "validatorRule": "PathParameterSchema",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/path-parameter-schema"
@@ -17391,6 +17527,7 @@
     },
     {
       "validatorRule": "PathResourceProviderMatchNamespace",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -17446,6 +17583,7 @@
     },
     {
       "validatorRule": "PathResourceProviderNamePascalCase",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case"
@@ -17553,6 +17691,7 @@
     },
     {
       "validatorRule": "PathResourceTypeNameCamelCase",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars"
@@ -17613,6 +17752,7 @@
     },
     {
       "validatorRule": "Post201Response",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/post-201-response"
@@ -17651,6 +17791,7 @@
     },
     {
       "validatorRule": "PostOperationIdContainsUrlVerb",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb"
@@ -18081,6 +18222,7 @@
     },
     {
       "validatorRule": "PostResponseCodes",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
@@ -18450,6 +18592,7 @@
     },
     {
       "validatorRule": "PreviewVersionOverOneYear",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/preview-version-over-one-year"
@@ -19049,6 +19192,7 @@
     },
     {
       "validatorRule": "PrivateEndpointResourceSchemaValidation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -19089,6 +19233,7 @@
     },
     {
       "validatorRule": "PropertiesTypeObjectNoDefinition",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/no-empty-model"
@@ -19119,6 +19264,7 @@
     },
     {
       "validatorRule": "PropertyDescription",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/documentation-required"
@@ -19149,6 +19295,7 @@
     },
     {
       "validatorRule": "PropertyType",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -19177,6 +19324,7 @@
     },
     {
       "validatorRule": "ProvisioningStateMustBeReadOnly",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state"
@@ -19483,6 +19631,7 @@
     },
     {
       "validatorRule": "ProvisioningStateSpecifiedForLROPatch",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -19550,6 +19699,7 @@
     },
     {
       "validatorRule": "ProvisioningStateSpecifiedForLROPut",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -19734,6 +19884,7 @@
     },
     {
       "validatorRule": "ProvisioningStateValidation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state"
@@ -19815,6 +19966,7 @@
     },
     {
       "validatorRule": "PutGetPatchResponseSchema",
+      "validatorMode": "production",
       "coverageKind": "partial",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
@@ -19887,6 +20039,7 @@
     },
     {
       "validatorRule": "PutInOperationName",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/put-in-operation-name"
@@ -20138,6 +20291,7 @@
     },
     {
       "validatorRule": "PutPath",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/put-path"
@@ -20174,6 +20328,7 @@
     },
     {
       "validatorRule": "PutRequestResponseScheme",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/put-request-response-scheme"
@@ -20212,6 +20367,7 @@
     },
     {
       "validatorRule": "PutRequestResponseSchemeArm",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
@@ -20409,6 +20565,7 @@
     },
     {
       "validatorRule": "PutResponseCodes",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes"
@@ -20754,6 +20911,7 @@
     },
     {
       "validatorRule": "QueryParametersInCollectionGet",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/query-parameters-in-collection-get"
@@ -20974,6 +21132,7 @@
     },
     {
       "validatorRule": "RepeatedPathInfo",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/repeated-path-info"
@@ -21110,6 +21269,7 @@
     },
     {
       "validatorRule": "RequestBodyMustExistForPutPatch",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21138,6 +21298,7 @@
     },
     {
       "validatorRule": "RequestBodyNotAllowed",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/request-body-not-allowed"
@@ -21176,6 +21337,7 @@
     },
     {
       "validatorRule": "RequestBodyOptional",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/request-body-optional"
@@ -21216,6 +21378,7 @@
     },
     {
       "validatorRule": "RequestSchemaForTrackedResourcesMustHaveTags",
+      "validatorMode": "production",
       "coverageKind": "blocked",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21325,6 +21488,7 @@
     },
     {
       "validatorRule": "RequiredDefaultResponse",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21377,6 +21541,7 @@
     },
     {
       "validatorRule": "RequiredPropertiesMissingInResourceModel",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21822,6 +21987,7 @@
     },
     {
       "validatorRule": "RequiredReadOnlySystemData",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21892,6 +22058,7 @@
     },
     {
       "validatorRule": "ReservedResourceNamesModelAsEnum",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21944,6 +22111,7 @@
     },
     {
       "validatorRule": "ResourceHasXMsResourceEnabled",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -21984,6 +22152,7 @@
     },
     {
       "validatorRule": "ResourceNameRestriction",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern"
@@ -22401,6 +22570,7 @@
     },
     {
       "validatorRule": "ResponseSchemaSpecifiedForSuccessStatusCode",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/no-response-body"
@@ -22449,6 +22619,7 @@
     },
     {
       "validatorRule": "Rpaas_ResourceProvisioningState",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -22477,6 +22648,7 @@
     },
     {
       "validatorRule": "SchemaDescriptionOrTitle",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/documentation-required"
@@ -22813,6 +22985,7 @@
     },
     {
       "validatorRule": "SchemaNamesConvention",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/casing-style"
@@ -22843,6 +23016,7 @@
     },
     {
       "validatorRule": "SchemaTypeAndFormat",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -22871,6 +23045,7 @@
     },
     {
       "validatorRule": "SecurityDefinitionDescription",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/security-definition-description"
@@ -22901,6 +23076,7 @@
     },
     {
       "validatorRule": "SecurityDefinitionsStructure",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -22929,6 +23105,7 @@
     },
     {
       "validatorRule": "SubscriptionIdParameterInOperations",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -22978,6 +23155,7 @@
     },
     {
       "validatorRule": "SubscriptionsAndResourceGroupCasing",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing"
@@ -23038,6 +23216,7 @@
     },
     {
       "validatorRule": "SuccessResponseBody",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -23066,6 +23245,7 @@
     },
     {
       "validatorRule": "SummaryAndDescriptionMustNotBeSame",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/summary-and-description-must-not-be-same"
@@ -23250,6 +23430,7 @@
     },
     {
       "validatorRule": "SystemDataDefinitionsCommonTypes",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
@@ -23289,6 +23470,7 @@
     },
     {
       "validatorRule": "SystemDataInPropertiesBag",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -23317,6 +23499,7 @@
     },
     {
       "validatorRule": "TagsAreNotAllowedForProxyResources",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources"
@@ -23385,6 +23568,7 @@
     },
     {
       "validatorRule": "TenantLevelAPIsNotAllowed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed"
@@ -23509,6 +23693,7 @@
     },
     {
       "validatorRule": "TopLevelResourcesListByResourceGroup",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group"
@@ -23571,6 +23756,7 @@
     },
     {
       "validatorRule": "TopLevelResourcesListBySubscription",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -23629,6 +23815,7 @@
     },
     {
       "validatorRule": "TrackedExtensionResourcesAreNotAllowed",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property"
@@ -23689,6 +23876,7 @@
     },
     {
       "validatorRule": "TrackedResourceBeyondsThirdLevel",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels"
@@ -23752,6 +23940,7 @@
     },
     {
       "validatorRule": "TrackedResourcePatchOperation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/tracked-resource-patch-operation"
@@ -23962,6 +24151,7 @@
     },
     {
       "validatorRule": "TrackedResourcesMustHavePut",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/tracked-resources-must-have-put"
@@ -24132,6 +24322,7 @@
     },
     {
       "validatorRule": "TrackedResourceTagsPropertyInRequest",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24160,6 +24351,7 @@
     },
     {
       "validatorRule": "UniqueClientParameterName",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24188,6 +24380,7 @@
     },
     {
       "validatorRule": "UniqueModelName",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24216,6 +24409,7 @@
     },
     {
       "validatorRule": "UniqueXmsEnumName",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24244,6 +24438,7 @@
     },
     {
       "validatorRule": "UniqueXmsExample",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24533,6 +24728,7 @@
     },
     {
       "validatorRule": "UnSupportedPatchProperties",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/unsupported-patch-properties"
@@ -24747,6 +24943,7 @@
     },
     {
       "validatorRule": "ValidFormats",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24796,7 +24993,8 @@
     },
     {
       "validatorRule": "ValidQueryParametersForPointOperations",
-      "coverageKind": "unknown",
+      "validatorMode": "staging",
+      "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations"
       ],
@@ -24804,22 +25002,148 @@
         "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations"
       ],
       "officialMapping": false,
-      "validatorProjectCount": 0,
-      "assessableValidatorProjectCount": 0,
+      "validatorProjectCount": 62,
+      "assessableValidatorProjectCount": 62,
       "typeSpecProjectCount": 62,
-      "overlapProjectCount": 0,
+      "overlapProjectCount": 62,
       "validatorOnlyProjectCount": 0,
       "unassessedProjectCount": 0,
-      "typeSpecOnlyProjectCount": 62,
-      "observedCoveragePercent": null,
-      "validatorDiagnosticCount": 0,
+      "typeSpecOnlyProjectCount": 0,
+      "observedCoveragePercent": 100,
+      "validatorDiagnosticCount": 321,
       "typeSpecDiagnosticCount": 724,
       "normalizedValidatorDiagnosticCount": null,
       "normalizedTypeSpecDiagnosticCount": null,
       "diagnosticConsistencyPercent": null,
       "normalizationMethod": null,
-      "validatorProjects": [],
-      "assessableValidatorProjects": [],
+      "validatorProjects": [
+        "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+        "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+        "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+        "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations",
+        "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+        "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+        "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+        "specification/billing/resource-manager/Microsoft.Billing/Billing",
+        "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+        "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+        "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+        "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+        "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+        "specification/computebulkactions/ComputeBulkActions.Management",
+        "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+        "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+        "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+        "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+        "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+        "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+        "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+        "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+        "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+        "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+        "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+        "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+        "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+        "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+        "specification/education/resource-manager/Microsoft.Education/Education",
+        "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+        "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+        "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions",
+        "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations",
+        "specification/machinelearningservices/MachineLearningServices.Management",
+        "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+        "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+        "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+        "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+        "specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi",
+        "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
+        "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+        "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+        "specification/newrelic/NewRelicObservability.Management",
+        "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+        "specification/peering/resource-manager/Microsoft.Peering/Peering",
+        "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+        "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+        "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+        "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+        "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+        "specification/resources/resource-manager/Microsoft.Authorization/policy",
+        "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+        "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+        "specification/scvmm/ScVmm.Management",
+        "specification/security/resource-manager/Microsoft.Security/Security/AssessmentAPI",
+        "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+        "specification/sql/resource-manager/Microsoft.Sql/SQL",
+        "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+        "specification/storage/Storage.Management",
+        "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+        "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+        "specification/web/resource-manager/Microsoft.Web/AppService"
+      ],
+      "assessableValidatorProjects": [
+        "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+        "specification/appcomplianceautomation/AppComplianceAutomation.Management",
+        "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+        "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations",
+        "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
+        "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
+        "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+        "specification/billing/resource-manager/Microsoft.Billing/Billing",
+        "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+        "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
+        "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+        "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+        "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
+        "specification/computebulkactions/ComputeBulkActions.Management",
+        "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
+        "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
+        "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+        "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+        "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
+        "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+        "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+        "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
+        "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
+        "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+        "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
+        "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
+        "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
+        "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+        "specification/education/resource-manager/Microsoft.Education/Education",
+        "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
+        "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+        "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions",
+        "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations",
+        "specification/machinelearningservices/MachineLearningServices.Management",
+        "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+        "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+        "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
+        "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
+        "specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi",
+        "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
+        "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+        "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
+        "specification/newrelic/NewRelicObservability.Management",
+        "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
+        "specification/peering/resource-manager/Microsoft.Peering/Peering",
+        "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+        "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
+        "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+        "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+        "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
+        "specification/resources/resource-manager/Microsoft.Authorization/policy",
+        "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
+        "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
+        "specification/scvmm/ScVmm.Management",
+        "specification/security/resource-manager/Microsoft.Security/Security/AssessmentAPI",
+        "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
+        "specification/sql/resource-manager/Microsoft.Sql/SQL",
+        "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
+        "specification/storage/Storage.Management",
+        "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
+        "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
+        "specification/web/resource-manager/Microsoft.Web/AppService"
+      ],
       "typeSpecProjects": [
         "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
         "specification/appcomplianceautomation/AppComplianceAutomation.Management",
@@ -24884,10 +25208,7 @@
         "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
         "specification/web/resource-manager/Microsoft.Web/AppService"
       ],
-      "overlapProjects": [],
-      "validatorOnlyProjects": [],
-      "unassessedProjects": [],
-      "typeSpecOnlyProjects": [
+      "overlapProjects": [
         "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
         "specification/appcomplianceautomation/AppComplianceAutomation.Management",
         "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
@@ -24950,10 +25271,14 @@
         "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
         "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
         "specification/web/resource-manager/Microsoft.Web/AppService"
-      ]
+      ],
+      "validatorOnlyProjects": [],
+      "unassessedProjects": [],
+      "typeSpecOnlyProjects": []
     },
     {
       "validatorRule": "ValidResponseCodeRequired",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -24982,6 +25307,7 @@
     },
     {
       "validatorRule": "VersionConvention",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -25010,6 +25336,7 @@
     },
     {
       "validatorRule": "VersionPolicy",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-core/operation-missing-api-version",
@@ -25041,6 +25368,7 @@
     },
     {
       "validatorRule": "XmsClientName",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -25069,6 +25397,7 @@
     },
     {
       "validatorRule": "XmsClientNameParameter",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -25097,6 +25426,7 @@
     },
     {
       "validatorRule": "XmsClientNameProperty",
+      "validatorMode": "production",
       "coverageKind": "template",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -25125,6 +25455,7 @@
     },
     {
       "validatorRule": "XmsEnumValidation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -25159,6 +25490,7 @@
     },
     {
       "validatorRule": "XmsExamplesRequired",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/xms-examples-required"
@@ -26124,6 +26456,7 @@
     },
     {
       "validatorRule": "XmsIdentifierValidation",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers"
@@ -26487,6 +26820,7 @@
     },
     {
       "validatorRule": "XMSLongRunningOperationProperty",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/xms-long-running-operation-property"
@@ -26535,6 +26869,7 @@
     },
     {
       "validatorRule": "XmsPageableForListCalls",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/xms-pageable-for-list-calls"
@@ -26821,6 +27156,7 @@
     },
     {
       "validatorRule": "XmsPageableListByRGAndSubscriptions",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -26849,6 +27185,7 @@
     },
     {
       "validatorRule": "XmsPageableMustHaveCorrespondingResponse",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/xms-pageable-must-have-corresponding-response"
@@ -26879,6 +27216,7 @@
     },
     {
       "validatorRule": "XmsParameterLocation",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -26919,6 +27257,7 @@
     },
     {
       "validatorRule": "XmsPathsMustOverloadPaths",
+      "validatorMode": "production",
       "coverageKind": "unknown",
       "mappedTypeSpecRules": [],
       "firedTypeSpecRules": [],
@@ -26953,6 +27292,7 @@
     },
     {
       "validatorRule": "XmsResourceInPutResponse",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "tsp-lintdiff-local-linter/xms-resource-in-put-response"
@@ -27035,6 +27375,7 @@
     },
     {
       "validatorRule": "XMSSecretInResponse",
+      "validatorMode": "production",
       "coverageKind": "lint",
       "mappedTypeSpecRules": [
         "@azure-tools/typespec-azure-resource-manager/secret-prop"

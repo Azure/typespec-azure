@@ -565,7 +565,7 @@ describe("validator and TypeSpec comparison", () => {
     expect(coverageMarkdown).toContain("Analysis duration: 1234 ms");
     expect(coverageMarkdown).toContain("Official mappings and fixture coverage kinds");
     expect(coverageMarkdown).toContain(
-      "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
+      "| Validator Rule | Mode | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
     );
     expect(coverageMarkdown).not.toContain("Normalized Validator Diagnostics");
     expect(coverageMarkdown).not.toContain("Unassessed");

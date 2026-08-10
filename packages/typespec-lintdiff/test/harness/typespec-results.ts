@@ -160,6 +160,7 @@ export interface AnalysisScope {
 
 export interface ComparisonEntry {
   validatorRule: string;
+  validatorMode: "production" | "staging";
   coverageKind: string;
   mappedTypeSpecRules: string[];
   firedTypeSpecRules: string[];
@@ -846,6 +847,7 @@ export function compareResults(
     knownValidatorRules?: Iterable<string>;
     fixtureMetadata?: Map<string, ValidatorFixtureMetadata>;
     normalizationContext?: DiagnosticNormalizationContext;
+    stagingValidatorRules?: Set<string>;
   } = {},
 ): ComparisonResults {
   const failedProjects = options.failedProjects ?? new Set<string>();
@@ -911,6 +913,9 @@ export function compareResults(
       );
       return {
         validatorRule,
+        validatorMode: options.stagingValidatorRules?.has(validatorRule)
+          ? "staging"
+          : "production",
         coverageKind: options.fixtureMetadata?.get(validatorRule)?.coverageKind ?? "unknown",
         mappedTypeSpecRules,
         firedTypeSpecRules,
@@ -1079,7 +1084,7 @@ function assertDatasetPath(datasetDir: string, relativePath: string): string {
   return absolutePath;
 }
 
-function loadValidatorRuleData(
+export function loadValidatorRuleData(
   datasetDir: string,
   validatorIndex: ValidatorIndex,
   selectedProjects: Set<string>,
@@ -1424,13 +1429,13 @@ function formatObservedPercent(value: number | null): string {
 
 function coverageTableHeader(): string[] {
   return [
-    "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
-    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |",
+    "| Validator Rule | Mode | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
+    "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |",
   ];
 }
 
 function coverageTableRow(entry: ComparisonEntry): string {
-  return `| ${escapeMarkdown(entry.validatorRule)} | ${escapeMarkdown(
+  return `| ${escapeMarkdown(entry.validatorRule)} | ${entry.validatorMode} | ${escapeMarkdown(
     entry.coverageKind,
   )} | ${entry.validatorProjectCount} | ${entry.typeSpecProjectCount} | ${
     entry.overlapProjectCount
@@ -1474,6 +1479,7 @@ export function comparisonMarkdown(comparison: ComparisonResults): string {
     "## Column definitions",
     "",
     "- **Fired**: included projects where the validator rule fired.",
+    "- **Mode**: `production` for the normal AutoRest validator run or `staging` for a separately evaluated `stagingOnly` rule.",
     "- **TSP Fired**: included projects where at least one mapped TypeSpec rule fired.",
     "- **Lint/Overlap**: validator projects with a mapped TypeSpec diagnostic in the same project.",
     "- **Gap**: validator projects without a mapped TypeSpec diagnostic.",
@@ -1576,7 +1582,7 @@ function appendCoverageSection(
 ): void {
   lines.push("", `## ${title} (${ruleIds.length})`, "", ...coverageTableHeader());
   if (ruleIds.length === 0) {
-    lines.push("| _None_ | — | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |");
+    lines.push("| _None_ | — | — | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |");
     return;
   }
   for (const ruleId of ruleIds) {
@@ -1615,6 +1621,7 @@ export function coverageBreakdownMarkdown(breakdown: CoverageBreakdown): string 
     "## Column definitions",
     "",
     "- **Validator Rule**: validator rule identifier from the catalog, fixtures, or validator results.",
+    "- **Mode**: `production` for the normal AutoRest validator run or `staging` for a separately evaluated `stagingOnly` rule.",
     "- **CovKind**: fixture `coverageKind` value, or `unknown` when no fixture supplies it.",
     "- **Fired**: included projects where the validator rule fired.",
     "- **TSP Fired**: included projects where at least one mapped TypeSpec rule fired.",
@@ -1770,16 +1777,44 @@ async function run(config: Config): Promise<void> {
         .filter((project) => project.status === "failed")
         .map((project) => project.project),
     );
+    const productionValidatorRules = loadValidatorRuleData(
+      config.datasetDir,
+      validatorIndex,
+      new Set(scope.projects),
+    );
+    const stagingValidatorPath = path.join(
+      config.datasetDir,
+      "staging-validator-results.json",
+    );
+    const stagingValidatorIndex = fs.existsSync(stagingValidatorPath)
+      ? readJson<ValidatorIndex>(stagingValidatorPath)
+      : undefined;
+    if (
+      stagingValidatorIndex &&
+      stagingValidatorIndex.specsCommit !== meta.specsCommit
+    ) {
+      throw new Error(
+        `Staging validator results do not match dataset commit ${meta.specsCommit}.`,
+      );
+    }
+    const stagingValidatorRules = stagingValidatorIndex
+      ? loadValidatorRuleData(
+          config.datasetDir,
+          stagingValidatorIndex,
+          new Set(scope.projects),
+        )
+      : {};
     const comparison = compareResults(
       meta.specsCommit,
       generatedAt,
-      loadValidatorRuleData(config.datasetDir, validatorIndex, new Set(scope.projects)),
+      { ...productionValidatorRules, ...stagingValidatorRules },
       aggregate,
       mappings,
       scope,
       {
         failedProjects,
         fixtureMetadata,
+        stagingValidatorRules: new Set(Object.keys(stagingValidatorRules)),
         knownValidatorRules: loadKnownValidatorRules(
           path.join(packageDir, "catalog", "validator-rule-metadata.json"),
         ),

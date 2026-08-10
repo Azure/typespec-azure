@@ -4,6 +4,7 @@ engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations
 tspRuleset: resource-manager
+coverageKind: lint
 ---
 
 # ValidQueryParametersForPointOperations

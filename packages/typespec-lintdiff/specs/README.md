@@ -98,6 +98,19 @@ pnpm specs:typespec `
   --concurrency 1
 ```
 
+Refresh staging-only validator results and rebuild the coverage reports without
+recompiling TypeSpec:
+
+```powershell
+npm run specs:staging
+npm run specs:coverage -- --specs-repo C:\dev\azure-rest-api-specs
+```
+
+The normal dataset uses the production AutoRest validator configuration.
+`specs:staging` evaluates separately tracked `stagingOnly` rules over the
+retained Swagger files. Coverage rows identify their source in the **Mode**
+column.
+
 The command always selects projects from the existing `_meta.json`; it does not
 regenerate Swagger. `--filter` matches the recorded source path and `--limit`
 caps the selected projects. Scoped and full runs use the same files and folder
