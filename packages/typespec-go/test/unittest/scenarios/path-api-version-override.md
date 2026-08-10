@@ -95,8 +95,7 @@ func (client *VersionedClient) WithPathAPIVersion(ctx context.Context, options *
 		return VersionedClientWithPathAPIVersionResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return VersionedClientWithPathAPIVersionResponse{}, err
+		return VersionedClientWithPathAPIVersionResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return VersionedClientWithPathAPIVersionResponse{}, nil
 }

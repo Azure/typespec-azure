@@ -88,8 +88,7 @@ func (client *RegressionsClient) ForceRequiredBodyPatch(ctx context.Context, bod
 		return RegressionsClientForceRequiredBodyPatchResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientForceRequiredBodyPatchResponse{}, err
+		return RegressionsClientForceRequiredBodyPatchResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientForceRequiredBodyPatchResponse{}, nil
 }
@@ -123,8 +122,7 @@ func (client *RegressionsClient) ForceRequiredBodyPut(ctx context.Context, body 
 		return RegressionsClientForceRequiredBodyPutResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientForceRequiredBodyPutResponse{}, err
+		return RegressionsClientForceRequiredBodyPutResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientForceRequiredBodyPutResponse{}, nil
 }
@@ -158,8 +156,7 @@ func (client *RegressionsClient) OptionalBinaryBody(ctx context.Context, options
 		return RegressionsClientOptionalBinaryBodyResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientOptionalBinaryBodyResponse{}, err
+		return RegressionsClientOptionalBinaryBodyResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientOptionalBinaryBodyResponse{}, nil
 }
@@ -196,8 +193,7 @@ func (client *RegressionsClient) OptionalBodyPost(ctx context.Context, options *
 		return RegressionsClientOptionalBodyPostResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientOptionalBodyPostResponse{}, err
+		return RegressionsClientOptionalBodyPostResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientOptionalBodyPostResponse{}, nil
 }

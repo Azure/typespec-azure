@@ -77,8 +77,7 @@ func (client *TestClient) Get(ctx context.Context, options *TestClientGetOptions
 		return TestClientGetResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return TestClientGetResponse{}, err
+		return TestClientGetResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return TestClientGetResponse{}, nil
 }

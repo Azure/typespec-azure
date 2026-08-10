@@ -190,6 +190,7 @@ model ProxyResourceUpdateModel<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > {
+  /** The resource-specific properties for this resource. */
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 

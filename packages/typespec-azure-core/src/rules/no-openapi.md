@@ -7,88 +7,22 @@ Those decorators are only meant to be read by the openapi emitters which means t
 
 - **Area:** API, SDK, Emitters
 
-Raw OpenAPI (`@openapi` and extensions) changes the OpenAPI output without informing other emitters such as SDKs, so SDKs can misrepresent the wire API.
+Raw OpenAPI decorators (such as `@operationId`, `@useRef`, and `@info`) change the OpenAPI output without informing other emitters such as SDKs, so SDKs can misrepresent the wire API.
+
+:::note
+This rule does not flag the `@extension` decorator. Client-altering `x-ms-*` extensions emitted through `@extension` are handled by the [`no-openapi-client-extensions`](./no-openapi-client-extensions.md) rule.
+:::
 
 ## Decorators and their alternatives
 
-| OpenAPI Decorator                    | Alternative                                                                                                                                                     |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@example`                           | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
-| `@extension("x-ms-examples", `       | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
-| `@extension("x-ms-client-flatten", ` | Use [`@flattenProperty`](../../typespec-client-generator-core/reference/decorators.md#@Azure.ClientGenerator.Core.Legacy.flattenProperty)                       |
-| `@extension("x-ms-mutability", `     | Use [`@visibility` decorator](https://typespec.io/docs/standard-library/built-in-decorators#@visibility)                                                        |
-| `@extension("x-ms-enum", `           | [Enum extensibility doc](../../../troubleshoot/enum-not-extensible.md)                                                                                          |
-| `@extension("x-ms-identifiers", `    | Use [`@identifiers`](../../azure-resource-manager/reference/decorators.md#@Azure.ResourceManager.identifiers)                                                   |
-| `@operationId`                       | Name your interface and operation accordingly                                                                                                                   |
-| `@useRef`                            | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
-| `@info`                              | Use versioning library for `version` and `@service` for title                                                                                                   |
+| OpenAPI Decorator | Alternative                                                                                                                                                     |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@example`        | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
+| `@operationId`    | Name your interface and operation accordingly                                                                                                                   |
+| `@useRef`         | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
+| `@info`           | Use versioning library for `version` and `@service` for title                                                                                                   |
 
 ## Examples
-
-### `@extension("x-ms-enum"`
-
-#### ❌ Incorrect
-
-```tsp
-@extension(
-  "x-ms-enum",
-  {
-    name: "PetKind",
-    modelAsString: true,
-  }
-)
-enum PetKind {
-  Cat,
-  Dog,
-}
-```
-
-#### ✅ Correct
-
-```tsp
-union PetKind {
-  Cat: "Cat",
-  Dog: "Dog",
-  string,
-}
-```
-
-### `@extension("x-ms-mutability"`
-
-#### ❌ Incorrect
-
-```tsp
-model Pet {
-  @extension("x-ms-mutability", #["read", "create"])
-  name: string;
-}
-```
-
-### `@extension("x-ms-identifiers"`
-
-#### ❌ Incorrect
-
-```tsp
-model Pet {
-  @extension("x-ms-identifiers", #["customId"])
-  names: Name[];
-}
-model Name {
-  customId: string;
-}
-```
-
-#### ✅ Correct
-
-```tsp
-model Pet {
-  @identifiers(#["customId"])
-  names: Name[];
-}
-model Name {
-  customId: string;
-}
-```
 
 ### `@operationId`
 
@@ -109,4 +43,4 @@ interface Pet {
 
 ## Suppression
 
-Suppression is acceptable when the extension does not affect the API or SDK - for example `@externalDocs`, or extensions like `x-ms-identifiers`. Extensions that do affect behavior should never be suppressed: use `@list` instead of `x-ms-pageable`, the Async operation templates instead of `x-ms-long-running-operation*`, `@secret` or a password type instead of `x-ms-secret`, and `@clientLocation` or `@clientName` instead of `@operationId`.
+Suppression is acceptable when the decorator does not affect the API or SDK - for example `@externalDocs`. Decorators that do affect behavior should never be suppressed: name your interface and operation accordingly instead of using `@operationId`, and define the types correctly in TypeSpec instead of using `@useRef`.

@@ -1,5 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
+import type { SdkBuiltInType } from "../../src/interfaces.js";
 import {
   AzureCoreTesterWithService,
   createSdkContextForTester,
@@ -169,6 +170,8 @@ it("array with encode", async () => {
   const modelProp = model.properties[0];
   strictEqual(modelProp.type.kind, "array");
   strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "string");
+  strictEqual((modelProp.type.valueType as SdkBuiltInType).encode, undefined);
 });
 
 it("array with encode for enum array", async () => {
@@ -223,4 +226,40 @@ it("array with encode for union as enum array", async () => {
   strictEqual(modelProp.encode, "commaDelimited");
   strictEqual(modelProp.type.valueType.kind, "enum");
   strictEqual(modelProp.type.valueType.isUnionAsEnum, true);
+});
+
+it("model with array encode and string encode from playground example", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model CommaDelimitedArrayProperty {
+      @encode(ArrayEncoding.commaDelimited)
+      value: string[];
+
+      @encode("abc", int32)
+      value1: string;
+    }
+
+    @route("/property/comma-delimited")
+    @post op commaDelimited(@body body: CommaDelimitedArrayProperty): CommaDelimitedArrayProperty;
+  `);
+  const context = await createSdkContextForTester(program);
+  const model = context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "CommaDelimitedArrayProperty");
+  strictEqual(model.properties.length, 2);
+
+  // array property with commaDelimited encoding
+  const arrayProp = model.properties.find((p) => p.name === "value")!;
+  ok(arrayProp);
+  strictEqual(arrayProp.type.kind, "array");
+  strictEqual(arrayProp.encode, "commaDelimited");
+  strictEqual(arrayProp.type.valueType.kind, "string");
+  strictEqual((arrayProp.type.valueType as SdkBuiltInType).encode, undefined);
+
+  // string property with custom encoding and int32 encodedAs
+  const stringProp = model.properties.find((p) => p.name === "value1")!;
+  ok(stringProp);
+  strictEqual(stringProp.type.kind, "string");
+  const stringType = stringProp.type as SdkBuiltInType;
+  strictEqual(stringType.encode, "abc");
+  strictEqual(stringType.wireType?.kind, "int32");
 });
