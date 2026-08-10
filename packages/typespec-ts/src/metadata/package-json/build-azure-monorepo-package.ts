@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { AzurePackageInfoConfig, getAzureCommonPackageInfo } from "./azure-package-common.js";
+import { type AzurePackageInfoConfig, getAzureCommonPackageInfo } from "./azure-package-common.js";
 import { getCommonPackageScripts, getPackageCommonInfo } from "./package-common.js";
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {

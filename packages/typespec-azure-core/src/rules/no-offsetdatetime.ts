@@ -1,11 +1,11 @@
 import {
-  DiagnosticTarget,
-  ModelProperty,
-  Operation,
-  Program,
-  Scalar,
-  Type,
-  UnionVariant,
+  type DiagnosticTarget,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
+  type UnionVariant,
   createRule,
   fileRef,
 } from "@typespec/compiler";

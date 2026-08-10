@@ -35,12 +35,10 @@ export function _receiveSend(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/receive")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/jsonl", ...options.requestOptions?.headers },
-    });
+  return context.path("/receive").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/jsonl", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _receiveDeserialize(result: StreamResponse): Promise<AsyncIterable<Info>> {

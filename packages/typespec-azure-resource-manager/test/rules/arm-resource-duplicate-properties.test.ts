@@ -1,8 +1,8 @@
 import { Tester } from "#test/tester.js";
-import { createLinterRuleTester, TesterInstance } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type TesterInstance } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { LinterRuleTester } from "@typespec/compiler/testing";
+import type { LinterRuleTester } from "@typespec/compiler/testing";
 import { armResourceDuplicatePropertiesRule } from "../../src/rules/arm-resource-duplicate-property.js";
 
 let runner: TesterInstance;

@@ -1,4 +1,4 @@
-import { CoreDependencies } from "../framework/dependency.js";
+import type { CoreDependencies } from "../framework/dependency.js";
 
 export const DefaultCoreDependencies: CoreDependencies = {
   Client: {

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
-import { Options } from "prettier";
-import { PackageDetails } from "./interfaces.js";
+import { createTypeSpecLibrary, type JSONSchemaType, paramMessage } from "@typespec/compiler";
+import type { Options } from "prettier";
+import type { PackageDetails } from "./interfaces.js";
 
 export interface EmitterOptions {
   /**

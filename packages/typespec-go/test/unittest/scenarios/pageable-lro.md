@@ -108,7 +108,7 @@ func (client *PageableLROsClient) BeginListPrivateEndPoints(ctx context.Context,
 			if err != nil {
 				return PageableLROsClientListPrivateEndPointsResponse{}, err
 			}
-			return client.listPrivateEndPointsHandleResponse(resp)
+			return client.listPrivateEndPointsHandleResponse(resp, http.StatusOK, http.StatusAccepted)
 		},
 	})
 	if options == nil || options.ResumeToken == "" {
@@ -139,8 +139,7 @@ func (client *PageableLROsClient) listPrivateEndPoints(ctx context.Context, apiV
 		return nil, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusOK, http.StatusAccepted) {
-		err = runtime.NewResponseError(httpResp)
-		return nil, err
+		return nil, runtime.NewResponseError(httpResp)
 	}
 	return httpResp, nil
 }
@@ -172,8 +171,11 @@ func (client *PageableLROsClient) listPrivateEndPointsCreateRequest(ctx context.
 }
 
 // listPrivateEndPointsHandleResponse handles the ListPrivateEndPoints response.
-func (client *PageableLROsClient) listPrivateEndPointsHandleResponse(resp *http.Response) (PageableLROsClientListPrivateEndPointsResponse, error) {
+func (client *PageableLROsClient) listPrivateEndPointsHandleResponse(resp *http.Response, successCodes ...int) (PageableLROsClientListPrivateEndPointsResponse, error) {
 	result := PageableLROsClientListPrivateEndPointsResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.SomeResourceListResult); err != nil {
 		return PageableLROsClientListPrivateEndPointsResponse{}, err
 	}

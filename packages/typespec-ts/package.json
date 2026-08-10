@@ -75,6 +75,7 @@
     "vite": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@microsoft/api-extractor": "catalog:",
+    "@types/pluralize": "catalog:",
     "yaml": "catalog:"
   },
   "peerDependencies": {
@@ -88,6 +89,7 @@
   },
   "dependencies": {
     "fast-xml-parser": "catalog:",
+    "pluralize": "catalog:",
     "prettier": "catalog:",
     "ts-morph": "catalog:",
     "tslib": "catalog:"

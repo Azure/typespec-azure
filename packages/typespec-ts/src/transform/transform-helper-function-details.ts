@@ -1,7 +1,10 @@
-import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { HelperFunctionDetails } from "../interfaces.js";
+import {
+  getHttpOperationWithCache,
+  type SdkClient,
+} from "@azure-tools/typespec-client-generator-core";
+import type { HelperFunctionDetails } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { getCollectionFormat } from "../utils/model-utils.js";
 import {
   extractPageDetails,

@@ -1,4 +1,4 @@
-import { Namespace, createRule, fileRef, getService } from "@typespec/compiler";
+import { type Namespace, createRule, fileRef, getService } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
 
 export const authRequiredRule = createRule({

@@ -2,9 +2,13 @@ import {
   BrandedSdkEmitterOptions,
   UnbrandedSdkEmitterOptions,
 } from "@azure-tools/typespec-client-generator-core";
-import { JSONSchemaType } from "@typespec/compiler";
+import type { JSONSchemaType } from "@typespec/compiler";
 
 export const LIB_NAME = "@azure-tools/typespec-java";
+export const DIAGNOSTIC_DOCS_BASE_PATH = "src/diagnostics";
+export const DIAGNOSTIC_DOCS_BASE_URL =
+  "https://azure.github.io/typespec-azure/docs/emitters/clients/typespec-java/reference/diagnostics";
+export const DIAGNOSTIC_DOCS_EXCLUDED = new Set<string>();
 
 export interface DevOptions {
   "generate-code-model"?: boolean;

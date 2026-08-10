@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { badRecordTypeRule } from "../../src/rules/bad-record-type.js";
 

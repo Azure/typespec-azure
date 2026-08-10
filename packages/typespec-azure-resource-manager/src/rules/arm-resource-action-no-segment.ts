@@ -1,4 +1,4 @@
-import { DecoratorApplication, Operation, createRule, fileRef } from "@typespec/compiler";
+import { type DecoratorApplication, type Operation, createRule, fileRef } from "@typespec/compiler";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceActionNoSegmentRule = createRule({

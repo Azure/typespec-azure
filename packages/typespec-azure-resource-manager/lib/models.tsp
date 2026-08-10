@@ -11,7 +11,7 @@ namespace Azure.ResourceManager;
  * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
  * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
  *
- * For additional decorators such as @minLength, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
+ * For additional decorators such as `@minLength`, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
  *
  * @template Resource The ARM resource this name parameter is applying to.
  * @template KeyName Override default key name of the resource.
@@ -229,6 +229,7 @@ model DefaultProvisioningStateProperty {
  * ```
  */
 model ExtendedLocationProperty {
+  /** The extended location of the resource. */
   @visibility(Lifecycle.Read, Lifecycle.Create)
   extendedLocation?: Foundations.ExtendedLocation;
 }
@@ -450,6 +451,23 @@ model EncryptionProperty {
 model AvailabilityZonesProperty {
   /** The availability zones. */
   zones?: string[];
+}
+
+/**
+ * Standard resource billing data property to represent the resource's current billing state.
+ * Spread this model directly into your resource property model when modeling e.g. prepaid resources.
+ *
+ * @example
+ *
+ * ```typespec
+ * model FooProperties {
+ *   ...BillingDataProperty,
+ * }
+ * ```
+ */
+model BillingDataProperty {
+  /** The billing data of the resource. */
+  billingData: CommonTypes.BillingData;
 }
 
 //#endregion

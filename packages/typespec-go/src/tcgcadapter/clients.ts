@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-deprecated -- uses TCGC APIs marked deprecated (correspondingMethodParams). */
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
-import { ModelProperty, NoTarget } from "@typespec/compiler";
+import { type ModelProperty, NoTarget } from "@typespec/compiler";
 import * as http from "@typespec/http";
 import * as go from "../codemodel/index.js";
 import {
@@ -113,7 +113,7 @@ export class ClientAdapter {
     if (docs.summary) {
       docs.summary = `${clientName} - ${docs.summary}`;
     } else if (docs.description) {
-      docs.description = `${clientName} - ${docs.description}`;
+      docs.description = go.prefixDocWithName(clientName, docs.description);
     } else if (clientName.length > 6) {
       // strip clientName's "Client" suffix
       const groupName = clientName.substring(0, clientName.length - 6);

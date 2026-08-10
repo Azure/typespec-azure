@@ -56,7 +56,8 @@ internal model AgentDefinition {
 /**
  * Appliance deployment model of AgentDefinition.
  * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or read-only when present.
+ * template parameter is false. When present, `instructions` is read-only while
+ * `modelDeploymentRef` stays writable so the client can point the agent at a model deployment.
  * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
  * @template HasInstructions Whether the instructions property is present.
  */
@@ -72,8 +73,8 @@ model AgentDefinitionAppliance<
   @baseTypeOptional(HasInstructions, true)
   instructions: string;
 
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, true)
+  /** Optional RP-specific reference to an underlying model deployment. Writable in both deployment models. */
+  @baseTypeOptional(HasModelDeploymentRef, false)
   modelDeploymentRef?: string;
 }
 
@@ -125,7 +126,10 @@ internal model AgentProperties {
 
 /**
  * Appliance deployment model of AgentProperties.
- * All properties are read-only (the appliance owns and reports state).
+ * All properties are read-only (the appliance owns and reports state), except the `definition`
+ * container itself: it stays writable so the client can send the fields the agent definition
+ * marks as writable, such as `modelDeploymentRef`. Every service-owned field inside the
+ * definition remains read-only.
  * @template AgentDefinitionType The user-defined agent definition model (must extend AgentDefinition).
  */
 model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
@@ -141,8 +145,7 @@ model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
   @visibility(Lifecycle.Read)
   description: string;
 
-  /** Inline agent definition. */
-  @visibility(Lifecycle.Read)
+  /** Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned. */
   definition: AgentDefinitionType;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */
@@ -186,6 +189,9 @@ model ConversationProperties {
   /** Timestamp of when the conversation was created. Read-only. */
   @visibility(Lifecycle.Read)
   createdAt?: utcDateTime;
+
+  /** Content input to the conversation. Required on create. */
+  input: InputItem;
 }
 
 /**
@@ -232,7 +238,7 @@ enum ItemType {
  *   - `FunctionCallOutput`: `callId`, `output`
  *   - `Compaction`: `summary`
  */
-model ConversationItem {
+model InputItem {
   /** Unique identifier of the item. Read-only (assigned by the service). */
   @visibility(Lifecycle.Read)
   id?: string;
@@ -240,11 +246,12 @@ model ConversationItem {
   /** The item type discriminator. Determines which variant this item represents. */
   type: ItemType;
 
-  /** The role of the message author. Applies to `Message` items. */
+  /** The role of the message author. Applies to `Message` items. Read-only. */
+  @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. */
-  content?: string;
+  /** The content of the message. Applies to `Message` items. */
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. */
   callId?: string;
@@ -316,7 +323,7 @@ model ResponseProperties {
   status?: ResponseStatus;
 
   /** Content input to the model. Required on create. */
-  input: ConversationItem;
+  input: InputItem;
 }
 
 /**
@@ -342,9 +349,9 @@ model ResponseItem {
   @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. Read-only. */
+  /** The content of the message. Applies to `Message` items. Read-only. */
   @visibility(Lifecycle.Read)
-  content?: string;
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. Read-only. */
   @visibility(Lifecycle.Read)

@@ -54,7 +54,7 @@
 name: "Documentation Sync"
 on:
   schedule:
-  - cron: "9 8 * * 1-5"
+  - cron: "34 22 * * 1-5"
     # Friendly format: daily on weekdays (scattered)
   workflow_dispatch:
     inputs:

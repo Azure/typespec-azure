@@ -42,12 +42,10 @@ export function _receiveSend(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/receive")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/event-stream", ...options.requestOptions?.headers },
-    });
+  return context.path("/receive").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/event-stream", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _receiveDeserialize(result: StreamResponse): Promise<AsyncIterable<Info>> {

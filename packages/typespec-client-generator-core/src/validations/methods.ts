@@ -1,5 +1,5 @@
 import { getClientNameOverride } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 import { listScopedDecoratorData, overrideKey } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 

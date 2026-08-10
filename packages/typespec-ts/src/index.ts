@@ -2,13 +2,13 @@
 // Licensed under the MIT License.
 
 import {
-  EmitContext,
-  Program,
+  type CompilerHost,
+  type EmitContext,
+  type Program,
   getBaseFileName,
   getDirectoryPath,
   joinPaths,
   resolvePath,
-  type CompilerHost,
 } from "@typespec/compiler";
 import { clearContexts, provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
@@ -33,11 +33,11 @@ import {
 } from "./modular/static-helpers-metadata.js";
 import { emitContentByBuilder } from "./utils/emit-util.js";
 import { clearDirectory, emptyDir, pathExists } from "./utils/file-system-utils.js";
-import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
+import type { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
 
 import {
-  SdkClientType,
-  SdkServiceOperation,
+  type SdkClientType,
+  type SdkServiceOperation,
   createSdkContext,
   listAllServiceNamespaces,
 } from "@azure-tools/typespec-client-generator-core";
@@ -45,8 +45,8 @@ import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes, resetSdkTypesState } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
-import { ClientModel, ClientOptions } from "./interfaces.js";
-import { EmitterOptions } from "./lib.js";
+import type { ClientModel, ClientOptions } from "./interfaces.js";
+import type { EmitterOptions } from "./lib.js";
 import { buildApiExtractorConfig } from "./metadata/build-api-extractor-config.js";
 import { buildChangelogFile } from "./metadata/build-changelog-file.js";
 import { buildEsLintConfig } from "./metadata/build-es-lint-config.js";
@@ -88,12 +88,12 @@ import { emitNonModelResponseTypes, emitTypes } from "./modular/emit-models.js";
 import { emitSamples } from "./modular/emit-samples.js";
 import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
-import { ModularEmitterOptions } from "./modular/interfaces.js";
-import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import {
   packageHasSseStreaming,
   packageHasStructuredStreaming,
 } from "./modular/helpers/operation-helpers.js";
+import type { ModularEmitterOptions } from "./modular/interfaces.js";
+import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import { transformClientOptions } from "./transform/transform-client-options.js";
 import { transformClientModel } from "./transform/transform.js";
 import { getClientHierarchyMap, getClientModuleInfo, getClients } from "./utils/client-utils.js";

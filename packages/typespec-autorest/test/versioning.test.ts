@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { expect, it } from "vitest";
-import { OpenAPI2Document } from "../src/openapi2-document.js";
+import type { OpenAPI2Document } from "../src/openapi2-document.js";
 import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 it("if version enum is referenced only include current member and mark it with modelAsString: true", async () => {

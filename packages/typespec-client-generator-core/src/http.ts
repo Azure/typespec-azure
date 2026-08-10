@@ -1,9 +1,9 @@
 import {
-  Diagnostic,
-  ModelProperty,
-  Operation,
-  Type,
-  Union,
+  type Diagnostic,
+  type ModelProperty,
+  type Operation,
+  type Type,
+  type Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -14,11 +14,11 @@ import { $ } from "@typespec/compiler/typekit";
 import { isEvents } from "@typespec/events";
 import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
-  HttpOperation,
-  HttpOperationHeaderParameter,
-  HttpOperationParameter,
-  HttpOperationPathParameter,
-  HttpOperationQueryParameter,
+  type HttpOperation,
+  type HttpOperationHeaderParameter,
+  type HttpOperationParameter,
+  type HttpOperationPathParameter,
+  type HttpOperationQueryParameter,
   Visibility,
   getCookieParamOptions,
   getHeaderFieldName,
@@ -32,11 +32,11 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
-import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
+import { type StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { isTerminalEvent } from "@typespec/sse";
 import { camelCase } from "change-case";
 import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
-import {
+import type {
   CollectionFormat,
   SdkBodyParameter,
   SdkClientType,

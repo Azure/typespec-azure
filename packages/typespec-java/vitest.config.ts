@@ -10,7 +10,7 @@ export default defineConfig({
     outputFile: {
       junit: "./test-results.xml",
     },
-    include: ["test/**/*.test.ts"],
+    include: ["test/**/*.test.ts", "eng/**/*.test.ts"],
     exclude: ["node_modules", "dist/test"],
   },
   server: {

@@ -1,4 +1,4 @@
-import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { csharpModelSuffixRule } from "../../src/rules/csharp-model-suffix.js";
 import { AzureCoreTester, d, SimpleBaseTester, SimpleTester } from "../tester.js";

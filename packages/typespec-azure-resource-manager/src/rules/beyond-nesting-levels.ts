@@ -1,4 +1,4 @@
-import { Model, createRule, fileRef } from "@typespec/compiler";
+import { type Model, createRule, fileRef } from "@typespec/compiler";
 
 import { getParentResource } from "@typespec/rest";
 import { isTrackedResource } from "./utils.js";

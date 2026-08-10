@@ -1,8 +1,8 @@
-import { Program, createRule, fileRef } from "@typespec/compiler";
+import { type Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
-import { ArmResourceOperation } from "../operations.js";
+import type { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
+import type { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
 
 /**
