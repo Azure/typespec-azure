@@ -1,7 +1,9 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-azure-resource-manager"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.ResourceManager
@@ -27,7 +29,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ### `@armLibraryNamespace` {#@Azure.ResourceManager.armLibraryNamespace}
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+This is used for library namespaces that define reusable ARM resource types that can be shared
+across multiple provider specifications.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -81,8 +85,9 @@ namespace Microsoft.ContosoService;
 
 ### `@armProviderNameValue` {#@Azure.ResourceManager.armProviderNameValue}
 
-`@armResourceType` sets the value fo the decorated string
-property to the type of the Azure Resource Manager resource.
+`@armProviderNameValue` sets the provider namespace value on operations.
+It is used internally to inject the correct provider namespace path segment
+for resource operations in auto-generated routes.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
@@ -98,8 +103,13 @@ None
 
 ### `@armResourceAction` {#@Azure.ResourceManager.armResourceAction}
 
+Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+This decorator associates a POST action operation with its resource,
+identifying the semantics of the operation as a resource action over a specific resource for documentation,
+resource validation, and use by downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model)
+@Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -108,13 +118,35 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
+
+### `@armResourceCheckExistence` {#@Azure.ResourceManager.armResourceCheckExistence}
+
+Marks the operation as being a check existence (HEAD) operation
+
+```typespec
+@Azure.ResourceManager.armResourceCheckExistence(resourceModel: Model, resourceName?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceCollectionAction` {#@Azure.ResourceManager.armResourceCollectionAction}
 
-Marks the operation as being a collection action
+Marks the operation as being a collection action that is not associated with a specific resource instance.
+Collection actions are operations that act on a resource collection rather than a single resource,
+such as `checkNameAvailability` or provider-level actions.
 
 ```typespec
 @Azure.ResourceManager.armResourceCollectionAction
@@ -130,8 +162,12 @@ None
 
 ### `@armResourceCreateOrUpdate` {#@Azure.ResourceManager.armResourceCreateOrUpdate}
 
+Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -140,14 +176,19 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceDelete` {#@Azure.ResourceManager.armResourceDelete}
 
+Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model)
+@Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -156,14 +197,19 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceList` {#@Azure.ResourceManager.armResourceList}
 
+Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model)
+@Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -172,23 +218,33 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceOperations` {#@Azure.ResourceManager.armResourceOperations}
 
 This decorator is used to identify interfaces containing resource operations.
-When applied, it marks the interface with the `@autoRoute` decorator so that
+By default, it marks the interface with the `@autoRoute` decorator so that
 all of its contained operations will have their routes generated
 automatically.
 
-It also adds a `@tag` decorator bearing the name of the interface so that all
+The decorator also adds a `@tag` decorator bearing the name of the interface so that all
 of the operations will be grouped based on the interface name in generated
 clients.
 
+The optional `resourceOperationOptions` parameter provides additional options.
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
+choose static (`@route`) or automatic (`@autoRoute`) routing.
+
+`resourceType: Model` specifies the resource type for the operations in the interface
+
+`omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+individually tagged
+
 ```typespec
-@Azure.ResourceManager.armResourceOperations(_?: unknown)
+@Azure.ResourceManager.armResourceOperations(resourceOperationOptions?: unknown | valueof Azure.ResourceManager.ResourceOperationOptions)
 ```
 
 #### Target
@@ -197,14 +253,18 @@ clients.
 
 #### Parameters
 
-| Name | Type      | Description |
-| ---- | --------- | ----------- |
-| \_   | `unknown` | DEPRECATED  |
+| Name                     | Type                                                                                                              | Description                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| resourceOperationOptions | `unknown` \| [valueof `ResourceOperationOptions`](./data-types.md#Azure.ResourceManager.ResourceOperationOptions) | Options for routing the operations in the interface and associating them with a specific resource |
 
 ### `@armResourceRead` {#@Azure.ResourceManager.armResourceRead}
 
+Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model)
+@Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -213,14 +273,19 @@ clients.
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceUpdate` {#@Azure.ResourceManager.armResourceUpdate}
 
+Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -229,17 +294,19 @@ clients.
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armVirtualResource` {#@Azure.ResourceManager.armVirtualResource}
 
 This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
+Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+which is useful for defining the scope of resources used only as parents for child resources, or scopes for extension resources.
 
 ```typespec
-@Azure.ResourceManager.armVirtualResource
+@Azure.ResourceManager.armVirtualResource(provider?: valueof string)
 ```
 
 #### Target
@@ -248,7 +315,9 @@ Azure.ResourceManager common types.
 
 #### Parameters
 
-None
+| Name     | Type             | Description                                                         |
+| -------- | ---------------- | ------------------------------------------------------------------- |
+| provider | `valueof string` | Optional. The resource provider namespace for the virtual resource. |
 
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 
@@ -272,6 +341,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+### `@featureFile` {#@Azure.ResourceManager.featureFile}
+
+Decorator to associate a feature file with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.featureFile(featureName: EnumMember)
+```
+
+#### Target
+
+The target to associate the feature file with
+`Model | Operation | Interface | Namespace`
+
+#### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+### `@featureFileOptions` {#@Azure.ResourceManager.featureFileOptions}
+
+Decorator to define options for a specific feature file
+
+```typespec
+@Azure.ResourceManager.featureFileOptions(options: valueof Azure.ResourceManager.ArmFeatureFileOptions)
+```
+
+#### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+#### Parameters
+
+| Name    | Type                                                                                           | Description                      |
+| ------- | ---------------------------------------------------------------------------------------------- | -------------------------------- |
+| options | [valueof `ArmFeatureFileOptions`](./data-types.md#Azure.ResourceManager.ArmFeatureFileOptions) | The options for the feature file |
+
+### `@featureFiles` {#@Azure.ResourceManager.featureFiles}
+
+Decorator to define a set of feature files for splitting output
+
+```typespec
+@Azure.ResourceManager.featureFiles(features: Enum)
+```
+
+#### Target
+
+The service namespace
+`Namespace`
+
+#### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
 ### `@identifiers` {#@Azure.ResourceManager.identifiers}
 
 This decorator is used to indicate the identifying properties of objects in the array, e.g. size
@@ -283,7 +409,7 @@ The properties that are used as identifiers for the object needs to be provided 
 
 #### Target
 
-`ModelProperty`
+`ModelProperty | unknown[]`
 
 #### Parameters
 
@@ -304,8 +430,9 @@ model Pet {
 
 `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
 
-Location based resources have REST API paths like
-`/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
+**Deprecated**: This decorator is deprecated. Use `@parentResource` with `ArmLocationResource` instead.
+See the [Location Resource sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/location/)
+for the recommended approach.
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
@@ -323,7 +450,8 @@ None
 
 ### `@resourceBaseType` {#@Azure.ResourceManager.resourceBaseType}
 
-This decorator sets the base type of the given resource.
+This decorator sets the base type of the given resource, indicating where in the
+Azure Resource Manager hierarchy the resource is located.
 
 ```typespec
 @Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
@@ -445,15 +573,19 @@ This allows sharing Azure Resource Manager resource types across specifications
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
 
-## Azure.ResourceManager.Legacy
+## Azure.ResourceManager.BaseTypes
 
-### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
+### `@azureBaseType` {#@Azure.ResourceManager.BaseTypes.azureBaseType}
 
-This decorator is used on resources that do not satisfy the definition of a resource
-but need to be identified as such.
+`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+a base type. Base types define structured constraints including required and
+optional properties that conforming resources must implement.
+
+This decorator may be applied multiple times to indicate conformance to
+multiple base types. Duplicate entries are ignored.
 
 ```typespec
-@Azure.ResourceManager.Legacy.customAzureResource
+@Azure.ResourceManager.BaseTypes.azureBaseType(baseType: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo)
 ```
 
 #### Target
@@ -462,7 +594,84 @@ but need to be identified as such.
 
 #### Parameters
 
+| Name     | Type                                                                                   | Description                                           |
+| -------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| baseType | [valueof `BaseTypeInfo`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseTypeInfo) | The base type specification this resource implements. |
+
+#### Examples
+
+```typespec
+// Agent definition and properties using the Appliance deployment model
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
+  ...DefaultProvisioningStateProperty;
+}
+
+// The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+// (The Agent template applies this automatically, but it can also be applied directly.)
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2026-04-01" })
+model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
+}
+```
+
+## Azure.ResourceManager.Legacy
+
+### `@armExternalType` {#@Azure.ResourceManager.Legacy.armExternalType}
+
+Signifies that a Resource is represented using a library type in generated SDKs.
+
+```typespec
+@Azure.ResourceManager.Legacy.armExternalType
+```
+
+#### Target
+
+The model to that is an external resource
+`Model`
+
+#### Parameters
+
 None
+
+### `@armOperationRoute` {#@Azure.ResourceManager.Legacy.armOperationRoute}
+
+Signifies that an operation is an Azure Resource Manager operation
+and optionally associates the operation with a route template.
+
+```typespec
+@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof Azure.ResourceManager.Legacy.ArmOperationOptions)
+```
+
+#### Target
+
+The operation to associate the model with
+`Operation`
+
+#### Parameters
+
+| Name  | Type                                                                                              | Description                                    |
+| ----- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| route | [valueof `ArmOperationOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmOperationOptions) | Optional route to associate with the operation |
+
+### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource(options?: valueof Azure.ResourceManager.Legacy.CustomResourceOptions)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name    | Type                                                                                                  | Description                                          |
+| ------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| options | [valueof `CustomResourceOptions`](./data-types.md#Azure.ResourceManager.Legacy.CustomResourceOptions) | Options for customizing the behavior of the resource |
 
 ### `@externalTypeRef` {#@Azure.ResourceManager.Legacy.externalTypeRef}
 
@@ -481,3 +690,80 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+### `@feature` {#@Azure.ResourceManager.Legacy.feature}
+
+Decorator to associate a feature with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
+```
+
+#### Target
+
+The target to associate the feature with
+`Model | Operation | Interface | Namespace`
+
+#### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+### `@featureOptions` {#@Azure.ResourceManager.Legacy.featureOptions}
+
+Decorator to define options for a specific feature
+
+```typespec
+@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
+```
+
+#### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+#### Parameters
+
+| Name    | Type                                                                                          | Description                 |
+| ------- | --------------------------------------------------------------------------------------------- | --------------------------- |
+| options | [valueof `ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmFeatureOptions) | The options for the feature |
+
+### `@features` {#@Azure.ResourceManager.Legacy.features}
+
+Decorator to define a set of features
+
+```typespec
+@Azure.ResourceManager.Legacy.features(features: Enum)
+```
+
+#### Target
+
+The service namespace
+`Namespace`
+
+#### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
+### `@renamePathParameter` {#@Azure.ResourceManager.Legacy.renamePathParameter}
+
+Renames a path parameter in an Azure Resource Manager operation.
+
+```typespec
+@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string)
+```
+
+#### Target
+
+The operation or interface to modify
+`Operation`
+
+#### Parameters
+
+| Name                | Type             | Description                         |
+| ------------------- | ---------------- | ----------------------------------- |
+| sourceParameterName | `valueof string` | The name of the parameter to rename |
+| targetParameterName | `valueof string` | The new name for the parameter      |

@@ -1,63 +1,225 @@
 import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
-  ArrayModelType,
+  type ArrayModelType,
   getProperty as compilerGetProperty,
-  DecoratorContext,
+  type DecoratorContext,
+  type Enum,
+  type EnumMember,
   getKeyName,
+  getNamespaceFullName,
   getTags,
-  Interface,
+  type Interface,
   isArrayModelType,
   isGlobalNamespace,
   isNeverType,
   isTemplateDeclaration,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  Type,
+  isTemplateDeclarationOrInstance,
+  isTemplateInstance,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Type,
 } from "@typespec/compiler";
-import { isPathParam } from "@typespec/http";
+import { useStateMap } from "@typespec/compiler/utils";
+import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
-import {
+
+import { camelCase, pascalCase } from "change-case";
+import type {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
   ExtensionResourceDecorator,
+  FeatureFileDecorator,
+  FeatureFileOptionsDecorator,
+  FeatureFilesDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
   ResourceGroupResourceDecorator,
+  ResourceOperationOptions,
   SingletonDecorator,
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import type {
+  ArmExternalTypeDecorator,
+  ArmFeatureOptions,
+  CustomAzureResourceDecorator,
+  CustomResourceOptions,
+  FeatureDecorator,
+  FeatureOptionsDecorator,
+  FeaturesDecorator,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
-import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
-import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
-import { getArmResource, listArmResources } from "./private.decorators.js";
+import {
+  getArmProviderNamespace,
+  isArmLibraryNamespace,
+  resolveProviderNamespace,
+} from "./namespace.js";
+import {
+  type ArmOperationKind,
+  type ArmResolvedOperationsForResource,
+  type ArmResourceOperation,
+  type ArmResourceOperations,
+  getArmResourceOperationData,
+  getArmResourceOperationList,
+  getResourceNameForOperation,
+  resolveResourceOperations,
+} from "./operations.js";
+import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
+export type ArmResourceKind =
+  "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn" | "Generic";
 
 /**
- * Interface for ARM resource detail base.
+ * The base details for all kinds of resources
  *
  * @interface
  */
 export interface ArmResourceDetailsBase {
+  /**
+   * The name of the resource.
+   */
   name: string;
+  /** The category of resource */
   kind: ArmResourceKind;
+  /** The RP namespace */
   armProviderNamespace: string;
-  keyName: string;
-  collectionName: string;
+  /** The name parameter for the resource */
+  keyName?: string;
+  /** The type name / collection name of the resource */
+  collectionName?: string;
+  /** A reference to the TypeSpec type */
   typespecType: Model;
 }
 
+export const [isArmExternalType, setArmExternalType] = useStateMap<Model, boolean>(
+  ArmStateKeys.armExternalType,
+);
+
+export const $armExternalType: ArmExternalTypeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+) => {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+  setArmExternalType(program, entity, true);
+};
+
+/** Details for RP resources */
 export interface ArmResourceDetails extends ArmResourceDetailsBase {
+  /** The set of lifecycle operations and actions for the resource */
   operations: ArmResourceOperations;
+  /** RPaaS-specific value for resource type */
   resourceTypePath?: string;
+}
+
+/** Representation of a resource used but not provided by the RP */
+export interface ArmVirtualResourceDetails {
+  /** The base kind for resources not provided by RPs */
+  kind: "Virtual";
+  /** The provider namespace for the provider of this resource */
+  provider?: string;
+}
+
+/** New details for a resolved resource */
+export interface ResourceModel {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
+  kind: ArmResourceKind;
+  /** The provider namespace */
+  providerNamespace: string;
+  /** The set of resolved operations for a resource.  For most 
+        resources there will be 1 returned record */
+  resources?: ResolvedResource[];
+}
+
+export interface Provider {
+  /** The set of resources in this provider */
+  resources?: ResolvedResource[];
+  /** non-resource operations in this provider */
+  providerOperations?: ArmResourceOperation[];
+}
+
+export interface ResourcePathInfo {
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+}
+
+export interface ResolvedResourceInfo {
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** Whether the resource name was explicitly provided as a parameter */
+  resourceNameIsExplicit?: boolean;
+}
+
+interface ResolvedResourceOperations {
+  operations: ArmResolvedOperationsForResource;
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** Whether the resource name was explicitly provided as a parameter */
+  resourceNameIsExplicit?: boolean;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string;
+}
+/** Resolved operations, including operations for non-arm resources */
+export interface ResolvedResource {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
+  kind: "Tracked" | "Proxy" | "Extension" | "Other";
+  /** The provider namespace */
+  providerNamespace: string;
+  /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
+  operations: ArmResolvedOperationsForResource;
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string | ResolvedResource;
+  /** Singleton resource information, if the resource is a singleton */
+  singleton?: SingletonResourceInfo;
+}
+
+/** Singleton resource information */
+export interface SingletonResourceInfo {
+  /** The key value(s) of the singleton resource (e.g. "default"). May be an array of strings if the singleton uses a union of names. */
+  keyValue: string | string[];
+}
+
+/** Description of the resource type */
+export interface ResourceType {
+  /** The provider namespace */
+  provider: string;
+  /** The type of the resource, including all ancestor types (in order) */
+  types: string[];
 }
 
 /**
@@ -69,10 +231,15 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
 export const $armVirtualResource: ArmVirtualResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  provider: string | undefined = undefined,
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
-  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
+  const result: ArmVirtualResourceDetails = {
+    kind: "Virtual",
+    provider,
+  };
+  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, result);
   const pathProperty = getProperty(
     entity,
     (p) => isPathParam(program, p) && getSegment(program, p) !== undefined,
@@ -95,16 +262,19 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
     });
     return;
   }
+
+  registerArmResource(context, entity);
 };
 
 export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  options?: CustomResourceOptions,
 ) => {
   const { program } = context;
+  const optionsValue = options ?? { isAzureResource: false };
   if (isTemplateDeclaration(entity)) return;
-
-  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
+  setCustomResource(program, entity, optionsValue);
 };
 
 function getProperty(
@@ -124,10 +294,44 @@ function getProperty(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isArmVirtualResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
-  if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
-  return false;
+  return getArmVirtualResourceDetails(program, target) !== undefined;
 }
+
+/**
+ *
+ * @param program The program to process.
+ * @param target The model to get details for
+ * @returns The resource details if the model is an external resource, otherwise undefined.
+ */
+export function getArmVirtualResourceDetails(
+  program: Program,
+  target: Model,
+  visited: Set<Model> = new Set<Model>(),
+): ArmVirtualResourceDetails | undefined {
+  if (visited.has(target)) return undefined;
+  visited.add(target);
+  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target)) {
+    return program
+      .stateMap(ArmStateKeys.armBuiltInResource)
+      .get(target) as ArmVirtualResourceDetails;
+  }
+
+  if (target.baseModel) {
+    const details = getArmVirtualResourceDetails(program, target.baseModel, visited);
+    if (details) return details;
+  }
+  const parent = getParentResource(program, target);
+  if (parent) {
+    return getArmVirtualResourceDetails(program, parent, visited);
+  }
+  return undefined;
+}
+
+const [getCustomResourceOptions, setCustomResource] = useStateMap<Model, CustomResourceOptions>(
+  ArmStateKeys.customAzureResource,
+);
+
+export { getCustomResourceOptions };
 
 /**
  * Determine if the given model is a custom resource.
@@ -136,9 +340,25 @@ export function isArmVirtualResource(program: Program, target: Model): boolean {
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isCustomAzureResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions) return true;
   if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
+}
+
+function getArmResourceItemPath(operations: ArmResourceOperations): string | undefined {
+  const returnPath =
+    operations.lifecycle.read?.path ||
+    operations.lifecycle.createOrUpdate?.path ||
+    operations.lifecycle.delete?.path;
+  if (returnPath !== undefined) return returnPath;
+  const actions = Object.values(operations.actions);
+  if (actions.length > 0) {
+    const longPath = actions[0].path;
+    return longPath.substring(0, longPath.lastIndexOf("/"));
+  }
+
+  return undefined;
 }
 
 function resolveArmResourceDetails(
@@ -150,7 +370,7 @@ function resolveArmResourceDetails(
 
   // Calculate the resource type path from the itemPath
   // TODO: This is currently a problem!  We don't have a canonical path to use for the itemPath
-  const itemPath = (operations.lifecycle.read || operations.lifecycle.createOrUpdate)?.path;
+  const itemPath = getArmResourceItemPath(operations);
   const baseType = getResourceBaseType(program, resource.typespecType);
   const resourceTypePath = getResourceTypePath(resource, itemPath, baseType);
 
@@ -180,10 +400,14 @@ function getResourceTypePath(
   // To do so, we need to:
   // 1) Cut out the resource name from the item path
   let temporaryPath;
-  const index = itemPath.indexOf(resource.collectionName);
-  if (index !== -1) {
-    const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
-    temporaryPath = truncatedPath;
+  if (resource.collectionName) {
+    const index = itemPath.indexOf(resource.collectionName);
+    if (index !== -1) {
+      const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
+      temporaryPath = truncatedPath;
+    } else {
+      temporaryPath = itemPath;
+    }
   } else {
     temporaryPath = itemPath;
   }
@@ -225,6 +449,681 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   return resources;
 }
 
+export const [getResolvedResources, setResolvedResources] = useStateMap<Namespace, Provider>(
+  ArmStateKeys.armResolvedResources,
+);
+
+export function getPublicResourceKind(
+  typespecType: Model,
+): "Tracked" | "Proxy" | "Extension" | "Other" | undefined {
+  const kind = getArmResourceKind(typespecType);
+  if (kind === undefined) return "Other";
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    default:
+      return "Other";
+  }
+}
+
+function mapResourceKind(
+  kind: ArmResourceKind,
+  hasOperations: boolean,
+): "Tracked" | "Proxy" | "Extension" | "Other" {
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    case "Generic":
+      return "Other";
+    default:
+      return hasOperations ? "Tracked" : "Other";
+  }
+}
+
+export function resolveArmResources(program: Program): Provider {
+  const provider = resolveProviderNamespace(program);
+  if (provider === undefined) return {};
+  const resolvedResources = getResolvedResources(program, provider);
+  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
+    // Return the cached resource details
+    return resolvedResources;
+  }
+
+  // We haven't generated the full resource details yet
+  const resources: ResolvedResource[] = [];
+  for (const resource of listArmResources(program)) {
+    const operations = resolveArmResourceOperations(program, resource.typespecType);
+    const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
+    for (const op of operations) {
+      const fullResource: ResolvedResource = {
+        ...op,
+        type: resource.typespecType,
+        kind:
+          getPublicResourceKind(resource.typespecType) ??
+          mapResourceKind(resource.kind, operations.length > 0),
+        providerNamespace: resource.armProviderNamespace,
+        ...(singletonKeyValues !== undefined
+          ? { singleton: { keyValue: singletonKeyValues } }
+          : {}),
+      };
+      resources.push(fullResource);
+    }
+  }
+  const toProcess = resources.slice();
+  while (toProcess.length > 0) {
+    const resource = toProcess.shift()!;
+    resource.parent = getResourceParent(resources, resource, toProcess);
+    resource.scope = getResourceScope(resources, resource, toProcess);
+  }
+
+  // Add the unmarked operations
+  const resolved: Provider = {
+    resources: resources,
+    providerOperations: getUnassociatedOperations(program).filter(
+      (op) => !isArmResourceOperation(program, op.operation),
+    ),
+  };
+
+  setResolvedResources(program, provider, resolved);
+  return resolved;
+}
+
+function getResourceParent(
+  knownResources: ResolvedResource[],
+  child: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | undefined {
+  if (child.resourceType.types.length < 2) return undefined;
+  for (const resource of knownResources) {
+    if (
+      resource.resourceType.types.length + 1 === child.resourceType.types.length &&
+      resource.resourceType.provider === child.resourceType.provider &&
+      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/")
+    ) {
+      return resource;
+    }
+  }
+  const parent: ResolvedResource = {
+    type: child.type,
+    kind: "Other",
+    providerNamespace: child.providerNamespace,
+    resourceType: {
+      provider: child.resourceType.provider,
+      types: child.resourceType.types.slice(0, -1),
+    },
+    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceInstancePath: `/${child.resourceInstancePath
+      .split("/")
+      .filter((s) => s.length > 0)
+      .slice(0, -2)
+      .join("/")}`,
+    operations: { lifecycle: {}, actions: [], lists: [] },
+  };
+  knownResources.push(parent);
+  resourcesToProcess.push(parent);
+  return parent;
+}
+
+function getParentName(typeName: string): string {
+  if (typeName.endsWith("s")) {
+    typeName = typeName.slice(0, -1);
+  }
+  return pascalCase(typeName);
+}
+
+function getResourceScope(
+  knownResources: ResolvedResource[],
+  resource: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | string | undefined {
+  if (resource.scope !== undefined) return resource.scope;
+  if (resource.parent !== undefined)
+    return getResourceScope(knownResources, resource.parent, resourcesToProcess);
+  const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
+  if (partsIndex === 0) return "Tenant";
+
+  const segments = resource.resourceInstancePath
+    .slice(0, partsIndex)
+    .split("/")
+    .filter((s) => s.length > 0);
+  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (
+    segments.length === 2 &&
+    isVariableSegment(segments[1]) &&
+    segments[0].toLowerCase() === "subscriptions"
+  )
+    return "Subscription";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    segments[2].toLowerCase() === "resourcegroups"
+  )
+    return "ResourceGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "managementgroups"
+  )
+    return "ManagementGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "servicegroups"
+  )
+    return "ServiceGroup";
+  if (segments.some((s) => s.toLowerCase() === "providers")) {
+    const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+    if (segments.length < parentProviderIndex + 2) {
+      return "ExternalResource";
+    }
+    const provider = segments[parentProviderIndex + 1];
+    if (isVariableSegment(provider)) {
+      return "ExternalResource";
+    }
+    const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
+    if (typeSegments.length % 2 !== 0) {
+      return "ExternalResource";
+    }
+    const types: string[] = [];
+    for (let i = 0; i < typeSegments.length; i++) {
+      if (i % 2 === 0) {
+        if (isVariableSegment(typeSegments[i])) {
+          return "ExternalResource";
+        }
+        types.push(typeSegments[i]);
+      } else if (!isVariableSegment(typeSegments[i])) {
+        return "ExternalResource";
+      }
+    }
+    const parent: ResolvedResource = {
+      type: resource.type,
+      kind: "Other",
+      providerNamespace: provider,
+      resourceType: {
+        provider: provider,
+        types: types,
+      },
+      resourceName: getParentName(types[types.length - 1]),
+      resourceInstancePath: `/${segments.join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    for (const knownResource of knownResources) {
+      if (
+        parent.resourceType.provider.toLowerCase() ===
+          knownResource.resourceType.provider.toLowerCase() &&
+        parent.resourceType.types.flatMap((r) => r.toLowerCase()).join("/") ===
+          knownResource.resourceType.types.flatMap((k) => k.toLowerCase()).join("/")
+      ) {
+        return knownResource;
+      }
+    }
+    knownResources.push(parent);
+    resourcesToProcess.push(parent);
+    return parent;
+  }
+  return undefined;
+}
+
+function isVariableSegment(segment: string): boolean {
+  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
+}
+
+/**
+ * Extracts the scope prefix from a resource instance path.
+ * The scope prefix is the portion of the path before the last `/providers/` occurrence.
+ * For example:
+ *   - `/subscriptions/{id}/providers/Microsoft.Foo/bars/{name}` → `/subscriptions/{id}`
+ *   - `/providers/Microsoft.Foo/bars/{name}` → `` (empty)
+ */
+function getScopePrefix(resourceInstancePath: string): string {
+  const lastProviders = resourceInstancePath.lastIndexOf("/providers/");
+  if (lastProviders <= 0) return "";
+  return resourceInstancePath.slice(0, lastProviders);
+}
+
+/**
+ * Normalizes a path for scope comparison by lowercasing static segments
+ * and replacing variable segments with a placeholder.
+ */
+function normalizePathForScopeComparison(path: string): string {
+  return path
+    .split("/")
+    .map((s) => (isVariableSegment(s) ? "{}" : s.toLowerCase()))
+    .join("/");
+}
+
+function getResourceInfo(
+  program: Program,
+  operation: ArmResourceOperation,
+  resourceModel?: Model,
+): ResolvedResourceInfo | undefined {
+  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
+  // First, try to get resource info from the path when it contains /providers/
+  if (pathInfo !== undefined) {
+    return {
+      ...pathInfo,
+      resourceName: operation.resourceName ?? operation.operationGroup,
+    };
+  }
+
+  // If the path does not contain /providers/, we can still identify the resource
+  // because an ARM operations decorator was executed on this operation (e.g.
+  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
+  // namespace and the path structure to construct resource info.
+  const fallback = getResourceInfoFromArmOperation(
+    program,
+    operation.httpOperation.path,
+    operation.kind,
+    operation.operation,
+    resourceModel,
+  );
+  if (fallback === undefined) return undefined;
+  return {
+    ...fallback,
+    resourceName: operation.resourceName ?? operation.operationGroup,
+  };
+}
+
+export function getResourcePathElements(
+  path: string,
+  kind: ArmOperationKind,
+): ResourcePathInfo | undefined {
+  const segments = path.split("/").filter((s) => s.length > 0);
+  const providerIndex = segments.findLastIndex((s) => s === "providers");
+  if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
+  const provider = segments[providerIndex + 1];
+  const typeSegments: string[] = [];
+  const instanceSegments: string[] = segments.slice(0, providerIndex + 2);
+  for (let i = providerIndex + 2; i < segments.length; i += 2) {
+    if (isVariableSegment(segments[i])) {
+      break;
+    }
+
+    if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
+      typeSegments.push(segments[i]);
+      instanceSegments.push(segments[i]);
+      instanceSegments.push(segments[i + 1]);
+    } else if (i + 1 === segments.length) {
+      switch (kind) {
+        case "list":
+          typeSegments.push(segments[i]);
+          instanceSegments.push(segments[i]);
+          instanceSegments.push("{name}");
+          break;
+        default:
+          break;
+      }
+      break;
+    }
+  }
+  if (provider !== undefined && typeSegments.length > 0) {
+    return {
+      resourceType: {
+        provider: provider,
+        types: typeSegments,
+      },
+      resourceInstancePath: `/${instanceSegments.join("/")}`,
+    };
+  }
+  return undefined;
+}
+
+/**
+ * Construct resource path info for an ARM resource operation whose path does not
+ * contain a /providers/ segment. This relies on the fact that an ARM operations
+ * decorator was executed on the operation, so we know it belongs to a resource.
+ * The provider namespace is resolved from the operation's namespace.
+ */
+function getResourceInfoFromArmOperation(
+  program: Program,
+  path: string,
+  kind: ArmOperationKind,
+  operation: Operation,
+  resourceModel?: Model,
+): ResourcePathInfo | undefined {
+  const provider = operation.namespace
+    ? getArmProviderNamespace(program, operation.namespace)
+    : undefined;
+  if (provider === undefined) return undefined;
+
+  const segments = path.split("/").filter((s) => s.length > 0);
+
+  // Find the innermost resource type segment by scanning forward.
+  // The resource type segment is a non-variable segment followed by either
+  // a variable segment (instance path) or end-of-path (list operation).
+  let resourceTypeIndex = -1;
+  for (let i = 0; i < segments.length; i++) {
+    if (!isVariableSegment(segments[i])) {
+      if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
+        // Non-variable followed by variable: this is a resource type/instance pair
+        resourceTypeIndex = i;
+      } else if (i + 1 === segments.length && kind === "list") {
+        // Terminal non-variable segment in a list operation: this is the resource type
+        resourceTypeIndex = i;
+      }
+    }
+  }
+
+  if (resourceTypeIndex === -1) {
+    // For generic resources, the path may consist entirely of variable segments
+    // (e.g. /{resourceId}). Use the raw path as the instance path.
+    if (segments.length > 0 && segments.every((s) => isVariableSegment(s))) {
+      return {
+        resourceType: {
+          provider: provider,
+          types: [],
+        },
+        resourceInstancePath: path,
+      };
+    }
+    return undefined;
+  }
+
+  const resourceTypeName = segments[resourceTypeIndex];
+  const typeSegments = [resourceTypeName];
+
+  // Build the instance path: all segments up to and including the resource type,
+  // plus the instance variable
+  const instanceSegments = segments.slice(0, resourceTypeIndex + 1);
+
+  // For list operations (no instance variable in path), derive the variable name
+  // from the resource model's @key property
+  if (
+    resourceTypeIndex + 1 < segments.length &&
+    isVariableSegment(segments[resourceTypeIndex + 1])
+  ) {
+    instanceSegments.push(segments[resourceTypeIndex + 1]);
+  } else if (kind === "list" && resourceModel) {
+    // Derive instance path variable name from the resource model's @key property
+    let keyPropName: string | undefined;
+    for (const [, prop] of resourceModel.properties) {
+      const keyName = getKeyName(program, prop);
+      if (keyName !== undefined) {
+        keyPropName = keyName;
+        break;
+      }
+    }
+    if (keyPropName) {
+      instanceSegments.push(`{${keyPropName}}`);
+    } else {
+      instanceSegments.push("{name}");
+    }
+  } else {
+    instanceSegments.push("{name}");
+  }
+
+  return {
+    resourceType: {
+      provider: provider,
+      types: typeSegments,
+    },
+    resourceInstancePath: `/${instanceSegments.join("/")}`,
+  };
+}
+
+function tryAddLifecycleOperation(
+  resourceType: ResourceType,
+  sourceOperation: ArmResourceOperation,
+  targetResource: ResolvedResourceOperations,
+): boolean {
+  const opType = sourceOperation.kind;
+  const operations = targetResource.operations;
+  switch (opType) {
+    case "read":
+      operations.lifecycle.read ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.read);
+      return true;
+    case "createOrUpdate":
+      operations.lifecycle.createOrUpdate ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.createOrUpdate);
+      return true;
+    case "update":
+      operations.lifecycle.update ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.update);
+      return true;
+    case "delete":
+      operations.lifecycle.delete ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.delete);
+      return true;
+    case "list":
+      operations.lists ??= [];
+      addUniqueOperation(sourceOperation, operations.lists);
+      return true;
+    case "action":
+      operations.actions ??= [];
+      addUniqueOperation(sourceOperation, operations.actions);
+      return true;
+    case "checkExistence":
+      operations.lifecycle.checkExistence ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.checkExistence);
+      return true;
+    case "other":
+      targetResource.associatedOperations ??= [];
+      addUniqueOperation(sourceOperation, targetResource.associatedOperations);
+      return true;
+  }
+  return false;
+}
+
+function addAssociatedOperation(
+  sourceOperation: ArmResourceOperation,
+  targetOperation: ResolvedResourceOperations,
+): void {
+  targetOperation.associatedOperations ??= [];
+  addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
+}
+
+export function isResourceOperationMatch(
+  source: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+    resourceNameIsExplicit?: boolean;
+  },
+  target: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+    resourceNameIsExplicit?: boolean;
+  },
+): boolean {
+  if (
+    source.resourceName &&
+    target.resourceName &&
+    source.resourceName.toLowerCase() !== target.resourceName.toLowerCase()
+  )
+    return false;
+  if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
+    return false;
+  if (source.resourceType.types.length !== target.resourceType.types.length) return false;
+  for (let i = 0; i < source.resourceType.types.length; i++) {
+    if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
+      return false;
+  }
+
+  // When neither resource has an explicitly provided resource name, also compare
+  // the scope prefix of the instance path to prevent merging cross-scope operations
+  if (!source.resourceNameIsExplicit && !target.resourceNameIsExplicit) {
+    const sourceScope = getScopePrefix(source.resourceInstancePath);
+    const targetScope = getScopePrefix(target.resourceInstancePath);
+    if (
+      normalizePathForScopeComparison(sourceScope) !== normalizePathForScopeComparison(targetScope)
+    )
+      return false;
+  }
+
+  return true;
+}
+
+export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
+  return getAllOperations(program)
+    .map((op) => getResourceOperation(program, op))
+    .filter((op) => op !== undefined) as ArmResourceOperation[];
+}
+
+export function getResourceOperation(
+  program: Program,
+  operation: Operation,
+): ArmResourceOperation | undefined {
+  if (operation.kind !== "Operation") return undefined;
+  if (operation.isFinished === false) return undefined;
+  if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation))
+    return undefined;
+  if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
+  const [httpOp, _] = getHttpOperation(program, operation);
+  return {
+    path: httpOp.path,
+    httpOperation: httpOp,
+    name: operation.name,
+    kind: "other",
+    operation: operation,
+    operationGroup: operation.interface.name,
+    resourceModelName: "",
+  };
+}
+
+function isArmResourceOperation(program: Program, operation: Operation): boolean {
+  if (operation.kind !== "Operation") return false;
+  if (operation.isFinished === false) return false;
+  if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation)) return false;
+  return getArmResourceOperationData(program, operation) !== undefined;
+}
+
+function getAllOperations(
+  program: Program,
+  container?: Namespace | Interface | undefined,
+): Operation[] {
+  container = container || resolveProviderNamespace(program);
+  if (!container) {
+    return [];
+  }
+  const operations: Operation[] = [];
+  for (const op of container.operations.values()) {
+    if (
+      op.kind === "Operation" &&
+      op.isFinished &&
+      (!isTemplateDeclarationOrInstance(op) || isTemplateInstance(op)) &&
+      !isArmResourceOperation(program, op)
+    ) {
+      operations.push(op);
+    }
+  }
+  if (container.kind === "Namespace") {
+    for (const child of container.namespaces.values()) {
+      operations.push(...getAllOperations(program, child));
+    }
+    for (const iface of container.interfaces.values()) {
+      operations.push(...getAllOperations(program, iface));
+    }
+  }
+  return operations;
+}
+
+function addUniqueOperation(operation: ArmResourceOperation, operations: ArmResourceOperation[]) {
+  if (
+    !operations.some(
+      (op) =>
+        op.name.toLowerCase() === operation.name.toLowerCase() &&
+        op.operationGroup.toLowerCase() === operation.operationGroup.toLowerCase(),
+    )
+  ) {
+    operations.push(operation);
+  }
+}
+
+export function resolveArmResourceOperations(
+  program: Program,
+  resourceType: Model,
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
+  const operations = getArmResourceOperationList(program, resourceType);
+  for (const operation of operations) {
+    const armOperation: ArmResourceOperation | undefined = getResourceOperation(
+      program,
+      operation.operation,
+    );
+
+    if (armOperation === undefined) continue;
+    armOperation.kind = operation.kind;
+
+    armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
+    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
+    if (resourceInfo === undefined) continue;
+    armOperation.name = operation.name;
+    armOperation.resourceKind = operation.resourceKind;
+    const resourceNameIsExplicit = operation.resourceName !== undefined;
+    resourceInfo.resourceName =
+      operation.resourceName ??
+      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
+      armOperation.resourceModelName;
+    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
+    armOperation.resourceName = resourceInfo.resourceName;
+
+    let matched = false;
+    // Check if we already have an operation for this resource
+    for (const resolvedOp of resolvedOperations) {
+      if (isResourceOperationMatch(resourceInfo, resolvedOp)) {
+        matched = true;
+        if (tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp)) {
+          continue;
+        }
+        addAssociatedOperation(armOperation, resolvedOp);
+        continue;
+      }
+    }
+
+    if (matched) continue;
+    // If we don't have an operation for this resource, create a new one
+    const newResource: ResolvedResourceOperations = {
+      resourceType: resourceInfo.resourceType,
+      resourceInstancePath: resourceInfo.resourceInstancePath,
+      resourceName: resourceInfo.resourceName,
+      resourceNameIsExplicit: resourceNameIsExplicit,
+      operations: {
+        lifecycle: {
+          read: undefined,
+          createOrUpdate: undefined,
+          update: undefined,
+          delete: undefined,
+          checkExistence: undefined,
+        },
+        actions: [],
+        lists: [],
+      },
+      associatedOperations: [],
+    };
+    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource)) {
+      addAssociatedOperation(armOperation, newResource);
+    }
+    resolvedOperations.add(newResource);
+  }
+  return [...resolvedOperations.values()].toSorted((a, b) => {
+    // Sort by provider, type, then instance path
+    if (a.resourceType.types.length < b.resourceType.types.length) return -1;
+    if (a.resourceType.types.length > b.resourceType.types.length) return 1;
+    const aSegments = a.resourceInstancePath.split("/");
+    const bSegments = b.resourceInstancePath.split("/");
+    if (aSegments.length < bSegments.length) return -1;
+    if (aSegments.length > bSegments.length) return 1;
+    if (a.resourceInstancePath.toLowerCase() < b.resourceInstancePath.toLowerCase()) return -1;
+    if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
+    return 0;
+  });
+}
+
 export { getArmResource } from "./private.decorators.js";
 
 export function getArmResourceInfo(
@@ -251,16 +1150,40 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   if (resourceType.baseModel) {
     const coreType = resourceType.baseModel;
-    if (coreType.name.startsWith("TrackedResource")) {
+    const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
+    if (
+      coreType.name.startsWith("TrackedResource") ||
+      coreType.name.startsWith("LegacyTrackedResource") ||
+      (coreTypeNamespace.startsWith("Azure.ResourceManager") &&
+        resourceType.properties.has("location") &&
+        resourceType.properties.has("tags"))
+    ) {
       return "Tracked";
     } else if (coreType.name.startsWith("ProxyResource")) {
       return "Proxy";
     } else if (coreType.name.startsWith("ExtensionResource")) {
       return "Extension";
+    } else if (coreTypeNamespace === "Azure.ResourceManager.CommonTypes") {
+      return "BuiltIn";
     }
   }
 
   return undefined;
+}
+
+function getResourceOperationOptions(
+  type: ResourceOperationOptions | unknown,
+): ResourceOperationOptions {
+  const defaultOptions: ResourceOperationOptions = {
+    allowStaticRoutes: false,
+    omitTags: false,
+  };
+
+  const options = type as ResourceOperationOptions;
+  if (options === undefined || typeof options !== "object") {
+    return defaultOptions;
+  }
+  return options;
 }
 
 /**
@@ -276,15 +1199,21 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
 export const $armResourceOperations: ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   interfaceType: Interface,
+  resourceOperationsOptions?: ResourceOperationOptions | unknown,
 ) => {
   const { program } = context;
+  const options = getResourceOperationOptions(resourceOperationsOptions);
 
-  // All resource interfaces should use @autoRoute
-  context.call($autoRoute, interfaceType);
+  if (!options.allowStaticRoutes) {
+    // All resource interfaces should use @autoRoute
+    context.call($autoRoute, interfaceType);
+  }
 
-  // If no tag is given for the interface, tag it with the interface name
-  if (getTags(program, interfaceType).length === 0) {
-    context.call($tag, interfaceType, interfaceType.name);
+  if (!options.omitTags) {
+    // If no tag is given for the interface, tag it with the interface name
+    if (getTags(program, interfaceType).length === 0) {
+      context.call($tag, interfaceType, interfaceType.name);
+    }
   }
 };
 
@@ -310,12 +1239,48 @@ export function getSingletonResourceKey(program: Program, resourceType: Model): 
   return program.stateMap(ArmStateKeys.armSingletonResources).get(resourceType);
 }
 
+/**
+ * Gets the singleton key value(s) for a resource. For resources with a union name type,
+ * returns an array of the string literal values in the union. For simple singletons,
+ * returns the key string from the @singleton decorator.
+ */
+function getSingletonKeyValues(
+  program: Program,
+  resourceType: Model,
+): string | string[] | undefined {
+  const singletonKey = getSingletonResourceKey(program, resourceType);
+  if (singletonKey === undefined) return undefined;
+
+  // Check the name property for union types
+  for (const [, prop] of resourceType.properties) {
+    if (getKeyName(program, prop) !== undefined) {
+      if (prop.type.kind === "Union") {
+        const values: string[] = [];
+        for (const variant of prop.type.variants.values()) {
+          if (variant.type.kind === "String") {
+            values.push(variant.type.value);
+          }
+        }
+        if (values.length > 0) {
+          return values;
+        }
+      }
+      break;
+    }
+  }
+
+  return singletonKey;
+}
+
 export enum ResourceBaseType {
   Tenant = "Tenant",
   Subscription = "Subscription",
   Location = "Location",
   ResourceGroup = "ResourceGroup",
   Extension = "Extension",
+  BuiltIn = "BuiltIn",
+  BuiltInSubscription = "BuiltInSubscription",
+  BuiltInResourceGroup = "BuiltInResourceGroup",
 }
 
 export const $resourceBaseType: ResourceBaseTypeDecorator = (
@@ -379,17 +1344,12 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => {
   const { program } = context;
-  const { type } = entity;
-
-  if (
-    type.kind !== "Model" ||
-    !isArrayModelType(program, type) ||
-    type.indexer.value.kind !== "Model"
-  ) {
+  const type = entity.kind === "ModelProperty" ? entity.type : entity;
+  if (type.kind !== "Model" || !isArrayModelType(type) || type.indexer.value.kind !== "Model") {
     reportDiagnostic(program, {
       code: "decorator-param-wrong-type",
       messageId: "armIdentifiersIncorrectEntity",
@@ -398,33 +1358,42 @@ export const $identifiers: IdentifiersDecorator = (
     return;
   }
 
-  context.program.stateMap(ArmStateKeys.armIdentifiers).set(type.indexer.value, properties);
+  context.program.stateMap(ArmStateKeys.armIdentifiers).set(entity, properties);
 };
 
 /**
- * This function returns all arm identifiers for the given array model type
- * This includes the identifiers specified using the @identifiers decorator
- * and the identifiers using the @key decorator.
+ * This function returns identifiers using the '@identifiers' decorator
  *
  * @param program The program to process.
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
+export function getArmIdentifiers(
+  program: Program,
+  entity: ModelProperty | Model,
+): string[] | undefined {
+  return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
+}
+
+/**
+ * This function returns identifiers using the '@key' decorator.
+ *
+ * @param program The program to process.
+ * @param entity The array model type to check.
+ * @returns returns list of arm identifiers for the given array model type if any or undefined.
+ */
+export function getArmKeyIdentifiers(
+  program: Program,
+  entity: ArrayModelType,
+): string[] | undefined {
   const value = entity.indexer.value;
-
-  const getIdentifiers = program.stateMap(ArmStateKeys.armIdentifiers).get(value);
-  if (getIdentifiers !== undefined) {
-    return getIdentifiers;
-  }
-
   const result: string[] = [];
   if (value.kind === "Model") {
     for (const property of value.properties.values()) {
       const pathToKey = getPathToKey(program, property);
-      if (pathToKey !== undefined) {
+      if (pathToKey !== undefined && !pathToKey.endsWith("/id") && !pathToKey.endsWith("/name")) {
         result.push(property.name + pathToKey);
-      } else if (getKeyName(program, property)) {
+      } else if (getKeyName(program, property) && !["id", "name"].includes(property.name)) {
         result.push(property.name);
       }
     }
@@ -485,7 +1454,7 @@ function getServiceNamespace(program: Program, type: Type | undefined): string |
   }
 }
 
-function setResourceBaseType(program: Program, resource: Model, type: string) {
+export function setResourceBaseType(program: Program, resource: Model, type: string) {
   if (program.stateMap(ArmStateKeys.resourceBaseType).has(resource)) {
     reportDiagnostic(program, {
       code: "arm-resource-duplicate-base-parameter",
@@ -531,7 +1500,184 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
       case "Extension":
         resolvedType = ResourceBaseType.Extension;
         break;
+      case "BuiltIn":
+        resolvedType = ResourceBaseType.BuiltIn;
+        break;
+      case "BuiltInSubscription":
+        resolvedType = ResourceBaseType.BuiltInSubscription;
+        break;
+      case "BuiltInResourceGroup":
+        resolvedType = ResourceBaseType.BuiltInResourceGroup;
+        break;
     }
   }
   return resolvedType;
 }
+
+export const [getResourceFeature, setResourceFeature] = useStateMap<
+  Model | Operation | Interface | Namespace,
+  EnumMember
+>(ArmStateKeys.armFeature);
+
+export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
+  Namespace,
+  Map<string, ArmFeatureOptions>
+>(ArmStateKeys.armFeatureSet);
+
+export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, boolean>(
+  ArmStateKeys.armFeatureFileSet,
+);
+
+export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
+  EnumMember,
+  ArmFeatureOptions
+>(ArmStateKeys.armFeatureOptions);
+
+const commonFeatureOptions: ArmFeatureOptions = {
+  featureName: "Common",
+  fileName: "common",
+  description: "",
+};
+export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
+  const defaultFeatureName: string = (feature.value ?? feature.name) as string;
+  const defaultOptions: ArmFeatureOptions = {
+    featureName: defaultFeatureName,
+    fileName: camelCase(defaultFeatureName),
+    description: "",
+  };
+  return program.stateMap(ArmStateKeys.armFeatureOptions).get(feature) ?? defaultOptions;
+}
+
+/**
+ * Get the FeatureOptions for a given type, these could be inherited from the namespace or parent type
+ * @param program - The program to process.
+ * @param entity - The type entity to get feature options for.
+ * @returns The ArmFeatureOptions if found, otherwise undefined.
+ */
+export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
+  switch (entity.kind) {
+    case "Namespace": {
+      const feature = getResourceFeature(program, entity);
+      if (feature === undefined) return commonFeatureOptions;
+      const options = getFeatureOptions(program, feature);
+      return options;
+    }
+    case "Interface": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Model": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      if (isTemplateInstance(entity)) {
+        for (const arg of entity.templateMapper.args) {
+          if (arg.entityKind === "Type" && arg.kind === "Model") {
+            const options = getFeature(program, arg);
+            if (options !== commonFeatureOptions) return options;
+          }
+        }
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Operation": {
+      const opFeature = getResourceFeature(program, entity);
+      if (opFeature !== undefined) return getFeatureOptions(program, opFeature);
+      const opInterface = entity.interface;
+      if (opInterface !== undefined) {
+        return getFeature(program, opInterface);
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "EnumMember": {
+      return getFeature(program, entity.enum);
+    }
+    case "UnionVariant": {
+      return getFeature(program, entity.union);
+    }
+    case "ModelProperty": {
+      if (entity.model === undefined) return commonFeatureOptions;
+      return getFeature(program, entity.model);
+    }
+    case "Enum":
+    case "Union":
+    case "Scalar": {
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+
+    default:
+      return commonFeatureOptions;
+  }
+}
+
+export const $feature: FeatureDecorator = (
+  context: DecoratorContext,
+  entity: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => {
+  const { program } = context;
+  setResourceFeature(program, entity, featureName);
+};
+
+export const $features: FeaturesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  const { program } = context;
+  let featureMap: Map<string, ArmFeatureOptions> | undefined = getResourceFeatureSet(
+    program,
+    entity,
+  );
+  if (featureMap !== undefined) {
+    return;
+  }
+  featureMap = new Map<string, ArmFeatureOptions>();
+
+  for (const member of features.members.values()) {
+    const options = getFeatureOptions(program, member); // Ensure defaults are created
+    featureMap.set(options.featureName, options);
+  }
+  const common = [...featureMap.keys()].some((k) => k.toLowerCase() === "common");
+  if (!common) {
+    featureMap.set("Common", commonFeatureOptions);
+  }
+  setResourceFeatureSet(program, entity, featureMap);
+};
+
+export const $featureOptions: FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember,
+  options: ArmFeatureOptions,
+) => {
+  setResourceFeatureOptions(context.program, entity, options);
+};
+
+// New Azure.ResourceManager namespace decorators
+export const $featureFile: FeatureFileDecorator = $feature as unknown as FeatureFileDecorator;
+export const $featureFiles: FeatureFilesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  setFeatureFileSet(context.program, entity, true);
+  $features(context, entity, features);
+};
+export const $featureFileOptions: FeatureFileOptionsDecorator =
+  $featureOptions as unknown as FeatureFileOptionsDecorator;

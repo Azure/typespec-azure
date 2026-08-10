@@ -1,9 +1,10 @@
-import { ModelProperty, createRule, paramMessage } from "@typespec/compiler";
+import { type ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 
 export const propertyNameConflictRule = createRule({
   name: "property-name-conflict",
+  docs: fileRef.fromPackageRoot("src/rules/property-name-conflict.md"),
   description: "Avoid naming conflicts between a property and a model of the same name.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict",
@@ -14,6 +15,9 @@ export const propertyNameConflictRule = createRule({
     const tcgcContext = createTCGCContext(
       context.program,
       "@azure-tools/typespec-client-generator-core",
+      {
+        mutateNamespace: false,
+      },
     );
     return {
       modelProperty: (property: ModelProperty) => {

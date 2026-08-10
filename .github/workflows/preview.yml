@@ -1,0 +1,47 @@
+name: Preview
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths-ignore:
+      - "packages/http-client-csharp/**"
+      - "packages/http-client-java/**"
+      - "packages/http-client-python/**"
+      - "website/**"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run --filter "internal-build-utils" --filter "[origin/main]..." --filter='!@typespec/website' --filter='!@azure-tools/typespec-azure-website' build
+
+      - name: Bump version to prerelease targets
+        run: pnpm change version --prerelease "{nextVersion}-pr.${{ github.event.pull_request.number }}.${{ github.run_number }}"
+
+      # `chronus version --prerelease` rewrites package.json specifiers (e.g. workspace:^ ->
+      # a concrete prerelease range) without updating the lockfile. pnpm 11's verifyDepsBeforeRun
+      # check then fails the next `pnpm` invocation with ERR_PNPM_OUTDATED_LOCKFILE. Disable it
+      # for the remainder of the job since the mismatch is expected here.
+      - run: pnpm config set verifyDepsBeforeRun false --location project
+
+      - run: node eng/scripts/pkg-pr-new.ts

@@ -1,9 +1,16 @@
-import { createRule, Interface, Namespace, paramMessage } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  type Interface,
+  type Namespace,
+  paramMessage,
+} from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getClient } from "../decorators.js";
 
 export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
+  docs: fileRef.fromPackageRoot("src/rules/require-client-suffix.md"),
   description: "Client names should end with 'Client'.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix",
@@ -14,11 +21,14 @@ export const requireClientSuffixRule = createRule({
     const tcgcContext = createTCGCContext(
       context.program,
       "@azure-tools/typespec-client-generator-core",
+      {
+        mutateNamespace: false,
+      },
     );
     return {
       namespace: (namespace: Namespace) => {
         const sdkClient = getClient(tcgcContext, namespace);
-        if (sdkClient && !sdkClient.name.endsWith("Client")) {
+        if (sdkClient && sdkClient.parent === undefined && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: namespace,
             format: {
@@ -29,7 +39,7 @@ export const requireClientSuffixRule = createRule({
       },
       interface: (interfaceType: Interface) => {
         const sdkClient = getClient(tcgcContext, interfaceType);
-        if (sdkClient && !sdkClient.name.endsWith("Client")) {
+        if (sdkClient && sdkClient.parent === undefined && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: interfaceType,
             format: {

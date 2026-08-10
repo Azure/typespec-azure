@@ -1,6 +1,7 @@
 import {
-  Model,
+  type Model,
   createRule,
+  fileRef,
   getLifecycleVisibilityEnum,
   getVisibilityForClass,
   isKey,
@@ -10,8 +11,10 @@ import { isExcludedCoreType, isInlineModel, isTemplateDeclarationType } from "./
 
 export const requireKeyVisibility = createRule({
   name: "key-visibility-required",
+  docs: fileRef.fromPackageRoot("src/rules/key-visibility-required.md"),
   description: "Key properties need to have a Lifecycle visibility setting.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/key-visibility-required",
   messages: {
     default: paramMessage`The key property '${"name"}' has default Lifecycle visibility, please use the @visibility decorator to change it.`,
   },

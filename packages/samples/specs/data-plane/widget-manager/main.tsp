@@ -11,13 +11,25 @@ using Azure.Core.Traits;
 
 @service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
-@useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
+@useAuth(WidgetManagerApiKeyAuth | WidgetManagerOauth2Auth)
 namespace Contoso.WidgetManager;
+
+/** Authenticate requests with an API key in the X-Key header. */
+model WidgetManagerApiKeyAuth is ApiKeyAuth<ApiKeyLocation.header, "X-Key">;
+
+/** Authenticate requests with OAuth2 using the widget service scope. */
+model WidgetManagerOauth2Auth
+  is OAuth2Auth<[
+    {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize";
+      scopes: ["https://widget.contoso.com/.default"];
+    }
+  ]>;
 
 @doc("The Contoso Widget Manager service version.")
 enum Versions {
   @doc("Version 2022-08-31")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   `2022-08-31`,
 }
 
@@ -179,6 +191,7 @@ interface Widgets {
   getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @doc("Creates or updates a Widget asynchronously")
   @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
@@ -200,6 +213,7 @@ interface Widgets {
   @doc("Get a WidgetAnalytics")
   getAnalytics is Operations.ResourceRead<WidgetAnalytics>;
 
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @doc("Creates or updates a WidgetAnalytics")
   updateAnalytics is Operations.ResourceCreateOrUpdate<WidgetAnalytics>;
 

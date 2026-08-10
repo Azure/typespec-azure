@@ -1,84 +1,89 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
+import { ignoreDiagnostics } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   expectDiagnosticEmpty,
   expectDiagnostics,
-  LinterRuleTester,
+  t,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import {
   getClient,
-  getOperationGroup,
   listClients,
-  listOperationGroups,
-  listOperationsInOperationGroup,
+  listOperationsInClient,
+  listSubClients,
 } from "../../src/decorators.js";
-import { SdkClientType, SdkHttpOperation, SdkOperationGroup } from "../../src/interfaces.js";
+import type { SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-let tester: LinterRuleTester;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-  tester = createLinterRuleTester(
-    runner,
-    requireClientSuffixRule,
-    "@azure-tools/typespec-client-generator-core",
-  );
-});
+import {
+  AzureCoreTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 describe("@client", () => {
   it("mark an namespace as a client", async () => {
-    const { MyClient } = await runner.compile(`
-        @client
+    const { program, MyClient } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients, [
       {
         kind: "SdkClient",
         name: "MyClient",
-        service: MyClient,
+        clientPath: "MyClient",
+        services: [MyClient],
         type: MyClient,
-        crossLanguageDefinitionId: "MyClient.MyClient",
+        subClients: [],
+        autoMergeService: false,
       },
     ]);
   });
 
   it("mark an interface as a client", async () => {
-    const { MyService, MyClient } = await runner.compile(`
+    const { program, MyService, MyClient } = await SimpleTester.compile(t.code`
         @service
-        @test namespace MyService;
+        namespace ${t.namespace("MyService")};
         @client({service: MyService})
-        @test interface MyClient {}
+        interface ${t.interface("MyClient")} {}
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients, [
       {
         kind: "SdkClient",
         name: "MyClient",
-        service: MyService,
+        clientPath: "MyClient",
+        services: [MyService],
         type: MyClient,
-        crossLanguageDefinitionId: "MyService.MyClient",
+        subClients: [],
+        autoMergeService: false,
       },
     ]);
   });
 
   it("emit diagnostic if the client namespace doesn't ends with client", async () => {
+    const instance = await SimpleTester.createInstance();
+    const tester = createLinterRuleTester(
+      instance,
+      requireClientSuffixRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
     await tester
       .expect(
         `
-        @client
+        @client({service: MyService})
         @service
-        @test namespace MyService;
+        namespace MyService;
       `,
       )
       .toEmitDiagnostics([
@@ -91,12 +96,18 @@ describe("@client", () => {
   });
 
   it("emit diagnostic if the client explicit name doesn't ends with Client", async () => {
+    const instance = await SimpleTester.createInstance();
+    const tester = createLinterRuleTester(
+      instance,
+      requireClientSuffixRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
     await tester
       .expect(
         `
-        @client({name: "MySDK"})
+        @client({name: "MySDK", service: MyService})
         @service
-        @test namespace MyService;
+        namespace MyService;
       `,
       )
       .toEmitDiagnostics([
@@ -115,166 +126,187 @@ describe("@client", () => {
         })
         namespace Azure.IoT.DeviceUpdate;
         
-        @client({name: "DeviceUpdateClient"}, "java")
-        @client({name: "DeviceUpdateClient"}, "csharp")
-        @client({name: "DeviceUpdateClient"}, "javascript")
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "java")
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "csharp")
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "javascript")
         interface DeviceUpdateOperations {
         }
         
-        @client({name: "DeviceManagementClient"}, "java")
-        @client({name: "DeviceManagementClient"}, "csharp")
-        @client({name: "DeviceManagementClient"}, "javascript")
+        @client({name: "DeviceManagementClient", service: Azure.IoT.DeviceUpdate}, "java")
+        @client({name: "DeviceManagementClient", service: Azure.IoT.DeviceUpdate}, "csharp")
+        @client({name: "DeviceManagementClient", service: Azure.IoT.DeviceUpdate}, "javascript")
         interface DeviceManagementOperations {
         }
         
-        @client({name: "InstanceManagementClient"}, "java")
-        @client({name: "InstanceManagementClient"}, "csharp")
-        @client({name: "InstanceManagementClient"}, "javascript")
+        @client({name: "InstanceManagementClient", service: Azure.IoT.DeviceUpdate}, "java")
+        @client({name: "InstanceManagementClient", service: Azure.IoT.DeviceUpdate}, "csharp")
+        @client({name: "InstanceManagementClient", service: Azure.IoT.DeviceUpdate}, "javascript")
         interface InstanceManagementOperations {
         }
       `;
 
     // java should get three clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      await runner.compile(testCode);
-      strictEqual(listClients(runner.context).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      strictEqual(listClients(context).length, 3);
     }
 
     // csharp should get three clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-      await runner.compile(testCode);
-      strictEqual(listClients(runner.context).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      strictEqual(listClients(context).length, 3);
     }
 
     // python should get one client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-      await runner.compile(testCode);
-      strictEqual(listClients(runner.context).length, 1);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      strictEqual(listClients(context).length, 0);
     }
 
     // typescript should get three clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-ts" });
-      await runner.compile(testCode);
-      strictEqual(listClients(runner.context).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-ts",
+      });
+      strictEqual(listClients(context).length, 3);
     }
   });
 });
 
 describe("listClients without @client", () => {
   it("use service namespace if there is not clients and append Client to service name", async () => {
-    const { MyService } = await runner.compile(`
+    const { program, MyService } = await SimpleTester.compile(t.code`
         @service
-        @test
-        namespace MyService;
+        namespace ${t.namespace("MyService")};
+
+        op test(): void;
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients, [
       {
         kind: "SdkClient",
         name: "MyServiceClient",
-        service: MyService,
+        clientPath: "MyServiceClient",
+        services: [MyService],
         type: MyService,
-        crossLanguageDefinitionId: "MyService",
+        subClients: [],
       },
     ]);
   });
 });
 
 describe("@operationGroup", () => {
-  it("mark an namespace as an operation group", async () => {
-    const { MyClient, MyGroup } = (await runner.compile(`
-        @client
+  it("mark an namespace as an sub client", async () => {
+    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @operationGroup
-        @test namespace MyGroup {}
-      `)) as { MyClient: Namespace; MyGroup: Namespace };
+        namespace ${t.namespace("MyGroup")} {}
+      `);
 
-    const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
+    const context = await createSdkContextForTester(program);
+    const client = getClient(context, MyClient);
+    ok(client);
+    const groups = listSubClients(context, client);
     deepStrictEqual(groups, [
       {
-        kind: "SdkOperationGroup",
+        kind: "SdkClient",
+        name: "MyGroup",
         type: MyGroup,
-        groupPath: "MyClient.MyGroup",
-        service: MyClient,
-        hasOperations: false,
+        clientPath: "MyClient.MyGroup",
+        services: [MyClient],
+        subClients: [],
+        parent: client,
+        autoMergeService: false,
       },
     ]);
   });
 
   it("mark an interface as an operationGroup", async () => {
-    const { MyClient, MyGroup } = (await runner.compile(`
-        @client
+    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
         @operationGroup
-        @test
-        interface MyGroup {}
-      `)) as { MyClient: Namespace; MyGroup: Interface };
+        interface ${t.interface("MyGroup")} {}
+      `);
 
-    const groups = listOperationGroups(runner.context, getClient(runner.context, MyClient)!);
+    const context = await createSdkContextForTester(program);
+    const client = getClient(context, MyClient);
+    ok(client);
+    const groups = listSubClients(context, client);
     deepStrictEqual(groups, [
       {
-        kind: "SdkOperationGroup",
+        kind: "SdkClient",
+        name: "MyGroup",
         type: MyGroup,
-        groupPath: "MyClient.MyGroup",
-        service: MyClient,
-        hasOperations: false,
+        clientPath: "MyClient.MyGroup",
+        services: [MyClient],
+        subClients: [],
+        parent: client,
+        autoMergeService: false,
       },
     ]);
   });
 
-  it("list operations at root of client outside of operation group", async () => {
-    const { MyClient } = (await runner.compile(`
-        @client
+  it("list operations at root of client outside of sub client", async () => {
+    const { program, MyClient } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @route("/root1") op atRoot1(): void;       
         @route("/root2") op atRoot2(): void;
 
         @operationGroup
-        @test interface MyGroup {
+        interface MyGroup {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
-      `)) as { MyClient: Namespace };
+      `);
 
-    const operations = listOperationsInOperationGroup(
-      runner.context,
-      getClient(runner.context, MyClient)!,
-    );
+    const context = await createSdkContextForTester(program);
+    const operations = listOperationsInClient(context, getClient(context, MyClient)!);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["atRoot1", "atRoot2"],
     );
   });
 
-  it("list operations in an operation group", async () => {
-    const { MyGroup } = (await runner.compile(`
-        @client
+  it("list operations in an sub client", async () => {
+    const { program, MyGroup } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
         @route("/root2") op atRoot2(): void;
 
         @operationGroup
-        @test interface MyGroup {
+        interface ${t.interface("MyGroup")} {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
-      `)) as { MyGroup: Interface };
+      `);
 
-    const group = getOperationGroup(runner.context, MyGroup);
+    const context = await createSdkContextForTester(program);
+    const group = getClient(context, MyGroup);
     ok(group);
-    const operations = listOperationsInOperationGroup(runner.context, group);
+    const operations = listOperationsInClient(context, group);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["inOpGroup1", "inOpGroup2"],
@@ -282,80 +314,79 @@ describe("@operationGroup", () => {
   });
 
   it("crossLanguageDefinitionId basic", async () => {
-    const { one } = (await runner.compile(`
-        @client
+    const { program, one } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
-        @test op one(): void;
-      `)) as { one: Operation };
+        op ${t.op("one")}(): void;
+      `);
 
-    strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.one");
+    const context = await createSdkContextForTester(program);
+    strictEqual(getCrossLanguageDefinitionId(context, one), "MyClient.one");
   });
 
   it("crossLanguageDefinitionId with interface", async () => {
-    const { one } = (await runner.compile(`
-        @client
+    const { program, one } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         interface Widgets {
-          @test op one(): void;
+          op ${t.op("one")}(): void;
         }
-      `)) as { one: Operation };
+      `);
 
-    strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
+    const context = await createSdkContextForTester(program);
+    strictEqual(getCrossLanguageDefinitionId(context, one), "MyClient.Widgets.one");
   });
 
   it("crossLanguageDefinitionId with subnamespace", async () => {
-    const { one } = (await runner.compile(`
-        @client
+    const { program, one } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         namespace Widgets {
-          @test op one(): void;
+          op ${t.op("one")}(): void;
         }
-      `)) as { one: Operation };
+      `);
 
-    strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
+    const context = await createSdkContextForTester(program);
+    strictEqual(getCrossLanguageDefinitionId(context, one), "MyClient.Widgets.one");
   });
 
   it("crossLanguageDefinitionId with subnamespace and interface", async () => {
-    const { one } = (await runner.compile(`
-        @client
+    const { program, one } = await SimpleTester.compile(t.code`
+        @client({service: MyClient})
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         namespace SubNamespace {
           interface Widgets {
-            @test op one(): void;
+            op ${t.op("one")}(): void;
           }
         }
-      `)) as { one: Operation };
+      `);
 
-    strictEqual(
-      getCrossLanguageDefinitionId(runner.context, one),
-      "MyClient.SubNamespace.Widgets.one",
-    );
+    const context = await createSdkContextForTester(program);
+    strictEqual(getCrossLanguageDefinitionId(context, one), "MyClient.SubNamespace.Widgets.one");
   });
 
   it("crossLanguagePackageId", async () => {
-    await runner.compile(`
-        @client({name: "MyPackageClient"})
+    const { program } = await SimpleTester.compile(`
+        @client({name: "MyPackageClient", service: My.Package.Namespace})
         @service
         namespace My.Package.Namespace;
 
         namespace SubNamespace {
           interface Widgets {
-            @test op one(): void;
+            op one(): void;
           }
         }
       `);
-    strictEqual(
-      ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
-      "My.Package.Namespace",
-    );
+    const context = await createSdkContextForTester(program);
+    strictEqual(ignoreDiagnostics(getCrossLanguagePackageId(context)), "My.Package.Namespace");
   });
 
   it("@operationGroup with scope", async () => {
@@ -363,6 +394,8 @@ describe("@operationGroup", () => {
         @service(#{
           title: "DeviceUpdateClient",
         })
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
+        @client({service: Azure.IoT.DeviceUpdate}, "!python")
         namespace Azure.IoT.DeviceUpdate;
         
         @operationGroup("java")
@@ -382,75 +415,81 @@ describe("@operationGroup", () => {
         @operationGroup("javascript")
         interface InstanceManagementOperations {
         }
-
-        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
-        namespace Customizations{}
       `;
 
-    // java should get three operation groups
+    // java should get three sub clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      await runner.compile(testCode);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 3);
     }
 
-    // csharp should get three operation groups
+    // csharp should get three sub clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-      await runner.compile(testCode);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 3);
     }
 
-    // python should get three operation groups
+    // python should get three sub clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-      await runner.compile(testCode);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 0);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 0);
     }
 
-    // typescript should get three operation groups
+    // typescript should get three sub clients
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-ts" });
-      await runner.compile(testCode);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 3);
+      const { program } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-ts",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 3);
     }
   });
 
   it("use service namespace if there is not clients and append Client to service name", async () => {
-    const { MyService } = await runner.compile(`
+    const { program, MyService } = await SimpleTester.compile(t.code`
         @service
-        @test
-        namespace MyService;
+        namespace ${t.namespace("MyService")};
         op foo(): void;
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients, [
       {
         kind: "SdkClient",
         name: "MyServiceClient",
-        service: MyService,
+        clientPath: "MyServiceClient",
+        services: [MyService],
         type: MyService,
-        crossLanguageDefinitionId: "MyService",
+        subClients: [],
       },
     ]);
   });
 
   it("with @clientName", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
-        @operationGroup
         @clientName("ClientModel")
         interface Model {
           op foo(): void;
         }
         `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     strictEqual(sdkPackage.clients.length, 1);
     const mainClient = sdkPackage.clients[0];
     strictEqual(mainClient.methods.length, 0);
@@ -460,95 +499,93 @@ describe("@operationGroup", () => {
     strictEqual(client.name, "ClientModel");
   });
 
-  it("@operationGroup with diagnostics", async () => {
-    const testCode = [
-      `
+  it("@operationGroup with different scope", async () => {
+    const mainCode = `
         @service(#{
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
-      `,
-      `
-        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
+      `;
+    const clientCode = `
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python, java")
         namespace Customizations;
-
-        @operationGroup("java")
-        interface SubClientOnlyForJava {
-        }
 
         @operationGroup("python")
         interface SubClientOnlyForPython {
         }
-      `,
-    ];
+      `;
 
     // java should only have one root client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
       );
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 0);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 0);
     }
 
     // python should have one sub client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
       );
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 1);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 1);
     }
 
-    // csharp should only have one root client
+    // csharp should have no client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
       );
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 0);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const client = listClients(context);
+      strictEqual(client.length, 0);
     }
   });
 });
 
 describe("listOperationGroups without @client and @operationGroup", () => {
   it("list operations in namespace or interface", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
         @route("/root2") op atRoot2(): void;
 
-        @test interface MyGroup {
+        interface MyGroup {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
       `);
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
-    let operations = listOperationsInOperationGroup(runner.context, clients[0]);
+    let operations = listOperationsInClient(context, clients[0]);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["atRoot1", "atRoot2"],
     );
 
-    const ogs = listOperationGroups(runner.context, clients[0]);
+    const ogs = listSubClients(context, clients[0]);
     strictEqual(ogs.length, 1);
-    strictEqual(ogs[0].subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, ogs[0]).length, 0);
+    strictEqual(ogs[0].subClients.length, 0);
+    strictEqual(listSubClients(context, ogs[0]).length, 0);
 
-    operations = listOperationsInOperationGroup(runner.context, ogs[0]);
+    operations = listOperationsInClient(context, ogs[0]);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["inOpGroup1", "inOpGroup2"],
@@ -556,208 +593,131 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   });
 
   it("namespace and interface hierarchy", async () => {
-    const { A, AA, AAA, AAB, AG, AAG, AABGroup1, AABGroup2 } = (await runner.compile(`
+    const { program, A, AA, AAB, AG, AAG, AABGroup1 } = await SimpleTester.compile(t.code`
         @service
         @route("/a")
-        @test namespace A {
+        namespace ${t.namespace("A")} {
           @route("/o1") op a_o1(): void;
           @route("/o2") op a_o2(): void;
 
           @route("/g")
-          @test interface AG {
+          interface ${t.interface("AG")} {
             @route("/o1") a_g_o1(): void;
             @route("/o2") a_g_o2(): void;
           }
 
           @route("/a")
-          @test namespace AA {
+          namespace ${t.namespace("AA")} {
             @route("/o1") op aa_o1(): void;
             @route("/o2") op aa_o2(): void;
 
             @route("/g")
-            @test interface AAG {
+            interface ${t.interface("AAG")} {
               @route("/o1") aa_g_o1(): void;
               @route("/o2") aa_g_o2(): void;
             }
 
             @route("/a")
-            @test namespace AAA{};
+            namespace AAA{};
 
             @route("/b")
-            @test namespace AAB{
+            namespace ${t.namespace("AAB")}{
               @route("/o1") op aab_o1(): void;
               @route("/o2") op aab_o2(): void;
 
               @route("/g1")
-              @test interface AABGroup1 {
+              interface ${t.interface("AABGroup1")} {
                 @route("/o1") aab_g1_o1(): void;
                 @route("/o2") aab_g1_o2(): void;
               }
 
               @route("/g2")
-              @test interface AABGroup2 {
+              interface AABGroup2 {
               }
             };
           }
         };
-      `)) as {
-      A: Namespace;
-      AA: Namespace;
-      AAA: Namespace;
-      AAB: Namespace;
-      AG: Interface;
-      AAG: Interface;
-      AABGroup1: Interface;
-      AABGroup2: Interface;
-    };
+      `);
 
-    const ag: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AG,
-      groupPath: "AClient.AG",
-      service: A,
-      hasOperations: true,
-    };
-
-    const aag: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AAG,
-      groupPath: "AClient.AA.AAG",
-      service: A,
-      hasOperations: true,
-    };
-
-    const aabGroup1: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AABGroup1,
-      groupPath: "AClient.AA.AAB.AABGroup1",
-      service: A,
-      hasOperations: true,
-    };
-
-    const aabGroup2: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AABGroup2,
-      groupPath: "AClient.AA.AAB.AABGroup2",
-      service: A,
-      hasOperations: false,
-    };
-
-    const aaa: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AAA,
-      groupPath: "AClient.AA.AAA",
-      service: A,
-      hasOperations: false,
-    };
-
-    const aab: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AAB,
-      subOperationGroups: [aabGroup1, aabGroup2],
-      groupPath: "AClient.AA.AAB",
-      service: A,
-      hasOperations: true,
-    };
-
-    const aa: SdkOperationGroup = {
-      kind: "SdkOperationGroup",
-      type: AA,
-      subOperationGroups: [aaa, aab, aag],
-      groupPath: "AClient.AA",
-      service: A,
-      hasOperations: true,
-    };
-
-    const client = getClient(runner.context, A);
+    const context = await createSdkContextForTester(program);
+    const client = getClient(context, A);
     ok(client);
-    let operations = listOperationsInOperationGroup(runner.context, client);
+    let operations = listOperationsInClient(context, client);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["a_o1", "a_o2"],
     );
 
-    let group = getOperationGroup(runner.context, AA);
-    deepStrictEqual(group, aa);
-    operations = listOperationsInOperationGroup(runner.context, group);
+    const aa = getClient(context, AA);
+    ok(aa);
+    deepStrictEqual(aa.type, AA);
+    operations = listOperationsInClient(context, aa);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["aa_o1", "aa_o2"],
     );
 
-    group = getOperationGroup(runner.context, AAA);
-    deepStrictEqual(group, aaa);
-    deepStrictEqual(listOperationsInOperationGroup(runner.context, group), []);
-
-    group = getOperationGroup(runner.context, AAB);
-    deepStrictEqual(group, aab);
-    operations = listOperationsInOperationGroup(runner.context, group);
+    const aab = getClient(context, AAB);
+    ok(aab);
+    deepStrictEqual(aab.type, AAB);
+    operations = listOperationsInClient(context, aab);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["aab_o1", "aab_o2"],
     );
 
-    group = getOperationGroup(runner.context, AG);
-    deepStrictEqual(group, ag);
-    operations = listOperationsInOperationGroup(runner.context, group);
+    const ag = getClient(context, AG);
+    ok(ag);
+    deepStrictEqual(ag.type, AG);
+    operations = listOperationsInClient(context, ag);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["a_g_o1", "a_g_o2"],
     );
 
-    group = getOperationGroup(runner.context, AAG);
-    deepStrictEqual(group, aag);
-    operations = listOperationsInOperationGroup(runner.context, group);
+    const aag = getClient(context, AAG);
+    ok(aag);
+    deepStrictEqual(aag.type, AAG);
+    operations = listOperationsInClient(context, aag);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["aa_g_o1", "aa_g_o2"],
     );
 
-    group = getOperationGroup(runner.context, AABGroup1);
-    deepStrictEqual(group, aabGroup1);
-    operations = listOperationsInOperationGroup(runner.context, group);
+    const aabGroup1 = getClient(context, AABGroup1);
+    ok(aabGroup1);
+    deepStrictEqual(aabGroup1.type, AABGroup1);
+    operations = listOperationsInClient(context, aabGroup1);
     deepStrictEqual(
       operations.map((x) => x.name),
       ["aab_g1_o1", "aab_g1_o2"],
     );
 
-    group = getOperationGroup(runner.context, AABGroup2);
-    deepStrictEqual(group, aabGroup2);
-    deepStrictEqual(listOperationsInOperationGroup(runner.context, group), []);
-
-    let allOperationGroups = listOperationGroups(runner.context, client);
+    let allOperationGroups = listSubClients(context, client);
     deepStrictEqual(allOperationGroups, [aa, ag]);
-    allOperationGroups = listOperationGroups(runner.context, aa);
+    allOperationGroups = listSubClients(context, aa);
     deepStrictEqual(allOperationGroups, [aab, aag]);
-    allOperationGroups = listOperationGroups(runner.context, aaa);
-    deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aab);
+    allOperationGroups = listSubClients(context, aab);
     deepStrictEqual(allOperationGroups, [aabGroup1]);
-    allOperationGroups = listOperationGroups(runner.context, aag);
+    allOperationGroups = listSubClients(context, aag);
     deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aabGroup1);
+    allOperationGroups = listSubClients(context, aabGroup1);
     deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aabGroup2);
-    deepStrictEqual(allOperationGroups, []);
-    deepStrictEqual(listOperationGroups(runner.context, ag), []);
+    deepStrictEqual(listSubClients(context, ag), []);
 
-    allOperationGroups = listOperationGroups(runner.context, client, true);
+    allOperationGroups = listSubClients(context, client, true);
     deepStrictEqual(allOperationGroups, [aa, ag, aab, aag, aabGroup1]);
-    allOperationGroups = listOperationGroups(runner.context, aa, true);
+    allOperationGroups = listSubClients(context, aa, true);
     deepStrictEqual(allOperationGroups, [aab, aag, aabGroup1]);
-    allOperationGroups = listOperationGroups(runner.context, aaa, true);
-    deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aab, true);
+    allOperationGroups = listSubClients(context, aab, true);
     deepStrictEqual(allOperationGroups, [aabGroup1]);
-    allOperationGroups = listOperationGroups(runner.context, aag, true);
+    allOperationGroups = listSubClients(context, aag, true);
     deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aabGroup1, true);
+    allOperationGroups = listSubClients(context, aabGroup1, true);
     deepStrictEqual(allOperationGroups, []);
-    allOperationGroups = listOperationGroups(runner.context, aabGroup2, true);
-    deepStrictEqual(allOperationGroups, []);
-    deepStrictEqual(listOperationGroups(runner.context, ag, true), []);
+    deepStrictEqual(listSubClients(context, ag, true), []);
 
-    let allOperations = listOperationsInOperationGroup(runner.context, client, true);
+    let allOperations = listOperationsInClient(context, client, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
       [
@@ -765,41 +725,37 @@ describe("listOperationGroups without @client and @operationGroup", () => {
         "a_o2",
         "aa_o1",
         "aa_o2",
-        "aab_o1",
-        "aab_o2",
-        "aab_g1_o1",
-        "aab_g1_o2",
-        "aa_g_o1",
-        "aa_g_o2",
         "a_g_o1",
         "a_g_o2",
+        "aab_o1",
+        "aab_o2",
+        "aa_g_o1",
+        "aa_g_o2",
+        "aab_g1_o1",
+        "aab_g1_o2",
       ],
     );
-    allOperations = listOperationsInOperationGroup(runner.context, aa, true);
+    allOperations = listOperationsInClient(context, aa, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
-      ["aa_o1", "aa_o2", "aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2", "aa_g_o1", "aa_g_o2"],
+      ["aa_o1", "aa_o2", "aab_o1", "aab_o2", "aa_g_o1", "aa_g_o2", "aab_g1_o1", "aab_g1_o2"],
     );
-    allOperations = listOperationsInOperationGroup(runner.context, aaa, true);
-    deepStrictEqual(allOperations, []);
-    allOperations = listOperationsInOperationGroup(runner.context, aab, true);
+    allOperations = listOperationsInClient(context, aab, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
       ["aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2"],
     );
-    allOperations = listOperationsInOperationGroup(runner.context, aag, true);
+    allOperations = listOperationsInClient(context, aag, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
       ["aa_g_o1", "aa_g_o2"],
     );
-    allOperations = listOperationsInOperationGroup(runner.context, aabGroup1, true);
+    allOperations = listOperationsInClient(context, aabGroup1, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
       ["aab_g1_o1", "aab_g1_o2"],
     );
-    allOperations = listOperationsInOperationGroup(runner.context, aabGroup2, true);
-    deepStrictEqual(allOperations, []);
-    allOperations = listOperationsInOperationGroup(runner.context, ag, true);
+    allOperations = listOperationsInClient(context, ag, true);
     deepStrictEqual(
       allOperations.map((x) => x.name),
       ["a_g_o1", "a_g_o2"],
@@ -807,34 +763,38 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   });
 
   it("interface without operation", async () => {
-    const { MyGroup, MyClient } = (await runner.compile(`
+    const { program, MyGroup, MyClient } = await SimpleTester.compile(t.code`
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @route("/root1") op atRoot1(): void;
 
-        @test interface MyGroup {
+        interface ${t.interface("MyGroup")} {
           @route("/root2") op atRoot2(): void;
         }
-      `)) as { MyGroup: Interface; MyClient: Namespace };
+      `);
 
-    deepStrictEqual(getOperationGroup(runner.context, MyGroup), {
-      kind: "SdkOperationGroup",
+    const context = await createSdkContextForTester(program);
+    const client = getClient(context, MyClient);
+    ok(client);
+    deepStrictEqual(getClient(context, MyGroup), {
+      kind: "SdkClient",
+      name: "MyGroup",
       type: MyGroup,
-      groupPath: "MyClient.MyGroup",
-      service: MyClient,
-      hasOperations: true,
+      clientPath: "MyClient.MyGroup",
+      services: [MyClient],
+      subClients: [],
+      parent: client,
     });
 
-    const clients = listClients(runner.context);
-    const ogs = listOperationGroups(runner.context, clients[0]);
+    const clients = listClients(context);
+    const ogs = listSubClients(context, clients[0]);
     deepStrictEqual(ogs.length, 1);
   });
 
   it("empty namespaces and interfaces", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
-        @test
         namespace MyService {
           namespace A {
             namespace B {
@@ -874,16 +834,17 @@ describe("listOperationGroups without @client and @operationGroup", () => {
         };
       `);
 
-    const clients = listClients(runner.context);
-    const ogs = listOperationGroups(runner.context, clients[0]);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
+    const ogs = listSubClients(context, clients[0]);
     let countFromProperty = ogs.length;
     let countFromList = ogs.length;
     const q = [...ogs];
     while (q.length > 0) {
       const og = q.pop()!;
-      countFromProperty += og.subOperationGroups?.length ?? 0;
-      countFromList += listOperationGroups(runner.context, og).length;
-      q.push(...(og.subOperationGroups ?? []));
+      countFromProperty += og.subClients?.length ?? 0;
+      countFromList += listSubClients(context, og).length;
+      q.push(...(og.subClients ?? []));
     }
     deepStrictEqual(countFromProperty, 13);
     deepStrictEqual(countFromList, 13);
@@ -892,17 +853,18 @@ describe("listOperationGroups without @client and @operationGroup", () => {
 
 describe("client hierarchy", () => {
   it("no client", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         namespace Test1Client {
           op x(): void;
         }
       `);
 
-    deepStrictEqual(listClients(runner.context).length, 0);
+    const context = await createSdkContextForTester(program);
+    deepStrictEqual(listClients(context).length, 0);
   });
 
   it("omit one namespace", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace Test1Client {
           op x(): void;
@@ -913,20 +875,21 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInClient(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listSubClients(context, client1).length, 0);
   });
 
   it("nested namespace", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace Test1Client {
           namespace B {
@@ -935,28 +898,29 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
-    strictEqual(listOperationsInOperationGroup(runner.context, client1).length, 0);
+    strictEqual(listOperationsInClient(context, client1).length, 0);
 
-    const client1Ogs = listOperationGroups(runner.context, client1);
+    const client1Ogs = listSubClients(context, client1);
     strictEqual(client1Ogs.length, 1);
-    const b = client1Ogs.find((x) => x.type.name === "B");
+    const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.subClients.length, 0);
+    strictEqual(listSubClients(context, b).length, 0);
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
+      listOperationsInClient(context, b).map((x) => x.name),
       ["x"],
     );
   });
 
   it("nested namespace and interface with naming change", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace Test1Client {
           @route("/b")
@@ -972,38 +936,39 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
-    strictEqual(listOperationsInOperationGroup(runner.context, client1).length, 0);
+    strictEqual(listOperationsInClient(context, client1).length, 0);
 
-    const client1Ogs = listOperationGroups(runner.context, client1);
+    const client1Ogs = listSubClients(context, client1);
     strictEqual(client1Ogs.length, 1);
-    const b = client1Ogs.find((x) => x.type.name === "B");
+    const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups?.length, 1);
-    strictEqual(listOperationGroups(runner.context, b).length, 1);
-    strictEqual(b.groupPath, "Test1Client.BRename");
+    strictEqual(b.subClients?.length, 1);
+    strictEqual(listSubClients(context, b).length, 1);
+    strictEqual(b.clientPath, "Test1Client.BRename");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
+      listOperationsInClient(context, b).map((x) => x.name),
       ["x"],
     );
 
-    const c = b.subOperationGroups?.find((x) => x.type.name === "C");
+    const c = b.subClients?.find((x) => x.type?.name === "C");
     ok(c);
-    strictEqual(c.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, c).length, 0);
-    strictEqual(c.groupPath, "Test1Client.BRename.C");
+    strictEqual(c.subClients.length, 0);
+    strictEqual(listSubClients(context, c).length, 0);
+    strictEqual(c.clientPath, "Test1Client.BRename.C");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
+      listOperationsInClient(context, c).map((x) => x.name),
       ["y"],
     );
   });
 
   it("nested empty namespace and interface", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace Test1Client {
           namespace B {
@@ -1014,92 +979,101 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
-    strictEqual(listOperationsInOperationGroup(runner.context, client1).length, 0);
+    strictEqual(listOperationsInClient(context, client1).length, 0);
 
-    const client1Ogs = listOperationGroups(runner.context, client1);
+    const client1Ogs = listSubClients(context, client1);
     strictEqual(client1Ogs.length, 1);
-    const b = client1Ogs.find((x) => x.type.name === "B");
+    const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups?.length, 1);
-    strictEqual(listOperationGroups(runner.context, b).length, 1);
-    strictEqual(b.groupPath, "Test1Client.B");
-    strictEqual(listOperationsInOperationGroup(runner.context, b).length, 0);
+    strictEqual(b.subClients?.length, 1);
+    strictEqual(listSubClients(context, b).length, 1);
+    strictEqual(b.clientPath, "Test1Client.B");
+    strictEqual(listOperationsInClient(context, b).length, 0);
 
-    const c = b.subOperationGroups?.find((x) => x.type.name === "C");
+    const c = b.subClients?.find((x) => x.type?.name === "C");
     ok(c);
-    strictEqual(c.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, c).length, 0);
-    strictEqual(c.groupPath, "Test1Client.B.C");
-    strictEqual(listOperationsInOperationGroup(runner.context, c).length, 1);
+    strictEqual(c.subClients.length, 0);
+    strictEqual(listSubClients(context, c).length, 0);
+    strictEqual(c.clientPath, "Test1Client.B.C");
+    strictEqual(listOperationsInClient(context, c).length, 1);
   });
 
   it("rename client name", async () => {
-    await runner.compileWithCustomization(
-      `
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace A {
           op x(): void;
         }
       `,
-      `
+        `
         namespace Customizations;
 
         @@clientName(A, "Test1Client");
       `,
+      ),
     );
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInClient(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listSubClients(context, client1).length, 0);
   });
 
   it("rename client name - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace A {
           op x(): void;
         }
       `,
-      `
+        `
         @@client(A, {
           name: "Test1Client",
           service: A
         });
       `,
+      ),
     );
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
     });
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "AClient");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInClient(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listSubClients(context, client1).length, 0);
   });
 
   it("split into two clients", async () => {
-    await runner.compileWithCustomization(
-      `
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace A {
           @route("/b")
@@ -1112,7 +1086,9 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+        `
+        namespace Customizations;
+        
         @client({name: "Test1Client", service: A})
         interface Test1Client {
           x is A.B.x;
@@ -1123,31 +1099,35 @@ describe("client hierarchy", () => {
           y is A.C.y;
         }
       `,
+      ),
     );
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 2);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInClient(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listSubClients(context, client1).length, 0);
 
     const client2 = clients.find((x) => x.name === "Test2Client");
     ok(client2);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client2).map((x) => x.name),
+      listOperationsInClient(context, client2).map((x) => x.name),
       ["y"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client2).length, 0);
+    deepStrictEqual(listSubClients(context, client2).length, 0);
   });
 
   it("split into two clients - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace A {
           @route("/b")
@@ -1160,7 +1140,7 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+        `
         @@client(A.B, {
           name: "Test1Client",
         });
@@ -1169,6 +1149,7 @@ describe("client hierarchy", () => {
           name: "Test2Client",
         });
       `,
+      ),
     );
 
     expectDiagnostics(diagnostics, [
@@ -1180,40 +1161,42 @@ describe("client hierarchy", () => {
       },
     ]);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "AClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInClient(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listSubClients(context, client);
     strictEqual(clientOgs.length, 2);
 
-    const og1 = clientOgs.find((x) => x.type.name === "B");
+    const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
-    strictEqual(og1.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
-    strictEqual(og1.groupPath, "AClient.B");
+    strictEqual(og1.subClients.length, 0);
+    strictEqual(listSubClients(context, og1).length, 0);
+    strictEqual(og1.clientPath, "AClient.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInClient(context, og1).map((x) => x.name),
       ["x"],
     );
 
-    const og2 = clientOgs.find((x) => x.type.name === "C");
+    const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
-    strictEqual(og2.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
-    strictEqual(og2.groupPath, "AClient.C");
+    strictEqual(og2.subClients.length, 0);
+    strictEqual(listSubClients(context, og2).length, 0);
+    strictEqual(og2.clientPath, "AClient.C");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInClient(context, og2).map((x) => x.name),
       ["y"],
     );
   });
 
-  it("one client and two operation groups", async () => {
-    await runner.compileWithCustomization(
-      `
+  it("one client and two sub clients", async () => {
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace PetStore {
           @route("/feed")
@@ -1222,7 +1205,7 @@ describe("client hierarchy", () => {
           @route("/pet")
           op pet(): void;
         }`,
-      `
+        `
         @client({
           name: "PetStoreClient",
           service: PetStore
@@ -1239,42 +1222,46 @@ describe("client hierarchy", () => {
           pet is PetStore.pet
         }
       `,
+      ),
     );
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "PetStoreClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInClient(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listSubClients(context, client);
     strictEqual(clientOgs.length, 2);
 
-    const og1 = clientOgs.find((x) => x.type.name === "OpGrp1");
+    const og1 = clientOgs.find((x) => x.type?.name === "OpGrp1");
     ok(og1);
-    strictEqual(og1.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
-    strictEqual(og1.groupPath, "PetStoreClient.OpGrp1");
+    strictEqual(og1.subClients.length, 0);
+    strictEqual(listSubClients(context, og1).length, 0);
+    strictEqual(og1.clientPath, "PetStoreClient.OpGrp1");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInClient(context, og1).map((x) => x.name),
       ["feed"],
     );
 
-    const og2 = clientOgs.find((x) => x.type.name === "OpGrp2");
+    const og2 = clientOgs.find((x) => x.type?.name === "OpGrp2");
     ok(og2);
-    strictEqual(og2.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
-    strictEqual(og2.groupPath, "PetStoreClient.OpGrp2");
+    strictEqual(og2.subClients.length, 0);
+    strictEqual(listSubClients(context, og2).length, 0);
+    strictEqual(og2.clientPath, "PetStoreClient.OpGrp2");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInClient(context, og2).map((x) => x.name),
       ["pet"],
     );
   });
 
-  it("operation group - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+  it("sub client - diagnostics", async () => {
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
         @service
         namespace A {
           @route("/b")
@@ -1287,48 +1274,50 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+        `
         @@operationGroup(A.B);
       `,
+      ),
     );
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
     });
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "AClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInClient(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listSubClients(context, client);
     strictEqual(clientOgs.length, 2);
 
-    const og1 = clientOgs.find((x) => x.type.name === "B");
+    const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
-    strictEqual(og1.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
-    strictEqual(og1.groupPath, "AClient.B");
+    strictEqual(og1.subClients.length, 0);
+    strictEqual(listSubClients(context, og1).length, 0);
+    strictEqual(og1.clientPath, "AClient.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInClient(context, og1).map((x) => x.name),
       ["x"],
     );
 
-    const og2 = clientOgs.find((x) => x.type.name === "C");
+    const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
-    strictEqual(og2.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
-    strictEqual(og2.groupPath, "AClient.C");
+    strictEqual(og2.subClients.length, 0);
+    strictEqual(listSubClients(context, og2).length, 0);
+    strictEqual(og2.clientPath, "AClient.C");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInClient(context, og2).map((x) => x.name),
       ["y"],
     );
   });
 
   it("rearrange operations", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace A {
           @route("/b")
@@ -1355,28 +1344,29 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
-    strictEqual(listOperationsInOperationGroup(runner.context, client1).length, 0);
+    strictEqual(listOperationsInClient(context, client1).length, 0);
 
-    const client1Ogs = listOperationGroups(runner.context, client1);
+    const client1Ogs = listSubClients(context, client1);
     strictEqual(client1Ogs.length, 1);
-    const b = client1Ogs.find((x) => x.type.name === "B");
+    const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.subClients.length, 0);
+    strictEqual(listSubClients(context, b).length, 0);
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
+      listOperationsInClient(context, b).map((x) => x.name),
       ["x", "y"],
     );
   });
 
   it("rearrange operations with scope", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         @server(
           "{endpoint}/face/{apiVersion}",
@@ -1417,42 +1407,37 @@ describe("client hierarchy", () => {
         }
       `);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program);
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
-    strictEqual(listOperationsInOperationGroup(runner.context, client1).length, 0);
+    strictEqual(listOperationsInClient(context, client1).length, 0);
 
-    const client1Ogs = listOperationGroups(runner.context, client1);
+    const client1Ogs = listSubClients(context, client1);
     strictEqual(client1Ogs.length, 1);
-    const b = client1Ogs.find((x) => x.type.name === "B");
+    const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups, undefined);
-    strictEqual(listOperationGroups(runner.context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.subClients.length, 0);
+    strictEqual(listSubClients(context, b).length, 0);
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
+      listOperationsInClient(context, b).map((x) => x.name),
       ["x", "y"],
     );
   });
 
   it("triple-nested with core and versioning", async () => {
-    const runnerWithCore = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithCore.compile(
+    const { program } = await AzureCoreTester.compile(
       `
       @service
       @versioned(StorageVersions)
       @clientName("BlobServiceClient")
       namespace Storage.Blob {
         enum StorageVersions {
-          @doc("The 2025-01-05 version of the Azure.Storage.Blob service.")
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2025_01_05: "2025-01-05",
+          
+                  v2025_01_05: "2025-01-05",
         }
 
         op ServiceOperation<
@@ -1476,7 +1461,8 @@ describe("client hierarchy", () => {
       `,
     );
 
-    const sdkPackage = runnerWithCore.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const containerClient = sdkPackage.clients[0].children?.[0];
     strictEqual(containerClient?.kind, "client");
     const blobClient = containerClient.children?.[0];
@@ -1488,4 +1474,41 @@ describe("client hierarchy", () => {
     deepStrictEqual(apiVersionParam.apiVersions, ["2025-01-05"]);
     strictEqual(apiVersionParam.clientDefaultValue, "2025-01-05");
   });
+});
+
+it("operations under namespace or interface without @client or @operationGroup", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @client({service: Test})
+    namespace Test;
+
+    @route("/a")
+    op a(): void;
+
+    namespace B {
+      @route("/b")
+      op b(): void;
+
+      interface C {
+        @route("/c")
+        op c(): void;
+      }
+    }
+
+    @operationGroup
+    interface D {
+      @route("/d")
+      op d(): void;
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const clients = listClients(context);
+  strictEqual(clients.length, 1);
+  const client = clients[0];
+  strictEqual(listOperationsInClient(context, client).length, 1);
+  const operationGroups = listSubClients(context, client);
+  strictEqual(operationGroups.length, 1);
+  const operationGroup = operationGroups[0];
+  strictEqual(listOperationsInClient(context, operationGroup).length, 1);
 });

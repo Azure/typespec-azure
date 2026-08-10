@@ -1,0 +1,48 @@
+diff --git a/http-client-generator-core/pom.xml b/http-client-generator-core/pom.xml
+index 2015b7761..d5103d017 100644
+--- a/http-client-generator-core/pom.xml
++++ b/http-client-generator-core/pom.xml
+@@ -51,6 +51,11 @@
+   </build>
+ 
+   <dependencies>
++    <dependency>
++      <groupId>com.azure.tools</groupId>
++      <artifactId>azure-autorest-customization</artifactId>
++      <version>1.0.0-beta.11</version>
++    </dependency>
+     <dependency>
+       <groupId>io.clientcore</groupId>
+       <artifactId>core</artifactId>
+diff --git a/http-client-generator-core/src/main/java/com/microsoft/typespec/http/client/generator/core/postprocessor/Postprocessor.java b/http-client-generator-core/src/main/java/com/microsoft/typespec/http/client/generator/core/postprocessor/Postprocessor.java
+index e9b1e0a49..18955e7d7 100644
+--- a/http-client-generator-core/src/main/java/com/microsoft/typespec/http/client/generator/core/postprocessor/Postprocessor.java
++++ b/http-client-generator-core/src/main/java/com/microsoft/typespec/http/client/generator/core/postprocessor/Postprocessor.java
+@@ -3,8 +3,8 @@
+ 
+ package com.microsoft.typespec.http.client.generator.core.postprocessor;
+ 
+-import com.microsoft.typespec.http.client.generator.core.customization.Customization;
+-import com.microsoft.typespec.http.client.generator.core.customization.implementation.Utils;
++import com.azure.autorest.customization.Customization;
++import com.azure.autorest.customization.implementation.Utils;
+ import com.microsoft.typespec.http.client.generator.core.extension.base.util.FileUtils;
+ import com.microsoft.typespec.http.client.generator.core.extension.plugin.JavaSettings;
+ import com.microsoft.typespec.http.client.generator.core.extension.plugin.NewPlugin;
+diff --git a/http-client-generator/src/main/resources/readme/pom.xml b/http-client-generator/src/main/resources/readme/pom.xml
+index 58fc6b54d..09804e3f0 100644
+--- a/http-client-generator/src/main/resources/readme/pom.xml
++++ b/http-client-generator/src/main/resources/readme/pom.xml
+@@ -16,9 +16,9 @@
+ 
+   <dependencies>
+     <dependency>
+-      <groupId>com.microsoft.typespec</groupId>
+-      <artifactId>http-client-generator-core</artifactId>
+-      <version>1.0.0-beta.1</version>
++      <groupId>com.azure.tools</groupId>
++      <artifactId>azure-autorest-customization</artifactId>
++      <version>1.0.0-beta.11</version>
+     </dependency>
+   </dependencies>
+ </project>

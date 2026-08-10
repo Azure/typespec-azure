@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "samples/dist/samples.ts"],
+  "exclude": ["**/*.test.*"],
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.build.json" },
+    { "path": "../../core/packages/openapi/tsconfig.build.json" },
+    { "path": "../../core/packages/rest/tsconfig.build.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.build.json" }
+  ]
+}

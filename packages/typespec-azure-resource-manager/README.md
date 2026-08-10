@@ -26,40 +26,52 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                           |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record)                                         | Don't use Record types for ARM resources.                                                                                                                                                                                                             |
-| `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                                                                                  | Specify the ARM common-types version using @armCommonTypesVersion.                                                                                                                                                                                    |
-| [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes) | Ensure delete operations have the appropriate status codes.                                                                                                                                                                                           |
-| [`@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/put-operation-response-codes)       | Ensure put operations have the appropriate status codes.                                                                                                                                                                                              |
-| [`@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/post-operation-response-codes)     | Ensure post operations have the appropriate status codes.                                                                                                                                                                                             |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment`                                                                                                                            | `@armResourceAction` should not be used with `@segment`.                                                                                                                                                                                              |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property`                                                                                                                           | Warn about duplicate properties in resources.                                                                                                                                                                                                         |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property`                                                                                                                    | Check for invalid resource envelope properties.                                                                                                                                                                                                       |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format`                                                                                                                       | Check for valid versions.                                                                                                                                                                                                                             |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars`                                                                                                                            | Arm resource key must contain only alphanumeric characters.                                                                                                                                                                                           |
-| [`@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name-pattern)                     | The resource name parameter should be defined with a 'pattern' restriction.                                                                                                                                                                           |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response`                                                                                                                           | [RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.                                                                                                                                                                               |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars`                                                                                                                   | Arm resource name must contain only alphanumeric characters.                                                                                                                                                                                          |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state`                                                                                                                           | Check for properly configured provisioningState property.                                                                                                                                                                                             |
-| `@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`                                                                                                                      | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                   |
-| `@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`                                                                                                                                     | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                              |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-operation`                                                                                                                                    | Validate ARM Resource operations.                                                                                                                                                                                                                     |
-| `@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`                                                                                                                              | Check for resources that must have a delete operation.                                                                                                                                                                                                |
-| `@azure-tools/typespec-azure-resource-manager/empty-updateable-properties`                                                                                                                               | Should have updateable properties.                                                                                                                                                                                                                    |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator`                                                                                                                 | Each resource interface must have an @armResourceOperations decorator.                                                                                                                                                                                |
-| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb)   | Actions must be HTTP Post or Get operations.                                                                                                                                                                                                          |
-| `@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation`                                                                                                                      | Tenant and Extension resources should not define a list by subscription operation.                                                                                                                                                                    |
-| [`@azure-tools/typespec-azure-resource-manager/lro-location-header`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-location-header)                             | A 202 response should include a Location response header.                                                                                                                                                                                             |
-| [`@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers)                   | Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", #[id-prop]) where "id-prop" is a list of the names of identifying properties in the item type. |
-| [`@azure-tools/typespec-azure-resource-manager/no-response-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-response-body)                                   | Check that the body is empty for 202 and 204 responses, and not empty for other success (2xx) responses.                                                                                                                                              |
-| `@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint`                                                                                                                               | Check for missing Operations interface.                                                                                                                                                                                                               |
-| `@azure-tools/typespec-azure-resource-manager/patch-envelope`                                                                                                                                            | Patch envelope properties should match the resource properties.                                                                                                                                                                                       |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-patch`                                                                                                                                        | Validate ARM PATCH operations.                                                                                                                                                                                                                        |
-| `@azure-tools/typespec-azure-resource-manager/resource-name`                                                                                                                                             | Check the resource name.                                                                                                                                                                                                                              |
-| `@azure-tools/typespec-azure-resource-manager/retry-after`                                                                                                                                               | Check if retry-after header appears in response body.                                                                                                                                                                                                 |
-| [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                   | Check for unsupported ARM types.                                                                                                                                                                                                                      |
-| [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                         |
+| Name                                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-child-resources)             | Resources decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource.                                                                                                                          |
+| [`@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-lifecycle-operations)   | Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-relationship-required-properties)           | Resources decorated with @azureBaseType for the Relationship base type must be extension resources with the required Relationship schema.                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record)                                                         | Don't use Record types for ARM resources.                                                                                                                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-path-casing-conflicts)                           | Operation paths must be unique when compared case-insensitively.                                                                                                                                                                                      |
+| [`@azure-tools/typespec-azure-resource-manager/no-override-props`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-override-props)                                                 | Disallow redefining properties already defined in a base type.                                                                                                                                                                                        |
+| [`@azure-tools/typespec-azure-resource-manager/arm-common-types-version`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-common-types-version)                                   | Specify the ARM common-types version using @armCommonTypesVersion.                                                                                                                                                                                    |
+| [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-delete-operation-response-codes)             | Ensure delete operations have the appropriate status codes.                                                                                                                                                                                           |
+| [`@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-put-operation-response-codes)                   | Ensure put operations have the appropriate status codes.                                                                                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-post-operation-response-codes)                 | Ensure post operations have the appropriate status codes.                                                                                                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-action-no-segment)                       | `@armResourceAction` should not be used with `@segment`.                                                                                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-duplicate-property)                     | Warn about duplicate properties in resources.                                                                                                                                                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-envelope-property)       | Check for invalid resource envelope properties.                                                                                                                                                                                                       |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-version-format)             | Check for valid versions.                                                                                                                                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-key-invalid-chars)                       | Arm resource key must contain only alphanumeric characters.                                                                                                                                                                                           |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-name-pattern)                                 | The resource name parameter should be defined with a 'pattern' restriction.                                                                                                                                                                           |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-response)                     | [RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.                                                                                                                                                                               |
+| [`@azure-tools/typespec-azure-resource-manager/use-api-version`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-api-version)                                                     | Validate ARM Resource operations include the api-version parameter referencing Azure.ResourceManager.CommonTypes.ApiVersionParameter.                                                                                                                 |
+| [`@azure-tools/typespec-azure-resource-manager/use-operation-decorator`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-operation-decorator)                                     | Validate ARM Resource operations use the correct decorator for the HTTP verb.                                                                                                                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-path-segment-invalid-chars)     | Arm resource name must contain only alphanumeric characters.                                                                                                                                                                                          |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-provisioning-state)                     | Check for properly configured provisioningState property.                                                                                                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/version-progression`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/version-progression)                                             | Validate that ARM service versions all use unique dates and are declared in strictly increasing chronological order.                                                                                                                                  |
+| [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-no-key)                               | Validate that custom resource contains a key property.                                                                                                                                                                                                |
+| [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-usage-discourage)           | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                   |
+| [`@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-feature-file-usage-discourage)                 | Verify the usage of @featureFiles decorator.                                                                                                                                                                                                          |
+| [`@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/beyond-nesting-levels)                                         | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/use-interface`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-interface)                                                         | Validate ARM Resource operations are defined inside an interface declaration.                                                                                                                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-delete-operation)                           | Check for resources that must have a delete operation.                                                                                                                                                                                                |
+| [`@azure-tools/typespec-azure-resource-manager/empty-updateable-properties`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/empty-updateable-properties)                             | Should have updateable properties.                                                                                                                                                                                                                    |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-interface-requires-decorator) | Each resource interface must have an @armResourceOperations decorator.                                                                                                                                                                                |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb)                   | Actions must be HTTP Post or Get operations.                                                                                                                                                                                                          |
+| [`@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/improper-subscription-list-operation)           | Tenant and Extension resources should not define a list by subscription operation.                                                                                                                                                                    |
+| [`@azure-tools/typespec-azure-resource-manager/lro-location-header`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-location-header)                                             | A 202 response should include a Location response header.                                                                                                                                                                                             |
+| [`@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers)                                   | Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", #[id-prop]) where "id-prop" is a list of the names of identifying properties in the item type. |
+| [`@azure-tools/typespec-azure-resource-manager/no-response-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-response-body)                                                   | Check that the body is empty for 202 and 204 responses, and not empty for other success (2xx) responses.                                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-operations-endpoint)                             | Check for missing Operations interface.                                                                                                                                                                                                               |
+| [`@azure-tools/typespec-azure-resource-manager/patch-envelope`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-envelope)                                                       | Patch envelope properties should match the resource properties.                                                                                                                                                                                       |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-patch`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-patch)                                               | Validate ARM PATCH operations.                                                                                                                                                                                                                        |
+| [`@azure-tools/typespec-azure-resource-manager/resource-name`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/resource-name)                                                         | Check the resource name.                                                                                                                                                                                                                              |
+| [`@azure-tools/typespec-azure-resource-manager/retry-after`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/retry-after)                                                             | Check if retry-after header appears in response body.                                                                                                                                                                                                 |
+| [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                                   | Check for unsupported ARM types.                                                                                                                                                                                                                      |
+| [`@azure-tools/typespec-azure-resource-manager/secret-prop`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop)                                                             | RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.                                                                                      |
+| [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-reserved-resource-property)                         | Reserved property names (for example 'billingData') must not be present in a resource's property bag. The property name is matched case-insensitively.                                                                                                |
 
 ## Decorators
 
@@ -70,6 +82,7 @@ Available ruleSets:
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
 - [`@armResourceAction`](#@armresourceaction)
+- [`@armResourceCheckExistence`](#@armresourcecheckexistence)
 - [`@armResourceCollectionAction`](#@armresourcecollectionaction)
 - [`@armResourceCreateOrUpdate`](#@armresourcecreateorupdate)
 - [`@armResourceDelete`](#@armresourcedelete)
@@ -79,6 +92,9 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
+- [`@featureFile`](#@featurefile)
+- [`@featureFileOptions`](#@featurefileoptions)
+- [`@featureFiles`](#@featurefiles)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -109,7 +125,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+This is used for library namespaces that define reusable ARM resource types that can be shared
+across multiple provider specifications.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -163,8 +181,9 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
-property to the type of the Azure Resource Manager resource.
+`@armProviderNameValue` sets the provider namespace value on operations.
+It is used internally to inject the correct provider namespace path segment
+for resource operations in auto-generated routes.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
@@ -180,8 +199,13 @@ None
 
 #### `@armResourceAction`
 
+Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+This decorator associates a POST action operation with its resource,
+identifying the semantics of the operation as a resource action over a specific resource for documentation,
+resource validation, and use by downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model)
+@Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -190,13 +214,35 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
+
+#### `@armResourceCheckExistence`
+
+Marks the operation as being a check existence (HEAD) operation
+
+```typespec
+@Azure.ResourceManager.armResourceCheckExistence(resourceModel: Model, resourceName?: valueof string)
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceCollectionAction`
 
-Marks the operation as being a collection action
+Marks the operation as being a collection action that is not associated with a specific resource instance.
+Collection actions are operations that act on a resource collection rather than a single resource,
+such as `checkNameAvailability` or provider-level actions.
 
 ```typespec
 @Azure.ResourceManager.armResourceCollectionAction
@@ -212,8 +258,12 @@ None
 
 #### `@armResourceCreateOrUpdate`
 
+Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -222,14 +272,19 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceDelete`
 
+Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model)
+@Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -238,14 +293,19 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceList`
 
+Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model)
+@Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -254,23 +314,33 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceOperations`
 
 This decorator is used to identify interfaces containing resource operations.
-When applied, it marks the interface with the `@autoRoute` decorator so that
+By default, it marks the interface with the `@autoRoute` decorator so that
 all of its contained operations will have their routes generated
 automatically.
 
-It also adds a `@tag` decorator bearing the name of the interface so that all
+The decorator also adds a `@tag` decorator bearing the name of the interface so that all
 of the operations will be grouped based on the interface name in generated
 clients.
 
+The optional `resourceOperationOptions` parameter provides additional options.
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
+choose static (`@route`) or automatic (`@autoRoute`) routing.
+
+`resourceType: Model` specifies the resource type for the operations in the interface
+
+`omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+individually tagged
+
 ```typespec
-@Azure.ResourceManager.armResourceOperations(_?: unknown)
+@Azure.ResourceManager.armResourceOperations(resourceOperationOptions?: unknown | valueof Azure.ResourceManager.ResourceOperationOptions)
 ```
 
 ##### Target
@@ -279,14 +349,18 @@ clients.
 
 ##### Parameters
 
-| Name | Type      | Description |
-| ---- | --------- | ----------- |
-| \_   | `unknown` | DEPRECATED  |
+| Name                     | Type                                                                         | Description                                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| resourceOperationOptions | `unknown` \| [valueof `ResourceOperationOptions`](#resourceoperationoptions) | Options for routing the operations in the interface and associating them with a specific resource |
 
 #### `@armResourceRead`
 
+Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model)
+@Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -295,14 +369,19 @@ clients.
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceUpdate`
 
+Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -311,17 +390,19 @@ clients.
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armVirtualResource`
 
 This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
+Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+which is useful for defining the scope of resources used only as parents for child resources, or scopes for extension resources.
 
 ```typespec
-@Azure.ResourceManager.armVirtualResource
+@Azure.ResourceManager.armVirtualResource(provider?: valueof string)
 ```
 
 ##### Target
@@ -330,7 +411,9 @@ Azure.ResourceManager common types.
 
 ##### Parameters
 
-None
+| Name     | Type             | Description                                                         |
+| -------- | ---------------- | ------------------------------------------------------------------- |
+| provider | `valueof string` | Optional. The resource provider namespace for the virtual resource. |
 
 #### `@extensionResource`
 
@@ -354,6 +437,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+#### `@featureFile`
+
+Decorator to associate a feature file with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.featureFile(featureName: EnumMember)
+```
+
+##### Target
+
+The target to associate the feature file with
+`Model | Operation | Interface | Namespace`
+
+##### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+#### `@featureFileOptions`
+
+Decorator to define options for a specific feature file
+
+```typespec
+@Azure.ResourceManager.featureFileOptions(options: valueof Azure.ResourceManager.ArmFeatureFileOptions)
+```
+
+##### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+##### Parameters
+
+| Name    | Type                                                      | Description                      |
+| ------- | --------------------------------------------------------- | -------------------------------- |
+| options | [valueof `ArmFeatureFileOptions`](#armfeaturefileoptions) | The options for the feature file |
+
+#### `@featureFiles`
+
+Decorator to define a set of feature files for splitting output
+
+```typespec
+@Azure.ResourceManager.featureFiles(features: Enum)
+```
+
+##### Target
+
+The service namespace
+`Namespace`
+
+##### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
 #### `@identifiers`
 
 This decorator is used to indicate the identifying properties of objects in the array, e.g. size
@@ -365,7 +505,7 @@ The properties that are used as identifiers for the object needs to be provided 
 
 ##### Target
 
-`ModelProperty`
+`ModelProperty | unknown[]`
 
 ##### Parameters
 
@@ -386,8 +526,9 @@ model Pet {
 
 `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
 
-Location based resources have REST API paths like
-`/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
+**Deprecated**: This decorator is deprecated. Use `@parentResource` with `ArmLocationResource` instead.
+See the [Location Resource sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/location/)
+for the recommended approach.
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
@@ -405,7 +546,8 @@ None
 
 #### `@resourceBaseType`
 
-This decorator sets the base type of the given resource.
+This decorator sets the base type of the given resource, indicating where in the
+Azure Resource Manager hierarchy the resource is located.
 
 ```typespec
 @Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
@@ -527,18 +669,21 @@ This allows sharing Azure Resource Manager resource types across specifications
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
 
-### Azure.ResourceManager.Legacy
+### Azure.ResourceManager.BaseTypes
 
-- [`@customAzureResource`](#@customazureresource)
-- [`@externalTypeRef`](#@externaltyperef)
+- [`@azureBaseType`](#@azurebasetype)
 
-#### `@customAzureResource`
+#### `@azureBaseType`
 
-This decorator is used on resources that do not satisfy the definition of a resource
-but need to be identified as such.
+`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+a base type. Base types define structured constraints including required and
+optional properties that conforming resources must implement.
+
+This decorator may be applied multiple times to indicate conformance to
+multiple base types. Duplicate entries are ignored.
 
 ```typespec
-@Azure.ResourceManager.Legacy.customAzureResource
+@Azure.ResourceManager.BaseTypes.azureBaseType(baseType: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo)
 ```
 
 ##### Target
@@ -547,7 +692,93 @@ but need to be identified as such.
 
 ##### Parameters
 
+| Name     | Type                                    | Description                                           |
+| -------- | --------------------------------------- | ----------------------------------------------------- |
+| baseType | [valueof `BaseTypeInfo`](#basetypeinfo) | The base type specification this resource implements. |
+
+##### Examples
+
+```typespec
+// Agent definition and properties using the Appliance deployment model
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
+  ...DefaultProvisioningStateProperty;
+}
+
+// The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+// (The Agent template applies this automatically, but it can also be applied directly.)
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2026-04-01" })
+model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
+}
+```
+
+### Azure.ResourceManager.Legacy
+
+- [`@armExternalType`](#@armexternaltype)
+- [`@armOperationRoute`](#@armoperationroute)
+- [`@customAzureResource`](#@customazureresource)
+- [`@externalTypeRef`](#@externaltyperef)
+- [`@feature`](#@feature)
+- [`@featureOptions`](#@featureoptions)
+- [`@features`](#@features)
+- [`@renamePathParameter`](#@renamepathparameter)
+
+#### `@armExternalType`
+
+Signifies that a Resource is represented using a library type in generated SDKs.
+
+```typespec
+@Azure.ResourceManager.Legacy.armExternalType
+```
+
+##### Target
+
+The model to that is an external resource
+`Model`
+
+##### Parameters
+
 None
+
+#### `@armOperationRoute`
+
+Signifies that an operation is an Azure Resource Manager operation
+and optionally associates the operation with a route template.
+
+```typespec
+@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof Azure.ResourceManager.Legacy.ArmOperationOptions)
+```
+
+##### Target
+
+The operation to associate the model with
+`Operation`
+
+##### Parameters
+
+| Name  | Type                                                  | Description                                    |
+| ----- | ----------------------------------------------------- | ---------------------------------------------- |
+| route | [valueof `ArmOperationOptions`](#armoperationoptions) | Optional route to associate with the operation |
+
+#### `@customAzureResource`
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource(options?: valueof Azure.ResourceManager.Legacy.CustomResourceOptions)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name    | Type                                                      | Description                                          |
+| ------- | --------------------------------------------------------- | ---------------------------------------------------- |
+| options | [valueof `CustomResourceOptions`](#customresourceoptions) | Options for customizing the behavior of the resource |
 
 #### `@externalTypeRef`
 
@@ -566,3 +797,80 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+#### `@feature`
+
+Decorator to associate a feature with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
+```
+
+##### Target
+
+The target to associate the feature with
+`Model | Operation | Interface | Namespace`
+
+##### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+#### `@featureOptions`
+
+Decorator to define options for a specific feature
+
+```typespec
+@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
+```
+
+##### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+##### Parameters
+
+| Name    | Type                                              | Description                 |
+| ------- | ------------------------------------------------- | --------------------------- |
+| options | [valueof `ArmFeatureOptions`](#armfeatureoptions) | The options for the feature |
+
+#### `@features`
+
+Decorator to define a set of features
+
+```typespec
+@Azure.ResourceManager.Legacy.features(features: Enum)
+```
+
+##### Target
+
+The service namespace
+`Namespace`
+
+##### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
+#### `@renamePathParameter`
+
+Renames a path parameter in an Azure Resource Manager operation.
+
+```typespec
+@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string)
+```
+
+##### Target
+
+The operation or interface to modify
+`Operation`
+
+##### Parameters
+
+| Name                | Type             | Description                         |
+| ------------------- | ---------------- | ----------------------------------- |
+| sourceParameterName | `valueof string` | The name of the parameter to rename |
+| targetParameterName | `valueof string` | The new name for the parameter      |

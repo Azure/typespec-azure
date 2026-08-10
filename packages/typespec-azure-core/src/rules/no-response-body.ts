@@ -1,11 +1,13 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
 import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noResponseBodyRule = createRule({
   name: "no-response-body",
+  docs: fileRef.fromPackageRoot("src/rules/no-response-body.md"),
   description: "Ensure that the body is set correctly for the response type.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-response-body",
   messages: {
     default: `The body of non-204 responses should not be empty.`,
     response204: `The body of 204 response should be empty.`,

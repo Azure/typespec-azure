@@ -1,5 +1,197 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.70.0
+
+No changes, version bump only.
+
+## 0.69.0
+
+No changes, version bump only.
+
+## 0.68.0
+
+### Features
+
+- [#4144](https://github.com/Azure/typespec-azure/pull/4144) Add `no-route-parameter-name-mismatch` linting rule that detects when two operation routes differ only by path parameter name.
+
+### Bug Fixes
+
+- [#4394](https://github.com/Azure/typespec-azure/pull/4394) Make `@useFinalStateVia` validation decorator-order independent for PUT operations.
+
+
+## 0.67.1
+
+### Bug Fixes
+
+- [#4277](https://github.com/Azure/typespec-azure/pull/4277) Allow `@useFinalStateVia("original-uri")` for long-running POST operations, even when there is no GET operation modeled at the POST url.
+
+
+## 0.67.0
+
+No changes, version bump only.
+
+## 0.66.1
+
+### Bug Fixes
+
+- [#4101](https://github.com/Azure/typespec-azure/pull/4101) Fix `getLroMetadata` to correctly handle scalar types (e.g., `string`) as LRO final results. Previously, scalar result types in status monitor `@lroResult` properties were not recognized, causing incorrect metadata.
+
+
+## 0.66.0
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+
+## 0.65.0
+
+No changes, version bump only.
+
+## 0.64.0
+
+### Features
+
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3747](https://github.com/Azure/typespec-azure/pull/3747) Allow final-state-via: original-uri for PATCH operations
+
+
+## 0.63.1
+
+### Bug Fixes
+
+- Align `unknown-format` rule name change
+
+## 0.63.0
+
+### Features
+
+- [#3475](https://github.com/Azure/typespec-azure/pull/3475) Add new `no-case-mismatch` rule checking for types with names only differing by case
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3529](https://github.com/Azure/typespec-azure/pull/3529) Fix `no-legacy-usage` linting rule to check for model is, spread and augment decorators
+- [#3604](https://github.com/Azure/typespec-azure/pull/3604) Add pagination decorators to query parameter models: `@pageSize` to `MaxPageSizeQueryParameter.maxpagesize` and `@offset` to `SkipQueryParameter.skip`
+- [#3483](https://github.com/Azure/typespec-azure/pull/3483) Add new `no-unnamed-union` rule to prevent usage of unnamed unions in Azure
+
+
+## 0.62.0
+
+### Features
+
+- [#3449](https://github.com/Azure/typespec-azure/pull/3449) Added experimental decorators to namespace `Azure.Core.Experimental` for mutative updates to types. These decorators are dangerous and may be removed at any time, so they automatically trigger a warning diagnostic that requires a suppression.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove exception for `no-openapi` rule for using `x-ms-identifiers`. Migrating to `@identifiers` is required.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3480](https://github.com/Azure/typespec-azure/pull/3480) Include typespec sources in subdirectories of lib into the package.
+- [#3481](https://github.com/Azure/typespec-azure/pull/3481) Fix #3477 Allow uniqueItems for nullable array properties
+
+
+## 0.61.0
+
+### Breaking Changes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Remove legacy Azure.Core paging. The following was removed
+    - `@pagedResult` decorator
+    - `@items` decorator
+    - [API] `getPagedResult` -> `getPagingOperation` in `@typespec/compiler`
+    - [API] `getItems`
+    - [API] `getNextLink`
+- [#3214](https://github.com/Azure/typespec-azure/pull/3214) Remove unused `@nextPageOperation` decorator.
+
+### Features
+
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Export `isPreviewVersion` for `@previewVersion` decorator.
+
+### Bug Fixes
+
+- [#3346](https://github.com/Azure/typespec-azure/pull/3346) [rpc-operation-request-body] Correctly ignores properties marked with `@bodyIgnore`
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.Core.Versions.v1_preview2)
+  ```
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+
+## 0.59.0
+
+### Breaking Changes
+
+- [#2757](https://github.com/Azure/typespec-azure/pull/2757) Remove deprecated `@fixed` decorator.
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3028](https://github.com/Azure/typespec-azure/pull/3028) Allow paged models to be used with TypeSpec core paging(`@list` operations)
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+- [#2979](https://github.com/Azure/typespec-azure/pull/2979) Add validation when `@pollingOperationParameter` is referencing non existent parameter
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.0
+
+### Features
+
+- [#2976](https://github.com/Azure/typespec-azure/pull/2976) Introduce `@previewVersion` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2599](https://github.com/Azure/typespec-azure/pull/2599) Fix old reference to api guidelines in Azure.Core
+
+
+## 0.57.0
+
+### Bug Fixes
+
+- [#2734](https://github.com/Azure/typespec-azure/pull/2734) Fix incorrect use of `templateArguments` in `parameterizedNextLink` decorator.
+- [#2670](https://github.com/Azure/typespec-azure/pull/2670) Correct casing of `ArmResourceDeploymentScope` and `AllArmResourceDeploymentScopes` values to follow camel case conventions.
+
+
+## 0.56.0
+
+### Features
+
+- [#2586](https://github.com/Azure/typespec-azure/pull/2586) Ease casing style validation for PascalCase with accepted acronyms (AI, VM, OS, IP, CPU, GPU, LRO)
+
+### Bug Fixes
+
+- [#2628](https://github.com/Azure/typespec-azure/pull/2628) Handle new behavior of `@patch` keeping old behavior
+
+
 ## 0.55.0
 
 ### Bug Fixes

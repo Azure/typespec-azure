@@ -1,0 +1,92 @@
+import { Tester } from "#test/tester.js";
+import {
+  type LinterRuleTester,
+  type TesterInstance,
+  createLinterRuleTester,
+} from "@typespec/compiler/testing";
+import { beforeEach, it } from "vitest";
+
+import { deleteOperationMissingRule } from "../../src/rules/no-resource-delete-operation.js";
+
+let runner: TesterInstance;
+let tester: LinterRuleTester;
+
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    deleteOperationMissingRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+it("is valid if arm resource has a delete operation", async () => {
+  await tester
+    .expect(
+      `
+              @armProviderNamespace
+        namespace Microsoft.Foo;
+
+        model Foo is TrackedResource<{}> {
+          ...ResourceNameParameter<Foo>;
+        }
+
+        @armResourceOperations
+        interface FooOperations  {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+          delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        }
+      `,
+    )
+    .toBeValid();
+});
+
+it("emit warnings if TrackedResource is missing a delete operation", async () => {
+  await tester
+    .expect(
+      `
+          @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        ...ResourceNameParameter<Foo>;
+      }
+
+      @armResourceOperations
+      interface FooOperations  {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",
+      message: `Resource 'Foo' must have a delete operation.`,
+    });
+});
+
+it("emit warnings if the delete operation is for another resource", async () => {
+  await tester
+    .expect(
+      `
+          @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        ...ResourceNameParameter<Foo>;
+      }
+      model Bar is TrackedResource<{}> {
+        ...ResourceNameParameter<Bar>;
+      }
+
+      @armResourceOperations
+      interface FooOperations  {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Bar>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",
+      message: `Resource 'Foo' must have a delete operation.`,
+    });
+});

@@ -216,3 +216,55 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 
 # Playwright
 .last-run.json
+
+.pnpm-store/
+
+# Turborepo
+.turbo
+
+# python emitter
+packages/typespec-python/alpha
+
+# go emitter
+packages/typespec-go/test/**/zz_*.go
+packages/typespec-go/test/**/go.mod
+packages/typespec-go/test/**/go.sum
+packages/typespec-go/test/**/LICENSE.txt
+packages/typespec-go/test/**/testdata
+!packages/typespec-go/test/local/gogenerate/testdata/generate/transforms.go
+# containingmod is a committed fixture: its go.mod/go.sum carry a v2 module
+# identity used to exercise the emitter's go.mod discovery logic, so re-include
+# them even though test/**/go.mod and test/**/go.sum are normally ignored.
+!packages/typespec-go/test/local/containingmod/go.mod
+!packages/typespec-go/test/local/containingmod/go.sum
+# java emitter
+# Emitter TS sources copied from core/packages/http-client-java/emitter at build
+# time (only src/options.ts is committed).
+packages/typespec-java/src/**
+!packages/typespec-java/src/options.ts
+!packages/typespec-java/src/diagnostics/
+!packages/typespec-java/src/diagnostics/dpg-*.md
+packages/typespec-java/test/**
+# Java emitter.jar + assets staged from the core generator build.
+packages/typespec-java/generator/**
+
+# java emitter-tests (Maven+tsp spector suite, part of the typespec-java package)
+# Generated SDK + generated tests are regenerated, never committed; only
+# hand-written tests, specs, customization and the harness are tracked.
+packages/typespec-java/emitter-tests/src/main/**
+packages/typespec-java/emitter-tests/**/generated/**
+packages/typespec-java/emitter-tests/tsp-output/**
+packages/typespec-java/emitter-tests/specs/**
+packages/typespec-java/emitter-tests/node_modules/**
+packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
+
+# Generated linter rule and diagnostic reference pages (produced by `tspd doc` /
+# regen-docs via each rule's or diagnostic's `docs` field). Regenerated during the
+# website build (build:web), so they are not tracked. The source docs live in
+# packages/*/src/rules/*.md and packages/*/src/diagnostics/*.md.
+website/src/content/docs/docs/libraries/*/rules/
+website/src/content/docs/docs/libraries/*/reference/diagnostics/
+website/src/content/docs/docs/emitters/**/reference/diagnostics/
+
+# Empty
+prs.external-reviewers.generated.yml

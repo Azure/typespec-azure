@@ -62,9 +62,48 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 TCGC provides flags to control the client type graph style, such as enabling or disabling convenience APIs. See the [documentation](../reference/emitter/#emitter-options) for details.
 
+## TCGC Raw Types and Helpers
+
+In order to introduce the client concept, TCGC introduces some new raw types and helper functions.
+
+[`SdkClient`](../reference/js-api/interfaces/sdkclient/) represents a client. Sub clients are also represented as `SdkClient` with the `subClients` property providing the client hierarchy. Emitters can use [`listClients`](../reference/js-api/functions/listclients/) to get all the root clients calculated from the current spec. Each `SdkClient` has a `subClients` array containing its child clients.
+
+For these helper functions, the return type is either TCGC raw types or TypeSpec core types.
+
 ## Client Type Graph
 
-### Namespace
+Unlike TCGC raw types and helpers, the client type graph is a calculated complete type graph that represents your spec. Emitters can use it to get all client info without calling any extra functions. It is recommended to use this type graph instead of calculating all client-related logic with TCGC raw types or TypeSpec core types.
+
+### Common Properties
+
+Most TCGC types share the following common properties:
+
+- **`namespace`**: Indicates the type's namespace.
+- **`doc` and `summary`**: Contain documentation-related information.
+- **`apiVersions`**: Indicates which API versions the type exists in.
+- **`decorators`**: Stores all TypeSpec decorator info for advanced use cases.
+- **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
+- **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
+- **`isExactName`**: Indicates that the name was set via `@clientName` with the `exact()` function and must be used as-is by language emitters, without applying any casing transformations (e.g., no snake_case for Python, no camelCase for JavaScript).
+- **`access`**: Indicates whether the type has public or private accessibility.
+- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration. The flags are:
+  - `Input` (2): Type is used as input (in a request body).
+  - `Output` (4): Type is used as output (in a response body).
+  - `ApiVersionEnum` (8): Type is an API version enum.
+  - `JsonMergePatch` (16): Type is used in a JSON merge patch request.
+  - `MultipartFormData` (32): Type is used in a multipart form data request.
+  - `Spread` (64): Type is used in a spread operation.
+  - `Json` (256): Type is serialized as JSON.
+  - `Xml` (512): Type is serialized as XML.
+  - `Exception` (1024): Type is used as an error/exception model.
+  - `LroInitial` (2048): Type is used in the initial response of an LRO.
+  - `LroPolling` (4096): Type is used in a polling response of an LRO.
+  - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
+  - `External` (16384): Type is only referenced through external alternate types. When a type has the `External` flag and no `Input` or `Output` flags, it means emitters do not need to generate serialization/deserialization code for it — the external package handles that. TCGC blocks propagation of non-`External` usage flags (such as `Input`, `Output`, `Json`) through types marked as external.
+- **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
+- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
+
+### Package
 
 [`SdkPackage`](../reference/js-api/interfaces/sdkpackage/) represents a client package, containing all clients, operations, and types.
 
@@ -73,15 +112,20 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
-The `namespace` property in TCGC types indicates the type's namespace.
+### Package Metadata
+
+Emitters can get package metadata from `SdkPackage.metadata`. The metadata currently contains API version information:
+
+- **`apiVersion`** _(deprecated)_: A single string representing the resolved API version for single-service packages. For multi-service packages this is `undefined`. Use `apiVersions` instead.
+- **`apiVersions`**: A `Map<string, string>` where each key is a service namespace's full qualified name and each value is the resolved API version for that service. For single-service packages, the map has one entry. For multi-service packages, each service has its own entry. If the `api-version` config is set to `"all"` (single-service only), the value is the string `"all"`.
 
 ### License Information
 
-The `licenseInfo` property in [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
+Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
 
 If `licenseInfo` is `undefined`, omit license information in the generated code or files.
 
-Use `licenseInfo.name` (license name), `licenseInfo.company` (company name), `licenseInfo.link` (license document link), `licenseInfo.header` (header comments), and `licenseInfo.description` (license file content) directly when generating license-related content.
+Use `LicenseInfo.name` (license name), `LicenseInfo.company` (company name), `LicenseInfo.link` (license document link), `LicenseInfo.header` (header comments), and `LicenseInfo.description` (license file content) directly when generating license-related content.
 
 For Azure services, emitters should hard-code the license configuration as follows:
 
@@ -98,16 +142,285 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 ### Client
 
-An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a single client in the package.
+Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
+
+`SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
+
+`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
+
+- `Individually` (1): The client can be instantiated directly by the user.
+- `Parent` (2): The client is created through a parent client's accessor method.
+- `CustomizeCode` (4): Initialization is omitted from generated code and handled manually in custom code (cannot be combined with other flags).
+
+The initialization parameter can be either [`SdkEndpointParameter`](../reference/js-api/interfaces/sdkendpointparameter/), [`SdkCredentialParameter`](../reference/js-api/interfaces/sdkcredentialparameter/) or [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/).
+
+**SdkEndpointParameter** is a parameter for the client API endpoint. `SdkEndpointParameter.type` tells how to compose the endpoint. It can be an [`SdkEndpointType`](../reference/js-api/interfaces/sdkendpointtype/) type or union of `SdkEndpointType` types if there are multiple ways to compose the endpoint. `SdkEndpointType.serverUrl` is the base string of the endpoint while `SdkEndpointType.templateArguments` contains the template arguments used in the `SdkEndpointType.serverUrl` if they exist.
+
+**SdkCredentialParameter** is a parameter for how to authorize the client. `SdkCredentialParameter.type` contains the details of the authorizations. It can be an [`SdkCredentialType`](../reference/js-api/interfaces/sdkcredentialtype/) type or union of `SdkCredentialType` types if there are multiple ways to authorize the client. `SdkCredentialType.scheme` is the scheme of the authorization method. Currently, TCGC only supports [`HttpAuth`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpauth/).
+
+**SdkMethodParameter** is a normal client-level parameter that can be used in some of the methods belonging to the client. For type details, refer to the next section.
 
 ### Method
 
-TODO
+Emitters get all methods belonging to a client with `SdkClientType.methods`. An [`SdkServiceMethod`](../reference/js-api/type-aliases/sdkservicemethod/) represents a client's method.
+
+TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-api/interfaces/sdkbasicservicemethod/), [`SdkPagingServiceMethod`](../reference/js-api/interfaces/sdkpagingservicemethod/), [`SdkLroServiceMethod`](../reference/js-api/interfaces/sdklroservicemethod/), and [`SdkLroPagingServiceMethod`](../reference/js-api/interfaces/sdklropagingservicemethod/).
+
+**SdkBasicServiceMethod** is a basic method that calls a synchronous server-side API. It contains flags to indicate how the client signature should be generated, and the input and output of the method.
+
+`SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
+
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+
+**SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
+
+**SdkLroServiceMethod** is an LRO method that calls a long-running server-side API. It extends `SdkBasicServiceMethod` and contains extra LRO information.
+
+**SdkLroPagingServiceMethod** is an LRO method that calls a long-running server-side API and has pageable responses. It extends `SdkBasicServiceMethod`, `SdkPagingServiceMethod` and `SdkLroServiceMethod`.
 
 ### Operation
 
-TODO
+TCGC separates the client-level operation from the protocol-level operation. This way, TCGC can abstract away the protocol used to call the service (i.e. `HTTP` or `gRPC`).
+Emitters can get the protocol-level operation from `SdkServiceMethod.operation`. An [`SdkServiceOperation`](../reference/js-api/type-aliases/sdkserviceoperation/) represents a protocol operation.
+
+TCGC currently supports one kind of operation: [`SdkHttpOperation`](../reference/js-api/interfaces/sdkhttpoperation/).
+
+`SdkHttpOperation` contains verb, path, URI template, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation.
+
+Each parameter for an HTTP operation has a `methodParameterSegments` property to indicate the mapping of one payload parameter with the path of one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mapping paths because of the implicit body parameter resolving from the TypeSpec HTTP library.
+
+#### Streaming and Server-Sent Events
+
+When the request body or a response is a streaming type, TCGC sets `streamMetadata` (an [`SdkStreamMetadata`](../reference/js-api/interfaces/sdkstreammetadata/)) on the corresponding `SdkBodyParameter` or `SdkMethodResponse`, describing the stream's content types.
+
+For server-sent event (SSE, `text/event-stream`) streams specifically, TCGC additionally sets `sseMetadata` (an [`SdkSseMetadata`](../reference/js-api/interfaces/sdkssemetadata/)) alongside `streamMetadata`. It is `undefined` for non-event streams such as JSONL. `SdkSseMetadata.events` has one [`SdkSseEventMetadata`](../reference/js-api/interfaces/sdksseeventmetadata/) entry per variant of the streamed `@events` union, giving emitters everything they need to (de)serialize each event without re-deriving it from raw TypeSpec:
+
+- `eventType`: the SSE `event:` field name (from the named union variant); `undefined` for unnamed variants, which are `message` events with no `event:` field.
+- `isTerminalEvent`: whether receiving this event terminates the stream (from `@terminalEvent`), so the client should disconnect.
+- `isEventEnvelope`: whether `type` describes an envelope wrapping a separate `@data` payload. When `false`, `type`/`payloadType` (and their content types) are identical.
+- `type` / `contentType`: the event type and its content type (the envelope when `isEventEnvelope` is `true`).
+- `payloadType` / `payloadContentType`: the event payload type and its content type.
 
 ### Type
 
-TODO
+For types in TypeSpec, TCGC provides several client types to represent them in a way that's more similar to client languages.
+
+**Built-in Types:**
+
+- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`.
+
+**Date and Time Types:**
+
+- [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) are converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in the `encode` property.
+
+**Collection Types:**
+
+- [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) are converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types. `SdkArrayType` and `SdkDictionaryType` also expose an optional `serializationOptions` property. It is only set when the collection is a named model that carries explicit serialization decorators — for example `@Xml.name("SignedIdentifiers") model SignedIdentifiers is SignedIdentifier[];` — in which case the wrapping element name comes from the collection model itself. For anonymous or inline arrays/records the property is left `undefined`, and the wrapping name is taken from the referencing property or model instead.
+
+**Nullable Types:**
+
+- [`SdkNullableType`](../reference/js-api/interfaces/sdknullabletype/) represents a type whose value can be null. The actual type is in `SdkNullableType.type`.
+
+**Enumeration Types:**
+
+- [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+
+**Literal Types:**
+
+- [`SdkConstantType`](../reference/js-api/interfaces/sdkconstanttype/) represents a literal type in TypeSpec ([`StringLiteral`](https://typespec.io/docs/language-basics/type-literals/#string-literals), [`NumericLiteral`](https://typespec.io/docs/language-basics/type-literals/#numeric-literal), or [`BooleanLiteral`](https://typespec.io/docs/language-basics/type-literals/#boolean-literal)).
+
+**Union Types:**
+
+- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+
+**Model Types:**
+
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
+
+**Model Property Types:**
+
+- [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
+  - `flatten`: Indicates if the property can be flattened
+  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - For discriminated models:
+    - `discriminatorProperty`: The property used as a discriminator
+    - `discriminatedSubtypes`: List of all subtypes of this discriminated model
+  - For subtypes of discriminated models:
+    - `discriminatorValue`: The instance value for the discriminator for this subtype
+  - For array properties:
+    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+
+### Example types
+
+Example types help model the examples that TypeSpec authors define to help users understand how to use the API. TCGC currently only supports examples based on HTTP payload, so the examples are available in `SdkHttpOperation.examples`.
+
+[`SdkHttpOperationExample`](../reference/js-api/interfaces/sdkhttpoperationexample/) represents an example. [`SdkHttpParameterExampleValue`](../reference/js-api/interfaces/sdkhttpparameterexamplevalue/), [`SdkHttpResponseExampleValue`](../reference/js-api/interfaces/sdkhttpresponseexamplevalue/), and [`SdkHttpResponseHeaderExampleValue`](../reference/js-api/interfaces/sdkhttpresponseheaderexamplevalue/) represent HTTP parameter, response body, and response header examples. Each type contains the example value and its corresponding definition type.
+
+[`SdkExampleValue`](../reference/js-api/type-aliases/sdkexamplevalue/) represents an example value of different types. All related types are used to represent the example value of a definition type. One definition type may have different example value types.
+
+For [`SdkUnionExampleValue`](../reference/js-api/interfaces/sdkunionexamplevalue/), since it is difficult to determine which union variant the example value should belong to, TCGC preserves the raw value and leaves this determination to the emitter.
+
+For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue/), TCGC helps map the example type to the correct subtype for discriminated types and separates additional property values from property values. However, for models with inheritance, TCGC does not break down the type graph but instead places all example values in the child model.
+
+## Client Type Calculation Logic
+
+### Client Detection
+
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, and `@moveTo`.
+
+If there is no explicitly defined `@client`, then each namespace with `@service` is a separate root client. The nested namespaces and interfaces under each service namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+
+If there is any `@client` definition, then each top-level `@client` is a root client and each nested `@client` is a sub client with hierarchy.
+
+When multiple services are merged into the same client (via `@client({service: [ServiceA, ServiceB]})`), TCGC checks whether the services depend on different versions of a shared library dependency. If they do, the `inconsistent-multiple-service-dependency` diagnostic is emitted as a warning. For example, if `ServiceA` uses `SharedLib.v1` and `ServiceB` uses `SharedLib.v2`, and they are both merged into `CombineClient`, the warning message is: `Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".`
+
+If a detected client or sub client does not contain any sub client or operation, then this client is ignored.
+
+### Client Initialization Creation
+
+Normally, a client's initialization parameters include:
+
+1. **Endpoint parameter**: Converted from `@server` definition on the service the client belongs to.
+   - If the server URL is a constant, TCGC returns a templated endpoint with a default value of the constant server URL.
+   - When the endpoint has additional template arguments, the type is a union of a completely-overridable endpoint and an endpoint that accepts template arguments.
+   - If there are multiple servers, TCGC returns the union of all possibilities.
+
+2. **Credential parameter**: Converted from `@useAuth` definition on the service the client belongs to.
+
+3. **API version parameter**: If the service is versioned, then the API version parameter on method is elevated to client.
+   - The API version parameter is detected by parameter name (`api-version` or `apiversion`) or parameter type (API version enum type used in `@versioned` decorator).
+
+4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
+
+The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
+
+With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
+
+### Method Detection
+
+The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
+
+A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
+
+### Method Parameters Handling
+
+If `@override` is used for the method, the parameters are handled by the target method.
+
+Parameters used in client (either API version parameter or client parameter defined in `@clientInitialization`) are filtered from method parameter list.
+
+`@scope` can also be applied to individual operation parameters (which are `ModelProperty` types). When a parameter is scoped out for a given emitter, it is excluded from both the method signature and the HTTP operation parameters. If a required parameter is scoped out, a warning diagnostic is emitted.
+
+### Method Return Type Calculation
+
+The method's return type is determined by the underlying operation's normal responses:
+
+- If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
+- If the responses contain multiple return types, the return type is a union of all the types.
+- If the responses contain empty return type, the return type is wrapped with a nullable type.
+
+The paging method's return type is an array type of the page items type. It is inferred from `@pageItems` or `@items` decorator.
+
+The LRO method's return type is the final response type. It is inferred from `LroMetadata`.
+
+### HTTP Operation Parameters Handling
+
+The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).
+
+TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationBody`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationbody/). If the body is explicitly defined (with `@body` or `@bodyRoot`), TCGC uses the type directly as the body type. If not, TCGC treats the body parameter as a spread case. For such body types, TCGC tries to get back the original model if all the spread properties are from one model. Otherwise, TCGC creates a new model type for the body parameter.
+
+TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
+
+For request bodies with multiple content types, the `Content-Type` parameter is modeled as an enum with one value per content type. For responses with multiple content types, the `Accept` header parameter is modeled as a single constant whose value is a comma-joined string of all response content types. Structured content types (JSON, XML, `text/plain`) are sorted before unstructured ones. For example, if a response can return `image/png` or `application/json`, the `Accept` constant value is `"application/json, image/png"`.
+
+TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
+
+- Check if the parameter is a client-level method parameter.
+- Check if the parameter is an API version parameter that has been elevated to client.
+- Check if the parameter is a subscription parameter that has been elevated to client (only for ARM services).
+- Check if the parameter is a method parameter or a nested model property of a method parameter (nested HTTP metadata case when using `@bodyRoot`).
+- Check if all properties of the parameter can be mapped to a method parameter or a nested model property of a method parameter (spread).
+
+Body parameters include a `serializationOptions` property that indicates how to serialize the body. TCGC automatically populates this from the operation's content types — for example, if the content type is `application/json`, the `json` option is set with the serialized name of the body parameter. This provides a consistent way for emitters to determine the serialization format, regardless of whether the body type is a model or a basic type.
+
+### HTTP Operation Response Calculation
+
+The response is inferred from TypeSpec HTTP lib type [`HttpOperationResponse`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationresponse/).
+
+For each response, TCGC will check the response's content. If contents from different responses are not equal, TCGC takes the last one as the response type. Any response with `*` status code or response content type that has `@error` decorator, TCGC puts them into the exception response list. Others are put in the response list.
+
+If `@responseAsBool` is on the operation's upper level method, the `404` status code is always recognized as a normal response.
+
+HTTP responses include a `serializationOptions` property that indicates how to deserialize the response body. TCGC automatically populates this from the response's content types — for example, if the response content type is `application/json`, the `json` option is set. Responses without a body have empty serialization options.
+
+### Type Detection
+
+TCGC uses the following steps to detect all the types in one spec:
+
+1. Starts from the root clients and iterates all nested clients to find the methods.
+2. For all methods, iterates all method's parameters to find types.
+3. For all methods' underlying operations, iterates all operation's parameters, body parameter, response body, response header to find types.
+4. If type is a `Union`, iterates all union variants to find types.
+5. If type is a `Model`, iterates all model properties to find types, finds types for additional properties if they exist and finds types for model's base model.
+6. If type is a `Model` with `@discriminator`, iterates all sub-types belonging to it.
+7. If type is an `Array` or `Record`, finds types for the value type.
+8. If type is a `Tuple`, iterates all values to find types.
+9. If type is an `EnumMember`, finds types for the enum the member belongs to.
+10. If type is a `UnionVariant`, finds types for the union the variant belongs to.
+11. Iterates parameters defined in `@server` and finds types.
+12. Finds orphan types (`Model`, `Enum`, and `Union` not referred by any `Operation`) by scanning all types and namespaces that have an explicit `@usage` decorator, including types in imported libraries.
+13. Handles API version `Enum` used in `@versioned`.
+
+### Access Calculation
+
+If there is no `@access` used in the spec, all model properties, types, and methods in TCGC have `public` accessibility.
+If `@access` is decorated on either `Namespace`, `Operation`, types, or model properties, the accessibility is overridden with the new [logic](../reference/decorators/#@Azure.ClientGenerator.Core.access).
+
+### Usage Calculation
+
+If there is no `@usage` used in the spec, all types' usage in TCGC is calculated by the place where the type is used. The `@usage` decorator can extend the usage for one type or all types under one namespace. The calculation logic is [here](../reference/decorators/#@Azure.ClientGenerator.Core.usage).
+
+#### Usage Flag Propagation for Readonly Properties
+
+When TCGC propagates usage flags through model properties, readonly properties receive special handling. The `Input` flag is stripped from the propagation value for readonly properties, but other flags (such as `Output`, `Json`, `Xml`) still propagate through. For example:
+
+- If propagating `Input | Output | Json` through a readonly property, only `Output | Json` propagates to the property's type.
+- If propagating only `Input`, the readonly property is skipped entirely (since stripping `Input` leaves no flags to propagate).
+
+This ensures that types reachable only through readonly properties are not incorrectly marked as input types.
+
+### Naming Logic for Anonymous Types
+
+`SdkModelType`, `SdkEnumType`, `SdkUnionType`, and `SdkConstantType` always have names. If the original TypeSpec type does not have a name, TCGC creates a name for it. The naming logic follows these steps:
+
+1. **Find the place where the type is used:**
+   - Find if the type is used in the method's underlying operation: either in parameters, body parameter, response header, or response body.
+   - Find if the type is used in the method's parameters.
+   - Find if the type is used in orphan types.
+
+2. **With the path of where the type is used:**
+   - Reversely look up the first path segment whose name is not empty and the segment is a model, union, or method.
+   - Create the name with the model, union, or method's name, concatenating with all segments' names starting after that segment.
+   - If a segment is an HTTP parameter, the concatenated name is `Request` + parameter name in PascalCase.
+   - If a segment is an HTTP body parameter, the concatenated name is `Request`.
+   - If a segment is an HTTP response header, the concatenated name is `Response` + header name in PascalCase.
+   - If a segment is an HTTP response body, the concatenated name is `Response`.
+   - If a segment is a method's parameter, the concatenated name is `Parameter` + parameter name in PascalCase.
+   - If a segment is a model's additional property, the concatenated name is `AdditionalProperty`.
+   - If a segment is a model's property, the concatenated name is the property name in PascalCase, and the property name is converted to singular if the property type is an array or dictionary.
+
+### Extending the decorator allowlist (additionalDecorators)
+
+By default, TCGC only includes decorators that are on a safe allowlist when populating the `decorators` arrays on the client type graph. Language emitters that need to include extra decorators (for example to enable core/custom decorators in the generated SDK model) can append regular-expression strings to that allowlist using the `additionalDecorators` option passed to `createSdkContext`.
+
+Each entry should be a string containing a regular expression matched against the fully-qualified decorator name (for example: `Azure.ClientGenerator.Core.@override`). Because these are provided as JavaScript strings, backslashes must be escaped (see example).
+
+Example (inside an emitter or emitter class):
+
+```ts
+this.sdkContext = await createSdkContext(this.emitterContext, LIB_NAME, {
+  additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@override"],
+  versioning: { previewStringRegex: /$/ },
+}); // include all versions and do the filter by ourselves
+```
+
+These patterns are appended to the default allowlist used by TCGC; matched decorators will be included on the resulting `Sdk*` types' `decorators` lists.

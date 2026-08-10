@@ -1,17 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { ok, strictEqual } from "assert";
+import { it } from "vitest";
 import { listClients } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
-it("multiple-services", async () => {
-  const diagnostics = await runner.diagnose(
+it("multiple-services without explicit @client creates separate root clients", async () => {
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
       @service
       namespace Test1Client {
@@ -24,23 +18,27 @@ it("multiple-services", async () => {
     `,
   );
 
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/multiple-services",
-    },
-  ]);
+  const context = await createSdkContextForTester(program);
 
-  strictEqual(listClients(runner.context).length, 1);
-  strictEqual(runner.context.sdkPackage.clients.length, 1);
+  // No diagnostics - multiple services without explicit @client is now supported
+  expectDiagnostics(diagnostics, []);
 
-  const client = runner.context.sdkPackage.clients[0];
-  strictEqual(client.name, "Test1Client");
-  strictEqual(client.methods.length, 1);
-  strictEqual(client.methods[0].name, "x");
+  strictEqual(listClients(context).length, 2);
+  strictEqual(context.sdkPackage.clients.length, 2);
+
+  const client1 = context.sdkPackage.clients.find((c) => c.name === "Test1Client");
+  ok(client1);
+  strictEqual(client1.methods.length, 1);
+  strictEqual(client1.methods[0].name, "x");
+
+  const client2 = context.sdkPackage.clients.find((c) => c.name === "Test2Client");
+  ok(client2);
+  strictEqual(client2.methods.length, 1);
+  strictEqual(client2.methods[0].name, "y");
 });
 
 it("require-versioned-service", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     @clientApiVersions(ApiVersions)
@@ -49,6 +47,9 @@ it("require-versioned-service", async () => {
     }
       `,
   );
+
+  await createSdkContextForTester(program);
+
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/require-versioned-service",
@@ -59,25 +60,25 @@ it("require-versioned-service", async () => {
 });
 
 it("missing-service-versions", async () => {
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(
-      `
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+    `
     @service
     @versioned(Versions)
     namespace My.Service {
       enum Versions { v1, v2, v3 };
     }
-    `,
-      `
+
     enum ClientApiVersions { v4, v5, v6 };
     @@clientApiVersions(My.Service, ClientApiVersions);
     `,
-    )
-  )[1];
+  );
+
+  await createSdkContextForTester(program);
+
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/missing-service-versions",
-      severity: "warning",
+      severity: "error",
       message: `The @clientApiVersions decorator is missing one or more versions defined in My.Service. Client API must support all service versions to ensure compatibility. Missing versions: v1, v2, v3. Please update the client API to support all required service versions.`,
     },
   ]);

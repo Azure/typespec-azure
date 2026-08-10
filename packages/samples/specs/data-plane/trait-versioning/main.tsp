@@ -17,11 +17,9 @@ namespace Contoso.WidgetManager;
 @doc("The Contoso Widget Manager service version.")
 enum Versions {
   @doc("Version 2022-08-31")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_08_31: "2022-08-31",
 
   @doc("Version 2023-02-07")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2023_02_07: "2023-02-07",
 }
 
@@ -76,6 +74,7 @@ interface Widgets {
   getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @doc("Creates or updates a Widget asynchronously")
   @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;

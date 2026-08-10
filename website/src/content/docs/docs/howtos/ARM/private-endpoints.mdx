@@ -1,0 +1,94 @@
+---
+title: Private Endpoints
+description: Adding Private Endpoint Connection operations to ARM resources
+llmstxt: true
+---
+
+import { ExampleRef } from "@components/sample";
+
+Private Endpoint Connections allow users to manage private network access to a resource. Resource
+providers that support private endpoint connections must declare a private endpoint connection
+resource type in their provider namespace and use the standard `PrivateEndpoints` interface to
+expose operations.
+
+## Defining a Private Endpoint Connection Resource
+
+To define a private endpoint connection resource, create a model in your provider namespace that
+extends `PrivateEndpointConnectionResource`:
+
+```typespec
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+```
+
+## Defining Private Endpoint Operations
+
+Create an alias for your private endpoint operations using the `PrivateEndpoints` interface
+template:
+
+```typespec
+alias PrivateEndpointOps = PrivateEndpoints<PrivateEndpointConnection>;
+```
+
+## Adding Private Endpoint Operations to Your Resource Interface
+
+Add private endpoint operations to your resource interface using the operations alias:
+
+```typespec
+@armResourceOperations
+interface Employees {
+  // ... other resource operations ...
+  getConnection is PrivateEndpointOps.Read<Employee>;
+  createOrUpdateConnection is PrivateEndpointOps.CreateOrUpdateAsync<Employee>;
+  updateConnection is PrivateEndpointOps.CustomPatchAsync<Employee>;
+  deleteConnection is PrivateEndpointOps.DeleteAsync<Employee>;
+  listConnections is PrivateEndpointOps.ListByParent<Employee>;
+}
+```
+
+## Available Operations
+
+The `PrivateEndpoints` interface provides the following operations:
+
+| Operation            | Description                                           | TypeSpec Representation                               |
+| -------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
+| Read                 | Get a private endpoint connection                     | `get is Ops.Read<ParentResource>;`                    |
+| CreateOrUpdateAsync  | Create or update a connection (async)                 | `create is Ops.CreateOrUpdateAsync<ParentResource>;`  |
+| CreateOrReplaceSync  | Create or replace a connection (sync)                 | `create is Ops.CreateOrReplaceSync<ParentResource>;`  |
+| CreateOrReplaceAsync | Create or replace a connection (async)                | `create is Ops.CreateOrReplaceAsync<ParentResource>;` |
+| CustomPatchAsync     | Update a connection with custom PATCH payload (async) | `update is Ops.CustomPatchAsync<ParentResource>;`     |
+| CustomPatchSync      | Update a connection with custom PATCH payload (sync)  | `update is Ops.CustomPatchSync<ParentResource>;`      |
+| DeleteAsync          | Delete a connection (async)                           | `delete is Ops.DeleteAsync<ParentResource>;`          |
+| DeleteSync           | Delete a connection (sync)                            | `delete is Ops.DeleteSync<ParentResource>;`           |
+| ListByParent         | List connections for a parent resource                | `list is Ops.ListByParent<ParentResource>;`           |
+
+## Complete Example
+
+The following example shows a complete service with private endpoint connection support:
+
+<ExampleRef path="resource-manager/resource-types/private-endpoints" />
+
+## Using Private Endpoints with Child Resources
+
+Private endpoint operations can also be used with child resources. You can reuse the same operations
+alias across multiple resource interfaces:
+
+```typespec
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+
+  // Reuse the same private endpoint operations alias
+  getPrivateEndpointConnection is PrivateEndpointOps.Read<Dependent>;
+  createOrUpdatePrivateEndpointConnection is PrivateEndpointOps.CreateOrUpdateAsync<Dependent>;
+  deletePrivateEndpointConnection is PrivateEndpointOps.DeleteAsync<Dependent>;
+  listPrivateEndpointConnections is PrivateEndpointOps.ListByParent<Dependent>;
+}
+```

@@ -1,11 +1,13 @@
-import { Operation, createRule, ignoreDiagnostics } from "@typespec/compiler";
+import { type Operation, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 
 export const noErrorStatusCodesRule = createRule({
   name: "no-error-status-codes",
+  docs: fileRef.fromPackageRoot("src/rules/no-error-status-codes.md"),
   description: "Recommend using the error response defined by Azure REST API guidelines.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-error-status-codes",
   messages: {
     default:
       "Azure REST API guidelines recommend using 'default' error response for all error cases. Avoid defining custom 4xx or 5xx error cases.",

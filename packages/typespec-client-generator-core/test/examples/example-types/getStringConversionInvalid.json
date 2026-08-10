@@ -1,0 +1,13 @@
+{
+  "operationId": "getStringConversionInvalid",
+  "title": "getStringConversionInvalid",
+  "parameters": {
+    "invalidNumber": "abc",
+    "invalidBoolean": "yes"
+  },
+  "responses": {
+    "200": {
+      "body": "success"
+    }
+  }
+}

@@ -1,25 +1,24 @@
 import {
-  CallableMessage,
-  DecoratedType,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
+  type CallableMessage,
+  type DecoratedType,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
   getLocationContext,
   getNamespaceFullName,
   getTypeName,
-  Interface,
+  type Interface,
   isTemplateDeclaration,
-  LinterRuleContext,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
-  Scalar,
-  SourceLocation,
-  Type,
-  Union,
-  UnionVariant,
+  type LinterRuleContext,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
+  type Union,
+  type UnionVariant,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
@@ -131,6 +130,20 @@ export function isPascalCaseNoAcronyms(name: string): boolean {
   return /^([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
 }
 
+export function isPascalCaseWithAcceptedAcronyms(
+  name: string,
+  acceptedAcronyms: string[],
+): boolean {
+  if (isPascalCaseNoAcronyms(name)) {
+    return true;
+  }
+
+  const acceptedAcronymsRegex = new RegExp(
+    `^([A-Z][a-z0-9]*)*(${acceptedAcronyms.join("|")})([A-Z][a-z0-9]*)?$`,
+  );
+  return acceptedAcronymsRegex.test(name);
+}
+
 /**
  * Checks whether a given name is in camelCase
  * @param name the name to check
@@ -139,24 +152,6 @@ export function isPascalCaseNoAcronyms(name: string): boolean {
 export function isCamelCaseNoAcronyms(name: string): boolean {
   if (name === undefined || name === null || name === "") return true;
   return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
-}
-
-export function findLineStartAndIndent(location: SourceLocation): {
-  lineStart: number;
-  indent: string;
-} {
-  const text = location.file.text;
-  let pos = location.pos;
-  let indent = 0;
-  while (pos > 0 && text[pos - 1] !== "\n") {
-    if ([" ", "\t", "\n"].includes(text[pos - 1])) {
-      indent++;
-    } else {
-      indent = 0;
-    }
-    pos--;
-  }
-  return { lineStart: pos, indent: location.file.text.slice(pos, pos + indent) };
 }
 
 export function checkReferenceInDisallowedNamespace(
@@ -185,10 +180,10 @@ export function checkDecoratorsInDisallowedNamespace(
   type: Type & DecoratedType,
   disallowedNamespace: "Private" | "Legacy",
 ) {
-  if (getLocationContext(context.program, type).type !== "project") {
-    return;
-  }
   for (const decorator of type.decorators) {
+    if (decorator.node && getLocationContext(context.program, decorator.node).type !== "project") {
+      continue;
+    }
     if (
       decorator.definition &&
       isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&
@@ -202,7 +197,7 @@ export function checkDecoratorsInDisallowedNamespace(
   }
 }
 
-function isInDisallowedNamespace(
+export function isInDisallowedNamespace(
   type: Type,
   disallowedNamespace: "Private" | "Legacy",
 ): type is Type & { namespace: Namespace } {

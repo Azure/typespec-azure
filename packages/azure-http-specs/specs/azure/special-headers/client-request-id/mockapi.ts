@@ -1,7 +1,7 @@
 import {
   MockRequest,
   passOnSuccess,
-  ScenarioMockApi,
+  type ScenarioMockApi,
   validateValueFormat,
 } from "@typespec/spec-api";
 

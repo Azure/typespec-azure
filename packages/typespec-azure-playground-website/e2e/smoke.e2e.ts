@@ -7,9 +7,10 @@ test.describe("typespec-azure-playground-website UI tests", () => {
 
   test("compiled arm sample", async ({ page }) => {
     await page.goto(host);
-    const samplesDropDown = page.locator("_react=SamplesDropdown").locator("select");
-    await samplesDropDown.selectOption({ label: "Azure Resource Manager framework" });
-    const outputContainer = page.locator("_react=FileOutput");
-    await expect(outputContainer).toContainText(`"title": "ContosoProviderHubClient"`);
+    const samplesButton = page.locator('button[aria-label="Browse samples"]');
+    await samplesButton.click();
+    await page.locator("text=Azure Core Scalars").first().click();
+    // Check the version is there
+    await expect(page.getByText(`"title": "Azure Core Scalars"`)).toBeVisible();
   });
 });

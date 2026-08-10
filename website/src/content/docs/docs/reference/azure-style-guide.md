@@ -37,7 +37,6 @@ import "@typespec/versioning";
 namespace Contoso.WidgetManager;
 
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_08_31: "2022-08-31",
 }
 ```

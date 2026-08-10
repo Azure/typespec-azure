@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, type JSONSchemaType, paramMessage } from "@typespec/compiler";
 
 export interface AutorestCanonicalEmitterOptions {
   /**
@@ -6,9 +6,8 @@ export interface AutorestCanonicalEmitterOptions {
    * Output file will interpolate the following values:
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
-   *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`
+   * @default `{emitter-output-dir}/{service-name}/canonical/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -27,6 +26,7 @@ export interface AutorestCanonicalEmitterOptions {
    */
   "output-file"?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**
@@ -53,6 +53,16 @@ export interface AutorestCanonicalEmitterOptions {
    * @default "${project-root}/../../common-types/resource-management"
    */
   "arm-types-dir"?: string;
+
+  /**
+   * Strategy for applying XML serialization metadata to schemas.
+   *
+   * - "xml-service": Apply XML serialization metadata for any service that uses the `"application/xml"` content type.
+   * - "none": Do not apply any XML serialization metadata.
+   *
+   * @default "xml-service"
+   */
+  "xml-strategy"?: "xml-service" | "none";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
@@ -106,6 +116,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestCanonicalEmitterOptions> = {
       default: "never",
       description:
         "If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.\nThis extension is meant for debugging and should not be depended on.",
+    },
+    "xml-strategy": {
+      type: "string",
+      enum: ["xml-service", "none"],
+      nullable: true,
+      default: "xml-service",
+      description: "Strategy for applying XML serialization metadata to schemas.",
     },
   },
   required: [],

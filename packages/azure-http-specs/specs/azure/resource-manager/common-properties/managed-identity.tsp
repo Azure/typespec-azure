@@ -10,7 +10,6 @@ using Rest;
 using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
-using OpenAPI;
 using Spector;
 
 namespace Azure.ResourceManager.CommonProperties;
@@ -144,8 +143,8 @@ interface ManagedIdentity {
     }
     ```
     """)
-  updateWithUserAssignedAndSystemAssigned is ArmResourcePatchSync<
+  updateWithUserAssignedAndSystemAssigned is ArmCustomPatchSync<
     ManagedIdentityTrackedResource,
-    ManagedIdentityTrackedResourceProperties
+    ManagedIdentityTrackedResource
   >;
 }

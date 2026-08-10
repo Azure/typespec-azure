@@ -1,4 +1,4 @@
-import { getAnyExtensionFromPath, Program } from "@typespec/compiler";
+import { getAnyExtensionFromPath, type Program } from "@typespec/compiler";
 import { isFileExist } from "./decorators.js";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
 

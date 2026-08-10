@@ -19,13 +19,14 @@ namespace Microsoft.UpdateTests;
 /** UpdateTests API versions */
 enum Versions {
   /** 2023-03-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+  @previewVersion
   `2023-03-01-preview`,
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "For sample purpose"
 @doc("Widget Resource")
 model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -53,6 +54,7 @@ model WidgetResourceProperties {
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
   create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
+  #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
   update is ArmTagsPatchSync<WidgetResource>;
   delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;

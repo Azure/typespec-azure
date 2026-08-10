@@ -1,33 +1,25 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-});
+import { it } from "vitest";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("SdkStringExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getString.json",
     `${__dirname}/example-types/getString.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getString(): string;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -36,50 +28,52 @@ it("SdkStringExample", async () => {
   strictEqual(response.bodyValue?.value, "test");
   strictEqual(response.bodyValue?.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringDiagnostic.json",
     `${__dirname}/example-types/getStringDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getStringDiagnostic(): string;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getStringDiagnostic.json' does not follow its definition:\n123`,
   });
 });
 
 it("SdkStringExample from constant", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromConstant.json",
     `${__dirname}/example-types/getStringFromConstant.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getStringFromConstant(): "test";
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -88,41 +82,43 @@ it("SdkStringExample from constant", async () => {
   strictEqual(response.bodyValue?.value, "test");
   strictEqual(response.bodyValue?.type.kind, "constant");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample from constant diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromConstantDiagnostic.json",
     `${__dirname}/example-types/getStringFromConstantDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getStringFromConstantDiagnostic(): "test";
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getStringFromConstantDiagnostic.json' does not follow its definition:\n123`,
   });
 });
 
 it("SdkStringExample from enum", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromEnum.json",
     `${__dirname}/example-types/getStringFromEnum.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       enum TestEnum {
@@ -131,10 +127,10 @@ it("SdkStringExample from enum", async () => {
       op getStringFromEnum(): TestEnum;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -143,15 +139,16 @@ it("SdkStringExample from enum", async () => {
   strictEqual(response.bodyValue?.value, "one");
   strictEqual(response.bodyValue?.type.kind, "enum");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample from extensible enum", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromExtensibleEnum.json",
     `${__dirname}/example-types/getStringFromExtensibleEnum.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       union TestEnum {
@@ -160,10 +157,10 @@ it("SdkStringExample from extensible enum", async () => {
       op getStringFromExtensibleEnum(): {@body body: TestEnum};
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -172,15 +169,16 @@ it("SdkStringExample from extensible enum", async () => {
   strictEqual(response.bodyValue?.value, "four");
   strictEqual(response.bodyValue?.type.kind, "enum");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample from enum diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromEnumDiagnostic.json",
     `${__dirname}/example-types/getStringFromEnumDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       enum TestEnum {
@@ -189,27 +187,28 @@ it("SdkStringExample from enum diagnostic", async () => {
       op getStringFromEnumDiagnostic(): TestEnum;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getStringFromEnumDiagnostic.json' does not follow its definition:\n"four"`,
   });
 });
 
 it("SdkStringExample from enum value", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromEnumValue.json",
     `${__dirname}/example-types/getStringFromEnumValue.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       enum TestEnum {
@@ -218,10 +217,10 @@ it("SdkStringExample from enum value", async () => {
       op getStringFromEnumValue(): TestEnum.one;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -230,15 +229,16 @@ it("SdkStringExample from enum value", async () => {
   strictEqual(response.bodyValue?.value, "one");
   strictEqual(response.bodyValue?.type.kind, "enumvalue");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample from enum value diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromEnumValueDiagnostic.json",
     `${__dirname}/example-types/getStringFromEnumValueDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       enum TestEnum {
@@ -247,36 +247,37 @@ it("SdkStringExample from enum value diagnostic", async () => {
       op getStringFromEnumValueDiagnostic(): TestEnum.one;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getStringFromEnumValueDiagnostic.json' does not follow its definition:\n"four"`,
   });
 });
 
 it("SdkStringExample from datetime", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromDataTime.json",
     `${__dirname}/example-types/getStringFromDataTime.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getStringFromDataTime(): utcDateTime;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -286,24 +287,25 @@ it("SdkStringExample from datetime", async () => {
   strictEqual(response.bodyValue?.type.kind, "utcDateTime");
   strictEqual(response.bodyValue?.type.wireType.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkStringExample from duration", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getStringFromDuration.json",
     `${__dirname}/example-types/getStringFromDuration.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getStringFromDuration(): duration;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -313,24 +315,25 @@ it("SdkStringExample from duration", async () => {
   strictEqual(response?.bodyValue?.type.kind, "duration");
   strictEqual(response.bodyValue?.type.wireType.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkNumberExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getNumber.json",
     `${__dirname}/example-types/getNumber.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getNumber(): float32;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -339,41 +342,100 @@ it("SdkNumberExample", async () => {
   strictEqual(response.bodyValue?.value, 31.752);
   strictEqual(response.bodyValue?.type.kind, "float32");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkNumberExample for decimal", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal.json",
+    `${__dirname}/example-types/getDecimal.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal(): decimal;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 123.45);
+  strictEqual(response.bodyValue?.type.kind, "decimal");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkNumberExample for decimal128", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal128.json",
+    `${__dirname}/example-types/getDecimal128.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal128(): decimal128;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 80);
+  strictEqual(response.bodyValue?.type.kind, "decimal128");
+
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkNumberExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getNumberDiagnostic.json",
     `${__dirname}/example-types/getNumberDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getNumberDiagnostic(): float32;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
-  strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
-    message: `Value in example file 'getNumberDiagnostic.json' does not follow its definition:\n"123"`,
-  });
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "number");
+  strictEqual(response.bodyValue.value, 123);
+  strictEqual(response.bodyValue.type.kind, "float32");
+
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkNumberExample from datetime", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getNumberFromDateTime.json",
     `${__dirname}/example-types/getNumberFromDateTime.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @encode(DateTimeKnownEncoding.unixTimestamp, int64)
@@ -382,10 +444,10 @@ it("SdkNumberExample from datetime", async () => {
       op getNumberFromDateTime(): timestamp;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -395,15 +457,16 @@ it("SdkNumberExample from datetime", async () => {
   strictEqual(response.bodyValue?.type.kind, "utcDateTime");
   strictEqual(response.bodyValue?.type.wireType.kind, "int64");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkNumberExample from duration", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getNumberFromDuration.json",
     `${__dirname}/example-types/getNumberFromDuration.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @encode(DurationKnownEncoding.seconds, float)
@@ -412,10 +475,10 @@ it("SdkNumberExample from duration", async () => {
       op getNumberFromDuration(): delta;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -425,24 +488,25 @@ it("SdkNumberExample from duration", async () => {
   strictEqual(response.bodyValue?.type.kind, "duration");
   strictEqual(response.bodyValue?.type.wireType.kind, "float");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkBooleanExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getBoolean.json",
     `${__dirname}/example-types/getBoolean.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getBoolean(): boolean;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -451,50 +515,245 @@ it("SdkBooleanExample", async () => {
   strictEqual(response.bodyValue?.value, true);
   strictEqual(response.bodyValue?.type.kind, "boolean");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkBooleanExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getBooleanDiagnostic.json",
     `${__dirname}/example-types/getBooleanDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getBooleanDiagnostic(): boolean;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getBooleanDiagnostic.json' does not follow its definition:\n123`,
   });
 });
 
+it("SdkNumberExample string conversion", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getNumberStringConversion.json",
+    `${__dirname}/example-types/getNumberStringConversion.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op getNumberStringConversion(): float32;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "number");
+  strictEqual(response.bodyValue.value, 123);
+  strictEqual(response.bodyValue.type.kind, "float32");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkBooleanExample string conversion", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getBooleanStringConversion.json",
+    `${__dirname}/example-types/getBooleanStringConversion.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op getBooleanStringConversion(): boolean;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "boolean");
+  strictEqual(response.bodyValue.value, true);
+  strictEqual(response.bodyValue.type.kind, "boolean");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkNumberExample parameter string conversion", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getStringToNumberParameter.json",
+    `${__dirname}/example-types/getStringToNumberParameter.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op getStringToNumberParameter(
+        @query count: int32,
+        @query price: float64,
+        @query negative: int32
+      ): string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 3);
+
+  // Check that string "10" was converted to number 10
+  strictEqual(parameters[0].value.kind, "number");
+  strictEqual(parameters[0].value.value, 10);
+  strictEqual(parameters[0].value.type.kind, "int32");
+
+  // Check that string "99.99" was converted to number 99.99
+  strictEqual(parameters[1].value.kind, "number");
+  strictEqual(parameters[1].value.value, 99.99);
+  strictEqual(parameters[1].value.type.kind, "float64");
+
+  // Check that string "-42" was converted to number -42
+  strictEqual(parameters[2].value.kind, "number");
+  strictEqual(parameters[2].value.value, -42);
+  strictEqual(parameters[2].value.type.kind, "int32");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkBooleanExample parameter string conversion", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getStringToBooleanParameter.json",
+    `${__dirname}/example-types/getStringToBooleanParameter.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op getStringToBooleanParameter(
+        @query enabled: boolean,
+        @query disabled: boolean,
+        @query upperEnabled: boolean,
+        @query mixedEnabled: boolean
+      ): string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 4);
+
+  // Check that string "true" was converted to boolean true
+  strictEqual(parameters[0].value.kind, "boolean");
+  strictEqual(parameters[0].value.value, true);
+  strictEqual(parameters[0].value.type.kind, "boolean");
+
+  // Check that string "false" was converted to boolean false
+  strictEqual(parameters[1].value.kind, "boolean");
+  strictEqual(parameters[1].value.value, false);
+  strictEqual(parameters[1].value.type.kind, "boolean");
+
+  // Check that string "TRUE" was converted to boolean true
+  strictEqual(parameters[2].value.kind, "boolean");
+  strictEqual(parameters[2].value.value, true);
+  strictEqual(parameters[2].value.type.kind, "boolean");
+
+  // Check that string "True" was converted to boolean true
+  strictEqual(parameters[3].value.kind, "boolean");
+  strictEqual(parameters[3].value.value, true);
+  strictEqual(parameters[3].value.type.kind, "boolean");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkStringConversionExample invalid diagnostic", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getStringConversionInvalid.json",
+    `${__dirname}/example-types/getStringConversionInvalid.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op getStringConversionInvalid(
+        @query invalidNumber: int32,
+        @query invalidBoolean: boolean
+      ): string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 0); // Should be 0 because both conversions failed
+
+  expectDiagnostics(context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+      message: `Value in example file 'getStringConversionInvalid.json' does not follow its definition:\n"abc"`,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+      message: `Value in example file 'getStringConversionInvalid.json' does not follow its definition:\n"yes"`,
+    },
+  ]);
+});
+
 it("SdkNullExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getNull.json",
     `${__dirname}/example-types/getNull.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getNull(): {@body body: string | null};
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -504,24 +763,25 @@ it("SdkNullExample", async () => {
   strictEqual(response.bodyValue?.type.kind, "nullable");
   strictEqual(response.bodyValue?.type.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkAnyExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getAny.json",
     `${__dirname}/example-types/getAny.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getAny(): unknown;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -529,24 +789,25 @@ it("SdkAnyExample", async () => {
   strictEqual(response.bodyValue?.kind, "unknown");
   deepStrictEqual(response.bodyValue?.value, { test: 123 });
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkUnionExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getUnion.json",
     `${__dirname}/example-types/getUnion.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getUnion(): {@body body: string | int32};
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -557,20 +818,21 @@ it("SdkUnionExample", async () => {
 });
 
 it("SdkArrayExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getArray.json",
     `${__dirname}/example-types/getArray.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getArray(): string[];
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -589,50 +851,52 @@ it("SdkArrayExample", async () => {
   strictEqual(response.bodyValue.value[2].kind, "string");
   strictEqual(response.bodyValue.value[2].type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkArrayExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getArrayDiagnostic.json",
     `${__dirname}/example-types/getArrayDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getArrayDiagnostic(): string[];
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getArrayDiagnostic.json' does not follow its definition:\n"test"`,
   });
 });
 
 it("SdkDictionaryExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getDictionary.json",
     `${__dirname}/example-types/getDictionary.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getDictionary(): Record<string>;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -651,41 +915,43 @@ it("SdkDictionaryExample", async () => {
   strictEqual(bodyValue.value["c"].kind, "string");
   strictEqual(bodyValue.value["c"].type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkDictionaryExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getDictionaryDiagnostic.json",
     `${__dirname}/example-types/getDictionaryDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op getDictionaryDiagnostic(): Record<string>;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
   strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getDictionaryDiagnostic.json' does not follow its definition:\n"test"`,
   });
 });
 
 it("SdkModelExample", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getModel.json",
     `${__dirname}/example-types/getModel.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -699,10 +965,10 @@ it("SdkModelExample", async () => {
       op getModel(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -723,15 +989,16 @@ it("SdkModelExample", async () => {
   strictEqual(bodyValue.value["prop"].kind, "string");
   strictEqual(bodyValue.value["prop"].type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkModelExample diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getModelDiagnostic.json",
     `${__dirname}/example-types/getModelDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -742,24 +1009,25 @@ it("SdkModelExample diagnostic", async () => {
       op getModelDiagnostic(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getModelDiagnostic.json' does not follow its definition:\n{"c":true}`,
   });
 });
 
 it("SdkModelExample from discriminated types", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getModelDiscriminator.json",
     `${__dirname}/example-types/getModelDiscriminator.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @discriminator("kind")
@@ -792,10 +1060,10 @@ it("SdkModelExample from discriminated types", async () => {
       op getModelDiscriminator(): Shark;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -851,62 +1119,288 @@ it("SdkModelExample from discriminated types", async () => {
   strictEqual(bodyValue.value["prop"].value[2].kind, "number");
   strictEqual(bodyValue.value["prop"].value[2].type.kind, "int32");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
-it("SdkModelExample from discriminated types diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
-    "./examples/getModelDiscriminatorDiagnostic.json",
-    `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`,
+it("SdkModelExample from discriminated types with string kind fallback", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorStringFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorStringFallback.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @discriminator("kind")
       model Fish {
+        kind: string;
       }
 
-      @discriminator("sharktype")
-      model Shark extends Fish {
-        kind: "shark";
-      }
-
-      model Salmon extends Fish {
-        kind: "salmon";
-      }
-
-      model SawShark extends Shark {
-        sharktype: "saw";
-      }
-
-      model GoblinShark extends Shark {
-        sharktype: "goblin";
-      }
-
-      op getModelDiscriminatorDiagnostic(): Shark;
+      op getModelDiscriminator(): Fish;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
-  strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "string");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with string kind with extra property fallback", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorStringExtraPropertyFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorStringExtraPropertyFallback.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: string;
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "string");
+
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
-    message: `Value in example file 'getModelDiscriminatorDiagnostic.json' does not follow its definition:\n{"kind":"shark","sharktype":"test","age":2}`,
+    message: `Value in example file 'getModelDiscriminatorStringExtraPropertyFallback.json' does not follow its definition:\n{"extraProperty":"test"}`,
   });
 });
 
+it("SdkModelExample from discriminated types with enum kind fallback", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorEnumFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorEnumFallback.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      enum FishKind {
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "enum");
+  strictEqual(bodyValue.value["kind"].type.isFixed, true);
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with enum kind with wrong kind fallback", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorEnumWrongKindFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorEnumWrongKindFallback.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      enum FishKind {
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 0);
+
+  expectDiagnostics(context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+    message: `Value in example file 'getModelDiscriminatorEnumWrongKindFallback.json' does not follow its definition:\n"goldfish"`,
+  });
+});
+
+it("SdkModelExample from discriminated types with union kind fallback", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorUnionFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorUnionFallback.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      union FishKind {
+        string,
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "goldfish");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "enum");
+  strictEqual(bodyValue.value["kind"].type.isFixed, false);
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with child value via intermediate model", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/updatePet.json",
+    `${__dirname}/example-types/getModelDiscriminatorFromChild.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Animal {
+        kind: string;
+        @doc("Whether the pet is trained")
+        isTrained: boolean;
+      }
+
+      model Pet extends Animal {
+        kind: "pet";
+      }
+
+      model Dog extends Animal {
+        kind: "dog";
+        breed: string;
+      }
+
+      model Cat extends Animal {
+        kind: "cat";
+      }
+
+      @@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog, Pet);
+      @@usage(Animal, Usage.input | Usage.output);
+
+      op updatePet(@body pet: Pet): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const example = operation.examples[0];
+  const bodyParam = example.parameters.find((x) => x.parameter.name === "pet");
+  ok(bodyParam);
+  strictEqual(bodyParam.value.kind, "model");
+  strictEqual(bodyParam.value.type.name, "Dog");
+  // The discriminator value "dog" from the child model should be preserved
+  strictEqual(bodyParam.value.value["kind"].value, "dog");
+  strictEqual(bodyParam.value.value["kind"].kind, "string");
+  strictEqual(bodyParam.value.value["kind"].type.kind, "constant");
+  strictEqual(bodyParam.value.value["isTrained"].value, true);
+  strictEqual(bodyParam.value.value["breed"].value, "labrador");
+  strictEqual(bodyParam.value.value["breed"].kind, "string");
+
+  // Only diagnostic expected is for the response body
+  // (operation returns void but example has a response body)
+  expectDiagnostics(context.diagnostics, [
+    { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
+  ]);
+});
+
 it("SdkModelExample with additional properties", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getModelAdditionalProperties.json",
     `${__dirname}/example-types/getModelAdditionalProperties.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -919,10 +1413,10 @@ it("SdkModelExample with additional properties", async () => {
       op getModelAdditionalProperties(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -949,15 +1443,16 @@ it("SdkModelExample with additional properties", async () => {
   strictEqual(bodyValue.additionalPropertiesValue["d"].kind, "unknown");
   strictEqual(bodyValue.additionalPropertiesValue["d"].type.kind, "unknown");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("SdkModelExample with extra paramters", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getModelWithExtraParamter.json",
     `${__dirname}/example-types/getModelWithExtraParamter.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -970,10 +1465,10 @@ it("SdkModelExample with extra paramters", async () => {
       op getModelWithExtraParamter(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -997,15 +1492,16 @@ it("SdkModelExample with extra paramters", async () => {
   strictEqual(bodyValue.value["b"].kind, "number");
   strictEqual(bodyValue.value["b"].type.kind, "int32");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("unknown type with null example value", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getUnknownNull.json",
     `${__dirname}/example-types/getUnknownNull.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -1015,10 +1511,10 @@ it("unknown type with null example value", async () => {
       op getUnknownNull(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -1034,15 +1530,16 @@ it("unknown type with null example value", async () => {
   strictEqual(bodyValue.value["prop"].kind, "unknown");
   strictEqual(bodyValue.value["prop"].type.kind, "unknown");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("unexpected null value", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getUnexpectedNull.json",
     `${__dirname}/example-types/getUnexpectedNull.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -1062,10 +1559,10 @@ it("unexpected null value", async () => {
       op getUnexpectedNull(): Test;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
@@ -1079,5 +1576,5 @@ it("unexpected null value", async () => {
   strictEqual(Object.keys(bodyValue.value).length, 1);
   ok(bodyValue.value["d"]);
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });

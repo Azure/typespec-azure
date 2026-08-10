@@ -1,10 +1,27 @@
 ---
-title: 6. Defining long-running resource operations
+title: 6. Defining child resources
+description: Defining child resources
+llmstxt: true
 ---
 
-If your service uses any long-running operations (LROs; see [our guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#long-running-operations--jobs) for specifics), you will need to define a "status monitor" operation which can report the status of the operation.
+Sometimes your resource types will need to have child resources that relate to their parent types. You can identify that a resource type is the child of another resource by using the `@parentResource` decorator.
 
-Let's say that we want to make our `createOrUpdateWidget` and `deleteWidget` operations long-running. Here's how we can update our `Widgets` interface to accomplish that:
+For example, here's how you could create a new `WidgetPart` resource under the `Widget` defined above:
+
+```typespec
+/** A WidgetPart resource belonging to a Widget resource. */
+@resource("parts")
+@parentResource(Widget)
+model WidgetPart {
+  @key("partName")
+  name: string;
+
+  /** The part number. */
+  number: string;
+}
+```
+
+When you use the standard resource operations with child resource types, their operation routes will include the route of the parent resource. For example, we might define the following operations for `WidgetPart`:
 
 ```typespec
 import "@azure-tools/typespec-azure-core";
@@ -18,30 +35,15 @@ alias ServiceTraits = SupportsRepeatableRequests &
 
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-interface Widgets {
-  /** Get status of a Widget operation. This operation return status in status code. No response body is returned. */
-  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
+/** Creates a WidgetPart */
+op createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
 
-  /** Fetch a Widget by name. */
-  getWidget is Operations.ResourceRead<Widget>;
-
-  /** Create or replace a Widget asynchronously. */
-  @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrUpdateWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
-
-  /** Delete a Widget asynchronously. */
-  @pollingOperation(Widgets.getWidgetOperationStatus)
-  deleteWidget is Operations.LongRunningResourceDelete<Widget>;
-
-  /** List Widget resources. */
-  listWidgets is Operations.ResourceList<Widget>;
-}
+/** Get a WidgetPart */
+op getWidgetPart is Operations.ResourceRead<WidgetPart>;
 ```
 
-1. We change `createOrUpdateWidget` to use `LongRunningResourceCreateOrReplace<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`.
-2. We define the `getWidgetOperationStatus` operation based on the `GetResourceOperationStatus` signature. This defines the operation status monitor as a child resource of the `Widget` type so that it shows up under that resource in the route hierarchy.
-3. We **must** add the `pollingOperation` decorator to both of the long-running operations and reference the `Widgets.getWidgetOperationStatus` operation. This connects the long-running operations to their associated status monitor operation to make it easier for service clients to be generated.
+These operations will be defined under the route path:
 
-> **NOTE:** The status monitor operation **must** be defined earlier in the interface than the long-running operations that reference it otherwise TypeSpec will not be able to resolve the reference!
-
-See [considerations for service design](https://github.com/microsoft/api-guidelines/blob/vNext/azure/ConsiderationsForServiceDesign.md#long-running-operations) for more information about LROs.
+```
+/widgets/{widgetName}/parts/{partName}
+```

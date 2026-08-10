@@ -2,7 +2,7 @@
 title: Migrate ARM spec
 ---
 
-The swagger converter will not be able to accurately represent every part of every API in TypeSpec. This document outlines some common changes you may need to make to a converted TypeSpec to make it conform to your existing service API and pass validation checks.
+The OpenAPI converter will not be able to accurately represent every part of every API in TypeSpec. This document outlines some common changes you may need to make to a converted TypeSpec to make it conform to your existing service API and pass validation checks.
 
 ## Initial pass through checklist
 
@@ -38,6 +38,19 @@ linter:
 
 ✅ **DO** use the [standard Typespec Azure.ResourceManager and Azure.Core operation templates and data-types][standard-templates] wherever possible. Standard operation templates should be used as much as possible
 
+✅ **DO** use the `CustomAzureResource` template for ARM resources that do not follow the standard `TrackedResource` or `ProxyResource` patterns. Do not use the `@customAzureResource` decorator directly or force non-standard resources into standard ARM shapes.
+
+```tsp
+model VmSizeResource is CustomAzureResource {
+  /** The unique key for this VM size within its scope */
+  @key
+  vmSizeName: string;
+
+  /** Normal payload properties */
+  properties?: VmSizeResourceProperties;
+}
+```
+
 ✅ **DO** use `union` instead of `enum` to define Azure extensible enums. See: [Defining enums for Azure services][no-enum]. Example:
 
 ```tsp
@@ -58,9 +71,17 @@ union WidgetColor {
 
 ❌ **DON'T** import or use templates `xxx.Private` namespaces
 
-✅ **DO** make client customizations in a `client.tsp` file
+❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in files other than `client.tsp` or `back-compat.tsp`
 
-❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in other files aside from client.tsp.
+✅ **DO** reference `client.tsp` in `main.tsp` (add `import "./client.tsp";` so `main.tsp` is the single entrypoint)
+
+✅ **DO** reference `back-compat.tsp` in `main.tsp`
+
+✅ **DO** add customizations for ARM APIs in `back-compat.tsp`
+
+✅ **DO** add customizations that impact only generated client SDKs in `client.tsp`
+
+✅ **DO** add customizations that impact both generated client SDKs and generated OpenAPI specs in `back-compat.tsp`
 
 ✅ **DO** run `tsp compile .` on your specification and address all warnings
 

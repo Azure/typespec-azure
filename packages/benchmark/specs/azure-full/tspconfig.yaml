@@ -1,0 +1,24 @@
+emit:
+  - "@azure-tools/typespec-autorest"
+  - "@typespec/openapi3"
+  - "@azure-tools/typespec-python"
+  - "@typespec/http-client-js"
+  - "@azure-tools/typespec-ts"
+  - "@azure-tools/typespec-java"
+options:
+  "@azure-tools/typespec-autorest":
+    use-read-only-status-schema: true
+    output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"
+  "@azure-tools/typespec-python":
+    namespace: "contoso.benchmarkfull"
+    package-mode: dataplane
+  "@azure-tools/typespec-ts":
+    package-details:
+      name: "@msinternal/contoso-benchmark-full"
+  "@azure-tools/typespec-java":
+    namespace: "com.contoso.benchmarkfull"
+    generate-samples: false
+    generate-tests: false
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-rulesets/data-plane"

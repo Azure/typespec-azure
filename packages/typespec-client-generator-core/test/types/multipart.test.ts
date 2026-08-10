@@ -1,25 +1,21 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
+import { it } from "vitest";
+import {
+  type SdkBuiltInType,
+  type SdkModelPropertyType,
+  UsageFlags,
+} from "../../src/interfaces.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("multipart form basic", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       id: HttpPart<string>;
       profileImage: HttpPart<bytes>;
@@ -27,8 +23,9 @@ it("multipart form basic", async function () {
 
     op basic(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.kind, "model");
@@ -39,17 +36,40 @@ it("multipart form basic", async function () {
   ok(id);
   strictEqual(id.kind, "property");
   strictEqual(id.type.kind, "string");
+  strictEqual(id.serializationOptions.multipart?.headers.length, 0);
   const profileImage = model.properties.find((x) => x.name === "profileImage");
   ok(profileImage);
   strictEqual(profileImage.kind, "property");
+  strictEqual(profileImage.type.kind, "bytes");
+  strictEqual((profileImage.type as SdkBuiltInType).encode, "bytes");
   ok(profileImage.serializationOptions.multipart);
   strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
   strictEqual(profileImage.isMultipartFileInput, true);
   strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
 });
 
+it("multipart bytes in HttpPart should have bytes encode", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op anonymousModel(
+      @header contentType: "multipart/form-data",
+      @multipartBody body: {
+        profileImage: HttpPart<bytes>;
+      },
+    ): NoContentResponse;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  const profileImage = model.properties.find((x) => x.name === "profileImage");
+  ok(profileImage);
+  strictEqual(profileImage.type.kind, "bytes");
+  strictEqual((profileImage.type as SdkBuiltInType).encode, "bytes");
+});
+
 it("multipart conflicting model usage", async function () {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
         @service(#{title: "Test Service"}) namespace TestService;
         model MultiPartRequest {
@@ -61,13 +81,14 @@ it("multipart conflicting model usage", async function () {
         @post op multipartUse(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
   });
 });
 
 it("multipart conflicting model usage for only multipart operations", async function () {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service(#{title: "Test Service"}) namespace TestService;
       model Address {city: string;}
@@ -85,19 +106,18 @@ it("multipart conflicting model usage for only multipart operations", async func
       op basic2(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  deepEqual(runner.context.diagnostics.length, 0);
-  const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
+  const context = await createSdkContextForTester(program);
+  deepEqual(context.diagnostics.length, 0);
+  const address = context.sdkPackage.models.find((x) => x.name === "Address");
   ok(address);
   deepEqual(address.usage, UsageFlags.Input);
-  const multiPartRequest = runner.context.sdkPackage.models.find(
-    (x) => x.name === "MultiPartRequest",
-  );
+  const multiPartRequest = context.sdkPackage.models.find((x) => x.name === "MultiPartRequest");
   ok(multiPartRequest);
   deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
 });
 
 it("multipart conflicting model usage for mixed operations", async function () {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service(#{title: "Test Service"}) namespace TestService;
       model Address {city: string;}
@@ -118,57 +138,18 @@ it("multipart conflicting model usage for mixed operations", async function () {
       op basic2(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  deepEqual(runner.context.diagnostics.length, 0);
-  const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
+  const context = await createSdkContextForTester(program);
+  deepEqual(context.diagnostics.length, 0);
+  const address = context.sdkPackage.models.find((x) => x.name === "Address");
   ok(address);
   deepEqual(address.usage, UsageFlags.Input | UsageFlags.Json);
-  const multiPartRequest = runner.context.sdkPackage.models.find(
-    (x) => x.name === "MultiPartRequest",
-  );
+  const multiPartRequest = context.sdkPackage.models.find((x) => x.name === "MultiPartRequest");
   ok(multiPartRequest);
   deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
 });
 
-it("multipart resolving conflicting model usage with spread", async function () {
-  await runner.compileWithBuiltInService(
-    `
-      model B {
-        doc: HttpPart<bytes>
-      }
-      
-      model A {
-        ...B
-      }
-      
-      @put op multipartOperation(@header contentType: "multipart/form-data", @multipartBody body: A): void;
-      @post op normalOperation(...B): void;
-      `,
-  );
-  const models = runner.context.sdkPackage.models;
-  strictEqual(models.length, 2);
-  const modelA = models.find((x) => x.name === "A");
-  ok(modelA);
-  strictEqual(modelA.kind, "model");
-  strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
-  strictEqual(modelA.properties.length, 1);
-  const modelAProp = modelA.properties[0];
-  strictEqual(modelAProp.kind, "property");
-
-  ok(modelAProp.serializationOptions.multipart);
-  strictEqual(modelAProp.serializationOptions.multipart.isFilePart, true);
-  strictEqual(modelAProp.multipartOptions, modelAProp.serializationOptions.multipart);
-  strictEqual(modelAProp.isMultipartFileInput, true);
-
-  const modelB = models.find((x) => x.name === "B");
-  ok(modelB);
-  strictEqual(modelB.kind, "model");
-  strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
-  strictEqual(modelB.properties.length, 1);
-  strictEqual(modelB.properties[0].type.kind, "bytes");
-});
-
 it("multipart with non-formdata model property", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model Address {
         city: string;
@@ -186,12 +167,13 @@ it("multipart with non-formdata model property", async function () {
       @put op multipartOne(@header contentType: "multipart/form-data", @multipartBody body: AddressFirstAppearance): void;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 });
 
 it("multipart with list of bytes", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model PictureWrapper {
       pictures: HttpPart<bytes>[];
@@ -200,7 +182,8 @@ it("multipart with list of bytes", async function () {
     @put op multipartOp(@header contentType: "multipart/form-data", @multipartBody body: PictureWrapper): void;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.properties.length, 1);
@@ -214,7 +197,7 @@ it("multipart with list of bytes", async function () {
 });
 
 it("multipart with reused error model", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model PictureWrapper {
         pictures: HttpPart<bytes>[];
@@ -228,7 +211,8 @@ it("multipart with reused error model", async function () {
       @post op normalOp(): void | ErrorResponse;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
   const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
@@ -242,8 +226,8 @@ it("multipart with reused error model", async function () {
 });
 
 it("expands model into formData parameters", async function () {
-  await runner.compileWithBuiltInService(`
-    @doc("A widget.")
+  const { program } = await SimpleTesterWithService.compile(`
+    
     model Widget {
       @key("widgetName")
       name: HttpPart<string>;
@@ -265,7 +249,8 @@ it("expands model into formData parameters", async function () {
       upload(...WidgetForm): Widget;
     }
   `);
-  const client = runner.context.sdkPackage.clients[0].children?.[0];
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0].children?.[0];
   ok(client);
   const formDataMethod = client.methods[0];
   strictEqual(formDataMethod.kind, "basic");
@@ -296,7 +281,7 @@ it("expands model into formData parameters", async function () {
 });
 
 it("usage doesn't apply to properties of a form data", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       id: HttpPart<string>;
       profileImage: HttpPart<bytes>;
@@ -310,7 +295,8 @@ it("usage doesn't apply to properties of a form data", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(multiPartRequest);
@@ -322,7 +308,7 @@ it("usage doesn't apply to properties of a form data", async function () {
 });
 
 it("Json[] and bytes[] in multipart/form-data", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       profileImages: HttpPart<bytes>[];
       addresses: HttpPart<Address>[];
@@ -333,7 +319,8 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(multiPartRequest);
@@ -348,7 +335,7 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
 });
 
 it("basic multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -360,12 +347,13 @@ it("basic multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
-  const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkBodyModelPropertyType;
+  const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkModelPropertyType;
   strictEqual(id.optional, true);
   ok(id.serializationOptions.multipart);
   strictEqual(id.serializationOptions.multipart.isFilePart, false);
@@ -373,7 +361,7 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(id.multipartOptions, id.serializationOptions.multipart);
   const profileImage = MultiPartRequest.properties.find(
     (x) => x.name === "profileImage",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   strictEqual(profileImage.optional, false);
   ok(profileImage.serializationOptions.multipart);
   strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
@@ -385,7 +373,7 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
   const address = MultiPartRequest.properties.find(
     (x) => x.name === "address",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   strictEqual(address.optional, false);
   ok(address.serializationOptions.multipart);
   strictEqual(address.serializationOptions.multipart.isFilePart, false);
@@ -393,14 +381,14 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(address.multipartOptions, address.serializationOptions.multipart);
   strictEqual(address.type.kind, "model");
 
-  const city = address.type.properties.find((x) => x.name === "city") as SdkBodyModelPropertyType;
+  const city = address.type.properties.find((x) => x.name === "city") as SdkModelPropertyType;
   ok(city);
   ok(city.serializationOptions.json);
   strictEqual(city.serializationOptions.json.name, "city");
 });
 
 it("File[] of multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest{
         fileArrayOnePart: HttpPart<File[]>;
         fileArrayMultiParts: HttpPart<File>[];
@@ -408,7 +396,8 @@ it("File[] of multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   const fileModel = models.find((x) => x.name === "File");
@@ -417,14 +406,14 @@ it("File[] of multipart with @multipartBody for model", async function () {
   // filename property
   const filenameProperty = fileModel.properties.find(
     (x) => x.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   // contentType property
   const contentTypeProperty = fileModel.properties.find(
     (x) => x.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const fileArrayOnePart = MultiPartRequest.properties.find(
     (x) => x.name === "fileArrayOnePart",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileArrayOnePart);
   ok(fileArrayOnePart.serializationOptions.multipart);
   strictEqual(fileArrayOnePart.type.kind, "array");
@@ -440,7 +429,7 @@ it("File[] of multipart with @multipartBody for model", async function () {
 
   const fileArrayMultiParts = MultiPartRequest.properties.find(
     (x) => x.name === "fileArrayMultiParts",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileArrayMultiParts);
   ok(fileArrayMultiParts.serializationOptions.multipart);
   strictEqual(fileArrayMultiParts.type.kind, "array");
@@ -463,7 +452,7 @@ it("File[] of multipart with @multipartBody for model", async function () {
 });
 
 it("File with specific content-type", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RequiredMetaData extends File {
       filename: string;
       contentType: "image/png";
@@ -474,12 +463,13 @@ it("File with specific content-type", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   const fileOptionalFileName = MultiPartRequest.properties.find(
     (x) => x.name === "file",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileOptionalFileName);
   ok(fileOptionalFileName.serializationOptions.multipart);
   deepEqual(fileOptionalFileName.serializationOptions.multipart.defaultContentTypes, ["image/png"]);
@@ -490,7 +480,7 @@ it("File with specific content-type", async function () {
 });
 
 it("File of multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RequiredMetaData extends File {
       filename: string;
       contentType: string;
@@ -502,7 +492,8 @@ it("File of multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   const fileModel = models.find((x) => x.name === "File");
@@ -511,14 +502,14 @@ it("File of multipart with @multipartBody for model", async function () {
   ok(fileModel);
   const fileOptionalFileName = MultiPartRequest.properties.find(
     (x) => x.name === "fileOptionalFileName",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileOptionalFileName);
   const filenameProperty = fileModel.properties.find(
     (p) => p.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const contentTypeProperty = fileModel.properties.find(
     (p) => p.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(filenameProperty);
   ok(contentTypeProperty);
   strictEqual(fileOptionalFileName.optional, false);
@@ -542,13 +533,13 @@ it("File of multipart with @multipartBody for model", async function () {
   ok(requiredMetaDataModel);
   const fileRequiredFileName = MultiPartRequest.properties.find(
     (x) => x.name === "fileRequiredFileName",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const requiredFilenameProperty = requiredMetaDataModel.properties.find(
     (p) => p.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const requiredContentTypeProperty = requiredMetaDataModel.properties.find(
     (p) => p.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileRequiredFileName);
   ok(requiredFilenameProperty);
   ok(requiredContentTypeProperty);
@@ -577,7 +568,7 @@ it("File of multipart with @multipartBody for model", async function () {
 });
 
 it("check 'multi' of multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -594,7 +585,8 @@ it("check 'multi' of multipart with @multipartBody for model", async function ()
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -607,7 +599,7 @@ it("check 'multi' of multipart with @multipartBody for model", async function ()
 });
 
 it("check returned sdkType of multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         stringsOnePart: HttpPart<string[]>;
         stringsMultiParts: HttpPart<string>[];
@@ -615,13 +607,14 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   const stringsOnePart = MultiPartRequest.properties.find(
     (x) => x.name === "stringsOnePart",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringsOnePart);
   strictEqual(stringsOnePart.type.kind, "array");
   strictEqual(stringsOnePart.type.valueType.kind, "string");
@@ -630,7 +623,7 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
   strictEqual(stringsOnePart.multipartOptions, stringsOnePart.serializationOptions.multipart);
   const stringsMultiParts = MultiPartRequest.properties.find(
     (x) => x.name === "stringsMultiParts",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringsMultiParts);
   strictEqual(stringsMultiParts.type.kind, "array");
   strictEqual(stringsMultiParts.type.valueType.kind, "string");
@@ -640,23 +633,24 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
 });
 
 it("check content-type in multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         stringWithoutContentType: HttpPart<string>,
         stringWithContentType: HttpPart<{@body body: string, @header contentType: "text/html"}>,
         bytesWithoutContentType: HttpPart<bytes>,
-        bytesWithContentType: HttpPart<{@body body: string, @header contentType: "image/png"}>
+        bytesWithContentType: HttpPart<{@body body: bytes, @header contentType: "image/png"}>
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
-  strictEqual(models.length, 3);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   const stringWithoutContentType = MultiPartRequest.properties.find(
     (x) => x.name === "stringWithoutContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringWithoutContentType);
   strictEqual(stringWithoutContentType.type.kind, "string");
   ok(stringWithoutContentType.serializationOptions.multipart);
@@ -664,6 +658,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   deepEqual(stringWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
     "text/plain",
   ]);
+  strictEqual(stringWithoutContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     stringWithoutContentType.multipartOptions,
     stringWithoutContentType.serializationOptions.multipart,
@@ -671,15 +666,15 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const stringWithContentType = MultiPartRequest.properties.find(
     (x) => x.name === "stringWithContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringWithContentType);
-  strictEqual(stringWithContentType.type.kind, "model");
-  strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
+  strictEqual(stringWithContentType.type.kind, "string");
   ok(stringWithContentType.serializationOptions.multipart);
   ok(stringWithContentType.serializationOptions.multipart.contentType);
   deepEqual(stringWithContentType.serializationOptions.multipart.defaultContentTypes, [
     "text/html",
   ]);
+  strictEqual(stringWithContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     stringWithContentType.multipartOptions,
     stringWithContentType.serializationOptions.multipart,
@@ -687,7 +682,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const bytesWithoutContentType = MultiPartRequest.properties.find(
     (x) => x.name === "bytesWithoutContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(bytesWithoutContentType);
   strictEqual(bytesWithoutContentType.type.kind, "bytes");
   ok(bytesWithoutContentType.serializationOptions.multipart);
@@ -695,6 +690,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   deepEqual(bytesWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
     "application/octet-stream",
   ]);
+  strictEqual(bytesWithoutContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     bytesWithoutContentType.multipartOptions,
     bytesWithoutContentType.serializationOptions.multipart,
@@ -702,13 +698,13 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const bytesWithContentType = MultiPartRequest.properties.find(
     (x) => x.name === "bytesWithContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(bytesWithContentType);
-  strictEqual(bytesWithContentType.type.kind, "model");
-  strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
+  strictEqual(bytesWithContentType.type.kind, "bytes");
   ok(bytesWithContentType.serializationOptions.multipart);
   ok(bytesWithContentType.serializationOptions.multipart.contentType);
   deepEqual(bytesWithContentType.serializationOptions.multipart.defaultContentTypes, ["image/png"]);
+  strictEqual(bytesWithContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     bytesWithContentType.multipartOptions,
     bytesWithContentType.serializationOptions.multipart,
@@ -716,7 +712,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 });
 
 it("check isFilePart in multipart with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         bytesRaw: HttpPart<bytes>,
         bytesArrayRaw: HttpPart<bytes>[],
@@ -730,7 +726,8 @@ it("check isFilePart in multipart with @multipartBody for model", async function
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
 
@@ -744,27 +741,29 @@ it("check isFilePart in multipart with @multipartBody for model", async function
 });
 
 it("check serialized name with @multipartBody for model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         name: HttpPart<bytes, #{ name: "serializedName" }>,
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   const nameProperty = MultiPartRequest.properties.find((x) => x.name === "name");
   ok(nameProperty);
   strictEqual(nameProperty.name, "name");
   strictEqual(nameProperty.kind, "property");
-  strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
+  strictEqual((nameProperty as SdkModelPropertyType).serializedName, "serializedName");
   strictEqual(nameProperty.serializationOptions.multipart?.name, "serializedName");
 });
 
 it("multipart in client customization", async () => {
-  const testCode = [
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service(#{title: "Test Service"}) namespace TestService;
       model MultiPartRequest {
         profileImage: HttpPart<bytes>;
@@ -772,7 +771,7 @@ it("multipart in client customization", async () => {
 
       @post op multipartUse(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
-    `
+      `
       namespace Customizations;
       
       @client({name: "FirstOrderClient", service: TestService})
@@ -783,11 +782,11 @@ it("multipart in client customization", async () => {
         myOp is TestService.multipartUse
       }
     `,
-  ];
+    ),
+  );
+  const context = await createSdkContextForTester(program);
 
-  await runner.compileWithCustomization(testCode[0], testCode[1]);
-
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   const property = MultiPartRequest.properties.find((x) => x.name === "profileImage");
@@ -797,4 +796,109 @@ it("multipart in client customization", async () => {
   strictEqual(property.serializationOptions.multipart.isFilePart, true);
   strictEqual(property.multipartOptions, property.serializationOptions.multipart);
   strictEqual(property.isMultipartFileInput, true);
+});
+
+it("check header in multipart with @multipartBody for model", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model MultiPartRequest {
+        prop: HttpPart<{@body body: string, @header test: string}>,
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+  ok(MultiPartRequest);
+  const prop = MultiPartRequest.properties.find((x) => x.name === "prop") as SdkModelPropertyType;
+  ok(prop);
+  strictEqual(prop.type.kind, "string");
+  ok(prop.serializationOptions.multipart);
+  strictEqual(prop.serializationOptions.multipart.contentType, undefined);
+  deepEqual(prop.serializationOptions.multipart.defaultContentTypes, ["text/plain"]);
+  strictEqual(prop.serializationOptions.multipart.headers.length, 1);
+  strictEqual(prop.multipartOptions, prop.serializationOptions.multipart);
+});
+
+it("multipart response", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    @route("/downloadFile")
+    @post
+    op downloadFile(): {
+      @header contentType: "multipart/form-data";
+      @multipartBody body: {
+        name: HttpPart<string>;
+        file: HttpPart<bytes>[];
+      };
+    };
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.kind, "model");
+  ok((model.usage & UsageFlags.MultipartFormData) > 0);
+  strictEqual(model.name, "DownloadFileResponse");
+  strictEqual(model.properties.length, 2);
+  const name = model.properties.find((x) => x.name === "name");
+  ok(name);
+  strictEqual(name.kind, "property");
+  strictEqual(name.type.kind, "string");
+  strictEqual(name.serializationOptions.multipart?.headers.length, 0);
+  const file = model.properties.find((x) => x.name === "file");
+  ok(file);
+  strictEqual(file.kind, "property");
+  ok(file.serializationOptions.multipart);
+  strictEqual(file.serializationOptions.multipart.isFilePart, true);
+  strictEqual(file.isMultipartFileInput, true);
+  strictEqual(file.multipartOptions, file.serializationOptions.multipart);
+});
+
+it("multipart with visibility", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model TodoItem {
+      @visibility(Lifecycle.Read) @key id: safeint;
+      @maxLength(255)
+      title: string;
+      @visibility(Lifecycle.Read) createdBy: string;
+      assignedTo?: string;
+      description?: string;
+      status: "NotStarted" | "InProgress" | "Completed";
+      @visibility(Lifecycle.Read) createdAt: utcDateTime;
+      @visibility(Lifecycle.Read) updatedAt: utcDateTime;
+      @visibility(Lifecycle.Read) completedAt?: utcDateTime;
+      labels?: string[];
+      @visibility(Lifecycle.Create) dummy?: string;
+    }
+
+    op try(@header contentType: "multipart/form-data",
+        @multipartBody body: {
+      item: HttpPart<TodoItem>;
+    }): void;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  const model = models[0];
+  strictEqual(model.kind, "model");
+  ok((model.usage & UsageFlags.MultipartFormData) > 0);
+  strictEqual(model.name, "TryRequest");
+  strictEqual(model.properties.length, 1);
+  const item = model.properties.find((x) => x.name === "item");
+  ok(item);
+  strictEqual(item.kind, "property");
+  strictEqual(item.type.kind, "model");
+  strictEqual(item.serializationOptions.multipart?.headers.length, 0);
+  strictEqual(item.serializationOptions.multipart?.isFilePart, false);
+  strictEqual(item.serializationOptions.multipart?.defaultContentTypes.length, 1);
+  strictEqual(item.serializationOptions.multipart.defaultContentTypes[0], "application/json");
+
+  const todoItem = models[1];
+  ok(todoItem);
+  strictEqual(todoItem.kind, "model");
+  strictEqual(todoItem.name, "TryRequestItem");
+  strictEqual(todoItem.properties.length, 6);
 });

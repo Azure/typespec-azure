@@ -1,5 +1,6 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-azure-portal-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
@@ -56,9 +57,9 @@ Provides a Model Property a display name
 
 #### Parameters
 
-| Name | Type             | Description |
-| ---- | ---------------- | ----------- |
-| name | `valueof string` |             |
+| Name | Type             | Description                                |
+| ---- | ---------------- | ------------------------------------------ |
+| name | `valueof string` | The display name to show for the property. |
 
 ### `@marketplaceOffer` {#@Azure.Portal.marketplaceOffer}
 

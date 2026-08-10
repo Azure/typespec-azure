@@ -11,12 +11,11 @@ namespace Azure.Core;
  * Describes a page of resource object.
  * @template Resource The resource type.
  */
-@pagedResult
 @friendlyName("Paged{name}", Resource)
 @doc("Paged collection of {name} items", Resource)
 model Page<Resource extends TypeSpec.Reflection.Model> {
   @doc("The {name} items on this page", Resource)
-  @items
+  @pageItems
   value: Resource[];
 
   @doc("The link to the next page of items")
@@ -39,11 +38,12 @@ model RequestParameter<Name extends valueof string> {}
 model ResponseProperty<Name extends valueof string> {}
 
 /**
- * @dev Provides the status of a resource operation.
+ * Provides the status of a resource operation.
  * @template Resource The resource type.
  * @template StatusResult Model describing the status result object. If not specified, the default is the resource type.
  * @template StatusError Model describing the status error object. If not specified, the default is the Foundations.Error.
  */
+@doc("Provides status details for long running operations.")
 @resource("operations")
 @parentResource(Resource)
 model ResourceOperationStatus<
@@ -69,6 +69,7 @@ model TopQueryParameter {
 @doc("Provides the standard 'skip' query parameter for list operations.")
 model SkipQueryParameter {
   @query
+  @offset
   @doc("The number of result items to skip.")
   skip?: int32 = 0;
 }
@@ -76,6 +77,7 @@ model SkipQueryParameter {
 @doc("Provides the standard 'maxpagesize' query parameter for list operations.")
 model MaxPageSizeQueryParameter {
   @query
+  @pageSize
   @doc("The maximum number of result items per page.")
   maxpagesize?: int32;
 }
@@ -232,7 +234,7 @@ model EmbeddingVector<Element extends numeric = float32> is Array<Element>;
  */
 model StatusMonitorPollingOptions<
   PollingModel extends TypeSpec.Reflection.Model | void = never,
-  FinalResult extends TypeSpec.Reflection.Model | void = never,
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = never,
   FinalProperty extends TypeSpec.Reflection.ModelProperty | string = never
 > extends StatusMonitorOptions {
   /** The kind of polling options */
@@ -266,7 +268,7 @@ model PollingOptions {
   pollingModel?: TypeSpec.Reflection.Model | void;
 
   /** The type that is returned when polling terminates successfully. */
-  finalResult?: TypeSpec.Reflection.Model | void;
+  finalResult?: TypeSpec.Reflection.Model | unknown | void;
 }
 
 /** The available kinds of polling options */
@@ -300,7 +302,7 @@ scalar uuid extends string;
  * 129.144.50.56
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("ipV4Address")
 scalar ipV4Address extends string;
 
@@ -315,7 +317,7 @@ scalar ipV4Address extends string;
  * 2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("ipV6Address")
 scalar ipV6Address extends string;
 
@@ -331,7 +333,7 @@ scalar ipV6Address extends string;
  * ETag: "675af34563dc-tr34"
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("eTag")
 scalar eTag extends string;
 
@@ -369,7 +371,7 @@ scalar armResourceType extends string;
  *   otherArmId: armResourceIdentifier;
  *   networkId: armResourceIdentifier<[{type:"Microsoft.Network/vnet"}]>
  *   vmIds: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["*"]}]>
- *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["tenant", "resourceGroup"]}]>
+ *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["Tenant", "ResourceGroup"]}]>
  * }
  * ```
  */
@@ -382,22 +384,26 @@ scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierA
   extends string;
 
 // Consider replacing `*`
+/** The deployment scopes in which an Azure Resource Manager resource identifier may be used. */
 union ArmResourceDeploymentScope {
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension",
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "ServiceGroup",
+  "Extension",
 }
 
 alias AllArmResourceDeploymentScopes = [
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension"
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "ServiceGroup",
+  "Extension"
 ];
 
+/** Describes a resource type, and the scopes it applies to, that an `armResourceIdentifier` is allowed to refer to. */
 model ArmResourceIdentifierAllowedResource {
   /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
   type: armResourceType;

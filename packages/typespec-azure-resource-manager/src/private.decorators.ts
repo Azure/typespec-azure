@@ -1,56 +1,210 @@
 import {
   $key,
-  DecoratorContext,
-  Interface,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  StringLiteral,
-  Tuple,
-  Type,
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
+  type DecoratorContext,
+  type Enum,
   getKeyName,
   getLifecycleVisibilityEnum,
+  getNamespaceFullName,
   getTypeName,
+  type Interface,
+  isKey,
+  isSealed,
+  isTemplateDeclarationOrInstance,
+  isTemplateInstance,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Scalar,
   sealVisibilityModifiers,
+  type Tuple,
+  type Type,
 } from "@typespec/compiler";
-import { $segment, getSegment } from "@typespec/rest";
+
+import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
+import { $bodyRoot, getHttpOperation } from "@typespec/http";
+import {
+  $actionSegment,
+  $createsOrReplacesResource,
+  $deletesResource,
+  $listsResource,
+  $readsResource,
+  $segment,
+  $updatesResource,
+  getActionSegment,
+  getSegment,
+} from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
-import {
+import type {
+  AzureResourceManagerExtensionPrivateDecorators,
+  BuiltInResourceDecorator,
+  BuiltInResourceGroupResourceDecorator,
+  BuiltInSubscriptionResourceDecorator,
+} from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
+import type {
+  ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
+  ArmResourceWithParameterDecorator,
   ArmUpdateProviderNamespaceDecorator,
   AssignProviderNameValueDecorator,
+  AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
-  ConditionalClientFlattenDecorator,
+  BaseTypeOptionalDecorator,
+  BuiltInResourceOperationDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
+  ExtensionResourceOperationDecorator,
+  GenericResourceInternalDecorator,
+  LegacyExtensionResourceOperationDecorator,
+  LegacyResourceOperationDecorator,
+  LegacyTypeDecorator,
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
+  ResourceParentTypeDecorator,
+  ValidateCommonTypesVersionForResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
+import { getArmCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
-import { armRenameListByOperationInternal } from "./operations.js";
 import {
-  ArmResourceDetails,
-  ResourceBaseType,
+  $armResourceAction,
+  $armResourceCheckExistence,
+  $armResourceCreateOrUpdate,
+  $armResourceDelete,
+  $armResourceList,
+  $armResourceRead,
+  $armResourceUpdate,
+  addArmResourceOperation,
+  type ArmOperationIdentifier,
+  armRenameListByOperationInternal,
+  type ArmResourceOperation,
+  getArmResourceOperations,
+  setArmOperationIdentifier,
+} from "./operations.js";
+import {
+  type ArmResourceDetails,
+  type ArmResourceKind,
   getArmResourceKind,
+  getArmVirtualResourceDetails,
   getResourceBaseType,
   isArmVirtualResource,
   isCustomAzureResource,
   resolveResourceBaseType,
+  ResourceBaseType,
+  setResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
+const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
+  Model,
+  ArmResourceDetails
+>(ArmStateKeys.armResources);
+
+export { getArmResource };
+
 /** @internal */
+
+const $builtInResource: BuiltInResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltIn);
+};
+
+const $builtInSubscriptionResource: BuiltInSubscriptionResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInSubscription);
+};
+
+const $builtInResourceGroupResource: BuiltInResourceGroupResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInResourceGroup);
+};
+
+const [getGenericResourceInternal, setGenericResourceInternal] = useStateMap<Model, boolean>(
+  ArmStateKeys.genericResource,
+);
+
+const $genericResourceInternal: GenericResourceInternalDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => {
+  setGenericResourceInternal(context.program, target, true);
+
+  // Register the resource directly with kind "Generic" — no key/segment required
+  const { program } = context;
+  const namespaceName = target.namespace ? getTypeName(target.namespace) : undefined;
+  if (
+    namespaceName === undefined ||
+    namespaceName === "Azure.ResourceManager" ||
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
+  ) {
+    return;
+  }
+
+  if (!target.namespace || target.namespace.name === "") {
+    reportDiagnostic(program, {
+      code: "decorator-in-namespace",
+      format: { decoratorName: "genericResourceInternal" },
+      target,
+    });
+    return;
+  }
+
+  const armProviderNamespace = getArmProviderNamespace(program, target);
+  const armLibraryNamespace = isArmLibraryNamespace(program, target.namespace);
+  if (!armProviderNamespace && !armLibraryNamespace) {
+    reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target });
+    return;
+  }
+
+  // Skip if already registered
+  if (getArmResource(program, target)) return;
+
+  const armResourceDetails: ArmResourceDetails = {
+    name: target.name,
+    kind: "Generic",
+    typespecType: target,
+    armProviderNamespace: armProviderNamespace ?? "",
+    operations: {
+      lifecycle: {},
+      lists: {},
+      actions: {},
+    },
+  };
+
+  setArmResource(program, target, armResourceDetails);
+};
+
+export function isGenericResource(program: Program, target: Model): boolean {
+  if (getGenericResourceInternal(program, target)) return true;
+  if (target.baseModel) return isGenericResource(program, target.baseModel);
+  return false;
+}
+
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -67,6 +221,32 @@ const $omitIfEmpty: OmitIfEmptyDecorator = (
   }
 };
 
+function checkAllowedVirtualResource(
+  program: Program,
+  target: Model | Operation,
+  type: Model,
+): boolean {
+  if (target.kind === "Model") return false;
+  if (!isArmVirtualResource(program, type)) return false;
+  const [httpOp, _] = getHttpOperation(program, target);
+  if (httpOp === undefined) return false;
+  const method = httpOp.verb;
+  switch (method) {
+    case "post":
+    case "delete":
+      return true;
+    default:
+      return true;
+  }
+}
+
+function isBuiltIn(baseType: ResourceBaseType): boolean {
+  return (
+    baseType === ResourceBaseType.BuiltIn ||
+    baseType === ResourceBaseType.BuiltInSubscription ||
+    baseType === ResourceBaseType.BuiltInResourceGroup
+  );
+}
 const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
@@ -77,7 +257,14 @@ const $enforceConstraint: EnforceConstraintDecorator = (
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
     do {
-      if (baseType === constraintType || isCustomAzureResource(context.program, baseType)) return;
+      if (
+        baseType === constraintType ||
+        isCustomAzureResource(context.program, baseType) ||
+        isGenericResource(context.program, baseType) ||
+        isBuiltIn(getResourceBaseType(context.program, baseType)) ||
+        checkAllowedVirtualResource(context.program, entity, baseType)
+      )
+        return;
     } while ((baseType = baseType.baseModel) !== undefined);
 
     reportDiagnostic(context.program, {
@@ -198,10 +385,52 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
+  let armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  // Workaround for deprecated Legacy.Provider which by default point to TenantActionScope which is not able to resolve the provider namespace
+  if (
+    resourceType.name === "TenantActionScope" &&
+    armProviderNamespace === undefined &&
+    target.model?.namespace
+  ) {
+    armProviderNamespace = getArmProviderNamespace(program, target.model.namespace);
+  }
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value === "Microsoft.ThisWillBeReplaced"
+  ) {
+    target.type = $(context.program).literal.createString(armProviderNamespace);
+  }
+};
 
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
-  if (armProviderNamespace) {
-    (target.type as StringLiteral).value = armProviderNamespace;
+/**
+ * This decorator allows setting a unique provider name value, for scenarios in which
+ * multiple providers are allowed.
+ * @param {DecoratorContext} context DecoratorContext
+ * @param {Type} target Target of this decorator. Must be a string `ModelProperty`.
+ * @param {Type} resourceType Must be a `Model`.
+ */
+const $assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  resourceType: Model,
+) => {
+  const { program } = context;
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  if (!armProviderNamespace && !isBuiltIn(getResourceBaseType(program, resourceType))) {
+    reportDiagnostic(program, {
+      code: "resource-without-provider-namespace",
+      format: { resourceName: resourceType.name },
+      target: resourceType,
+    });
+    return;
+  }
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value !== armProviderNamespace
+  ) {
+    target.type = $(program).literal.createString(armProviderNamespace);
   }
 };
 
@@ -233,8 +462,9 @@ const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
           });
           return;
         }
-
-        providerParam.type.value = armProviderNamespace;
+        if (providerParam.type.value === "Microsoft.ThisWillBeReplaced") {
+          providerParam.type.value = armProviderNamespace;
+        }
       }
     }
   }
@@ -272,9 +502,42 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   resourceType: Model,
   propertiesType: Model,
 ) => {
-  const { program } = context;
+  registerArmResource(context, resourceType);
+};
 
-  if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
+const $armResourceWithParameter: ArmResourceWithParameterDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  properties: Model,
+  type: string,
+  nameParameter: string,
+) => {
+  registerArmResource(context, target, type, nameParameter);
+};
+
+function getPrimaryKeyProperty(program: Program, resource: Model): ModelProperty | undefined {
+  const nameProperty = resource.properties.get("name");
+  if (nameProperty !== undefined) return nameProperty;
+  const keyProps = [...resource.properties.values()].filter((prop) => isKey(program, prop));
+  if (keyProps.length !== 1) return undefined;
+  return keyProps[0];
+}
+
+export function registerArmResource(
+  context: DecoratorContext,
+  resourceType: Model,
+  type?: string,
+  nameParameter?: string,
+): void {
+  const { program } = context;
+  const namespaceName = resourceType.namespace ? getTypeName(resourceType.namespace) : undefined;
+  if (
+    namespaceName === undefined ||
+    namespaceName === "Azure.ResourceManager" ||
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
+  ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
     // so ignore in that case.
@@ -292,47 +555,74 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   }
 
   // Locate the ARM namespace in the namespace hierarchy
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType.namespace);
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
   const armLibraryNamespace = isArmLibraryNamespace(program, resourceType.namespace);
-  if (!armProviderNamespace && !armLibraryNamespace) {
+  const armExternalNamespace = getArmVirtualResourceDetails(program, resourceType)?.provider;
+  if (!armProviderNamespace && !armLibraryNamespace && armExternalNamespace === undefined) {
     reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target: resourceType });
     return;
   }
 
-  // Ensure the resource type has defined a name property that has a segment
-  const nameProperty = resourceType.properties.get("name");
-  if (!nameProperty) {
-    reportDiagnostic(program, { code: "arm-resource-missing-name-property", target: resourceType });
-    return;
+  let keyName: string | undefined;
+  let collectionName: string | undefined;
+  let kind: ArmResourceKind | undefined;
+
+  if (type !== undefined && nameParameter !== undefined) {
+    keyName = nameParameter;
+    collectionName = type;
+    kind = "Proxy";
+  } else {
+    // Ensure the resource type has defined a name property that has a segment
+    const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
+    if (!primaryKeyProperty) {
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-property",
+        target: resourceType,
+      });
+      return;
+    }
+
+    // Set the name property to be read only
+    if (primaryKeyProperty.name === "name") {
+      const Lifecycle = getLifecycleVisibilityEnum(program);
+      // Decorators may be re-applied to copies of the resource (e.g. by versioning
+      // projections or emitters using the mutator framework), and such copies share the
+      // original property instances. Sealing is only done here, so an already sealed
+      // property means this decorator already ran and the visibility is already correct.
+      if (!isSealed(program, primaryKeyProperty, Lifecycle)) {
+        clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+        addVisibilityModifiers(
+          program,
+          primaryKeyProperty,
+          [Lifecycle.members.get("Read")!],
+          context,
+        );
+        sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+      }
+    }
+
+    keyName = getKeyName(program, primaryKeyProperty);
+    if (!keyName) {
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-key-decorator",
+        target: resourceType,
+      });
+      return;
+    }
+
+    collectionName = getSegment(program, primaryKeyProperty);
+    if (!collectionName) {
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-segment-decorator",
+        target: resourceType,
+      });
+      return;
+    }
+
+    kind = getArmResourceKind(resourceType);
+    if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
+    if (isCustomAzureResource(program, resourceType)) kind = "Custom";
   }
-
-  // Set the name property to be read only
-  const Lifecycle = getLifecycleVisibilityEnum(program);
-  clearVisibilityModifiersForClass(program, nameProperty, Lifecycle, context);
-  addVisibilityModifiers(program, nameProperty, [Lifecycle.members.get("Read")!], context);
-  sealVisibilityModifiers(program, nameProperty, Lifecycle);
-
-  const keyName = getKeyName(program, nameProperty);
-  if (!keyName) {
-    reportDiagnostic(program, {
-      code: "arm-resource-missing-name-key-decorator",
-      target: resourceType,
-    });
-    return;
-  }
-
-  const collectionName = getSegment(program, nameProperty);
-  if (!collectionName) {
-    reportDiagnostic(program, {
-      code: "arm-resource-missing-name-segment-decorator",
-      target: resourceType,
-    });
-    return;
-  }
-
-  let kind = getArmResourceKind(resourceType);
-  if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
-  if (isCustomAzureResource(program, resourceType)) kind = "Custom";
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",
@@ -348,7 +638,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
     typespecType: resourceType,
     collectionName,
     keyName,
-    armProviderNamespace: armProviderNamespace ?? "",
+    armProviderNamespace: armProviderNamespace ?? armExternalNamespace ?? "",
     operations: {
       lifecycle: {},
       lists: {},
@@ -356,18 +646,21 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
     },
   };
 
-  program.stateMap(ArmStateKeys.armResources).set(resourceType, armResourceDetails);
-};
-
-export function listArmResources(program: Program): ArmResourceDetails[] {
-  return [...program.stateMap(ArmStateKeys.armResources).values()];
+  setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-export function getArmResource(
-  program: Program,
-  resourceType: Model,
-): ArmResourceDetails | undefined {
-  return program.stateMap(ArmStateKeys.armResources).get(resourceType);
+export function listArmResources(program: Program): ArmResourceDetails[] {
+  // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
+  // createSdkContext or autorest's per-version snapshots) re-apply decorators on
+  // realm copies, registering them alongside the originals. By keeping only the
+  // first entry per qualified name, we ensure each resource appears exactly once.
+  const seen = new Set<string>();
+  return [...armResourceStateMap(program).values()].filter((r) => {
+    const name = getTypeName(r.typespecType);
+    if (seen.has(name)) return false;
+    seen.add(name);
+    return true;
+  });
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {
@@ -395,24 +688,6 @@ const $azureResourceBase: AzureResourceBaseDecorator = (
 export function isAzureResource(program: Program, resourceType: Model): boolean {
   const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
   return isResourceBase ?? false;
-}
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => {
-  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
-};
-
-export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
-  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
-  return flatten ?? false;
 }
 
 const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
@@ -443,6 +718,348 @@ const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorat
   }
 };
 
+const $armBodyRoot: ArmBodyRootDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isOptional: boolean,
+) => {
+  target.optional = isOptional;
+  context.call($bodyRoot, target);
+};
+
+const $baseTypeOptional: BaseTypeOptionalDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isPresent: boolean,
+  isAppliance: boolean,
+) => {
+  const { program } = context;
+  if (!isPresent) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    // Guard against this decorator being re-applied to a copy of the containing model
+    // (e.g. by versioning projections or the mutator framework), which shares the same
+    // property instance and would otherwise report `visibility-sealed`.
+    if (!isSealed(program, target, lifecycle)) {
+      clearVisibilityModifiersForClass(program, target, lifecycle);
+      sealVisibilityModifiers(program, target, lifecycle);
+    }
+  } else if (isAppliance) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const readMember = lifecycle.members.get("Read");
+    if (readMember) {
+      addVisibilityModifiers(program, target, [readMember], context);
+    }
+  }
+};
+
+const $legacyType: LegacyTypeDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Scalar,
+) => {
+  const { program } = context;
+  if (
+    target.namespace &&
+    getNamespaceFullName(target.namespace).startsWith("Azure.ResourceManager")
+  ) {
+    return;
+  }
+  reportDiagnostic(program, { code: "legacy-type-usage", target });
+};
+
+const $resourceParentType: ResourceParentTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
+) => {
+  const { program } = context;
+  setResourceBaseType(program, target, parentType);
+};
+function callOperationDecorator(
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  resourceName: string,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+): void {
+  switch (operationType) {
+    case "read":
+      context.call($armResourceRead, target, resourceType, resourceName);
+      break;
+    case "createOrUpdate":
+      context.call($armResourceCreateOrUpdate, target, resourceType, resourceName);
+      break;
+    case "update":
+      context.call($armResourceUpdate, target, resourceType, resourceName);
+      break;
+    case "delete":
+      context.call($armResourceDelete, target, resourceType, resourceName);
+      break;
+    case "list":
+      context.call($armResourceList, target, resourceType, resourceName);
+      break;
+    case "action":
+      context.call($armResourceAction, target, resourceType, resourceName);
+      break;
+    case "checkExistence":
+      context.call($armResourceCheckExistence, target, resourceType, resourceName);
+      break;
+  }
+}
+
+function callLifecycleDecorator(
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+): void {
+  switch (operationType) {
+    case "read":
+      context.call($readsResource, target, resourceType);
+      break;
+    case "createOrUpdate":
+      context.call($createsOrReplacesResource, target, resourceType);
+      break;
+    case "update":
+      context.call($updatesResource, target, resourceType);
+      break;
+    case "delete":
+      context.call($deletesResource, target, resourceType);
+      break;
+    case "list":
+      context.call($listsResource, target, resourceType);
+      break;
+    case "checkExistence":
+      context.call($armResourceCheckExistence, target, resourceType);
+      break;
+  }
+}
+
+const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+  resourceName?: string,
+) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
+  const resolvedResourceName =
+    resourceName === undefined || resourceName.length === 0
+      ? targetResourceType.name === "ScopeParameter"
+        ? extensionResourceType.name
+        : `${targetResourceType.name}${extensionResourceType.name}`
+      : resourceName;
+  callOperationDecorator(
+    context,
+    target,
+    extensionResourceType,
+    resolvedResourceName,
+    operationType,
+  );
+};
+
+const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+  resourceName?: string,
+) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
+  const resolvedResourceName =
+    resourceName === undefined || resourceName.length === 0
+      ? `${parentResourceType.name}${builtInResourceType.name}`
+      : resourceName;
+  callOperationDecorator(context, target, builtInResourceType, resolvedResourceName, operationType);
+};
+
+const $legacyResourceOperation: LegacyResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+  resourceName?: string,
+) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
+  // We can't resolve the operation path yet so treat the operation as a partial
+  // type so that we can fill in the missing details later
+  const operations = getArmResourceOperations(context.program, resourceType);
+  const operation: Partial<ArmResourceOperation> = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
+    resourceModelName: resourceType.name,
+    resourceKind: "legacy",
+  };
+
+  operations.lists[target.name] = operation as ArmResourceOperation;
+  const opId: ArmOperationIdentifier = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy",
+  };
+  addArmResourceOperation(context.program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: operationType,
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy",
+  });
+
+  const { program } = context;
+  callLifecycleDecorator(context, target, resourceType, operationType);
+  if (operationType === "action") {
+    const segment = getSegment(program, target) ?? getActionSegment(program, target);
+    if (!segment) {
+      // Also apply the @actionSegment decorator to the operation
+      context.call($actionSegment, target, uncapitalize(target.name));
+    }
+  }
+};
+
+function uncapitalize(str: string): string {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+  resourceName?: string,
+) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
+  // We can't resolve the operation path yet so treat the operation as a partial
+  // type so that we can fill in the missing details later
+  const operations = getArmResourceOperations(context.program, resourceType);
+  const operation: Partial<ArmResourceOperation> = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
+    resourceModelName: resourceType.name,
+    resourceKind: "legacy-extension",
+  };
+
+  operations.lists[target.name] = operation as ArmResourceOperation;
+  const opId: ArmOperationIdentifier = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy-extension",
+  };
+  addArmResourceOperation(context.program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: operationType,
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy-extension",
+  });
+  const { program } = context;
+  callLifecycleDecorator(context, target, resourceType, operationType);
+  if (operationType === "action") {
+    const segment = getSegment(program, target) ?? getActionSegment(program, target);
+    if (!segment) {
+      // Also apply the @actionSegment decorator to the operation
+      context.call($actionSegment, target, uncapitalize(target.name));
+    }
+  }
+};
+
+const $validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => {
+  if (isTemplateDeclarationOrInstance(target) && !isTemplateInstance(target)) {
+    return;
+  }
+  const lowestVersion = getLowestCommonTypeVersion(context.program, target.namespace!);
+  if (lowestVersion === undefined || lowestVersion < version) {
+    reportDiagnostic(context.program, {
+      code: "invalid-version-for-common-type",
+      target,
+      format: {
+        resourceName: resourceName,
+        requiredVersion: version,
+        version: lowestVersion ?? "v3",
+      },
+    });
+  }
+};
+
+function getLowestCommonTypeVersion(program: Program, ns: Namespace): string | undefined {
+  let lowestVersion = getArmCommonTypesVersion(program, ns);
+  // If it is versioned namespace, we will check each Version enum member. If no
+  // @armCommonTypeVersion decorator, add the one
+  const versioned = ns.decorators.find((x) => x.definition?.name === "@versioned");
+  if (versioned) {
+    const versionEnum = versioned.args[0].value as Enum;
+    versionEnum.members.forEach((v) => {
+      const candidateVersion = getArmCommonTypesVersion(program, v);
+      if (
+        candidateVersion !== undefined &&
+        (lowestVersion === undefined || lowestVersion > candidateVersion)
+      ) {
+        lowestVersion = candidateVersion;
+      }
+    });
+  }
+  return lowestVersion;
+}
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -450,7 +1067,7 @@ export const $decorators = {
     resourceParameterBaseFor: $resourceParameterBaseFor,
     azureResourceBase: $azureResourceBase,
     omitIfEmpty: $omitIfEmpty,
-    conditionalClientFlatten: $conditionalClientFlatten,
+    assignUniqueProviderNameValue: $assignUniqueProviderNameValue,
     assignProviderNameValue: $assignProviderNameValue,
     armUpdateProviderNamespace: $armUpdateProviderNamespace,
     armResourceInternal: $armResourceInternal,
@@ -458,5 +1075,21 @@ export const $decorators = {
     enforceConstraint: $enforceConstraint,
     armRenameListByOperation: $armRenameListByOperation,
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
+    armBodyRoot: $armBodyRoot,
+    baseTypeOptional: $baseTypeOptional,
+    armResourceWithParameter: $armResourceWithParameter,
+    legacyType: $legacyType,
+    resourceParentType: $resourceParentType,
+    extensionResourceOperation: $extensionResourceOperation,
+    legacyExtensionResourceOperation: $legacyExtensionResourceOperation,
+    legacyResourceOperation: $legacyResourceOperation,
+    builtInResourceOperation: $builtInResourceOperation,
+    validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
+    genericResourceInternal: $genericResourceInternal,
   } satisfies AzureResourceManagerPrivateDecorators,
+  "Azure.ResourceManager.Extension.Private": {
+    builtInResource: $builtInResource,
+    builtInSubscriptionResource: $builtInSubscriptionResource,
+    builtInResourceGroupResource: $builtInResourceGroupResource,
+  } satisfies AzureResourceManagerExtensionPrivateDecorators,
 };

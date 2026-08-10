@@ -1,24 +1,29 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { InitializedByFlags, SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import {
+  InitializedByFlags,
+  type SdkClientType,
+  type SdkHttpOperation,
+} from "../../src/interfaces.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("change client initialization", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blobName: string): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -27,8 +32,10 @@ it("change client initialization", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
@@ -65,14 +72,15 @@ it("change client initialization", async () => {
 });
 
 it("backward compatibility", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blobName: string): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -81,8 +89,10 @@ it("backward compatibility", async () => {
 
       @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
@@ -119,7 +129,7 @@ it("backward compatibility", async () => {
 });
 
 it("client accessor", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model clientInitModel
       {
@@ -130,24 +140,25 @@ it("client accessor", async () => {
       @clientInitialization({parameters: clientInitModel})
       interface bumpParameter {
           @route("/op1")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op1(@path p1: string, @query q1: string): void;
 
           @route("/op2")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op2(@path p1: string): void;
       }
       `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
 
   const bumpParameterClient = client.children![0] as SdkClientType<SdkHttpOperation>;
-  strictEqual(bumpParameterClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(bumpParameterClient.clientInitialization.initializedBy, InitializedByFlags.Default);
 
   const methods = bumpParameterClient.methods;
   strictEqual(methods.length, 2);
@@ -166,8 +177,9 @@ it("client accessor", async () => {
 });
 
 it("subclient", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace StorageClient {
 
@@ -180,7 +192,7 @@ it("subclient", async () => {
         }
       }
       `,
-    `
+      `
       model ClientInitialization {
         blobName: string
       };
@@ -188,8 +200,10 @@ it("subclient", async () => {
       @@clientInitialization(StorageClient, {parameters: ClientInitialization});
       @@clientInitialization(StorageClient.BlobClient, {parameters: ClientInitialization});
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const clients = sdkPackage.clients;
   strictEqual(clients.length, 1);
   const client = clients[0];
@@ -222,7 +236,7 @@ it("subclient", async () => {
 
   strictEqual(blobClient.kind, "client");
   strictEqual(blobClient.name, "BlobClient");
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(blobClient.clientInitialization.parameters.length, 2);
 
   const blobClientEndpoint = blobClient.clientInitialization.parameters.find(
@@ -260,15 +274,16 @@ it("subclient", async () => {
 });
 
 it("some methods don't have client initialization params", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blobName: string, @header header: int32): void;
       op noClientParams(@query query: int32): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -277,8 +292,10 @@ it("some methods don't have client initialization params", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
@@ -327,14 +344,15 @@ it("some methods don't have client initialization params", async () => {
 });
 
 it("multiple client params", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blobName: string, @path containerName: string): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -344,8 +362,10 @@ it("multiple client params", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 3);
@@ -397,13 +417,12 @@ it("multiple client params", async () => {
   strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
 });
 
-it("@operationGroup with same model on parent client", async () => {
-  await runner.compile(
+it("Sub client with same model on parent client", async () => {
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace MyService;
 
-      @operationGroup
       interface MyInterface {
         op download(@path blobName: string, @path containerName: string): void;
       }
@@ -417,7 +436,8 @@ it("@operationGroup with same model on parent client", async () => {
       @@clientInitialization(MyService.MyInterface, {parameters: MyClientInitialization});
       `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const client = sdkPackage.clients[0];
@@ -456,7 +476,7 @@ it("@operationGroup with same model on parent client", async () => {
   const og = client.children![0] as SdkClientType<SdkHttpOperation>;
   strictEqual(og.kind, "client");
 
-  strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(og.clientInitialization.parameters.length, 3);
 
   ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));
@@ -480,15 +500,16 @@ it("@operationGroup with same model on parent client", async () => {
 });
 
 it("redefine client structure", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op uploadContainer(@path containerName: string): void;
       op uploadBlob(@path containerName: string, @path blobName: string): void;
       `,
-    `
+      `
     namespace MyCustomizations {
       model ContainerClientInitialization {
         containerName: string;
@@ -497,7 +518,6 @@ it("redefine client structure", async () => {
       @clientInitialization({parameters: ContainerClientInitialization})
       namespace ContainerClient {
         op upload is MyService.uploadContainer;
-
 
         model BlobClientInitialization {
           containerName: string;
@@ -513,9 +533,11 @@ it("redefine client structure", async () => {
     }
     
     `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 2);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
 
   const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
   ok(containerClient);
@@ -548,9 +570,9 @@ it("redefine client structure", async () => {
   strictEqual(methods[0].operation.parameters.length, 1);
   strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
 
-  const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
+  const blobClient = containerClient.children?.find((x) => x.name === "BlobClient");
   ok(blobClient);
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(blobClient.clientInitialization.parameters.length, 3);
 
   const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(
@@ -592,15 +614,16 @@ it("redefine client structure", async () => {
 });
 
 it("@paramAlias", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace MyService;
 
     op download(@path blob: string): void;
     op upload(@path blobName: string): void;
     `,
-    `
+      `
     namespace MyCustomizations;
 
     model MyClientInitialization {
@@ -610,8 +633,10 @@ it("@paramAlias", async () => {
 
     @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
     `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
@@ -660,7 +685,7 @@ it("@paramAlias", async () => {
 });
 
 it("sub client initialized individually", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model clientInitModel
     {
@@ -671,20 +696,21 @@ it("sub client initialized individually", async () => {
     @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
     interface bumpParameter {
         @route("/op1")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op2(@path p1: string): void;
     }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
 
   const bumpParameterClient = client.children![0] as SdkClientType<SdkHttpOperation>;
@@ -695,7 +721,7 @@ it("sub client initialized individually", async () => {
 });
 
 it("wrong initializedBy value type", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @clientInitialization({initializedBy: 4})
     namespace Test {
     }
@@ -704,4 +730,36 @@ it("wrong initializedBy value type", async () => {
   expectDiagnostics(diagnostics, {
     code: "invalid-argument",
   });
+});
+
+it("client initialized with None", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string): void;
+      `,
+      `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization, initializedBy: InitializedBy.customizeCode});
+      `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.CustomizeCode);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+  ok(endpoint);
+  const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+  ok(blobName);
+  strictEqual(blobName.onClient, true);
 });

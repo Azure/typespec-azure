@@ -1,11 +1,13 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { isPathParam } from "@typespec/http";
 import { isExcludedCoreType } from "./utils.js";
 
 export const noRpcPathParamsRule = createRule({
   name: "no-rpc-path-params",
+  docs: fileRef.fromPackageRoot("src/rules/no-rpc-path-params.md"),
   description: "Operations defined using RpcOperation should not have path parameters.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rpc-path-params",
   messages: {
     default:
       "Operations defined using RpcOperation should not have path parameters. Consider using ResourceAction or ResourceCollectionAction instead.",

@@ -21,14 +21,12 @@ namespace _Specs_.Azure.Core.Scalar;
 @doc("The version of the API.")
 enum Versions {
   @doc("The version 2022-12-01-preview.")
-  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   v2022_12_01_preview: "2022-12-01-preview",
 }
 model AzureLocationModel {
   location: azureLocation;
 }
 
-@operationGroup
 @route("/azureLocation")
 interface AzureLocationScalar {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"

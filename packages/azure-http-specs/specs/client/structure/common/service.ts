@@ -1,4 +1,4 @@
-import { MockApiDefinition } from "@typespec/spec-api";
+import type { MockApiDefinition } from "@typespec/spec-api";
 
 export function createServerTests(uri: string): MockApiDefinition {
   return {

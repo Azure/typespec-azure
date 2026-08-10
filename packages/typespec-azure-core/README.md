@@ -27,46 +27,50 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                                                                     | Description                                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-azure-core/operation-missing-api-version`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/operation-missing-api-version) | Operations need an api version parameter.                                                                                                            |
-| [`@azure-tools/typespec-azure-core/auth-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/auth-required)                                 | Enforce service authentication.                                                                                                                      |
-| `@azure-tools/typespec-azure-core/request-body-problem`                                                                                                                  | Request body should not be of raw array type.                                                                                                        |
-| `@azure-tools/typespec-azure-core/byos`                                                                                                                                  | Use the BYOS pattern recommended for Azure Services.                                                                                                 |
-| [`@azure-tools/typespec-azure-core/casing-style`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style)                                   | Ensure proper casing style.                                                                                                                          |
-| `@azure-tools/typespec-azure-core/composition-over-inheritance`                                                                                                          | Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`. |
-| `@azure-tools/typespec-azure-core/known-encoding`                                                                                                                        | Check for supported encodings.                                                                                                                       |
-| `@azure-tools/typespec-azure-core/long-running-polling-operation-required`                                                                                               | Long-running operations should have a linked polling operation.                                                                                      |
-| [`@azure-tools/typespec-azure-core/no-closed-literal-union`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-closed-literal-union)             | Unions of literals should include the base scalar type to mark them as open enum.                                                                    |
-| [`@azure-tools/typespec-azure-core/no-enum`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-enum)                                             | Azure services should not use enums.                                                                                                                 |
-| `@azure-tools/typespec-azure-core/no-error-status-codes`                                                                                                                 | Recommend using the error response defined by Azure REST API guidelines.                                                                             |
-| `@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops`                                                                                                       | The @route decorator should not be used on standard resource operation signatures.                                                                   |
-| [`@azure-tools/typespec-azure-core/non-breaking-versioning`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/non-breaking-versioning)             | Check that only backward compatible versioning change are done to a service.                                                                         |
-| [`@azure-tools/typespec-azure-core/no-generic-numeric`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-numeric)                       | Don't use generic types. Use more specific types instead.                                                                                            |
-| [`@azure-tools/typespec-azure-core/no-nullable`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-nullable)                                     | Use `?` for optional properties.                                                                                                                     |
-| `@azure-tools/typespec-azure-core/no-offsetdatetime`                                                                                                                     | Prefer using `utcDateTime` when representing a datetime unless an offset is necessary.                                                               |
-| `@azure-tools/typespec-azure-core/no-response-body`                                                                                                                      | Ensure that the body is set correctly for the response type.                                                                                         |
-| `@azure-tools/typespec-azure-core/no-rpc-path-params`                                                                                                                    | Operations defined using RpcOperation should not have path parameters.                                                                               |
-| `@azure-tools/typespec-azure-core/no-openapi`                                                                                                                            | Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest                                                  |
-| [`@azure-tools/typespec-azure-core/no-header-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode)                         | It is recommended to serialize header parameter without explode: true                                                                                |
-| [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/prevent-format)                                    | Azure services should not use the `@format` decorator.                                                                                               |
-| `@azure-tools/typespec-azure-core/no-multiple-discriminator`                                                                                                             | Classes should have at most one discriminator.                                                                                                       |
-| `@azure-tools/typespec-azure-core/no-rest-library-interfaces`                                                                                                            | Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.                                                        |
-| `@azure-tools/typespec-azure-core/no-unknown`                                                                                                                            | Azure services must not have properties of type `unknown`.                                                                                           |
-| [`@azure-tools/typespec-azure-core/bad-record-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/bad-record-type)                             | Identify bad record definitions.                                                                                                                     |
-| `@azure-tools/typespec-azure-core/documentation-required`                                                                                                                | Require documentation over enums, models, and operations.                                                                                            |
-| `@azure-tools/typespec-azure-core/key-visibility-required`                                                                                                               | Key properties need to have a Lifecycle visibility setting.                                                                                          |
-| `@azure-tools/typespec-azure-core/response-schema-problem`                                                                                                               | Warn about operations having multiple non-error response schemas.                                                                                    |
-| `@azure-tools/typespec-azure-core/rpc-operation-request-body`                                                                                                            | Warning for RPC body problems.                                                                                                                       |
-| [`@azure-tools/typespec-azure-core/spread-discriminated-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/spread-discriminated-model)       | Check a model with a discriminator has not been used in composition.                                                                                 |
-| `@azure-tools/typespec-azure-core/use-standard-names`                                                                                                                    | Use recommended names for operations.                                                                                                                |
-| [`@azure-tools/typespec-azure-core/use-standard-operations`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-operations)             | Operations should be defined using a signature from the Azure.Core namespace.                                                                        |
-| [`@azure-tools/typespec-azure-core/no-string-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-string-discriminator)             | Azure services discriminated models should define the discriminated property as an extensible union.                                                 |
-| [`@azure-tools/typespec-azure-core/require-versioned`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/require-versioned)                         | Azure services should use the versioning library.                                                                                                    |
-| `@azure-tools/typespec-azure-core/friendly-name`                                                                                                                         | Ensures that @friendlyName is used as intended.                                                                                                      |
-| [`@azure-tools/typespec-azure-core/no-private-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage)                           | Verify that elements inside Private namespace are not referenced.                                                                                    |
-| [`@azure-tools/typespec-azure-core/no-legacy-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage)                             | Linter warning against using elements from the Legacy namespace                                                                                      |
-| [`@azure-tools/typespec-azure-core/no-query-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode)                           | It is recommended to serialize query parameter without explode: true                                                                                 |
+| Name                                                                                                                                                                                         | Description                                                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-azure-core/operation-missing-api-version`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/operation-missing-api-version)                     | Operations need an api version parameter.                                                                                                            |
+| [`@azure-tools/typespec-azure-core/auth-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/auth-required)                                                     | Enforce service authentication.                                                                                                                      |
+| [`@azure-tools/typespec-azure-core/request-body-problem`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/request-body-problem)                                       | Request body should not be of raw array type.                                                                                                        |
+| [`@azure-tools/typespec-azure-core/byos`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/byos)                                                                       | Use the BYOS pattern recommended for Azure Services.                                                                                                 |
+| [`@azure-tools/typespec-azure-core/casing-style`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style)                                                       | Ensure proper casing style.                                                                                                                          |
+| [`@azure-tools/typespec-azure-core/composition-over-inheritance`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/composition-over-inheritance)                       | Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`. |
+| [`@azure-tools/typespec-azure-core/known-encoding`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/known-encoding)                                                   | Check for supported encodings.                                                                                                                       |
+| [`@azure-tools/typespec-azure-core/long-running-polling-operation-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/long-running-polling-operation-required) | Long-running operations should have a linked polling operation.                                                                                      |
+| [`@azure-tools/typespec-azure-core/no-case-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-case-mismatch)                                               | Validate that no two types have the same name with different casing.                                                                                 |
+| [`@azure-tools/typespec-azure-core/no-closed-literal-union`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-closed-literal-union)                                 | Unions of literals should include the base scalar type to mark them as open enum.                                                                    |
+| [`@azure-tools/typespec-azure-core/no-enum`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-enum)                                                                 | Azure services should not use enums.                                                                                                                 |
+| [`@azure-tools/typespec-azure-core/no-error-status-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-error-status-codes)                                     | Recommend using the error response defined by Azure REST API guidelines.                                                                             |
+| [`@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-explicit-routes-resource-ops)                 | The @route decorator should not be used on standard resource operation signatures.                                                                   |
+| [`@azure-tools/typespec-azure-core/non-breaking-versioning`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/non-breaking-versioning)                                 | Check that only backward compatible versioning change are done to a service.                                                                         |
+| [`@azure-tools/typespec-azure-core/no-generic-numeric`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-generic-numeric)                                           | Don't use generic types. Use more specific types instead.                                                                                            |
+| [`@azure-tools/typespec-azure-core/no-nullable`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-nullable)                                                         | Use `?` for optional properties.                                                                                                                     |
+| [`@azure-tools/typespec-azure-core/no-offsetdatetime`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-offsetdatetime)                                             | Prefer using `utcDateTime` when representing a datetime unless an offset is necessary.                                                               |
+| [`@azure-tools/typespec-azure-core/no-response-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-response-body)                                               | Ensure that the body is set correctly for the response type.                                                                                         |
+| [`@azure-tools/typespec-azure-core/no-rpc-path-params`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rpc-path-params)                                           | Operations defined using RpcOperation should not have path parameters.                                                                               |
+| [`@azure-tools/typespec-azure-core/no-openapi`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi)                                                           | Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest                                                  |
+| [`@azure-tools/typespec-azure-core/no-unnamed-types`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-types)                                               | Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.      |
+| [`@azure-tools/typespec-azure-core/no-header-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode)                                             | It is recommended to serialize header parameter without explode: true                                                                                |
+| [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-format)                                                             | Azure services should not use the `@format` decorator.                                                                                               |
+| [`@azure-tools/typespec-azure-core/no-multiple-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-multiple-discriminator)                             | Classes should have at most one discriminator.                                                                                                       |
+| [`@azure-tools/typespec-azure-core/no-rest-library-interfaces`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rest-library-interfaces)                           | Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.                                                        |
+| [`@azure-tools/typespec-azure-core/no-unknown`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unknown)                                                           | Azure services must not have properties of type `unknown`.                                                                                           |
+| [`@azure-tools/typespec-azure-core/bad-record-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/bad-record-type)                                                 | Identify bad record definitions.                                                                                                                     |
+| [`@azure-tools/typespec-azure-core/documentation-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required)                                   | Require documentation over enums, models, and operations.                                                                                            |
+| [`@azure-tools/typespec-azure-core/key-visibility-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/key-visibility-required)                                 | Key properties need to have a Lifecycle visibility setting.                                                                                          |
+| [`@azure-tools/typespec-azure-core/response-schema-problem`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/response-schema-problem)                                 | Warn about operations having multiple non-error response schemas.                                                                                    |
+| [`@azure-tools/typespec-azure-core/rpc-operation-request-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/rpc-operation-request-body)                           | Warning for RPC body problems.                                                                                                                       |
+| [`@azure-tools/typespec-azure-core/spread-discriminated-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/spread-discriminated-model)                           | Check a model with a discriminator has not been used in composition.                                                                                 |
+| [`@azure-tools/typespec-azure-core/use-standard-names`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-names)                                           | Use recommended names for operations.                                                                                                                |
+| [`@azure-tools/typespec-azure-core/use-standard-operations`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-operations)                                 | Operations should be defined using a signature from the Azure.Core namespace.                                                                        |
+| [`@azure-tools/typespec-azure-core/no-string-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-string-discriminator)                                 | Azure services discriminated models should define the discriminated property as an extensible union.                                                 |
+| [`@azure-tools/typespec-azure-core/require-versioned`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/require-versioned)                                             | Azure services should use the versioning library.                                                                                                    |
+| [`@azure-tools/typespec-azure-core/friendly-name`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/friendly-name)                                                     | Ensures that @friendlyName is used as intended.                                                                                                      |
+| [`@azure-tools/typespec-azure-core/no-private-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage)                                               | Verify that elements inside Private namespace are not referenced.                                                                                    |
+| [`@azure-tools/typespec-azure-core/no-legacy-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage)                                                 | Linter warning against using elements from the Legacy namespace                                                                                      |
+| [`@azure-tools/typespec-azure-core/no-query-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode)                                               | It is recommended to serialize query parameter without explode: true                                                                                 |
+| [`@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch)               | Ensure that operations with the same path use consistent path parameter names.                                                                       |
+| [`@azure-tools/typespec-azure-core/no-openapi-client-extensions`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi-client-extensions)                       | Azure specs should not use @typespec/openapi @extension to emit client-altering x-ms-* extensions                                                    |
 
 ## Decorators
 
@@ -74,20 +78,18 @@ Available ruleSets:
 
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
-- [`@fixed`](#@fixed)
-- [`@items`](#@items)
 - [`@lroCanceled`](#@lrocanceled)
 - [`@lroErrorResult`](#@lroerrorresult)
 - [`@lroFailed`](#@lrofailed)
 - [`@lroResult`](#@lroresult)
 - [`@lroStatus`](#@lrostatus)
 - [`@lroSucceeded`](#@lrosucceeded)
-- [`@nextPageOperation`](#@nextpageoperation)
 - [`@operationLink`](#@operationlink)
-- [`@pagedResult`](#@pagedresult)
 - [`@pollingLocation`](#@pollinglocation)
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
+- [`@previewVersion`](#@previewversion)
+- [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
 
 #### `@finalLocation`
@@ -95,7 +97,7 @@ Available ruleSets:
 Identifies a ModelProperty as containing the final location for the operation result.
 
 ```typespec
-@Azure.Core.finalLocation(finalResult?: Model | void)
+@Azure.Core.finalLocation(finalResult?: Model | unknown | void)
 ```
 
 ##### Target
@@ -104,9 +106,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 ##### Parameters
 
-| Name        | Type            | Description                                                                                                                                                        |
-| ----------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| finalResult | `Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
+| Name        | Type                       | Description                                                                                                                                                        |
+| ----------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| finalResult | `Model \| unknown \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
 
 #### `@finalOperation`
 
@@ -126,39 +128,6 @@ Identifies that an operation is the final operation for an LRO.
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@fixed`
-
-Marks an Enum as being fixed since enums in Azure are
-assumed to be extensible.
-
-```typespec
-@Azure.Core.fixed
-```
-
-##### Target
-
-`Enum`
-
-##### Parameters
-
-None
-
-#### `@items`
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-##### Target
-
-`ModelProperty`
-
-##### Parameters
-
-None
 
 #### `@lroCanceled`
 
@@ -265,25 +234,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-#### `@nextPageOperation`
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
 #### `@operationLink`
 
 Identifies an operation that is linked to the target operation.
@@ -303,22 +253,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@pagedResult`
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-None
 
 #### `@pollingLocation`
 
@@ -374,6 +308,56 @@ Used to define how to call custom polling operations for long-running operations
 | Name            | Type                      | Description                                                                                                                                                                                        |
 | --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | targetParameter | `ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
+
+#### `@previewVersion`
+
+Decorator that marks a Version EnumMember as a preview version.
+This is used to indicate that the version is not yet stable and may change in future releases.
+
+```typespec
+@Azure.Core.previewVersion
+```
+
+##### Target
+
+The EnumMember that represents the preview version.
+`EnumMember`
+
+##### Parameters
+
+None
+
+##### Examples
+
+```typespec
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace DemoService;
+
+enum Versions {
+  v1,
+  v2,
+
+  @previewVersion
+  v3Preview,
+}
+```
+
+#### `@uniqueItems`
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+##### Target
+
+`ModelProperty | Model`
+
+##### Parameters
+
+None
 
 #### `@useFinalStateVia`
 

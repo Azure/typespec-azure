@@ -1,4 +1,4 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { type Operation, createRule } from "@typespec/compiler";
 import { getResourceOperation } from "@typespec/rest";
 import { isExcludedCoreType } from "./utils.js";
 
@@ -6,6 +6,7 @@ export const orderByRule = createRule({
   name: "no-order-by",
   description: `List operations with an 'orderBy' parameter are uncommon; support should only be added after large collection sorting performance concerns are considered.`,
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-order-by",
   messages: {
     default: `List operations with an 'orderBy' parameter are uncommon; support should only be added after large collection sorting performance concerns are considered.`,
   },

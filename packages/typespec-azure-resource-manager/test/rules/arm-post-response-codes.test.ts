@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
-  LinterRuleTester,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armPostResponseCodesRule } from "../../src/rules/arm-post-response-codes.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armPostResponseCodesRule } from "../../src/rules/arm-post-response-codes.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armPostResponseCodesRule,
@@ -24,15 +25,10 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -58,15 +54,10 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -93,15 +84,10 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -123,15 +109,10 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -155,8 +136,6 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -165,11 +144,7 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -201,8 +176,6 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -211,11 +184,7 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -248,8 +217,6 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -258,11 +225,7 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -297,8 +260,6 @@ it("Emits a warning for a long-running post operation that has invalid response 
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -307,11 +268,7 @@ it("Emits a warning for a long-running post operation that has invalid response 
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations

@@ -1,19 +1,18 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  AzureCoreBaseTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+} from "../tester.js";
 
 it("basic", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace MyService;
     model Params {
@@ -23,15 +22,17 @@ it("basic", async () => {
 
     op func(...Params): void;
     `,
-    `
+      `
     namespace MyCustomizations;
 
     op func(params: MyService.Params): void;
 
     @@override(MyService.func, MyCustomizations.func);
     `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
 
   const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
   ok(paramsModel);
@@ -50,9 +51,8 @@ it("basic", async () => {
   strictEqual(paramsModel, paramsParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
 });
 
 it("basic with scope", async () => {
@@ -74,11 +74,16 @@ it("basic with scope", async () => {
 
     @@override(MyService.func, MyCustomizations.func, "csharp");
     `;
-  await runner.compileWithCustomization(mainCode, customizationCode);
-  // runner has python scope, so shouldn't be overridden
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  // python scope, so shouldn't be overridden
 
-  ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
-  const sdkPackage = runner.context.sdkPackage;
+  ok(context.sdkPackage.models.find((x) => x.name === "Params"));
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);
   const method = client.methods[0];
@@ -104,14 +109,17 @@ it("basic with scope", async () => {
   strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
   strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
-  const paramModel = runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params");
+  // csharp scope, so should be overridden
+  const paramModel = contextCsharp.sdkPackage.models.find((x) => x.name === "Params");
   ok(paramModel);
 
-  const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
+  const sdkPackageWithCsharp = contextCsharp.sdkPackage;
   strictEqual(sdkPackageWithCsharp.clients.length, 1);
 
   strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
@@ -135,9 +143,8 @@ it("basic with scope", async () => {
     contentTypeParamWithCsharp,
   );
   ok(httpOpWithCsharp.bodyParam);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramModel.properties[0]);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[1], paramModel.properties[1]);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
 });
 
 it("regrouping", async () => {
@@ -164,10 +171,16 @@ it("regrouping", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  await runner.compileWithCustomization(mainCode, customizationCode);
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+
   // runner has python scope, so shouldn't be overridden
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);
   const method = client.methods[0];
@@ -226,13 +239,18 @@ it("remove optional parameter", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
-  )[1];
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   expectDiagnosticEmpty(diagnostics);
 
-  ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
-  const sdkPackage = runner.context.sdkPackage;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program);
+
+  ok(context.sdkPackage.models.find((x) => x.name === "Params"));
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);
   const method = client.methods[0];
@@ -279,13 +297,14 @@ it("remove optional parameter flip", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
-  )[1];
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 
-  ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
-  const sdkPackage = runner.context.sdkPackage;
+  ok(context.sdkPackage.models.find((x) => x.name === "Params"));
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);
   const method = client.methods[0];
@@ -333,9 +352,10 @@ it("params mismatch but same type", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
-  )[1];
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+
   strictEqual(diagnostics.length, 0);
 });
 
@@ -362,17 +382,20 @@ it("remove required parameter", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
-  )[1];
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    message:
+      'Method "func" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "bar".',
   });
 });
 
 it("recursive params", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace MyService;
     model Params {
@@ -382,15 +405,17 @@ it("recursive params", async () => {
 
     op func(...Params): void;
     `,
-    `
+      `
     namespace MyCustomizations;
 
     op func(input: MyService.Params): void;
 
     @@override(MyService.func, MyCustomizations.func);
     `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
 
   const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
   ok(paramsModel);
@@ -409,44 +434,45 @@ it("recursive params", async () => {
   strictEqual(paramsModel, inputParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
 });
 
 it("core template", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compileWithCustomization(
-    `
-    @useDependency(Versions.v1_0_Preview_2)
+  const { program } = await AzureCoreBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @server("http://localhost:3000", "endpoint")
-    @service()
+    @service
+    @versioned(Versions)
     namespace My.Service;
 
-    model Params {
-      foo: string;
-      params: Params[];
-}
+      enum Versions { v1  }
 
-    @route("/template")
-    op templateOp is Azure.Core.RpcOperation<
-      Params,
-      Params
-    >;
+      model Params {
+        foo: string;
+        params: Params[];
+      }
+
+      @route("/template")
+      op templateOp is Azure.Core.RpcOperation<
+        Params,
+        Params
+      >;
     `,
-    `
+      `
     namespace My.Customizations;
 
     op templateOp(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
 
     @@override(My.Service.templateOp, My.Customizations.templateOp);
     `,
+      ["@azure-tools/typespec-azure-core"],
+      ["Azure.Core"],
+    ),
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.parameters.length, 3);
   ok(method.parameters.find((x) => x.name === "contentType"));
@@ -456,4 +482,259 @@ it("core template", async () => {
   ok(paramsParam);
   strictEqual(paramsParam.type.kind, "model");
   strictEqual(paramsParam.type.name, "Params");
+});
+
+it("remove optional query param", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace KeyVault;
+
+    op getSecrets(@query("maxresults") maxresults?: int32): void;
+    `,
+      `
+    op listSecretProperties(): void;
+    @@override(KeyVault.getSecrets, listSecretProperties);
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.parameters.length, 0);
+  strictEqual(method.operation.parameters.length, 1);
+  strictEqual(method.operation.parameters[0].name, "maxresults");
+  strictEqual(method.operation.parameters[0].correspondingMethodParams.length, 0);
+});
+
+it("remove optional query param and add secret name", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace KeyVault;
+
+    @route("/secrets/{secret-name}/versions")
+    op getSecretVersions(
+      @path("secret-name")
+      secretName: string,
+
+      @query("maxresults")
+      maxresults?: int32
+    ): void;
+    `,
+      `
+    @route("/secrets/{secret-name}/versions")
+    op listSecretPropertiesVersions(@path("secret-name") secretName: string): void;
+    @@override(KeyVault.getSecretVersions, listSecretPropertiesVersions);
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.parameters.length, 1);
+  strictEqual(method.parameters[0].name, "secretName");
+  strictEqual(method.operation.parameters.length, 2);
+  const secretNameParam = method.operation.parameters.find((x) => x.name === "secretName");
+  ok(secretNameParam);
+  strictEqual(secretNameParam.correspondingMethodParams.length, 1);
+  strictEqual(secretNameParam.correspondingMethodParams[0], method.parameters[0]);
+  const maxResultsParam = method.operation.parameters.find((x) => x.name === "maxresults");
+  ok(maxResultsParam);
+  strictEqual(maxResultsParam.correspondingMethodParams.length, 0);
+  strictEqual(maxResultsParam.name, "maxresults");
+});
+
+it("reports diagnostic when override parameter is missing @path", async () => {
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    @route("/items/{itemId}")
+    op getItem(@path itemId: string): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op getItemOverride(itemId: string): void;
+
+    @@override(MyService.getItem, MyCustomizations.getItemOverride);
+    `,
+    ),
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+  });
+});
+
+it("does not report missing @path when the parameter is not a realized path parameter", async () => {
+  // A parameter can carry the `@path` decorator in the type graph (for example
+  // inside a body model) without being realized as a path parameter in the
+  // operation's actual route. Dropping `@path` from such a parameter in the
+  // override must not report an override-parameters-mismatch diagnostic.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    model Body {
+      @path name: string;
+      value: string;
+    }
+
+    @route("/items")
+    @post
+    op create(@body body: Body): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op createOverride(name: string, value: string): void;
+
+    @@override(MyService.create, MyCustomizations.createOverride);
+    `,
+    ),
+  );
+  ok(
+    !diagnostics.some(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    ),
+  );
+});
+
+it("does not report mismatch when the override adds parameters", async () => {
+  // Overrides are allowed to add parameters. Matching parameters by name (rather
+  // than by sorted position) ensures an added parameter does not shift the
+  // remaining parameters out of alignment and produce a false mismatch.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    @route("/items/{itemId}")
+    op getItem(@path itemId: string, @query filter: string): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op getItemOverride(@path itemId: string, @query filter: string, extra: string): void;
+
+    @@override(MyService.getItem, MyCustomizations.getItemOverride);
+    `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+});
+
+it("matches parameters by name when the override reorders and adds parameters", async () => {
+  // The override declares the original parameters in a different order and adds
+  // an extra parameter. Name-based matching must still pair each original
+  // parameter with its override counterpart without reporting a mismatch.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
+
+    op func(...Params): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op func(added: string, bar: string, foo: string): void;
+
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+});
+
+describe("@clientName", () => {
+  it("original method", async () => {
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+        `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(KeyVault.getSecret, "listSecretProperties");
+      `,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "listSecretProperties");
+  });
+  it("override method", async () => {
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+        `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(getSecretOverride, "listSecretProperties");
+      `,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-name-ineffective",
+      message:
+        'Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.',
+    });
+    const sdkPackage = context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "getSecret");
+  });
+
+  it("override parameter", async () => {
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+        `
+      alias OverrideParameters = {
+        @query("secret-name") secretName: string,
+      };
+      
+      op getSecretOverride(...OverrideParameters): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(OverrideParameters.secretName, "secretNameOverride");
+      `,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.parameters[0].name, "secretNameOverride");
+  });
 });

@@ -1,5 +1,7 @@
 ---
 title: 5. Defining Custom Actions
+description: Defining custom actions on ARM resources
+llmstxt: true
 ---
 
 Some resources will provide more than the standard CRUD operations and will need to define a custom action endpoint. Additional resource operations can be added to the `interface` where you defined standard resource operations, using the `ArmResourceAction` templates.
@@ -17,14 +19,23 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {
+interface Users {
+  get is ArmResourceRead<User>;
+  create is ArmResourceCreateOrReplaceAsync<User>;
+  update is ArmCustomPatchSync<
+    User,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<User, UserProperties>
+  >;
+  delete is ArmResourceDeleteSync<User>;
+  listByResourceGroup is ArmResourceListByParent<User>;
+  listBySubscription is ArmListBySubscription<User>;
   /** Send a notification to the user */
   @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 ```
 
-The following operation templates for different kinds of actions are provider in the `Azure.ResourceManager` namespace:
+The following operation templates for different kinds of actions are provided in the `Azure.ResourceManager` namespace:
 
 | Template                                                 | Description                                                                                        |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -44,10 +55,9 @@ In a custom operation, you define the operation parameters, responses, http verb
 /** Send a notification to the user */
 @post
 @segment("notify")
-op NotifyUser(
-  ...ResourceInstanceParameters<User>,
-  @body notification: NotificationDetails,
-): ArmResponse<string> | ErrorResponse;
+op NotifyUser(...ResourceInstanceParameters<User>, @body notification: NotificationDetails):
+  | ArmResponse<string>
+  | ErrorResponse;
 ```
 
 ### ARM Response Types

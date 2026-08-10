@@ -8,7 +8,7 @@ TypeSpec library for emitting openapi from the TypeSpec REST protocol binding
 npm install @azure-tools/typespec-autorest
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -44,6 +44,8 @@ See [Configuring output directory for more info](https://typespec.io/docs/handbo
 
 ### `output-dir`
 
+_Deprecated: This option is deprecated._
+
 **Type:** `string`
 
 Deprecated DO NOT USE. Use built-in emitter-output-dir instead
@@ -57,10 +59,9 @@ Output file will interpolate the following values:
 
 - service-name: Name of the service if multiple
 - version: Version of the service if multiple
-- azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-- version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
+- version-status: `preview` if version contains preview, stable otherwise.
 
-Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+Default: `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`
 
 Example: Single service no versioning
 
@@ -83,9 +84,9 @@ Example: Multiple service with versioning
 - `openapi.Org1.Service2.v1.0.yaml`
 - `openapi.Org1.Service2.v1.1.yaml`
 
-Example: azureResourceProviderFolder is provided
+Example: Versioning with version-status
 
-- `arm-folder/AzureService/preview/2020-01-01.yaml`
+- `arm-folder/AzureService/stable/2020-01-01.yaml`
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 
 ### `examples-dir`
@@ -95,6 +96,8 @@ Example: azureResourceProviderFolder is provided
 Directory where the examples are located. Default: `{project-root}/examples`.
 
 ### `examples-directory`
+
+_Deprecated: This option is deprecated._
 
 **Type:** `string`
 
@@ -108,6 +111,8 @@ DEPRECATED. Use examples-dir instead
 
 **Type:** `string`
 
+Deprecated. Do not use this option. Specify the path directly in emitter-output-dir.
+
 ### `arm-types-dir`
 
 **Type:** `string`
@@ -117,6 +122,8 @@ Path to the common-types.json file folder. Default: '${project-root}/../../commo
 ### `new-line`
 
 **Type:** `"crlf" | "lf"`
+
+**Default:** `"lf"`
 
 Set the newline character for emitting files.
 
@@ -130,11 +137,15 @@ Omit unreachable types. By default all types declared under the service namespac
 
 **Type:** `string`
 
+**Default:** `"omit"`
+
 Decide how to deal with the Version enum when when `omit-unreachable-types` is not set. Default to 'omit'
 
 ### `include-x-typespec-name`
 
 **Type:** `"inline-only" | "never"`
+
+**Default:** `"never"`
 
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
@@ -143,25 +154,63 @@ This extension is meant for debugging and should not be depended on.
 
 **Type:** `boolean`
 
+**Default:** `false`
+
 Create read-only property schema for lro status
 
 ### `emit-lro-options`
 
 **Type:** `"none" | "final-state-only" | "all"`
 
+**Default:** `"final-state-only"`
+
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
-
-### `arm-resource-flattening`
-
-**Type:** `boolean`
-
-Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.
 
 ### `emit-common-types-schema`
 
 **Type:** `"never" | "for-visibility-changes"`
 
+**Default:** `"for-visibility-changes"`
+
 Determine whether and how to emit schemas for common-types rather than referencing them
+
+### `xml-strategy`
+
+**Type:** `"xml-service" | "none"`
+
+**Default:** `"xml-service"`
+
+Strategy for applying XML serialization metadata to schemas.
+
+### `output-splitting`
+
+**Type:** `"legacy-feature-files"`
+
+Determines whether output should be split into multiple files. The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
+
+### `skip-example-copying`
+
+**Type:** `boolean`
+
+**Default:** `false`
+
+When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.
+
+### `type-name-strategy`
+
+**Type:** `"namespaced" | "name-only"`
+
+**Default:** `"namespaced"`
+
+Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.
+
+### `service-yaml`
+
+**Type:** `"auto" | "always" | "never"`
+
+**Default:** `"auto"`
+
+Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.
 
 ## Decorators
 

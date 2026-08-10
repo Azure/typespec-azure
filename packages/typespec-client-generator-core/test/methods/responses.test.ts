@@ -1,17 +1,16 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import type {
+  SdkHttpOperation,
+  SdkMethodResponse,
+  SdkServiceMethod,
+  SdkUnionType,
+} from "../../src/interfaces.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("basic returning void", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model Error {
@@ -21,7 +20,8 @@ it("basic returning void", async () => {
     @delete op delete(@path id: string): void | Error;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(method.name, "delete");
@@ -42,11 +42,11 @@ it("basic returning void", async () => {
   strictEqual(errorResponse.type, sdkPackage.models[0]);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("basic returning void and error model has status code", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model Error {
@@ -57,7 +57,8 @@ it("basic returning void and error model has status code", async () => {
     @delete op delete(@path id: string): void | Error;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(method.name, "delete");
@@ -78,18 +79,19 @@ it("basic returning void and error model has status code", async () => {
   strictEqual(errorResponse.type, sdkPackage.models[0]);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("basic returning compiler NotFoundResponse error", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model NotFoundErrorResponse is NotFoundResponse;
     @get op get(): void | NotFoundErrorResponse;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const getMethod = client.methods[0];
   strictEqual(getMethod.kind, "basic");
@@ -102,7 +104,7 @@ it("basic returning compiler NotFoundResponse error", async () => {
 });
 
 it("basic returning model", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       @visibility(Lifecycle.Read, Lifecycle.Update)
@@ -121,7 +123,8 @@ it("basic returning model", async () => {
     @post op create(...Widget): Widget | Error;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 3);
   strictEqual(method.name, "create");
@@ -150,11 +153,11 @@ it("basic returning model", async () => {
   strictEqual(method.response.kind, "method");
   const methodResponseType = method.response.type;
   strictEqual(methodResponseType, createResponse.type);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("Headers and body", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       @header id: string;
@@ -164,7 +167,8 @@ it("Headers and body", async () => {
     op operation(): Widget;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(method.name, "operation");
@@ -184,7 +188,7 @@ it("Headers and body", async () => {
   strictEqual(createResponse.headers[0].serializedName, "id");
 
   strictEqual(method.response.kind, "method");
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
   const methodResponseType = method.response.type;
   ok(methodResponseType);
   strictEqual(
@@ -195,7 +199,7 @@ it("Headers and body", async () => {
 });
 
 it("Headers and body with null", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       weight: int32;
@@ -204,7 +208,8 @@ it("Headers and body with null", async () => {
     op operation(): {@header id: string | null, @body body: Widget | null};
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponses = method.operation.responses;
 
@@ -215,8 +220,43 @@ it("Headers and body with null", async () => {
   strictEqual(method.response.type?.kind, "nullable");
 });
 
+it("Distinguish nullable body from optional response", async () => {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    model Widget {
+      weight: int32;
+    }
+
+    // This has a nullable body (Widget | null) - explicitly marked with @body
+    @route("/nullable")
+    op operationWithNullableBody(): {@body body: Widget | null};
+    
+    // This has an optional response (200 with body, 204 without body)
+    @route("/optional")
+    op operationWithOptionalResponse(): Widget | NoContentResponse;
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const methods = [...sdkPackage.clients[0].methods];
+
+  // Test nullable body
+  const methodWithNullableBody = methods.find((m) => m.name === "operationWithNullableBody");
+  ok(methodWithNullableBody);
+  strictEqual(methodWithNullableBody.response.type?.kind, "nullable");
+  strictEqual(methodWithNullableBody.response.optional, false);
+
+  // Test optional response
+  const methodWithOptionalResponse = methods.find(
+    (m) => m.name === "operationWithOptionalResponse",
+  );
+  ok(methodWithOptionalResponse);
+  strictEqual(methodWithOptionalResponse.response.type?.kind, "model");
+  strictEqual(methodWithOptionalResponse.response.optional, true);
+});
+
 it("OkResponse with NoContentResponse", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       weight: int32;
@@ -225,7 +265,8 @@ it("OkResponse with NoContentResponse", async () => {
     op operation(): Widget | NoContentResponse;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponses = method.operation.responses;
 
@@ -235,20 +276,22 @@ it("OkResponse with NoContentResponse", async () => {
   const noContentResponse = serviceResponses.find((x) => x.statusCodes === 204);
   ok(noContentResponse);
   strictEqual(noContentResponse.type, undefined);
-  strictEqual(method.response.type?.kind, "nullable");
+  strictEqual(method.response.type?.kind, "model");
+  strictEqual(method.response.optional, true);
   strictEqual(
-    method.response.type?.type,
+    method.response.type,
     sdkPackage.models.find((x) => x.name === "Widget"),
   );
 });
 
 it("NoContentResponse", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @delete op delete(@path id: string): NoContentResponse;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 0);
   strictEqual(method.name, "delete");
@@ -264,16 +307,17 @@ it("NoContentResponse", async () => {
   strictEqual(voidResponse.contentTypes, undefined);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("binary return type", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     op get(): {@header contentType: "image/jpeg"; @body image: bytes;};
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponse = method.operation.responses[0];
   deepStrictEqual(serviceResponse.contentTypes, ["image/jpeg"]);
@@ -282,7 +326,7 @@ it("binary return type", async () => {
 });
 
 it("protocol response usage", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Test {
       prop: string;
@@ -292,7 +336,8 @@ it("protocol response usage", async () => {
     op get(): Test;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.response.type?.kind, "model");
@@ -300,7 +345,7 @@ it("protocol response usage", async () => {
 });
 
 it("response model with property with none visibility", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
         @invisible(Lifecycle)
@@ -308,7 +353,8 @@ it("response model with property with none visibility", async function () {
     }
     op get(): Test;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const models = sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].properties.length, 1);
@@ -319,13 +365,14 @@ it("response model with property with none visibility", async function () {
 });
 
 it("rename for response header", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
     }
     op get(): {@header @clientName("xRename") x: string};
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const header = method.operation.responses[0].headers[0];
   strictEqual(header.serializedName, "x");
@@ -333,13 +380,14 @@ it("rename for response header", async function () {
 });
 
 it("content type shall be included in response headers", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       op get(): OkResponse & {@header("Content-Type") contentType: string; @bodyRoot body: bytes};
     }
   `);
-  const client = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
   ok(method);
@@ -351,7 +399,7 @@ it("content type shall be included in response headers", async () => {
 });
 
 it("description shall be included in response", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       op get(): Test;
@@ -362,7 +410,8 @@ it("description shall be included in response", async () => {
       }
     }
   `);
-  const client = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
   ok(method);
@@ -373,7 +422,7 @@ it("description shall be included in response", async () => {
 });
 
 it("response body with non-read visibility", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -386,11 +435,12 @@ it("response body with non-read visibility", async () => {
       op get(): Test;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.name, "Test");
-  const client = runner.context.sdkPackage.clients[0];
+  const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
   ok(method);
@@ -398,7 +448,7 @@ it("response body with non-read visibility", async () => {
 });
 
 it("response body of scalar with encode", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @encode(BytesKnownEncoding.base64url)
     scalar base64urlBytes extends bytes;
@@ -406,10 +456,225 @@ it("response body of scalar with encode", async () => {
     op get(): {@header contentType: "application/json", @body body: base64urlBytes;};
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponse = method.operation.responses[0];
   deepStrictEqual(serviceResponse.contentTypes, ["application/json"]);
   strictEqual(serviceResponse.type?.kind, "bytes");
   strictEqual(serviceResponse.type?.encode, "base64url");
+});
+
+it("multiple response types for one status code", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      op doStuff(): One | Two;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const oneModel = sdkPackage.models.find((m) => m.name === "One");
+  const twoModel = sdkPackage.models.find((m) => m.name === "Two");
+  ok(oneModel);
+  ok(twoModel);
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  ok(methodResponseType.variantTypes.find((x) => x === oneModel));
+  ok(methodResponseType.variantTypes.find((x) => x === twoModel));
+  const serviceResponses = method.operation.responses;
+  strictEqual(serviceResponses.length, 1);
+  const serviceResponseType = serviceResponses[0].type;
+  ok(serviceResponseType);
+  strictEqual(serviceResponseType.kind, "union");
+  ok(serviceResponseType.variantTypes.find((x) => x === oneModel));
+  ok(serviceResponseType.variantTypes.find((x) => x === twoModel));
+});
+
+it("multiple response types for one status code plus additional model for other status code", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      @get
+      op doStuff(): {
+        @statusCode statusCode: 200;
+        @body body: One | Two
+      } | {
+        @statusCode statusCode: 202;
+        @body body: string;
+      };
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const oneModel = sdkPackage.models.find((m) => m.name === "One");
+  const twoModel = sdkPackage.models.find((m) => m.name === "Two");
+  ok(oneModel);
+  ok(twoModel);
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  strictEqual(methodResponseType.variantTypes.length, 2);
+  const [firstVariant, secondVariant] = methodResponseType.variantTypes;
+  ok(firstVariant);
+  ok(secondVariant);
+  strictEqual(firstVariant.kind, "union");
+  ok(firstVariant.variantTypes.find((x) => x === oneModel));
+  ok(firstVariant.variantTypes.find((x) => x === twoModel));
+  strictEqual(secondVariant.kind, "string");
+  const serviceResponses = method.operation.responses;
+  strictEqual(serviceResponses.length, 2);
+  const unionServiceResponseType = serviceResponses[0].type;
+  ok(unionServiceResponseType);
+  strictEqual(unionServiceResponseType.kind, "union");
+  ok(unionServiceResponseType.variantTypes.find((x) => x === oneModel));
+  ok(unionServiceResponseType.variantTypes.find((x) => x === twoModel));
+
+  const stringServiceResponseType = serviceResponses[1].type;
+  ok(stringServiceResponseType);
+  strictEqual(stringServiceResponseType.kind, "string");
+});
+
+it("synthetic union from split response should have generated name", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      op doStuff(): One | Two;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  const unionType = methodResponseType as SdkUnionType;
+  strictEqual(unionType.name, "DoStuffResponse");
+  strictEqual(unionType.isGeneratedName, true);
+});
+
+it("models in union response should have correct generated names for anonymous unions", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService {
+
+      model EditCompletedEvent {
+        type: "edit.completed";
+        size: "1024x1024" | "536x536" | "auto";
+        quality: "low" | "medium" | "high";
+      }
+
+      model PartialCompletedEvent {
+        type: "partial.completed";
+        size: "1024x1024" | "536x536" | "auto";
+        quality: "low" | "medium" | "high";
+      }
+
+      model GenCompletedEvent {
+        type: "gen.completed";
+        size: "1024x1024" | "536x536" | "auto";
+        quality: "low" | "medium" | "high";
+      }
+
+      model GenPartialCompletedEvent {
+        type: "gen.partial.completed";
+        size: "1024x1024" | "536x536" | "auto";
+        quality: "low" | "medium" | "high";
+      }
+
+      union StreamingResponse {
+        EditCompletedEvent,
+        PartialCompletedEvent,
+        GenCompletedEvent,
+        GenPartialCompletedEvent,
+      }
+
+      @route("/stream")
+      @post
+      op createStream(): StreamingResponse;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  // Verify the models have named enums for their anonymous unions
+  const editModel = sdkPackage.models.find((m) => m.name === "EditCompletedEvent");
+  ok(editModel);
+  const sizeProp = editModel.properties.find((p) => p.name === "size");
+  ok(sizeProp);
+  ok(sizeProp.type.kind === "enum");
+  ok(sizeProp.type.name !== "");
+
+  const partialModel = sdkPackage.models.find((m) => m.name === "PartialCompletedEvent");
+  ok(partialModel);
+  const partialSizeProp = partialModel.properties.find((p) => p.name === "size");
+  ok(partialSizeProp);
+  ok(partialSizeProp.type.kind === "enum");
+  ok(partialSizeProp.type.name !== "");
+});
+
+it("synthetic union from more than two response types should not create union of union", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      model Three {
+        value: boolean;
+      }
+      op doStuff(): One | Two | Three;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const oneModel = sdkPackage.models.find((m) => m.name === "One");
+  const twoModel = sdkPackage.models.find((m) => m.name === "Two");
+  const threeModel = sdkPackage.models.find((m) => m.name === "Three");
+  ok(oneModel);
+  ok(twoModel);
+  ok(threeModel);
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  const unionType = methodResponseType as SdkUnionType;
+  // Should have a generated name, not empty
+  strictEqual(unionType.name, "DoStuffResponse");
+  strictEqual(unionType.isGeneratedName, true);
+  // All three variants should be at the top level (no nested union)
+  strictEqual(unionType.variantTypes.length, 3);
+  ok(unionType.variantTypes.find((x) => x === oneModel));
+  ok(unionType.variantTypes.find((x) => x === twoModel));
+  ok(unionType.variantTypes.find((x) => x === threeModel));
+  // None of the variants should be a union themselves (no union-of-union)
+  for (const variant of unionType.variantTypes) {
+    ok(variant.kind !== "union", "variant should not be a nested union");
+  }
 });

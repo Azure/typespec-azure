@@ -1,1 +1,0 @@
-import "./contoso.tsp";

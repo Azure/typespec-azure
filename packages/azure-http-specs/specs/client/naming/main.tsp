@@ -143,8 +143,7 @@ namespace Header {
 }
 
 @route("/model")
-@operationGroup
-@clientName("ClientModel")
+@clientName("ModelClient")
 namespace Model {
   @clientName("CSModel", "csharp")
   @clientName("GoModel", "go")
@@ -192,7 +191,6 @@ namespace Model {
   op language(@bodyRoot body: ModelWithLanguageClientName): NoContentResponse;
 }
 
-@operationGroup
 @route("/union-enum")
 namespace UnionEnum {
   @clientName("ClientExtensibleEnum")

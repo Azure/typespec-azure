@@ -8,7 +8,6 @@ using Versioning;
 /**
  * Enumerates the standard trait locations for Azure.Core operations.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Enumerates the standard trait locations for Azure.Core operations.")
 enum TraitLocation {
   @doc("Identifies operation parameters as the trait target.")
@@ -24,7 +23,6 @@ enum TraitLocation {
 /**
  * Enumerates the standard trait contexts for Azure.Core operations.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("")
 enum TraitContext {
   @doc("Trait is applicable for resource 'read' operations.")
@@ -53,7 +51,6 @@ enum TraitContext {
  * Used to override a trait.
  * @template Trait The trait to override.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.applyTraitOverride(Trait)
 model TraitOverride<Trait extends Model> {}
 
@@ -63,9 +60,9 @@ model TraitOverride<Trait extends Model> {}
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllQueryParams(Parameters)
 model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
+  /** The query parameters contributed by this trait. */
   @traitContext(Contexts)
   queryParams: {
     @traitLocation(TraitLocation.Parameters)
@@ -78,9 +75,10 @@ model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
  * @template Parameters Object describing the query parameters.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
-model ListQueryParametersTrait<Parameters extends Model>
-  is QueryParametersTrait<Parameters, TraitContext.List>;
+model ListQueryParametersTrait<Parameters extends Model> is QueryParametersTrait<
+  Parameters,
+  TraitContext.List
+>;
 
 /**
  * Declares a trait that is applied as a request header parameter.
@@ -88,9 +86,9 @@ model ListQueryParametersTrait<Parameters extends Model>
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
 model RequestHeadersTrait<Headers extends Model, Contexts = unknown> {
+  /** The request headers contributed by this trait. */
   @traitContext(Contexts)
   requestHeaders: {
     @traitLocation(TraitLocation.Parameters)
@@ -104,9 +102,9 @@ model RequestHeadersTrait<Headers extends Model, Contexts = unknown> {
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
 model ResponseHeadersTrait<Headers extends Model, Contexts = unknown> {
+  /** The response headers contributed by this trait. */
   @traitContext(Contexts)
   responseHeaders: {
     @traitLocation(TraitLocation.Response)
@@ -119,8 +117,8 @@ model ResponseHeadersTrait<Headers extends Model, Contexts = unknown> {
  * @template VersionParameter The type of the version parameter.
  */
 @trait("VersionParameter")
-@added(Azure.Core.Versions.v1_0_Preview_2)
 model VersionParameterTrait<VersionParameter> {
+  /** The API version parameter contributed by this trait. */
   versionParameter: {
     @traitLocation(TraitLocation.ApiVersionParameter)
     apiVersionParam: VersionParameter;
@@ -135,6 +133,7 @@ model VersionParameterTrait<VersionParameter> {
 @trait("ClientRequestId")
 @traitAdded(VersionAdded)
 model SupportsClientRequestId<VersionAdded extends EnumMember | null = null> {
+  /** The client request id headers contributed by this trait. */
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   clientRequestId: {
     @traitLocation(TraitLocation.Parameters)
@@ -150,6 +149,7 @@ model SupportsClientRequestId<VersionAdded extends EnumMember | null = null> {
  */
 @trait("ClientRequestId")
 model NoClientRequestId {
+  /** Empty, indicating that client request id headers are not supported. */
   clientRequestId: {};
 }
 
@@ -161,6 +161,7 @@ model NoClientRequestId {
 @trait("ConditionalRequests")
 @traitAdded(VersionAdded)
 model SupportsConditionalRequests<VersionAdded extends EnumMember | null = null> {
+  /** The conditional request headers and ETag headers contributed by this trait. */
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   conditionalRequests: {
     @traitContext(
@@ -180,6 +181,7 @@ model SupportsConditionalRequests<VersionAdded extends EnumMember | null = null>
  */
 @trait("ConditionalRequests")
 model NoConditionalRequests {
+  /** Empty, indicating that conditional requests are not supported. */
   conditionalRequests: {};
 }
 
@@ -191,6 +193,7 @@ model NoConditionalRequests {
 @trait("RepeatableRequests")
 @traitAdded(VersionAdded)
 model SupportsRepeatableRequests<VersionAdded extends EnumMember | null = null> {
+  /** The repeatable request headers contributed by this trait. */
   #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This inline model is never used directly in operations."
   @traitContext(
     TraitContext.Create | TraitContext.Update | TraitContext.Delete | TraitContext.Action
@@ -209,6 +212,7 @@ model SupportsRepeatableRequests<VersionAdded extends EnumMember | null = null> 
  */
 @trait("RepeatableRequests")
 model NoRepeatableRequests {
+  /** Empty, indicating that repeatable requests are not supported. */
   repeatableRequests: {};
 }
 
@@ -248,7 +252,6 @@ extern dec traitLocation(target: ModelProperty, contexts: EnumMember);
 extern dec traitAdded(target: Model | ModelProperty, addedVersion: EnumMember | null);
 
 namespace Private {
-  @added(Azure.Core.Versions.v1_0_Preview_2)
   @Private.addTraitProperties(Traits, Location, Contexts)
   model TraitProperties<
     Traits extends Model,

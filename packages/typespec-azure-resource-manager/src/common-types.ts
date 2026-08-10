@@ -1,23 +1,23 @@
 import {
-  DecoratorContext,
-  Diagnostic,
-  Enum,
-  EnumMember,
-  EnumValue,
-  Model,
-  ModelProperty,
-  Namespace,
-  Program,
-  Service,
-  Type,
-  Union,
+  type DecoratorContext,
+  type Diagnostic,
+  type Enum,
+  type EnumMember,
+  type EnumValue,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Program,
+  type Service,
+  type Type,
+  type Union,
   isTypeSpecValueTypeOf,
 } from "@typespec/compiler";
 import { $useDependency, getVersion } from "@typespec/versioning";
-import { ArmCommonTypesVersionDecorator } from "../generated-defs/Azure.ResourceManager.js";
-import { ExternalTypeRefDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import type { ArmCommonTypesVersionDecorator } from "../generated-defs/Azure.ResourceManager.js";
+import type { ExternalTypeRefDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import {
-  ArmCommonTypeRecord,
+  type ArmCommonTypeRecord,
   ArmCommonTypesDefaultVersion,
   getCommonTypeRecords,
 } from "./commontypes.private.decorators.js";
@@ -122,7 +122,7 @@ export const $armCommonTypesVersion: ArmCommonTypesVersionDecorator = (
 
 /**
  * Returns the ARM common-types version used by the service.
- * @param {DecoratorContext} context DecoratorContext object
+ * @param {Program} program Program object
  * @param {type} entity Target of the decorator. Must be `Namespace` or `EnumMember` type
  */
 export function getArmCommonTypesVersion(

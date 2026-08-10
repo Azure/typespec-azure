@@ -1,22 +1,15 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import type { SdkBuiltInType } from "../../src/interfaces.js";
+import {
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
 it("use model is to represent array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       model TestModel {
@@ -27,12 +20,13 @@ it("use model is to represent array", async () => {
       op get(): TestArray;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.kind, "model");
   strictEqual(model.name, "TestModel");
-  const client = runner.context.sdkPackage.clients[0];
+  const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
   ok(method);
@@ -45,19 +39,15 @@ it("use model is to represent array", async () => {
 });
 
 it("EmbeddingVector from azure-core", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model ModelWithEmbeddingVector {
       prop: EmbeddingVector<int32>;
     }
 
     op get(): ModelWithEmbeddingVector;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   const property = model.properties[0];
@@ -68,12 +58,7 @@ it("EmbeddingVector from azure-core", async () => {
 });
 
 it("alias of EmbeddingVector", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     alias MyEmbeddingVector = EmbeddingVector<int32>;
 
     model ModelWithEmbeddingVector {
@@ -82,7 +67,8 @@ it("alias of EmbeddingVector", async () => {
 
     op get(): ModelWithEmbeddingVector;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   const property = model.properties[0];
@@ -90,4 +76,190 @@ it("alias of EmbeddingVector", async () => {
   strictEqual(property.type.name, "EmbeddingVector");
   strictEqual(property.type.crossLanguageDefinitionId, "Azure.Core.EmbeddingVector");
   strictEqual(property.type.valueType.kind, "int32");
+});
+
+it("same type's array come to same type", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop: string;
+      }
+
+      model TestArray {
+        prop1: Test[];
+        prop2: Test[];
+        prop3: string[];
+        prop4: string[];
+        prop5: Test[][];
+        prop6: Test[][];
+        prop7: Record<Test>[];
+        prop8: Record<Test>[];
+        prop9: Record<Record<Test>>[];
+        prop10: Record<Record<Test>>[];
+      }
+
+      op get(): TestArray;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const testArrayModel = context.sdkPackage.models[0];
+  strictEqual(testArrayModel.kind, "model");
+  strictEqual(testArrayModel.name, "TestArray");
+  strictEqual(testArrayModel.properties.length, 10);
+  const prop1 = testArrayModel.properties[0];
+  const prop2 = testArrayModel.properties[1];
+  const prop3 = testArrayModel.properties[2];
+  const prop4 = testArrayModel.properties[3];
+  const prop5 = testArrayModel.properties[4];
+  const prop6 = testArrayModel.properties[5];
+  const prop7 = testArrayModel.properties[6];
+  const prop8 = testArrayModel.properties[7];
+  const prop9 = testArrayModel.properties[8];
+  const prop10 = testArrayModel.properties[9];
+  strictEqual(prop1.type, prop2.type);
+  strictEqual(prop3.type, prop4.type);
+  strictEqual(prop5.type, prop6.type);
+  strictEqual(prop7.type, prop8.type);
+  strictEqual(prop9.type, prop10.type);
+});
+
+it("recursive array type", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop?: Test[];
+      }
+
+      model TestArray {
+        prop: Test[];
+      }
+
+      op get(): TestArray;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const testModel = context.sdkPackage.models[1];
+  strictEqual(testModel.kind, "model");
+  strictEqual(testModel.name, "Test");
+  strictEqual(testModel.properties.length, 1);
+  const modelProp = testModel.properties[0];
+  const testArrayModel = context.sdkPackage.models[0];
+  strictEqual(testArrayModel.kind, "model");
+  strictEqual(testArrayModel.name, "TestArray");
+  strictEqual(testArrayModel.properties.length, 1);
+  const prop = testArrayModel.properties[0];
+  strictEqual(prop.type, modelProp.type);
+});
+
+it("array with encode", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: string[];
+    }
+
+    op get(): Foo;
+  `);
+  const context = await createSdkContextForTester(program);
+  const model = context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
+  strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "string");
+  strictEqual((modelProp.type.valueType as SdkBuiltInType).encode, undefined);
+});
+
+it("array with encode for enum array", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Color {
+      Red,
+      Green,
+      Blue,
+    }
+
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: Color[];
+    }
+
+    op get(): Foo;
+  `);
+  const context = await createSdkContextForTester(program);
+  const model = context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
+  strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "enum");
+});
+
+it("array with encode for union as enum array", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    union Color {
+      Red: "red",
+      Green: "green",
+      Blue: "blue",
+      string,
+    }
+
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: Color[];
+    }
+
+    op get(): Foo;
+  `);
+  const context = await createSdkContextForTester(program);
+  const model = context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
+  strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "enum");
+  strictEqual(modelProp.type.valueType.isUnionAsEnum, true);
+});
+
+it("model with array encode and string encode from playground example", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model CommaDelimitedArrayProperty {
+      @encode(ArrayEncoding.commaDelimited)
+      value: string[];
+
+      @encode("abc", int32)
+      value1: string;
+    }
+
+    @route("/property/comma-delimited")
+    @post op commaDelimited(@body body: CommaDelimitedArrayProperty): CommaDelimitedArrayProperty;
+  `);
+  const context = await createSdkContextForTester(program);
+  const model = context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "CommaDelimitedArrayProperty");
+  strictEqual(model.properties.length, 2);
+
+  // array property with commaDelimited encoding
+  const arrayProp = model.properties.find((p) => p.name === "value")!;
+  ok(arrayProp);
+  strictEqual(arrayProp.type.kind, "array");
+  strictEqual(arrayProp.encode, "commaDelimited");
+  strictEqual(arrayProp.type.valueType.kind, "string");
+  strictEqual((arrayProp.type.valueType as SdkBuiltInType).encode, undefined);
+
+  // string property with custom encoding and int32 encodedAs
+  const stringProp = model.properties.find((p) => p.name === "value1")!;
+  ok(stringProp);
+  strictEqual(stringProp.type.kind, "string");
+  const stringType = stringProp.type as SdkBuiltInType;
+  strictEqual(stringType.encode, "abc");
+  strictEqual(stringType.wireType?.kind, "int32");
 });

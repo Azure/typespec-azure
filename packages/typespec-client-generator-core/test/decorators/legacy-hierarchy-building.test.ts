@@ -1,0 +1,1112 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
+import { ok, strictEqual } from "assert";
+import { it } from "vitest";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
+
+it("three-level inheritance chain", async () => {
+  // Expected after rebase:
+  //   C extends B extends A
+  //   A.properties = { kind }, B.properties = { kind, foo }, C.properties = { kind, bar }.
+  //   Discriminator A.kind dispatches to { B, C }; B.kind dispatches to { C }.
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("kind")
+      model A {
+        kind: string;
+      }
+
+      alias BContent = {
+        foo: string;
+      };
+
+      model B extends A {
+        kind: "B";
+        ...BContent;
+      }
+
+      @Legacy.hierarchyBuilding(B)
+      model C extends A {
+        kind: "C";
+        ...BContent;
+        bar: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const modelA = models.find((m) => m.name === "A");
+  const modelB = models.find((m) => m.name === "B");
+  const modelC = models.find((m) => m.name === "C");
+
+  ok(modelA);
+  ok(modelB);
+  ok(modelC);
+
+  // C should inherit from B instead of A due to @Legacy.hierarchyBuilding
+  strictEqual(modelC.baseModel?.name, "B");
+  strictEqual(modelB.baseModel?.name, "A");
+
+  // Verify discriminator property is correctly identified
+  strictEqual(modelA.discriminatorProperty?.name, "kind");
+  strictEqual(modelB.discriminatorValue, "B");
+  strictEqual(modelB.discriminatorProperty?.name, "kind");
+  strictEqual(modelC.discriminatorValue, "C");
+  strictEqual(modelC.discriminatorProperty, undefined);
+  strictEqual(modelA.discriminatorValue, undefined);
+
+  // Verify properties are correctly inherited
+  strictEqual(modelC.properties.length, 2);
+  strictEqual(modelC.properties[0].name, "kind");
+  strictEqual(modelC.properties[1].name, "bar");
+  strictEqual(modelB.properties.length, 2);
+  strictEqual(modelB.properties[0].name, "kind");
+  strictEqual(modelB.properties[1].name, "foo");
+  strictEqual(modelA.properties.length, 1);
+  strictEqual(modelA.properties[0].name, "kind");
+
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(modelA.discriminatedSubtypes);
+  strictEqual(modelA.discriminatedSubtypes["B"], modelB);
+  strictEqual(modelA.discriminatedSubtypes["C"], modelC);
+
+  ok(modelB.discriminatedSubtypes);
+  strictEqual(modelB.discriminatedSubtypes["C"], modelC);
+});
+
+it("four-level inheritance chain", async () => {
+  // Expected after rebase:
+  //   SportsCar extends Car extends MotorVehicle extends Vehicle
+  //   Vehicle.properties = { type }, MotorVehicle.properties = { type, engine },
+  //   Car.properties = { type, doors }, SportsCar.properties = { type, topSpeed }.
+  //   Discriminator Vehicle.type dispatches to { MotorVehicle, Car, SportsCar }.
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("type")
+      model Vehicle {
+        type: string;
+      }
+
+      alias MotorVehicleContent = {
+        engine: string;
+      };
+
+      model MotorVehicle extends Vehicle {
+        type: "motor";
+        ...MotorVehicleContent;
+      }
+
+      alias CarContent = {
+        doors: int32;
+      };
+
+      @Legacy.hierarchyBuilding(MotorVehicle)
+      model Car extends Vehicle {
+        type: "car";
+        ...MotorVehicleContent;
+        ...CarContent;
+      }
+
+      @Legacy.hierarchyBuilding(Car)
+      model SportsCar extends Vehicle {
+        type: "sports";
+        ...MotorVehicleContent;
+        ...CarContent;
+        topSpeed: int32;
+      }
+
+      @route("/vehicles")
+      op getVehicle(): Vehicle;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const vehicleModel = models.find((m) => m.name === "Vehicle");
+  const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
+  const carModel = models.find((m) => m.name === "Car");
+  const sportsCarModel = models.find((m) => m.name === "SportsCar");
+
+  ok(vehicleModel);
+  ok(motorVehicleModel);
+  ok(carModel);
+  ok(sportsCarModel);
+
+  // SportsCar should inherit from Car instead of Vehicle due to @Legacy.hierarchyBuilding
+  strictEqual(sportsCarModel.baseModel?.name, "Car");
+  strictEqual(carModel.baseModel?.name, "MotorVehicle");
+  strictEqual(motorVehicleModel.baseModel?.name, "Vehicle");
+
+  // Verify discriminator property is correctly identified
+  strictEqual(vehicleModel.discriminatorProperty?.name, "type");
+  strictEqual(motorVehicleModel.discriminatorValue, "motor");
+  strictEqual(motorVehicleModel.discriminatorProperty?.name, "type");
+  strictEqual(carModel.discriminatorValue, "car");
+  strictEqual(carModel.discriminatorProperty?.name, "type");
+  strictEqual(sportsCarModel.discriminatorValue, "sports");
+  strictEqual(sportsCarModel.discriminatorProperty, undefined);
+
+  // Verify properties are correctly inherited
+  strictEqual(sportsCarModel.properties.length, 2);
+  strictEqual(sportsCarModel.properties[0].name, "type");
+  strictEqual(sportsCarModel.properties[1].name, "topSpeed");
+  strictEqual(carModel.properties.length, 2);
+  strictEqual(carModel.properties[0].name, "type");
+  strictEqual(carModel.properties[1].name, "doors");
+  strictEqual(motorVehicleModel.properties.length, 2);
+  strictEqual(motorVehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties[1].name, "engine");
+  strictEqual(vehicleModel.properties.length, 1);
+  strictEqual(vehicleModel.properties[0].name, "type");
+
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(vehicleModel.discriminatedSubtypes);
+  strictEqual(vehicleModel.discriminatedSubtypes["motor"], motorVehicleModel);
+  strictEqual(vehicleModel.discriminatedSubtypes["car"], carModel);
+  strictEqual(vehicleModel.discriminatedSubtypes["sports"], sportsCarModel);
+  ok(motorVehicleModel.discriminatedSubtypes);
+  strictEqual(motorVehicleModel.discriminatedSubtypes["car"], carModel);
+  // strictEqual(motorVehicleModel.discriminatedSubtypes["sports"], sportsCarModel);
+  ok(carModel.discriminatedSubtypes);
+  strictEqual(carModel.discriminatedSubtypes["sports"], sportsCarModel);
+});
+
+it("nested property inheritance", async () => {
+  // Expected after rebase:
+  //   SmartKindSalmon extends KingSalmon extends Salmon
+  //   SmartKindSalmon.properties = { kind }, KingSalmon.properties = { kind, properties },
+  //   Salmon.properties = { kind, properties }.
+  //   Nested anonymous `properties` model is a different shape per subtype
+  //   (refinement is allowed); compatibility check stays silent.
+  const { program } = await SimpleTesterWithService.compile(`
+    @discriminator("kind")
+    model Salmon {
+      properties: {
+      }
+    }
+
+    model KingSalmon extends Salmon {
+      kind: "kingsalmon";
+      properties: {
+        farmed: false;
+        size: int32;
+      }
+    }
+
+    @Legacy.hierarchyBuilding(KingSalmon)
+    model SmartKindSalmon extends Salmon {
+      kind: "smartkingsalmon";
+      properties: {
+        farmed: boolean;
+        size: boolean;
+      }
+    }
+
+    @route("/salmon")
+    op getSalmon(): Salmon;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 6);
+  const salmonModel = models.find((m) => m.name === "Salmon");
+  const kingSalmonModel = models.find((m) => m.name === "KingSalmon");
+  const smartKingSalmonModel = models.find((m) => m.name === "SmartKindSalmon");
+  const salmonPropertiesModel = models.find((m) => m.name === "SalmonProperties");
+  const kingSalmonPropertiesModel = models.find((m) => m.name === "KingSalmonProperties");
+  const smartKingSalmonPropertiesModel = models.find((m) => m.name === "SmartKindSalmonProperties");
+
+  ok(salmonModel);
+  ok(kingSalmonModel);
+  ok(smartKingSalmonModel);
+  ok(salmonPropertiesModel);
+  ok(kingSalmonPropertiesModel);
+  ok(smartKingSalmonPropertiesModel);
+
+  // SmartKindSalmon should inherit from KingSalmon instead of Salmon due to @Legacy.hierarchyBuilding
+  strictEqual(smartKingSalmonModel.baseModel?.name, "KingSalmon");
+  strictEqual(kingSalmonModel.baseModel?.name, "Salmon");
+
+  // Verify discriminator property is correctly identified
+  strictEqual(salmonModel.discriminatorProperty?.name, "kind");
+  strictEqual(kingSalmonModel.discriminatorValue, "kingsalmon");
+  strictEqual(kingSalmonModel.discriminatorProperty?.name, "kind");
+  strictEqual(smartKingSalmonModel.discriminatorValue, "smartkingsalmon");
+  strictEqual(smartKingSalmonModel.discriminatorProperty, undefined);
+
+  // Verify properties are correctly inherited
+  strictEqual(smartKingSalmonModel.properties.length, 1);
+  strictEqual(smartKingSalmonModel.properties[0].name, "kind");
+  strictEqual(smartKingSalmonPropertiesModel.properties.length, 2);
+  strictEqual(smartKingSalmonPropertiesModel.properties[0].name, "farmed");
+  strictEqual(smartKingSalmonPropertiesModel.properties[0].type.kind, "boolean");
+  strictEqual(smartKingSalmonPropertiesModel.properties[1].name, "size");
+  strictEqual(smartKingSalmonPropertiesModel.properties[1].type.kind, "boolean");
+
+  strictEqual(kingSalmonModel.properties.length, 2);
+  strictEqual(kingSalmonModel.properties[0].name, "kind");
+  strictEqual(kingSalmonModel.properties[1].type, kingSalmonPropertiesModel);
+  strictEqual(kingSalmonPropertiesModel.properties.length, 2);
+  strictEqual(kingSalmonPropertiesModel.properties[0].name, "farmed");
+  strictEqual(kingSalmonPropertiesModel.properties[0].type.kind, "constant");
+  strictEqual(kingSalmonPropertiesModel.properties[0].type.value, false);
+  strictEqual(kingSalmonPropertiesModel.properties[1].name, "size");
+  strictEqual(kingSalmonPropertiesModel.properties[1].type.kind, "int32");
+  strictEqual(salmonModel.properties.length, 2);
+  strictEqual(salmonModel.properties[0].name, "kind");
+  strictEqual(salmonModel.properties[0].type.kind, "string");
+  strictEqual(salmonModel.properties[1].type, salmonPropertiesModel);
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(salmonModel.discriminatedSubtypes);
+  strictEqual(salmonModel.discriminatedSubtypes["kingsalmon"], kingSalmonModel);
+  strictEqual(salmonModel.discriminatedSubtypes["smartkingsalmon"], smartKingSalmonModel);
+  ok(kingSalmonModel.discriminatedSubtypes);
+  strictEqual(kingSalmonModel.discriminatedSubtypes["smartkingsalmon"], smartKingSalmonModel);
+  ok(!smartKingSalmonModel.discriminatedSubtypes);
+});
+
+it("circular inheritance", async () => {
+  const { program } = await SimpleTester.compile(`
+      @service
+      @usage(Usage.input)
+      namespace TestService;
+
+      model A extends B {
+        propA: string;
+      }
+
+      @Legacy.hierarchyBuilding(A)
+      model B extends C {
+        propB: string;
+      }
+
+      model C {
+        propC: string;
+      }
+    `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
+    message: "@hierarchyBuilding decorator causes recursive base type reference.",
+  });
+});
+
+it("another circular inheritance", async () => {
+  const { program } = await SimpleTester.compile(`
+      @service
+      namespace TestService;
+
+      model A extends B {
+        propA: string;
+      }
+
+      model B extends C {
+        propB: string;
+      }
+
+      @Legacy.hierarchyBuilding(A)
+      model C {
+        propC: string;
+      }
+    `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
+    message: "@hierarchyBuilding decorator causes recursive base type reference.",
+  });
+});
+
+it("rebases to an unrelated base and lifts properties from the original parent", async () => {
+  // Expected after rebase:
+  //   C extends B
+  //   C.properties = { propC, propA }, B.properties = { propB }.
+  //   propA is lifted from the removed intermediate A; propB is supplied by the new base B.
+  const { program } = await SimpleTesterWithService.compile(`
+      model A {
+        propA: string;
+      }
+
+      model B {
+        propB: string;
+      }
+
+      @Legacy.hierarchyBuilding(B)
+      model C extends A {  // Doesn't have propB but @Legacy.hierarchyBuilding says B
+        propC: string;
+      }
+
+      @route("/test")
+      op test(): C;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const cModel = models.find((m) => m.name === "C");
+  ok(cModel);
+  // The rebase should succeed regardless of property-shape mismatch.
+  strictEqual(cModel.baseModel?.name, "B");
+  // C's own property is preserved; propA from removed intermediate A is lifted onto C.
+  // propB is supplied by the new base B, not lifted.
+  const propNames = cModel.properties.map((p) => p.name).sort();
+  ok(propNames.includes("propC"));
+  ok(propNames.includes("propA"));
+  ok(!propNames.includes("propB"));
+});
+
+it("inheritance override with template models", async () => {
+  // Expected after rebase:
+  //   SpecialContainer extends StringContainer extends Container<string>
+  //   SpecialContainer.properties = { type, metadata } (data is supplied by Container).
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("type")
+      model Container<T> {
+        type: string;
+        data: T;
+      }
+
+      model StringContainer extends Container<string> {
+        type: "string";
+      }
+
+      @Legacy.hierarchyBuilding(StringContainer)
+      model SpecialContainer extends Container<string> {
+        type: "special";
+        metadata: Record<string>;
+      }
+
+      @route("/containers")
+      op getContainer(): Container<string>;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const specialContainerModel = models.find((m) => m.name === "SpecialContainer");
+
+  ok(specialContainerModel);
+  // Should inherit from StringContainer instead of Container<string>
+  strictEqual(specialContainerModel.baseModel?.name, "StringContainer");
+});
+
+it("without polymorphism", async () => {
+  // Expected after rebase:
+  //   C extends B extends A
+  //   A.properties = { kind }, B.properties = { kind, foo }, C.properties = { kind, bar }.
+  //   Same shape as the discriminated three-level test but without @discriminator.
+  const { program } = await SimpleTesterWithService.compile(`
+      model A {
+        kind: string;
+      }
+
+      alias BContent = {
+        foo: string;
+      };
+
+      model B extends A {
+        kind: "B";
+        ...BContent;
+      }
+
+      @Legacy.hierarchyBuilding(B)
+      model C extends A {
+        kind: "C";
+        ...BContent;
+        bar: string;
+      }
+
+      op test(): C;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  const aModel = models.find((m) => m.name === "A");
+  const bModel = models.find((m) => m.name === "B");
+  const cModel = models.find((m) => m.name === "C");
+
+  ok(aModel);
+  ok(bModel);
+  ok(cModel);
+
+  // C should inherit from B instead of A due to @Legacy.hierarchyBuilding
+  strictEqual(cModel.baseModel?.name, "B");
+  strictEqual(bModel.baseModel?.name, "A");
+});
+
+it("verify respectLegacyHierarchyBuilding: false flag", async () => {
+  // Expected when the flag disables hierarchyBuilding:
+  //   SportsCar extends Vehicle, Car extends Vehicle (original chain preserved)
+  //   SportsCar.properties = { type }, Car.properties = { type }, Vehicle.properties = { type }.
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("type")
+      model Vehicle {
+        type: string;
+      }
+
+      model Car extends Vehicle {
+        type: "car";
+      }
+
+      @Legacy.hierarchyBuilding(Car)
+      model SportsCar extends Vehicle {
+        type: "sports";
+      }
+
+      @route("/vehicles")
+      op getVehicle(): Vehicle;
+    `);
+
+  const context = await createSdkContextForTester(
+    program,
+    {},
+    { enableLegacyHierarchyBuilding: false },
+  );
+
+  // Should not apply legacy hierarchy building
+  const models = context.sdkPackage.models;
+  const vehicleModel = models.find((m) => m.name === "Vehicle");
+  const carModel = models.find((m) => m.name === "Car");
+  const sportsCarModel = models.find((m) => m.name === "SportsCar");
+  ok(vehicleModel);
+  ok(carModel);
+  ok(sportsCarModel);
+  // SportsCar should inherit from Vehicle instead of Car
+  strictEqual(sportsCarModel.baseModel?.name, "Vehicle");
+  strictEqual(carModel.baseModel?.name, "Vehicle");
+});
+
+it("verify diagnostic gets raised for usage", async () => {
+  const result = await AzureCoreTester.diagnose(
+    `        
+        namespace MyService {
+        @discriminator("kind")
+        model A {
+          kind: string;
+        }
+
+        alias BContent = {
+          foo: string;
+        };
+
+        model B extends A {
+          kind: "B";
+          ...BContent;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(B)
+        model C extends A {
+          kind: "C";
+          ...BContent;
+          bar: string;
+        }
+      }
+      `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+          },
+        },
+      },
+    },
+  );
+  expectDiagnostics(result, [
+    {
+      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+      message:
+        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+    },
+  ]);
+});
+
+it("verify legacy hierarchy building usage with unordered models", async () => {
+  // Expected after rebase (decorator order in the source doesn't matter):
+  //   SportsCar extends Car extends MotorVehicle extends Vehicle
+  //   Vehicle.properties = { type }, MotorVehicle.properties = { type, engine },
+  //   Car.properties = { type, doors }, SportsCar.properties = { type, topSpeed }.
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("type")
+      model Vehicle {
+        type: string;
+      }
+      alias MotorVehicleContent = {
+        engine: string;
+      };
+
+      @Legacy.hierarchyBuilding(Car)
+      model SportsCar extends Vehicle {
+        type: "sports";
+        ...MotorVehicleContent;
+        ...CarContent;
+        topSpeed: int32;
+      }
+
+      model MotorVehicle extends Vehicle {
+        type: "motor";
+        ...MotorVehicleContent;
+      }
+      alias CarContent = {
+        doors: int32;
+      };
+
+      @Legacy.hierarchyBuilding(MotorVehicle)
+      model Car extends Vehicle {
+        type: "car";
+        ...MotorVehicleContent;
+        ...CarContent;
+      }
+
+      @route("/vehicles")
+      op getVehicle(): Vehicle;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const vehicleModel = models.find((m) => m.name === "Vehicle");
+  const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
+  const carModel = models.find((m) => m.name === "Car");
+  const sportsCarModel = models.find((m) => m.name === "SportsCar");
+  ok(vehicleModel);
+  ok(motorVehicleModel);
+  ok(carModel);
+  ok(sportsCarModel);
+  strictEqual(vehicleModel.properties.length, 1);
+  strictEqual(vehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties.length, 2);
+  strictEqual(motorVehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties[1].name, "engine");
+  strictEqual(carModel.properties.length, 2);
+  strictEqual(carModel.properties[0].name, "type");
+  strictEqual(carModel.properties[1].name, "doors");
+  strictEqual(sportsCarModel.properties.length, 2);
+  strictEqual(sportsCarModel.properties[0].name, "type");
+  strictEqual(sportsCarModel.properties[1].name, "topSpeed");
+});
+
+it("handles envelope properties correctly", async () => {
+  // Real-world ARM envelope-property pattern (issue #2768).
+  // Expected after rebase:
+  //   FooResourceWithHierarchy extends TrackedResource
+  //   TrackedResource.properties = { id, name, tags, location },
+  //   FooResourceWithHierarchy.properties = {} (everything is supplied by TrackedResource;
+  //   tags from the spread `...ArmTagsProperty` is dropped by reconciliation).
+  const { program } = await SimpleTesterWithService.compile(`
+      // Simulating Azure.ResourceManager.Foundations.ArmTagsProperty
+      model ArmTagsProperty {
+        tags?: Record<string>;
+      }
+
+      // Simulating a base model with tags defined directly
+      model TrackedResource {
+        id?: string;
+        name?: string;
+        tags?: Record<string>;
+        location?: string;
+      }
+
+      // This should NOT produce a diagnostic warning
+      @Legacy.hierarchyBuilding(TrackedResource)
+      model FooResourceWithHierarchy {
+        id?: string;
+        name?: string;
+        ...ArmTagsProperty;
+        location?: string;
+      }
+
+      @route("/foo")
+      op getFoo(): FooResourceWithHierarchy;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const trackedResource = models.find((m) => m.name === "TrackedResource");
+  const fooResourceWithHierarchy = models.find((m) => m.name === "FooResourceWithHierarchy");
+
+  ok(trackedResource);
+  ok(fooResourceWithHierarchy);
+
+  // FooResourceWithHierarchy should have TrackedResource as base
+  strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
+});
+
+it("lifts intermediate property when target is rebased to its grandparent", async () => {
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a, b }, C.properties = { c }.
+  const { program } = await SimpleTesterWithService.compile(`
+      model C {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const aModel = models.find((m) => m.name === "A");
+  const cModel = models.find((m) => m.name === "C");
+  ok(aModel);
+  ok(cModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  // a is target's own property; b was lifted from removed intermediate B.
+  // c stays inherited from the new base C and is NOT on A.
+  strictEqual(aProps.length, 2);
+  ok(aProps.includes("a"));
+  ok(aProps.includes("b"));
+  // C still only has c
+  strictEqual(cModel.properties.length, 1);
+  strictEqual(cModel.properties[0].name, "c");
+});
+
+it("lifts properties from every removed intermediate ancestor", async () => {
+  // Expected after rebase:
+  //   A extends D
+  //   A.properties = { a, b, c }, D.properties = { d }.
+  const { program } = await SimpleTesterWithService.compile(`
+      model D {
+        d?: string;
+      }
+      model C extends D {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+      @Legacy.hierarchyBuilding(D)
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const aModel = models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "D");
+  const aProps = aModel.properties.map((p) => p.name);
+  // own + lifted nearest-first (B's b, then C's c)
+  strictEqual(aProps.length, 3);
+  ok(aProps.includes("a"));
+  ok(aProps.includes("b"));
+  ok(aProps.includes("c"));
+});
+
+it("rebases to an unrelated model and inherits the new base's properties", async () => {
+  // Expected after rebase:
+  //   Patch extends NewBase
+  //   Patch.properties = { description, tags }, NewBase.properties = { id, name }.
+  const { program } = await SimpleTesterWithService.compile(`
+      // simulates an external base class supplying id/name itself
+      model NewBase {
+        id: string;
+        name: string;
+      }
+      model OldBase {
+        tags?: Record<string>;
+      }
+      @Legacy.hierarchyBuilding(NewBase)
+      model Patch extends OldBase {
+        description?: string;
+      }
+
+      @route("/test")
+      op test(): Patch;
+    `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const patch = models.find((m) => m.name === "Patch");
+  ok(patch);
+  strictEqual(patch.baseModel?.name, "NewBase");
+  const props = patch.properties.map((p) => p.name).sort();
+  // id/name come from new base, not lifted; tags lifted from removed OldBase; description is target's own
+  ok(props.includes("description"));
+  ok(props.includes("tags"));
+  ok(!props.includes("id"));
+  ok(!props.includes("name"));
+});
+
+it("silently drops the lifted intermediate property when the target already defines the same name", async () => {
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { shared }, C.properties = { c }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      model C {
+        c?: string;
+      }
+      model B extends C {
+        shared?: string;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends B {
+        shared?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // A's own property wins; the same-named property on the removed intermediate
+  // is shadowed (no diagnostic, no duplicate).
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "shared");
+  // No legacy-hierarchy-building-conflict diagnostics should be raised.
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("silently drops the lifted intermediate property when the new base supplies the same name and type", async () => {
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { shared }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      model C {
+        shared?: string;
+      }
+      model OldBase {
+        shared?: string;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends OldBase {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // `shared` is supplied by the new base; A inherits it instead of owning it.
+  const aProps = aModel.properties.map((p) => p.name);
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "a");
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("treats literal and sub-scalar types as compatible with their base scalar", async () => {
+  // A.kind is a string literal, A.location is a sub-scalar of string. Both
+  // names are also supplied by the new base C with plain `string`. Because
+  // the literal/sub-scalar are assignable to `string`, reconciliation drops
+  // them silently — no diagnostic is raised.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { kind, location }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      scalar azureLocation extends string;
+      model C {
+        kind: string;
+        location: string;
+      }
+      model OldBase {
+        kind: "old";
+        location: azureLocation;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends OldBase {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  const aProps = aModel.properties.map((p) => p.name);
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "a");
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("warns when a kept property has a different type than the new base's same-named property", async () => {
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { shared: int32 }, with `legacy-hierarchy-building-conflict` warning.
+  const { program } = await SimpleTesterWithService.compile(`
+      model C {
+        shared?: int32;
+      }
+      model OldBase {
+        shared?: string;  // different type than C.shared
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends OldBase {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    message: /property 'shared' on model 'A' has type that does not match/,
+  });
+});
+
+it("only lifts properties for the requested emitter scope", async () => {
+  // Expected for csharp scope:
+  //   A extends C
+  //   A.properties = { a, b }.
+  // Expected for python scope (rebase not applied):
+  //   A extends B
+  //   A.properties = { a }.
+  const { program } = await SimpleTesterWithService.compile(`
+      model C {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+      @Legacy.hierarchyBuilding(C, "csharp")
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  // csharp scope: rebase + lift apply
+  const csharpContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const csharpA = csharpContext.sdkPackage.models.find((m) => m.name === "A");
+  ok(csharpA);
+  strictEqual(csharpA.baseModel?.name, "C");
+  const csharpProps = csharpA.properties.map((p) => p.name).sort();
+  ok(csharpProps.includes("a"));
+  ok(csharpProps.includes("b"));
+
+  // python scope: original chain preserved, no lift
+  const pythonContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const pythonA = pythonContext.sdkPackage.models.find((m) => m.name === "A");
+  ok(pythonA);
+  strictEqual(pythonA.baseModel?.name, "B");
+  const pythonProps = pythonA.properties.map((p) => p.name).sort();
+  strictEqual(pythonProps.length, 1);
+  strictEqual(pythonProps[0], "a");
+});
+
+it("rebases a target that spreads the new base instead of extending it", async () => {
+  // Expected after rebase:
+  //   A extends B
+  //   A.properties = { propA }, B.properties = { propB }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      model B {
+        propB: string;
+      }
+
+      model A {
+        ...B;
+        propA: string;
+      }
+
+      @@Legacy.hierarchyBuilding(A, B);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "B");
+  // `propB` was an own property of A via spread, but the new base now
+  // supplies it; same type → silently dropped from A.
+  const propNames = aModel.properties.map((p) => p.name).sort();
+  strictEqual(propNames.length, 1);
+  strictEqual(propNames[0], "propA");
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("rebases to a wider base whose chain supplies extra properties", async () => {
+  // Real-world ARM scenario: A originally extends a small resource base (B);
+  // we want to rebase it onto a wider resource base (BB) that also carries
+  // additional properties (e.g. systemData).
+  // Expected after rebase:
+  //   A extends BB
+  //   A.properties = { foo }, BB.properties = { id, name, type, systemData }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      model B {
+        id?: string;
+        name?: string;
+        type?: string;
+      }
+      model BB {
+        id?: string;
+        name?: string;
+        type?: string;
+        systemData?: string;
+      }
+      model A extends B {
+        foo?: string;
+      }
+
+      @@Legacy.hierarchyBuilding(A, BB);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "BB");
+  // `id`/`name`/`type` are supplied by the new base chain → dropped from A.
+  // `systemData` is also supplied by BB → A inherits it, doesn't own it.
+  // `foo` is only on A → kept.
+  const propNames = aModel.properties.map((p) => p.name).sort();
+  strictEqual(propNames.length, 1);
+  strictEqual(propNames[0], "foo");
+  const bbModel = context.sdkPackage.models.find((m) => m.name === "BB");
+  ok(bbModel);
+  ok(bbModel.properties.some((p) => p.name === "systemData"));
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("rebases an ARM-style resource onto a tracked resource base", async () => {
+  // Real-world ARM scenario: A originally extends Resource (id/name/type) and
+  // declares `location?` and `tags?` itself. We want to rebase A onto
+  // TrackedResource, which already supplies `location` (required) and `tags?`.
+  // Expected after rebase:
+  //   A extends TrackedResource
+  //   A.properties = { properties }, TrackedResource.properties = { location, tags }.
+  //   `location` and `tags` are supplied by the new base chain → dropped from A
+  //   (no diagnostic — same scalar name; required-vs-optional difference is
+  //   not surfaced by the current narrow type-mismatch check).
+  const { program } = await SimpleTesterWithService.compile(`
+      model AProperties {
+        provisioningState?: string;
+      }
+      model Resource {
+        id?: string;
+        name?: string;
+        type?: string;
+      }
+      model TrackedResource extends Resource {
+        location: string;
+        tags?: Record<string>;
+      }
+      model A extends Resource {
+        properties: AProperties;
+        location?: string;
+        tags?: Record<string>;
+      }
+
+      @@Legacy.hierarchyBuilding(A, TrackedResource);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  const trackedResourceModel = context.sdkPackage.models.find((m) => m.name === "TrackedResource");
+  ok(aModel);
+  ok(trackedResourceModel);
+  strictEqual(aModel.baseModel?.name, "TrackedResource");
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "properties");
+  // TrackedResource keeps its own location/tags; id/name/type stay on Resource.
+  const trackedProps = trackedResourceModel.properties.map((p) => p.name).sort();
+  ok(trackedProps.includes("location"));
+  ok(trackedProps.includes("tags"));
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("nested @hierarchyBuilding on the new base chain follows the original parent links", async () => {
+  // C is itself rebased onto E (a sibling of D). When A is rebased onto C,
+  // the reconciliation should walk C's *original* parent chain (C → D) to
+  // determine which names the new base chain supplies, not C's overridden
+  // chain (C → E). The end result: A extends C (the literal new base), and
+  // any name supplied by C or D is treated as inherited.
+  const { program } = await SimpleTesterWithService.compile(`
+      model E {
+        e?: string;
+      }
+      model D {
+        d?: string;
+      }
+      model C extends D {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+
+      @@Legacy.hierarchyBuilding(C, E);
+      @@Legacy.hierarchyBuilding(A, C);
+
+      model A extends B {
+        a?: string;
+        b?: string;
+        c?: string;
+        d?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // C and D supply c and d, so they are dropped from A. b is lifted from the
+  // removed intermediate B. a is A's own.
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.join(","), "a,b");
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});

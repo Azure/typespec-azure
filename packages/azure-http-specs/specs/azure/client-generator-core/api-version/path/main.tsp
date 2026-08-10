@@ -24,7 +24,6 @@ namespace Client.AlternateApiVersion.Service.Path;
 @doc("Supported api versions.")
 enum ApiVersions {
   @doc("Api version 2025-01-01.")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2025_01_01: "2025-01-01",
 }
 

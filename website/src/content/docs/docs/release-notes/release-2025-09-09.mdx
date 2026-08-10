@@ -1,0 +1,45 @@
+---
+title: 0.60.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.4"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-09-09"
+/>
+
+# 0.60.0
+
+## Breaking Changes
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3189](https://github.com/Azure/typespec-azure/pull/3189) Compare type when map body parameter to method parameter. This is a behavior breaking change. The Http parameter's corresponding parameter may change.
+
+## Features
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3223](https://github.com/Azure/typespec-azure/pull/3223) add `.decorators` property to `SdkNamespace` type that will display decorators listed in the allowed list
+- [#2980](https://github.com/Azure/typespec-azure/pull/2980) Add support for `@clientLocation` to apply to parameters.
+- [#3199](https://github.com/Azure/typespec-azure/pull/3199) Add `.pageSizeParameterSegments` to `.pagingMetadata` on paging methods to return the path to the page size parameter
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#3240](https://github.com/Azure/typespec-azure/pull/3240) Add request parameters to legacy operations list
+- [#3242](https://github.com/Azure/typespec-azure/pull/3242) Fix #3201 Remove duplicate TrackedResource type
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+- [#3178](https://github.com/Azure/typespec-azure/pull/3178) Allow renaming parameters in an operation
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3232](https://github.com/Azure/typespec-azure/pull/3232) Add warning for `@clientName` that is applied to override methods bc they're ineffectual
+- [#3208](https://github.com/Azure/typespec-azure/pull/3208) Return union of response types with warning instead of silently selecting the first one

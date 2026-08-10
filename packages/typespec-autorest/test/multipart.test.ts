@@ -43,6 +43,23 @@ it("part of type `bytes` produce `type: file`", async () => {
   ]);
 });
 
+it("part of type `File` produce `type: file`", async () => {
+  const res = await openApiFor(
+    `
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: { profileImage: HttpPart<File> }): void;
+    `,
+  );
+  const op = res.paths["/"].post;
+  deepStrictEqual(op.parameters, [
+    {
+      in: "formData",
+      name: "profileImage",
+      required: true,
+      type: "file",
+    },
+  ]);
+});
+
 it("part of type `bytes[]` produce `type: array, items: { type: string, format: binary }`", async () => {
   const res = await openApiFor(
     `
@@ -133,4 +150,14 @@ it("include x-ms-client-name if http part defines a different name from the prop
     name: "part_name",
     "x-ms-client-name": "propName",
   });
+});
+
+it("doesn't emit a schema for the multipart body if a named model", async () => {
+  const res = await openApiFor(
+    `
+    model MyMultiPartBody { profileImage: HttpPart<bytes> }
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MyMultiPartBody): void;
+    `,
+  );
+  expect(res.definitions).toEqual({}); // No schema for multipart body
 });

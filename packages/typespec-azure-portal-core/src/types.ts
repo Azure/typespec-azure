@@ -1,4 +1,4 @@
-import { EnumMember } from "@typespec/compiler";
+import type { EnumMember } from "@typespec/compiler";
 
 export interface FilePath {
   filePath: string;

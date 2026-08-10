@@ -1,11 +1,12 @@
 import {
-  Interface,
-  Operation,
-  Program,
+  type Interface,
+  type Operation,
+  type Program,
   createRule,
+  fileRef,
   getNamespaceFullName,
 } from "@typespec/compiler";
-import { TypeReferenceNode } from "@typespec/compiler/ast";
+import type { TypeReferenceNode } from "@typespec/compiler/ast";
 import { isExcludedCoreType } from "./utils.js";
 
 function getTypeReferenceNamespace(program: Program, ref: TypeReferenceNode): string {
@@ -15,9 +16,11 @@ function getTypeReferenceNamespace(program: Program, ref: TypeReferenceNode): st
 
 export const preventRestLibraryInterfaces = createRule({
   name: "no-rest-library-interfaces",
+  docs: fileRef.fromPackageRoot("src/rules/no-rest-library-interfaces.md"),
   description:
     "Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rest-library-interfaces",
   messages: {
     default: `Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.`,
   },

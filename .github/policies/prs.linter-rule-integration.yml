@@ -1,0 +1,22 @@
+id: prs.linter-rule-integration
+name: Auto-apply int:azure-specs label on linter rule changes
+description: >-
+  Automatically applies the int:azure-specs label to PRs that modify linter rule
+  source files, ensuring the External Integration check is always triggered.
+resource: repository
+disabled: false
+configuration:
+  resourceManagementConfiguration:
+    eventResponderTasks:
+      - if:
+          - payloadType: Pull_Request
+        then:
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azure-core/src/rules/**/*
+                    - packages/typespec-azure-resource-manager/src/rules/**/*
+                    - packages/typespec-client-generator-core/src/rules/**/*
+            then:
+              - addLabel:
+                  label: int:azure-specs

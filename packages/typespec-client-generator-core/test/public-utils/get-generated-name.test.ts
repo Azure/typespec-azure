@@ -1,24 +1,19 @@
-import { Model, ModelProperty, Operation } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import type { Model } from "@typespec/compiler";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { getGeneratedName, getHttpOperationWithCache } from "../../src/public-utils.js";
 import { getSdkUnion } from "../../src/types.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("simple anonymous model", () => {
   it("should handle anonymous model used by operation body", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       op test(@body body: {name: string}): void;
     `);
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
     strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
@@ -26,10 +21,11 @@ describe("simple anonymous model", () => {
   });
 
   it("should handle anonymous model used by operation response", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
         op test(): {name: string};
       `);
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestResponse");
     strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Response.anonymous");
@@ -37,10 +33,11 @@ describe("simple anonymous model", () => {
   });
 
   it("should handle anonymous model in both body and response", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       op test(@body body: {name: string}): {name: string};
     `);
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -61,7 +58,7 @@ describe("simple anonymous model", () => {
   });
 
   it("should handle anonymous model used by operation response's model", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       model A {
         pForA: {
           name: string;
@@ -69,7 +66,8 @@ describe("simple anonymous model", () => {
       }
       op test(): A;
     `);
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -82,7 +80,7 @@ describe("simple anonymous model", () => {
   });
 
   it("should handle anonymous model used by operation body's model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: {
@@ -93,7 +91,8 @@ describe("simple anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -106,7 +105,7 @@ describe("simple anonymous model", () => {
   });
 
   it("should handle anonymous model used by both input and output", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: {
@@ -117,7 +116,8 @@ describe("simple anonymous model", () => {
         op test(@body body: A): A;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -132,7 +132,7 @@ describe("simple anonymous model", () => {
 
 describe("anonymous model with array or dict", () => {
   it("should handle anonymous model array used by model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           members: {name: string}[];
@@ -140,7 +140,8 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -153,12 +154,13 @@ describe("anonymous model with array or dict", () => {
   });
 
   it("should handle anonymous model array used by operation body", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         op test(@body body: {name: string}[]): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
     strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
@@ -166,12 +168,13 @@ describe("anonymous model with array or dict", () => {
   });
 
   it("should handle anonymous model dictionary used by operation body", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         op test(@body body: Record<{name: string}>): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
     strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
@@ -179,7 +182,7 @@ describe("anonymous model with array or dict", () => {
   });
 
   it("should handle anonymous model dictionary used by model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           members: Record<{name: {value: string}}>;
@@ -187,7 +190,8 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -209,7 +213,7 @@ describe("anonymous model with array or dict", () => {
 });
 describe("anonymous model in base or derived model", () => {
   it("should handle anonymous model used by base model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A extends B {
           name: string;
@@ -222,7 +226,8 @@ describe("anonymous model in base or derived model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -235,7 +240,7 @@ describe("anonymous model in base or derived model", () => {
   });
 
   it("should handle anonymous model used by derived model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         @discriminator("kind")
         model Fish {
@@ -259,7 +264,8 @@ describe("anonymous model in base or derived model", () => {
         op test(@body body: Fish): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 5);
     ok(
       models.find(
@@ -281,7 +287,7 @@ describe("anonymous model in base or derived model", () => {
 });
 describe("recursively handle anonymous model", () => {
   it("should handle model A -> model B -> anonymous model case", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: B;
@@ -296,7 +302,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -309,7 +316,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("should handle model A -> model B -> model C -> anonymous model case", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: B;
@@ -328,7 +335,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 4);
     ok(
       models.find(
@@ -341,7 +349,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("should handle cyclic model reference", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: B;
@@ -357,7 +365,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -370,7 +379,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("should handle additional properties type", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           ...Record<{name: string}>;
@@ -379,7 +388,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -392,7 +402,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("should recursively handle array of anonymous model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: {
@@ -405,7 +415,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -426,7 +437,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("should recursively handle dict of anonymous model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: Record<{name: {value: string}}>;
@@ -434,7 +445,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -455,7 +467,7 @@ describe("recursively handle anonymous model", () => {
   });
 
   it("model property of union with anonymous model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           b: null | {
@@ -465,7 +477,8 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
       models.find(
@@ -480,7 +493,7 @@ describe("recursively handle anonymous model", () => {
 
 describe("union model's name", () => {
   it("should handle union model used in model property", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           status: "start" | "stop";
@@ -488,7 +501,8 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     const unionEnum = models[0].properties[0].type;
     strictEqual(unionEnum.kind, "enum");
@@ -512,7 +526,7 @@ describe("union model's name", () => {
   });
 
   it("should handle union of anonymous model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           items: {name: string} | {test: string} | B;
@@ -524,8 +538,9 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
-    const diagnostics = runner.context.diagnostics;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
+    const diagnostics = context.diagnostics;
     ok(diagnostics);
     strictEqual(models.length, 4);
     const union = models[0].properties[0].type;
@@ -545,7 +560,7 @@ describe("union model's name", () => {
   });
 
   it("should handle union together with anonymous model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           choices: {status: "start" | "stop"}[];
@@ -553,7 +568,8 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     const test1 = models.find(
       (x) =>
@@ -572,7 +588,7 @@ describe("union model's name", () => {
 
 describe("anonymous model used in multiple operations", () => {
   it("should handle same anonymous model used in different operations", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         model A {
           pForA: B;
@@ -596,7 +612,8 @@ describe("anonymous model used in multiple operations", () => {
         op op3(@body body: B): boolean;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
       models.find(
@@ -611,7 +628,7 @@ describe("anonymous model used in multiple operations", () => {
 
 describe("orphan model with anonymous model", () => {
   it("model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         @usage(Usage.input | Usage.output)
         model A {
@@ -621,7 +638,8 @@ describe("orphan model with anonymous model", () => {
         }
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(models[0].properties[0].crossLanguageDefinitionId, "TestService.A.pForA");
     const propType = models[0].properties[0].type;
@@ -638,7 +656,7 @@ describe("orphan model with anonymous model", () => {
   });
 
   it("union", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         @usage(Usage.input | Usage.output)
         model A {
@@ -646,7 +664,8 @@ describe("orphan model with anonymous model", () => {
         }
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     const unionEnum = models[0].properties[0].type;
     strictEqual(unionEnum.kind, "enum");
@@ -655,11 +674,114 @@ describe("orphan model with anonymous model", () => {
     // not a defined type in tsp, so no crossLanguageDefinitionId
     strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
   });
+
+  it("orphan union with null variant should not produce empty generated name", async () => {
+    const { program } = await SimpleTesterWithService.compile(
+      `
+        union Verbosity {
+          "low" | "medium" | "high",
+          null,
+        }
+
+        union ReasoningEffort {
+          "none" | "minimal" | "low" | "medium" | "high",
+          null,
+        }
+
+        @@usage(ReasoningEffort, Usage.input);
+        @@usage(Verbosity, Usage.input);
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const duplicateDiags =
+      context.diagnostics?.filter(
+        (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      ) ?? [];
+    strictEqual(duplicateDiags.length, 0, "Should not have duplicate client name diagnostics");
+  });
+
+  it("discriminator model enum name problem", async () => {
+    // The root cause of the `EouDetectionModel1` name is the orphan model handling sequence, which cause the constant (will later be replaced by enum value, so not in code model) name collide with the enum name.
+    const { program } = await SimpleTester.compile(
+      `
+        @service
+        @versioned(Versions)
+        namespace VoiceLive;
+
+        enum Versions {
+          v1,
+        }
+
+        @discriminator("model")
+        @usage(Usage.input)
+        model EouDetection {
+          \`model\`:
+            | "semantic_detection_v1"
+            | "semantic_detection_v1_en"
+            | "semantic_detection_v1_multilingual"
+            | string;
+        }
+
+        @usage(Usage.input)
+        model AzureSemanticDetection extends EouDetection {
+          \`model\`: "semantic_detection_v1";
+
+          @minValue(0)
+          timeout_ms?: int32;
+        }
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const eouModel = context.sdkPackage.models.find((m) => m.name === "EouDetection");
+    ok(eouModel, "EouDetection model should exist");
+    const eouEnum = context.sdkPackage.enums.find((e) => e.name === "EouDetectionModel");
+    ok(eouEnum, "Enum should be named 'EouDetectionModel' without numeric suffix");
+  });
+
+  it("orphan union anonymous variant should be named from model property context", async () => {
+    // Regression test: when @@usage on the union appears before @@usage on the
+    // model that references it, the anonymous model variant of the union should
+    // still get its generated name from the model property context (e.g.
+    // "OuterWithNullableValue"), not from the union context (e.g.
+    // "RecursiveNullableType1").
+    const { program } = await SimpleTesterWithService.compile(`
+      union RecursiveNullableType {
+        null,
+        {
+          inner?: RecursiveNullableType,
+        },
+      }
+
+      model OuterWithNullable {
+        value?: RecursiveNullableType;
+      }
+
+      @@access(TestService.RecursiveNullableType, Access.public);
+      @@usage(TestService.RecursiveNullableType, Usage.output);
+      @@access(TestService.OuterWithNullable, Access.public);
+      @@usage(TestService.OuterWithNullable, Usage.output);
+    `);
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
+
+    const outerModel = models.find((m) => m.name === "OuterWithNullable");
+    ok(outerModel, "Should find OuterWithNullable model");
+
+    // The anonymous model variant should be named from the model property
+    // context, not the union context.
+    const anonModel = models.find((m) => m.isGeneratedName);
+    ok(anonModel, "Should find the anonymous model variant");
+    strictEqual(
+      anonModel.name,
+      "OuterWithNullableValue",
+      "Anonymous model should be named from model property context, not union context",
+    );
+  });
 });
 
 describe("corner case", () => {
   it("anonymous model from spread alias", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         alias RequestParameter = {
           @path
@@ -671,42 +793,44 @@ describe("corner case", () => {
         op test(...RequestParameter): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
     strictEqual(models[0].usage, UsageFlags.Spread | UsageFlags.Json);
   });
 
   it("anonymous model for body parameter", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
         op test(foo: string, bar: string): void;
       `,
     );
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
     strictEqual(models[0].usage, UsageFlags.Spread | UsageFlags.Json);
   });
 
   it("anonymous union in response header", async () => {
-    const { repeatabilityResult } = (await runner.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model ResponseWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected";
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected";
 
           test: string;
         }
 
         op test(): ResponseWithAnonymousUnion;
       }
-    `)) as { repeatabilityResult: ModelProperty };
+    `);
+    const context = await createSdkContextForTester(program);
 
     strictEqual(repeatabilityResult.type.kind, "Union");
-    const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
+    const unionEnum = getSdkUnion(context, repeatabilityResult.type);
     strictEqual(unionEnum.kind, "enum");
     strictEqual(unionEnum.name, "TestResponseRepeatabilityResult");
     // not a defined type in tsp, so no crossLanguageDefinitionId
@@ -718,23 +842,23 @@ describe("corner case", () => {
   });
 
   it("anonymous union in request header", async () => {
-    const { repeatabilityResult } = (await runner.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model RequestParameterWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected";
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected";
 
           test: string;
         }
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-    `)) as { repeatabilityResult: ModelProperty };
+    `);
+    const context = await createSdkContextForTester(program);
 
     strictEqual(repeatabilityResult.type.kind, "Union");
-    const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
+    const unionEnum = getSdkUnion(context, repeatabilityResult.type);
     strictEqual(unionEnum.kind, "enum");
     strictEqual(unionEnum.name, "TestRequestRepeatabilityResult");
     // not a defined type in tsp, so no crossLanguageDefinitionId
@@ -746,23 +870,23 @@ describe("corner case", () => {
   });
 
   it("anonymous union with base type", async () => {
-    const { repeatabilityResult } = (await runner.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model RequestParameterWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected" | string;
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected" | string;
 
           test: string;
         }
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-    `)) as { repeatabilityResult: ModelProperty };
+    `);
+    const context = await createSdkContextForTester(program);
 
     strictEqual(repeatabilityResult.type.kind, "Union");
-    const stringType = getSdkUnion(runner.context, repeatabilityResult.type);
+    const stringType = getSdkUnion(context, repeatabilityResult.type);
     strictEqual(stringType.kind, "enum");
     strictEqual(stringType.values.length, 2);
     strictEqual(stringType.values[0].kind, "enumvalue");
@@ -778,13 +902,12 @@ describe("corner case", () => {
     );
   });
 
-  it("anonymous model naming in multi layer operation group", async () => {
-    const { TestModel } = (await runner.compile(`
+  it("anonymous model naming in multi layer sub client", async () => {
+    const { program } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         namespace Test {
           namespace InnerTest {
-            @test
             model TestModel {
               anonymousProp: {prop: string}
             }
@@ -792,35 +915,37 @@ describe("corner case", () => {
           }
         }
       }
-    `)) as { TestModel: Model };
+    `);
+    const context = await createSdkContextForTester(program);
 
-    runner.context.__generatedNames?.clear();
-    const name = getGeneratedName(
-      runner.context,
-      [...TestModel.properties.values()][0].type as Model,
-    );
-    strictEqual(name, "TestModelAnonymousProp");
+    // Check the generated name from the SDK package
+    const models = context.sdkPackage.models;
+    const testModel = models.find((m) => m.name === "TestModel");
+    ok(testModel);
+    const anonymousPropType = testModel.properties.find((p) => p.name === "anonymousProp")?.type;
+    strictEqual(anonymousPropType?.kind, "model");
+    strictEqual(anonymousPropType?.name, "TestModelAnonymousProp");
   });
 
   it("anonymous model in response", async () => {
-    const { test } = (await runner.compile(`
+    const { program, test } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @test
-        op test(): {@header header: string, prop: string};
+        op ${t.op("test")}(): {@header header: string, prop: string};
       }
-    `)) as { test: Operation };
+    `);
+    const context = await createSdkContextForTester(program);
 
-    const httpOperation = getHttpOperationWithCache(runner.context, test);
+    const httpOperation = getHttpOperationWithCache(context, test);
     const name = getGeneratedName(
-      runner.context,
+      context,
       httpOperation.responses[0].responses[0].body?.type as Model,
     );
     strictEqual(name, "TestResponse");
   });
 
   it("generate name conflict with user defined name", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
         model TestResponse {
           prop: string;
         }
@@ -838,8 +963,9 @@ describe("corner case", () => {
         @route("/bar")
         op bar(): TestResponse1;
     `);
+    const context = await createSdkContextForTester(program);
 
-    const models = runner.context.sdkPackage.models;
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     const TestResponse = models.find((x) => x.name === "TestResponse");
     ok(TestResponse);
@@ -859,13 +985,14 @@ describe("corner case", () => {
   });
 
   it("generated name for body root anonymous model", async function () {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       model Test {
         prop: string;
       }
       op test(@bodyRoot body: {@body body: Test}): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     strictEqual(sdkPackage.models.length, 2);
     const testModel = sdkPackage.models.find((m) => m.name === "Test");
     ok(testModel);
@@ -875,7 +1002,7 @@ describe("corner case", () => {
     const anonymousModel = sdkPackage.models.find((m) => m.name === "TestParameterBody");
     ok(anonymousModel);
     strictEqual(anonymousModel.properties.length, 1);
-    strictEqual(anonymousModel.properties[0].kind, "body");
+    strictEqual(anonymousModel.properties[0].kind, "property");
     strictEqual(anonymousModel.properties[0].name, "body");
     strictEqual(anonymousModel.properties[0].type, testModel);
   });

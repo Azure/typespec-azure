@@ -1,12 +1,14 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getRoutePath } from "@typespec/http";
-import { isResourceOperation } from "../decorators.js";
+import { isResourceOperation } from "../decorators/private/ensure-resource-type.js";
 import { isExcludedCoreType } from "./utils.js";
 
 export const noExplicitRoutesResourceOps = createRule({
   name: "no-explicit-routes-resource-ops",
+  docs: fileRef.fromPackageRoot("src/rules/no-explicit-routes-resource-ops.md"),
   description: "The @route decorator should not be used on standard resource operation signatures.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-explicit-routes-resource-ops",
   messages: {
     default:
       "The @route decorator should not be used on standard resource operation signatures. If you are trying to add a route prefix to an operation use the @route decorator on an interface or namespace instead.",

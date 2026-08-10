@@ -1,5 +1,6 @@
 ---
 title: "Data types"
+description: "Data types exported by @azure-tools/typespec-azure-portal-core"
 ---
 
 ## Azure.Portal
@@ -19,7 +20,7 @@ model Azure.Portal.AboutOptions
 | icon?          | [`FilePath`](./data-types.md#Azure.Portal.FilePath)                       | Icon which represent resource                                                                      |
 | displayNames?  | [`DisplayNamesOptions`](./data-types.md#Azure.Portal.DisplayNamesOptions) | Display names which represent the resource                                                         |
 | keywords?      | `string[]`                                                                | Comma-separated set of words or phrases which allow users to search for your asset by identifiers. |
-| learnMoreDocs? | `Portal.LearnMoreDocsOptions[]`                                           | Set of links which can help learn more about the resource                                          |
+| learnMoreDocs? | `Azure.Portal.LearnMoreDocsOptions[]`                                     | Set of links which can help learn more about the resource                                          |
 
 ### `BrowseOptions` {#Azure.Portal.BrowseOptions}
 
@@ -31,9 +32,9 @@ model Azure.Portal.BrowseOptions
 
 #### Properties
 
-| Name      | Type                        | Description                                                                                                                              |
-| --------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| argQuery? | `string \| Portal.FilePath` | argQuery can be a literal string query or KQL file path.<br />KQL query which represents all possible data for your desired browse view. |
+| Name      | Type                              | Description                                                                                                                              |
+| --------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| argQuery? | `string \| Azure.Portal.FilePath` | argQuery can be a literal string query or KQL file path.<br />KQL query which represents all possible data for your desired browse view. |
 
 ### `DisplayNamesOptions` {#Azure.Portal.DisplayNamesOptions}
 
@@ -45,10 +46,10 @@ model Azure.Portal.DisplayNamesOptions
 
 #### Properties
 
-| Name     | Type     | Description |
-| -------- | -------- | ----------- |
-| singular | `string` |             |
-| plural   | `string` |             |
+| Name     | Type     | Description                                |
+| -------- | -------- | ------------------------------------------ |
+| singular | `string` | The singular display name of the resource. |
+| plural   | `string` | The plural display name of the resource.   |
 
 ### `FilePath` {#Azure.Portal.FilePath}
 
@@ -74,10 +75,10 @@ model Azure.Portal.LearnMoreDocsOptions
 
 #### Properties
 
-| Name  | Type     | Description |
-| ----- | -------- | ----------- |
-| title | `string` |             |
-| uri   | `string` |             |
+| Name  | Type     | Description                          |
+| ----- | -------- | ------------------------------------ |
+| title | `string` | The title of the documentation link. |
+| uri   | `string` | The URI of the documentation link.   |
 
 ### `MarketplaceOfferOptions` {#Azure.Portal.MarketplaceOfferOptions}
 
@@ -103,7 +104,7 @@ model Azure.Portal.PromotionOptions
 
 #### Properties
 
-| Name        | Type                   | Description |
-| ----------- | ---------------------- | ----------- |
-| apiVersion  | `string \| EnumMember` |             |
-| autoUpdate? | `boolean`              |             |
+| Name        | Type                   | Description                                                                           |
+| ----------- | ---------------------- | ------------------------------------------------------------------------------------- |
+| apiVersion  | `string \| EnumMember` | The API version to promote, either a literal version string or a version enum member. |
+| autoUpdate? | `boolean`              | Whether the promoted API version should be updated automatically.                     |

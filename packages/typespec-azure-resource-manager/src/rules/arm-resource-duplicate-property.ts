@@ -1,11 +1,20 @@
-import { Model, ModelProperty, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type ModelProperty,
+  createRule,
+  fileRef,
+  getProperty,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getArmResource } from "../resource.js";
 
 export const armResourceDuplicatePropertiesRule = createRule({
   name: "arm-resource-duplicate-property",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-duplicate-property.md"),
   severity: "warning",
   description: "Warn about duplicate properties in resources.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-duplicate-property",
   messages: {
     default: paramMessage`Duplicate property "${"propertyName"}" found in the resource envelope and resource properties.  Please do not duplicate envelope properties in resource properties.`,
   },

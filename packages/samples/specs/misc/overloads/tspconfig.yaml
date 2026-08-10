@@ -1,3 +1,4 @@
+extends: ../../tspconfig.yaml
 emit:
   - "@azure-tools/typespec-autorest"
 

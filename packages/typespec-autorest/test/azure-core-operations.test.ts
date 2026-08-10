@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
-import { describe, it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { it } from "vitest";
+import { compileOpenAPI } from "./test-host.js";
 
 const wrapperCode = `
 using Azure.Core.Traits;
@@ -21,14 +21,9 @@ using Azure.Core.Traits;
   "{endpoint}/widget",
   "Contoso Widget APIs",
   {
-    @doc("""
-Supported Widget Services endpoints (protocol and hostname, for example:
-https://westus.api.widget.contoso.com).
-""")
     endpoint: string,
   }
 )
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 
 alias ServiceTraits = SupportsRepeatableRequests &
@@ -38,103 +33,112 @@ SupportsClientRequestId;
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 `;
 
-describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
-  it("ensure properties with 'create' visibility are included in the ResourceCreateOrUpdate body", async () => {
-    const result = await openApiFor(`
-        ${wrapperCode}
-    
-        @doc("A widget.")
-        @resource("widgets")
-        model Widget {
-          @key("widgetName")
-          @doc("The widget name.")
-          @visibility(Lifecycle.Read)
-          name: string;
-        
-          @doc("modality")
-          @visibility(Lifecycle.Create, Lifecycle.Read)
-          modality: string;
-        
-          @doc("The widget color.")
-          color: string;
-        }
-        
-        @doc("Create or update a widget.")
-        @test
-        op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
-      `);
-    const propKeys = Object.keys(result.definitions["WidgetCreateOrUpdate"].properties);
-    deepStrictEqual(propKeys, ["modality", "color"]);
-  });
-
-  it("ensure properties with 'create' visibility are included in the LongRunningResourceCreateOrUpdate body", async () => {
-    const result = await openApiFor(`
+it("ensure properties with 'create' visibility are included in the ResourceCreateOrUpdate body", async () => {
+  const result = await compileOpenAPI(
+    `
       ${wrapperCode}
-
-      @doc("A widget.")
+  
+      
       @resource("widgets")
       model Widget {
         @key("widgetName")
-        @doc("The widget name.")
+        
         @visibility(Lifecycle.Read)
         name: string;
       
-        @doc("modality")
+        
         @visibility(Lifecycle.Create, Lifecycle.Read)
         modality: string;
       
-        @doc("The widget color.")
+        
         color: string;
       }
       
-      @doc("Create or update a widget.")
+      
       @test
-      op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
-    `);
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
+    `,
+    { preset: "azure" },
+  );
+  const propKeys = Object.keys(result.definitions?.["WidgetCreateOrUpdate"].properties!);
+  deepStrictEqual(propKeys, ["modality", "color"]);
+});
 
-    const propKeys = Object.keys(result.definitions["WidgetCreateOrUpdate"].properties);
-    deepStrictEqual(propKeys, ["modality", "color"]);
-  });
+it("ensure properties with 'create' visibility are included in the LongRunningResourceCreateOrUpdate body", async () => {
+  const result = await compileOpenAPI(
+    `
+    ${wrapperCode}
 
-  it("ensure ConditionalRequestHeaders does not appear on Action or List operations", async () => {
-    function checkParams(params: any, path: string) {
-      params.forEach((param: { $ref?: string }) => {
-        if (param.$ref) {
-          const hasConditionalRequestHeaders = param.$ref.indexOf("ConditionalRequestHeaders") > -1;
-          if (hasConditionalRequestHeaders) {
-            throw new Error(`ConditionalRequestHeaders should not appear in ${path}`);
-          }
+    
+    @resource("widgets")
+    model Widget {
+      @key("widgetName")
+      
+      @visibility(Lifecycle.Read)
+      name: string;
+    
+      
+      @visibility(Lifecycle.Create, Lifecycle.Read)
+      modality: string;
+    
+      
+      color: string;
+    }
+    
+    
+    @test
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+  `,
+    { preset: "azure" },
+  );
+
+  const propKeys = Object.keys(result.definitions!["WidgetCreateOrUpdate"].properties!);
+  deepStrictEqual(propKeys, ["modality", "color"]);
+});
+
+it("ensure ConditionalRequestHeaders does not appear on Action or List operations", async () => {
+  function checkParams(params: any, path: string) {
+    params.forEach((param: { $ref?: string }) => {
+      if (param.$ref) {
+        const hasConditionalRequestHeaders = param.$ref.indexOf("ConditionalRequestHeaders") > -1;
+        if (hasConditionalRequestHeaders) {
+          throw new Error(`ConditionalRequestHeaders should not appear in ${path}`);
         }
-      });
+      }
+    });
+  }
+
+  const result = await compileOpenAPI(
+    `
+    ${wrapperCode}
+
+    
+    @resource("widgets")
+    model Widget {
+      @key("widgetName")
+      
+      name: string;
     }
 
-    const result = await openApiFor(`
-      ${wrapperCode}
+    
+    @test
+    op listWidgets is Operations.ResourceList<
+      Widget,
+      ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
+    >;
 
-      @doc("A widget.")
-      @resource("widgets")
-      model Widget {
-        @key("widgetName")
-        @doc("The widget name.")
-        name: string;
-      }
+    
+    @test
+    op actionWidget is Operations.ResourceAction<Widget, {}, {}>;
+  `,
+    { preset: "azure" },
+  );
 
-      @doc(".")
-      @test
-      op listWidgets is Operations.ResourceList<
-        Widget,
-        ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
-      >;
+  let params = result.paths["/widgets/{widgetName}:actionWidget"].post!.parameters;
+  checkParams(params, "/widgets/{widgetName}:actionWidget");
 
-      @doc(".")
-      @test
-      op actionWidget is Operations.ResourceAction<Widget, {}, {}>;
-    `);
-
-    let params = result.paths["/widgets/{widgetName}:actionWidget"].post.parameters;
-    checkParams(params, "/widgets/{widgetName}:actionWidget");
-
-    params = result.paths["/widgets"].get.parameters;
-    checkParams(params, "/widgets");
-  });
+  params = result.paths["/widgets"].get!.parameters;
+  checkParams(params, "/widgets");
 });

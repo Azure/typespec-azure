@@ -1,17 +1,44 @@
 ---
-title: Resolving Swagger Breaking Change Violations
+title: Resolving OpenAPI Breaking Change Violations
 ---
 
-The Swagger Converter will not be able to accurately represent every part of every API in TypeSpec. This document
-outlines some common changes you might need to make to a converted TypeSpec to make it conform to your existing service API and  
-pass check-in validations.
+The OpenAPI Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you may need to make to a converted TypeSpec to ensure compatibility with your existing service API and to pass check-in validations.
 
-## Migrate ARM Specs
+## Migrating ARM Specifications
 
-### Changing the Names of Request Payload Parameters
+### Customizing Route for Action (POST) Operations
 
-For operations with non-empty request bodies (PUT, POST, PATCH), the TypeSpec operation templates provide a default name for the
-request parameter corresponding to the request payload. You can use augment decorators to make changes to this parameter, and other parts of the operation signature.
+By default, the last segment of a POST action operation route is the operation name. For example:
+
+```tsp
+move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+```
+
+This produces the route:  
+`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move`
+
+To customize the action segment, use the `@action` decorator:
+
+```tsp
+@action("customizedAction")
+move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+```
+
+This produces the route:  
+`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/customizedAction`
+
+### Customizing Request Payload Parameter Names
+
+For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templates provide **standardized request body names** by default. You can use augment decorators to customize these parameter names and other parts of the operation signature.
+
+#### Migration Decision: Preserving vs. Standardizing Parameter Names
+
+Request body parameter names affect generated SDK method signatures. While parameter names do not impact the API, changing them is an SDK breaking change, which may break existing SDK consumers.
+
+When migrating from Swagger with named body parameters, use the following guidance to make your **migration decision**:
+
+- **Preserve existing names to avoid breaking changes (recommended for SDK backward compatibility):** If your SDK is already released as GA, use `@@clientName` to keep the original Swagger named body parameters. This ensures SDK compatibility for existing consumers.
+- **Use standardized TypeSpec names:** Acceptable only when a breaking change is already planned, or the SDK surface is unreleased or in preview.
 
 The following sections show how to do this for each operation template.
 
@@ -25,13 +52,13 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `resource` so you can change the name in clients using an augment decorator
+TypeSpec uses `resource` as the standardized request body parameter name. If your existing Swagger used a different name, use `@@clientName` to preserve the original Swagger named body parameter and avoid a breaking change in SDK method signatures:
 
 ```tsp
-@@clientName(Widgets.createOrUpdate::parameters.resource, "<desired-request-body-parameter-name>");
+@@clientName(Widgets.createOrUpdate::parameters.resource, "<original-swagger-body-parameter-name>");
 ```
 
-Note that this works for _any_ PUT operation template.
+This works for any PUT operation template.
 
 #### Update (PATCH) APIs
 
@@ -43,15 +70,15 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `properties` so you can change the name in clients using an augment decorator
+TypeSpec uses `properties` as the standardized request body parameter name. If your existing Swagger used a different name, use `@@clientName` to preserve the original Swagger named body parameter and avoid a breaking change in SDK method signatures:
 
 ```tsp
-@@clientName(Widgets.update::parameters.properties, "<desired-request-body-parameter-name>");
+@@clientName(Widgets.update::parameters.properties, "<original-swagger-body-parameter-name>");
 ```
 
-Note that this works for _any_ PATCH operation template.
+This works for any PATCH operation template.
 
-### Action (POST) APIs
+#### Action (POST) APIs
 
 Given a POST operation, for example:
 
@@ -61,26 +88,26 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `body` so you can change the name in clients using an augment decorator
+TypeSpec uses `body` as the standardized request body parameter name. If your existing Swagger used a different name, use `@@clientName` to preserve the original Swagger named body parameter and avoid a breaking change in SDK method signatures:
 
 ```tsp
-@@clientName(Widgets.mungeWidget::parameters.body, "<desired-request-body-parameter-name>");
+@@clientName(Widgets.mungeWidget::parameters.body, "<original-swagger-body-parameter-name>");
 ```
 
-Note that this works for _any_ POST operation template.
+This works for any POST operation template.
 
 ### Adding Request Query or Header Parameters
 
 The `Parameters` template parameter allows you to specify additional parameters after the operation path (for example, query and header parameters) in the form of a model, with each model property corresponding to a parameter. You may use intersection to combine multiple separate parameters.
 
 ```tsp
-// all list query params
+// All list query params
 op listBySubscription is ArmListBySubscription<
   Widget,
   Parameters = Azure.Core.StandardListQueryParameters
 >;
 
-// intersecting individual parameters
+// Intersecting individual parameters
 op listBySubscription is ArmListBySubscription<
   Widget,
   Parameters = Azure.Core.TopQueryParameter & Azure.Core.SkipQueryParameter
@@ -92,7 +119,6 @@ op listBySubscription is ArmListBySubscription<
 The `Response` parameter allows you to specify non-error responses to the operation.
 
 ```tsp
-// all list query params
 op listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollectionType>;
 ```
 
@@ -101,7 +127,6 @@ op listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollec
 The `Error` parameter allows you to change the default error type used in an operation.
 
 ```tsp
-// all list query params
 op listBySubscription is ArmListBySubscription<Widget, Error = MyCustomError>;
 ```
 
@@ -111,16 +136,16 @@ You can generally choose an asynchronous operation template that matches your op
 
 #### Templates for Async PUT Operations
 
-- `ArmCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Location` LRO header.
+- `ArmResourceCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains a `Location` LRO header.
 
   ```tsp
-  op createOrUpdate is ArmCreateOrReplaceAsync<Resource>;
+  op createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;
   ```
 
-- `ArmCreateOrUpdateAsync`is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Azure-AsyncOperation` LRO header.
+- `ArmResourceCreateOrUpdateAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains an `Azure-AsyncOperation` LRO header.
 
   ```tsp
-  op createOrUpdate is ArmCreateOrUpdateAsync<Resource>;
+  op createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;
   ```
 
 #### Templates for Async PATCH Operations
@@ -131,13 +156,13 @@ You can generally choose an asynchronous operation template that matches your op
   op update is ArmTagsPatchAsync<Resource>;
   ```
 
-- `ArmResourcePatchAsync`is a PATCH operation that uses the visibility settings to select properties for the PATCH request body(any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
+- `ArmResourcePatchAsync` is a PATCH operation that uses the visibility settings to select properties for the PATCH request body (any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
   op update is ArmResourcePatchAsync<Resource, ResourceProperties>;
   ```
 
-- `ArmCustomPatchAsync`is a PATCH operation that allows you to customize the PATCH request body.
+- `ArmCustomPatchAsync` is a PATCH operation that allows you to customize the PATCH request body.
 
   ```tsp
   op update is ArmCustomPatchAsync<Resource, PatchRequestBody>;
@@ -150,23 +175,27 @@ You can generally choose an asynchronous operation template that matches your op
   ```tsp
   op doStuff is ArmResourceActionAsync<Resource, ActionRequest, ActionResponse>;
 
-  // with no request body
+  // With no request body
   op doStuffNoRequest is ArmResourceActionAsync<Resource, void, ActionResponse>;
 
-  // with no response body
+  // With no response body
   op doStuffCommand is ArmResourceActionAsync<Resource, ActionRequest, void>;
   ```
 
 #### Templates for Async DELETE Operations
 
-- `ArmResourceDeleteWithoutOKAsync` is a DELETE operation that uses no request body, will return a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
+- `ArmResourceDeleteWithoutOKAsync` is a DELETE operation that uses no request body, will return a `202` response in the case of an asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
   op delete is ArmResourceDeleteWithoutOKAsync<Resource>;
   ```
 
-- `ArmResourceDeleteAsync`iis a DELETE operation that uses no request body, and return a `200` response in the case of a successful synchronous delete, a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
+- `ArmResourceDeleteAsync` is a DELETE operation that uses no request body, and returns a `200` response in the case of a successful synchronous delete, a `202` response in the case of an asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
-  op createOrUpdate is ArmResourceDeleteAsync<Resource>;
+  op delete is ArmResourceDeleteAsync<Resource>;
   ```
+
+### Visibility Changes for `nextLink` and `value` Properties
+
+For the `nextLink` and `value` properties of pageable operation response model, some older specifications marked these values as `readOnly`. This has no impact on the API or on SDKs, you can safely ignore this difference in the spec, and any resulting breaking change violation.

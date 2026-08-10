@@ -1,4 +1,4 @@
-import { ExtensionKey } from "@typespec/openapi";
+import type { ExtensionKey } from "@typespec/openapi";
 
 export type Extensions = {
   [key in ExtensionKey]?: unknown;
@@ -110,7 +110,17 @@ export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "
  * Autorest allows a few properties to be next to $ref of a property.
  */
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
-  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability" | "title"> & {
+  Pick<
+    OpenAPI2Schema,
+    | "readOnly"
+    | "description"
+    | "default"
+    | "x-ms-mutability"
+    | "title"
+    | "xml"
+    | "externalDocs"
+    | "x-ms-client-default"
+  > & {
     /**
      * Provide a different name to be used in the client.
      */
@@ -213,6 +223,9 @@ export type OpenAPI2Schema = Extensions & {
    * "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
   default?: string | boolean | number | Record<string, unknown>;
 
+  /** Example value represented as JSON. */
+  example?: unknown;
+
   /**
    * the maximum value for the property
    *
@@ -283,7 +296,46 @@ export type OpenAPI2Schema = Extensions & {
   minProperties?: number;
 
   "x-ms-mutability"?: string[];
+
+  /** Default value set by the client */
+  "x-ms-client-default"?: unknown;
+
+  /**
+   * XML metadata for the schema, if applicable.
+   */
+  xml?: XmlObject;
+
+  /** Additional external documentation. */
+  externalDocs?: OpenAPI2ExternalDocs;
 };
+
+export interface XmlObject {
+  /**
+   * Overrides the XML element name for this schema or property.
+   */
+  name?: string;
+  /**
+   * XML namespace URI to use for the element/property.
+   */
+  namespace?: string;
+  /**
+   * XML namespace prefix to apply.
+   */
+  prefix?: string;
+  /**
+   * If true, the item is serialized as an XML attribute of its parent, not as a child element.
+   */
+  attribute?: boolean;
+  /**
+   * Controls whether array items are wrapped inside a container element. Useful when serializing arrays to XML.
+   */
+  wrapped?: boolean;
+
+  /**
+   * Microsoft extension that marks a property as the text content of an XML element.
+   */
+  "x-ms-text"?: boolean;
+}
 
 export type OpenAPI2FileSchema = {
   type: "file";

@@ -14,13 +14,32 @@ ignorePaths:
   - common/scripts/*
   - packages/website/build/*
   - pnpm-lock.yaml
+  - pnpm-workspace.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
+  - eng/scripts/doc-updater/knowledge/**
   - .git/**
   - .gitignore
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
+  - "*.lock.yml"
+  # temp ignore typespec-ts while repo move is inflight
+  - packages/typespec-ts/**
+  # Go emitter generated test outputs, synced upstream specs, and build scripts
+  # contain many Go package / Azure service names that aren't worth maintaining
+  # in the global dictionary.
+  - packages/typespec-go/test/**
+  - packages/typespec-go/temp/**
+  - packages/typespec-go/.scripts/**
+  # Go spector configs carry Go module names (moved out of .scripts/tspcompile.js).
+  - packages/typespec-go/spector.config.*.yaml
+  # typespec-java specs and hand-written tests are synced verbatim from
+  # core / autorest.java; don't spell-check upstream-sourced content.
+  - packages/typespec-java/emitter-tests/tsp/**
+  - packages/typespec-java/emitter-tests/src/**
+  # Developer/user docs ported verbatim from autorest.java's typespec-extension.
+  - packages/typespec-java/docs/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -29,12 +48,16 @@ words:
   - allof
   - apim
   - apos
+  - armcontoso
   - armId
   - azsdk
   - Bazs
   - byos
+  - chartjs
   - clsx
+  - contosobenchmark
   - contosowidgetmanager
+  - Chenjie
   - DMSS
   - Donezo
   - dynatrace
@@ -42,8 +65,10 @@ words:
   - fhir
   - foos
   - français
+  - healthdataaiservices
   - horiz
   - Howtos
+  - incentivizes
   - infile
   - kvset
   - kwargs
@@ -61,23 +86,80 @@ words:
   - mobo
   - msazure
   - msdata
+  - msinternal
   - mylocation
+  - nsps
   - nupkg
   - odata
   - Onco
   - oncophenotype
   - PAYG
+  - pipx
+  - popd
   - prismjs
   - psscriptanalyzer
+  - pushd
+  - pystac
   - pytest
   - qnas
   - regionality
+  - responseasbool
+  - retarget
+  - reinjected
   - Reranker
   - rpaasoneboxacr
   - rpass
   - SERVICERP
   - seti
+  - stac
+  - strconv
+  - stretchr
   - tcgc
+  - tsmv
   - userrp
   - vnet
+  - VMSS
   - WINDOWSVMIMAGE
+  - azcore
+  - azkeys
+  - azsecrets
+  - byval
+  - devcenter
+  - petstoreopgrp
+  - pypi
+  - Tsps
+  # Go emitter
+  - addl
+  - azfake
+  - azidentity
+  - errorf
+  - fatalf
+  - gomod
+  - gopath
+  - polymorphics
+  - respr
+  - retriable
+  - unmarshaller
+  - unmarshallers
+  - unmarshalling
+  - unpopulate
+  - ervices
+  - lient
+  - onfig
+  - ossible
+  - pchars
+  - sliceof
+  - tcgcadapter
+  - uninstantiable
+  - unmarshalled
+  - cmplx
+  - fcgi
+  - flate
+  - gofmt
+  - golangci
+  - gomodtidy
+  - gosym
+  - iotest
+  - mbcs
+  - msan
+  - pkix

@@ -1,4 +1,4 @@
-import { Program, SemanticNodeListener, createRule } from "@typespec/compiler";
+import { type Program, type SemanticNodeListener, createRule, fileRef } from "@typespec/compiler";
 import { getAllHttpServices } from "@typespec/http";
 import { getVersion } from "@typespec/versioning";
 import { getArmProviderNamespace } from "../namespace.js";
@@ -9,8 +9,10 @@ import { getArmProviderNamespace } from "../namespace.js";
  */
 export const armCommonTypesVersionRule = createRule({
   name: "arm-common-types-version",
+  docs: fileRef.fromPackageRoot("src/rules/arm-common-types-version.md"),
   severity: "warning",
   description: "Specify the ARM common-types version using @armCommonTypesVersion.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-common-types-version",
   messages: {
     default:
       "Specify the ARM common-types version using the @armCommonTypesVersion decorator on the service namespace or on each version of the service version enum.",

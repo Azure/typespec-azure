@@ -1,25 +1,9 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { compileOpenAPI, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
-describe("typespec-autorest: union schema", () => {
-  it("union with self reference model and null", async () => {
-    const res = await openApiFor(
-      `
-      model Thing {
-        id: string;
-        properties: Thing | null;
-      }
-      op doStuff(): Thing;
-      `,
-    );
-    deepStrictEqual(res.definitions.Thing.properties.properties, {
-      $ref: "#/definitions/Thing",
-      "x-nullable": true,
-    });
-  });
-
+describe("union as enum", () => {
   it("union of mixed types emit diagnostic", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
@@ -40,7 +24,9 @@ describe("typespec-autorest: union schema", () => {
 
   describe("unions as enum", () => {
     it("change definition name with @clientName", async () => {
-      const res = await openApiFor(`@clientName("ClientFoo") union Foo {"a"};`);
+      const res = await compileOpenAPI(`@clientName("ClientFoo") union Foo {"a"};`, {
+        preset: "azure",
+      });
       expect(res.definitions).toHaveProperty("ClientFoo");
       expect(res.definitions).not.toHaveProperty("Foo");
     });
@@ -110,10 +96,11 @@ describe("typespec-autorest: union schema", () => {
     });
 
     it("change x-ms-enum.values names with @clientName", async () => {
-      const res = await openApiFor(
+      const res = await compileOpenAPI(
         `union Test {@clientName("OneClient") One: "one" , @clientName("TwoClient") Two: "two"};`,
+        { preset: "azure" },
       );
-      expect(res.definitions.Test["x-ms-enum"].values).toEqual([
+      expect(res.definitions?.Test["x-ms-enum"]?.values).toEqual([
         { value: "one", name: "OneClient" },
         { value: "two", name: "TwoClient" },
       ]);
@@ -167,5 +154,64 @@ describe("typespec-autorest: union schema", () => {
       );
       strictEqual(res.definitions.Foo.description, "FooUnion");
     });
+  });
+
+  it("overrides x-ms-enum.name with @clientName", async () => {
+    const res: any = await compileOpenAPI(
+      `
+        @clientName("RenamedFoo")
+        union Foo {
+          foo: "foo",
+          bar: "bar"
+        }
+
+        model FooResponse {
+          foo: Foo;
+        }`,
+      { preset: "azure" },
+    );
+    const schema = res.definitions.RenamedFoo;
+    deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
+  });
+});
+
+describe("other unions", () => {
+  it("emit a warning", async () => {
+    const diagnostics = await diagnoseOpenApiFor(`
+      model Pet {
+        name: string | int32;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/union-unsupported",
+      message:
+        "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+    });
+  });
+
+  it("produce an empty schema", async () => {
+    const res = await compileOpenAPI(
+      `
+      model Pet {
+        #suppress "@azure-tools/typespec-autorest/union-unsupported" test
+        name: string | int32;
+      };
+      `,
+    );
+    expect(res.definitions?.Pet.properties?.name).toEqual({});
+  });
+
+  it("produce an empty schema (when a template)", async () => {
+    const res = await compileOpenAPI(`
+      model Pet {
+        name: MyUnion<int32>;
+      }
+        
+      #suppress "@azure-tools/typespec-autorest/union-unsupported" test
+      union MyUnion<T> {
+        T, string
+      }
+    `);
+    expect(res.definitions?.Pet.properties?.name).toEqual({});
   });
 });

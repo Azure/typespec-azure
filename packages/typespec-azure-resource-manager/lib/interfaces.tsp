@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 
@@ -13,14 +12,18 @@ namespace Azure.ResourceManager;
  *   GET "/providers/Microsoft.ContosoProviderHub/operations"
  */
 interface Operations {
+  /**
+   * List the operations for the provider.
+   */
   @tag("Operations")
   @autoRoute
   @armUpdateProviderNamespace
   @doc("List the operations for the provider")
   @segment("operations")
   @get
+  @list
   list(
-    ...ApiVersionParameter,
+    ...CommonTypes.ApiVersionParameter,
 
     @path
     @segment("providers")
@@ -30,11 +33,12 @@ interface Operations {
 }
 
 /**
- * @deprecated Use Azure.ResourceManager.TrackedResourceOperations instead
  * A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
  * and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
  * ListBySubscription operations. The actual route depends on the resource model.
  * This is the most common API pattern for Tracked Resources to use.
+ *
+ * Deprecated: use `Azure.ResourceManager.TrackedResourceOperations` instead.
  * @template Resource the ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
@@ -42,7 +46,7 @@ interface Operations {
  */
 #deprecated "Use Azure.ResourceManager.TrackedResourceOperations instead"
 interface ResourceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > extends TrackedResourceOperations<Resource, Properties, BaseParameters> {}
@@ -58,7 +62,7 @@ interface ResourceOperations<
  *
  */
 interface TrackedResourceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 >
@@ -78,7 +82,7 @@ interface TrackedResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ProxyResourceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 >
   extends ResourceRead<Resource, BaseParameters>,
@@ -99,7 +103,7 @@ interface ProxyResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface TenantResourceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends TenantResourceRead<Resource>,
@@ -117,7 +121,7 @@ interface TenantResourceOperations<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ResourceInstanceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   PatchModel = ResourceUpdateModel<Resource, Properties>
@@ -133,7 +137,7 @@ interface ResourceInstanceOperations<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCollectionOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > extends ResourceListByParent<Resource, BaseParameters>, ResourceListBySubscription<Resource> {}
 
@@ -141,11 +145,11 @@ interface ResourceCollectionOperations<
  * An interface for resources with can be listed by subscription.
  * @template Resource The ArmResource that provides these operations
  */
-interface ResourceListBySubscription<Resource extends Foundations.Resource> {
+interface ResourceListBySubscription<Resource extends Foundations.SimpleResource> {
   /**
-   * @dev List resources by subscription.
-   * @template Resource The ArmResource to list.
+   * List resources by subscription.
    */
+  @doc("List {name} resources by subscription ID", Resource)
   listBySubscription is ArmListBySubscription<Resource>;
 }
 
@@ -157,17 +161,13 @@ interface ResourceListBySubscription<Resource extends Foundations.Resource> {
  * @template ParentFriendlyName The friendly name of the parent resource
  */
 interface ResourceListByParent<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = ""
 > {
   /**
-   * @dev List resources by parent.
-   * @template Resource The ArmResource to list.
-   * @template BaseParameters The http parameters that are part of the request
-   * @template ParentName The name of the parent resource
-   * @template ParentFriendlyName The friendly name of the parent resource
+   * List resources by parent.
    */
   @Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, true) // This must come before @armResourceList!
   listByParent is ArmResourceListByParent<Resource, BaseParameters, ParentName, ParentFriendlyName>;
@@ -179,14 +179,13 @@ interface ResourceListByParent<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceRead<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Retrieve a resource.
-   * @template Resource The ArmResource to retrieve.
-   * @template BaseParameters The http parameters that are part of the request
+   * Retrieve a resource.
    */
+  @doc("Get a {name}", Resource)
   get is ArmResourceRead<Resource, BaseParameters>;
 }
 
@@ -196,14 +195,13 @@ interface ResourceRead<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Create or update a resource using the synchronous call pattern.
-   * @template Resource The ArmResource to create or update.
-   * @template BaseParameters The http parameters that are part of the request
+   * Create or update a resource using the synchronous call pattern.
    */
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrReplaceSync<Resource, BaseParameters>;
 }
 
@@ -213,19 +211,18 @@ interface ResourceCreateSync<
  * @template BaseParameters The http parameters that are part of the request
  */
 interface ResourceCreateAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Create or update a resource using the asynchronous call pattern.
-   * @template Resource The ArmResource to create or update.
-   * @template BaseParameters The http parameters that are part of the request
+   * Create or update a resource using the asynchronous call pattern.
    */
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a long-running delete operation.
+ * A composite interface for resources that include a long-running delete operation.
  *      DEPRECATED: Use ResourceDeleteWithoutOkAsync instead
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
@@ -233,32 +230,31 @@ interface ResourceCreateAsync<
 #deprecated "This should be deprecated in a future release"
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the asynchronous call pattern.
-   * @template Resource The ArmResource to delete.
-   * @template BaseParameters The http parameters that are part of the request
+   * Delete a resource using the asynchronous call pattern.
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteAsync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a synchronous delete operation.
+ * A composite interface for resources that include a long-running delete operation
+ * without returning a final OK response.
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Delete a resource using the asynchronous call pattern")
 interface ResourceDeleteWithoutOkAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the asynchronous call pattern.
-   * @template Resource The ArmResource to delete.
-   * @template BaseParameters The http parameters that are part of the request
+   * Delete a resource using the asynchronous call pattern.
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteWithoutOkAsync<Resource, BaseParameters>;
 }
 
@@ -269,35 +265,32 @@ interface ResourceDeleteWithoutOkAsync<
  */
 @doc("Delete a resource")
 interface ResourceDeleteSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Delete a resource using the synchronous call pattern.
-   * @template Resource The ArmResource to delete.
-   * @template BaseParameters The http parameters that are part of the request
+   * Delete a resource using the synchronous call pattern.
    */
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteSync<Resource, BaseParameters>;
 }
 
 /**
- * @dev A composite interface for resources that include a long-running update operation.
+ * A composite interface for resources that include a long-running update operation.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
  */
 @doc("Asynchronous resource update")
 interface ResourceUpdateAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Update a resource using the asynchronous call pattern.
-   * @template Resource The ArmResource to update.
-   * @template Properties RP-specific property bag for the resource
-   * @template BaseParameters The http parameters that are part of the request
+   * Update a resource using the asynchronous call pattern.
    */
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchAsync<
     Resource,
     ResourceUpdateModel<Resource, Properties>,
@@ -313,16 +306,16 @@ interface ResourceUpdateAsync<
  */
 @doc("Synchronous resource update")
 interface ResourceUpdateSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   /**
-   * @dev Update a resource using the synchronous call pattern.
-   * @template Resource The ArmResource to update.
-   * @template Properties RP-specific property bag for the resource
-   * @template BaseParameters The http parameters that are part of the request
+   * Update a resource using the synchronous call pattern.
    */
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+  @patch(#{ implicitOptionality: true })
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 
@@ -333,7 +326,7 @@ interface ResourceUpdateSync<
  */
 #suppress "deprecated" "This should be deprecated in a future release"
 interface ExtensionResourceInstanceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends ExtensionResourceRead<Resource>,
@@ -345,7 +338,7 @@ interface ExtensionResourceInstanceOperations<
  * A composite interface for resource collections that include a paginated list operation.
  * @template Resource The ArmResource that provides these operations
  */
-interface ExtensionResourceCollectionOperations<Resource extends Foundations.Resource>
+interface ExtensionResourceCollectionOperations<Resource extends Foundations.SimpleResource>
   extends ExtensionResourceList<Resource> {}
 
 /**
@@ -354,84 +347,84 @@ interface ExtensionResourceCollectionOperations<Resource extends Foundations.Res
  * @template Properties RP-specific property bag for the resource
  */
 interface ExtensionResourceOperations<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 >
   extends ExtensionResourceInstanceOperations<Resource, Properties>,
     ExtensionResourceCollectionOperations<Resource> {}
 
 alias ResourceCreate<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceCreateAsync<Resource, BaseParameters>;
 
 alias ResourceUpdate<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceUpdateSync<Resource, Properties, BaseParameters>;
 
 #suppress "deprecated" "This should be deprecated in a future release"
 alias ResourceDelete<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > = ResourceDeleteAsync<Resource, BaseParameters>;
 
 alias ProxyResourceUpdate<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties>;
 
-alias ExtensionResourceRead<Resource extends Foundations.Resource> = ResourceRead<
+alias ExtensionResourceRead<Resource extends Foundations.SimpleResource> = ResourceRead<
   Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceCreate<Resource extends Foundations.Resource> = ResourceCreate<
+alias ExtensionResourceCreate<Resource extends Foundations.SimpleResource> = ResourceCreate<
   Resource,
   ExtensionBaseParameters
 >;
 
 alias ExtensionResourceUpdate<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties, ExtensionBaseParameters>;
 
 #suppress "deprecated" "This should be deprecated in a future release"
-alias ExtensionResourceDelete<Resource extends Foundations.Resource> = ResourceDelete<
+alias ExtensionResourceDelete<Resource extends Foundations.SimpleResource> = ResourceDelete<
   Resource,
   ExtensionBaseParameters
 >;
 
-alias ExtensionResourceList<Resource extends Foundations.Resource> = ResourceListByParent<
+alias ExtensionResourceList<Resource extends Foundations.SimpleResource> = ResourceListByParent<
   Resource,
   ExtensionBaseParameters,
   "Extension",
   "parent"
 >;
 
-alias TenantResourceRead<Resource extends Foundations.Resource> = ResourceRead<
+alias TenantResourceRead<Resource extends Foundations.SimpleResource> = ResourceRead<
   Resource,
   TenantBaseParameters
 >;
 
-alias TenantResourceCreate<Resource extends Foundations.Resource> = ResourceCreateAsync<
+alias TenantResourceCreate<Resource extends Foundations.SimpleResource> = ResourceCreateAsync<
   Resource,
   TenantBaseParameters
 >;
 
 #suppress "deprecated" "This should be deprecated in a future release"
-alias TenantResourceDelete<Resource extends Foundations.Resource> = ResourceDelete<
+alias TenantResourceDelete<Resource extends Foundations.SimpleResource> = ResourceDelete<
   Resource,
   TenantBaseParameters
 >;
 
 alias TenantResourceUpdate<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > = ResourceUpdate<Resource, Properties, TenantBaseParameters>;
 
-alias TenantResourceListByParent<Resource extends Foundations.Resource> = ResourceListByParent<
+alias TenantResourceListByParent<Resource extends Foundations.SimpleResource> = ResourceListByParent<
   Resource,
   TenantBaseParameters,
   "Tenant",

@@ -19,7 +19,6 @@ namespace Azure.ResourceManager;
  * ```
  *
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  *
  */
 extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof string);
@@ -32,7 +31,9 @@ extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof s
 extern dec useLibraryNamespace(target: Namespace, ...namespaces: Namespace[]);
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+ * This is used for library namespaces that define reusable ARM resource types that can be shared
+ * across multiple provider specifications.
  *
  * @example
  *
@@ -79,8 +80,9 @@ extern dec subscriptionResource(target: Model);
 /**
  * `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
  *
- * Location based resources have REST API paths like
- *   `/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
+ * **Deprecated**: This decorator is deprecated. Use `@parentResource` with `ArmLocationResource` instead.
+ * See the [Location Resource sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/location/)
+ * for the recommended approach.
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
@@ -109,59 +111,151 @@ extern dec resourceGroupResource(target: Model);
 extern dec extensionResource(target: Model);
 
 /**
- * `@armResourceType` sets the value fo the decorated string
- * property to the type of the Azure Resource Manager resource.
- * @param resource The resource to get the type of
+ * `@armProviderNameValue` sets the provider namespace value on operations.
+ * It is used internally to inject the correct provider namespace path segment
+ * for resource operations in auto-generated routes.
  */
 extern dec armProviderNameValue(target: Operation);
 
 /**
- * Marks the operation as being a collection action
+ * Marks the operation as being a collection action that is not associated with a specific resource instance.
+ * Collection actions are operations that act on a resource collection rather than a single resource,
+ * such as `checkNameAvailability` or provider-level actions.
  */
 extern dec armResourceCollectionAction(target: Operation);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+ * This decorator associates a POST action operation with its resource,
+ * identifying the semantics of the operation as a resource action over a specific resource for documentation,
+ * resource validation, and use by downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceAction(target: Operation, resourceType: Model);
+extern dec armResourceAction(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+ * This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+ * for use in documentation, resource validation, and downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceCreateOrUpdate(target: Operation, resourceType: Model);
+extern dec armResourceCreateOrUpdate(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+ * This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+ * for use in documentation, resource validation, and downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceRead(target: Operation, resourceType: Model);
+extern dec armResourceRead(target: Operation, resourceModel: Model, resourceName?: valueof string);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+ * This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+ * resource validation, and downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceUpdate(target: Operation, resourceType: Model);
+extern dec armResourceUpdate(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+ * This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+ * resource validation, and downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceDelete(target: Operation, resourceType: Model);
+extern dec armResourceDelete(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
+ * Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+ * This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+ * resource validation, and downstream emitters.
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceList(target: Operation, resourceType: Model);
+extern dec armResourceList(target: Operation, resourceModel: Model, resourceName?: valueof string);
+
+/**
+ * Marks the operation as being a check existence (HEAD) operation
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+extern dec armResourceCheckExistence(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
  * This decorator is used to identify interfaces containing resource operations.
- * When applied, it marks the interface with the `@autoRoute` decorator so that
+ * By default, it marks the interface with the `@autoRoute` decorator so that
  * all of its contained operations will have their routes generated
  * automatically.
  *
- * It also adds a `@tag` decorator bearing the name of the interface so that all
+ * The decorator also adds a `@tag` decorator bearing the name of the interface so that all
  * of the operations will be grouped based on the interface name in generated
  * clients.
- * @param _ DEPRECATED
+ *
+ * The optional `resourceOperationOptions` parameter provides additional options.
+ * `allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
+ * choose static (`@route`) or automatic (`@autoRoute`) routing.
+ *
+ * `resourceType: Model` specifies the resource type for the operations in the interface
+ *
+ * `omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+ * individually tagged
+ *
+ *
+ * @param resourceOperationOptions Options for routing the operations in the interface and associating them with a specific resource
  */
-extern dec armResourceOperations(target: Interface, _?: unknown);
+extern dec armResourceOperations(
+  target: Interface,
+  resourceOperationOptions?: (valueof ResourceOperationOptions) | unknown
+);
+
+/** Interface-level operation options */
+model ResourceOperationOptions {
+  /**
+   * The resource type for the operations in the interface
+   */
+  resourceType?: Model;
+
+  /**
+   * If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing.
+   */
+  allowStaticRoutes?: boolean;
+
+  /**
+   * If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged
+   */
+  omitTags?: boolean;
+}
 
 /**
  * This decorator is used either on a namespace or a version enum value to indicate
@@ -176,14 +270,16 @@ extern dec armCommonTypesVersion(
 
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on
- * Azure.ResourceManager common types.
+ * Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+ * which is useful for defining the scope of resources used only as parents for child resources, or scopes for extension resources.
  *
- * @param propertiesType: The type of the resource properties.
+ * @param provider Optional. The resource provider namespace for the virtual resource.
  */
-extern dec armVirtualResource(target: Model);
+extern dec armVirtualResource(target: Model, provider?: valueof string);
 
 /**
- * This decorator sets the base type of the given resource.
+ * This decorator sets the base type of the given resource, indicating where in the
+ * Azure Resource Manager hierarchy the resource is located.
  *
  * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
  */
@@ -206,4 +302,45 @@ extern dec resourceBaseType(
  * }
  * ```
  */
-extern dec identifiers(entity: ModelProperty, properties: valueof string[]);
+extern dec identifiers(entity: ModelProperty | Array<unknown>, properties: valueof string[]);
+
+/**
+ * Options for defining a feature file and its associated output
+ */
+model ArmFeatureFileOptions {
+  /** The feature name */
+  featureName: string;
+
+  /** The associated file name for the features */
+  fileName: string;
+
+  /** The feature description in Swagger */
+  description: string;
+
+  /** The feature title in Swagger */
+  title?: string;
+
+  /** The feature terms of service in Swagger */
+  termsOfService?: string;
+}
+
+/**
+ * Decorator to define a set of feature files for splitting output
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+extern dec featureFiles(target: Namespace, features: Enum);
+
+/**
+ * Decorator to define options for a specific feature file
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature file
+ */
+extern dec featureFileOptions(target: EnumMember, options: valueof ArmFeatureFileOptions);
+
+/**
+ * Decorator to associate a feature file with a model, interface, or namespace
+ * @param target The target to associate the feature file with
+ * @param featureName The feature to associate with the target
+ */
+extern dec featureFile(target: Model | Operation | Interface | Namespace, featureName: EnumMember);

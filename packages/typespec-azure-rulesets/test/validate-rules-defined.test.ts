@@ -50,4 +50,14 @@ describe("expect all rules to be defined", () => {
       }
     });
   });
+
+  it("client-sdk configures C# naming rules", () => {
+    const ruleset = $linter.ruleSets?.["client-sdk"];
+    ok(ruleset);
+    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
+    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-model-suffix"]);
+    ok(
+      ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
+    );
+  });
 });

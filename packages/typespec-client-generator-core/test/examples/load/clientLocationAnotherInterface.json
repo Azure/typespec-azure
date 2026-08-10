@@ -1,0 +1,10 @@
+{
+  "operationId": "AnotherInterface_clientLocation",
+  "title": "AnotherInterface_clientLocation",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}

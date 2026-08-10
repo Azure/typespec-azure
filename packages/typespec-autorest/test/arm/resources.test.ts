@@ -1,12 +1,73 @@
-import { deepEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
-import { openApiFor } from "../test-host.js";
+import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, expect, it } from "vitest";
+import { compileOpenAPI } from "../test-host.js";
+
+describe("CustomAzureProxyResource", () => {
+  it("emits correct paths and schemas for subscription resource with standard CRUD operations", async () => {
+    const openApi = await compileOpenAPI(
+      `
+      @armProviderNamespace
+        namespace Microsoft.Contoso;
+
+      #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+      @subscriptionResource
+      model Widget is Azure.ResourceManager.Legacy.CustomAzureProxyResource {
+         ...ResourceNameParameter<Widget>;
+         /** The widget color */
+         color?: string;
+      }
+
+      @@visibility(Widget.name, Lifecycle.Read);
+
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        put is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, Azure.ResourceManager.Foundations.TagsUpdateModel<Widget>>;
+        delete is ArmResourceDeleteSync<Widget>;
+        list is ArmListBySubscription<Widget>;
+      }
+  `,
+      { preset: "azure" },
+    );
+
+    const widgetPath =
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets/{widgetName}";
+    const listPath = "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets";
+    const opApi = openApi as any;
+
+    // Validate that all expected paths exist
+    ok(opApi.paths[widgetPath], `Expected path ${widgetPath} to exist`);
+    ok(opApi.paths[listPath], `Expected path ${listPath} to exist`);
+
+    // Validate GET 200 response references the resource schema
+    expect(opApi.paths[widgetPath].get.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT 200 response references the resource schema
+    expect(opApi.paths[widgetPath].put.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PATCH 200 response references the resource schema
+    expect(opApi.paths[widgetPath].patch.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT request body parameter references the resource schema
+    const putBodyParam = opApi.paths[widgetPath].put.parameters.find((p: any) => p.in === "body");
+    ok(putBodyParam, "Expected PUT to have a body parameter");
+    expect(putBodyParam.schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+  });
+});
 
 it("emits correct paths for tenant resources", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
 
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
@@ -71,7 +132,9 @@ it("emits correct paths for tenant resources", async () => {
           increment: safeint
         ): ArmNoContentResponse<"Weight added successfully"> | ErrorResponse;
       }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets"].get);
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}"].get);
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}"].put);
@@ -91,10 +154,10 @@ it("emits correct paths for tenant resources", async () => {
 });
 
 it("emits correct paths for checkLocalName endpoints", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
           @armProviderNamespace
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          namespace Microsoft.Contoso;
+                  namespace Microsoft.Contoso;
 
           @doc("Widget resource")
           model Widget is ProxyResource<WidgetProperties> {
@@ -122,7 +185,9 @@ it("emits correct paths for checkLocalName endpoints", async () => {
             checkName is checkGlobalNameAvailability;
             checkLocalName is checkLocalNameAvailability;
           }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/checkNameAvailability"
@@ -136,11 +201,11 @@ it("emits correct paths for checkLocalName endpoints", async () => {
 });
 
 it("emits correct paths for ArmResourceHead operation", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
         @armProviderNamespace
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
           @doc("The name of the widget")
@@ -163,7 +228,9 @@ it("emits correct paths for ArmResourceHead operation", async () => {
         interface Widgets extends Operations {
           checkExist is ArmResourceCheckExistence<Widget>;
         }
-    `);
+    `,
+    { preset: "azure" },
+  );
   const headOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -204,10 +271,10 @@ it("emits correct paths for ArmResourceHead operation", async () => {
 });
 
 it("emits correct fixed union name parameter for resource", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -231,7 +298,9 @@ it("emits correct fixed union name parameter for resource", async () => {
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-`);
+`,
+    { preset: "azure" },
+  );
   const getOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -258,16 +327,17 @@ it("emits correct fixed union name parameter for resource", async () => {
     },
     in: "path",
     name: "widgetName",
+    pattern: "^[a-zA-Z0-9-]{3,24}$",
     required: true,
     type: "string",
   });
 });
 
 it("emits a scalar string with decorator parameter for resource", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -287,7 +357,9 @@ it("emits a scalar string with decorator parameter for resource", async () => {
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-`);
+`,
+    { preset: "azure" },
+  );
   const getOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -306,25 +378,137 @@ it("emits a scalar string with decorator parameter for resource", async () => {
 });
 
 it("emits x-ms-azure-resource for resource with @azureResourceBase", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     @Azure.ResourceManager.Private.azureResourceBase
     model Widget {
        name: string;
     }
-`);
-  ok(openApi.definitions.Widget["x-ms-azure-resource"]);
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+
+it("emits allOf reference to AzureEntityResource for a model extending AzureEntityResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    /** Move response */
+    model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
+      /** The status of the move */
+      movingStatus: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect((openApi.definitions?.MoveResponse as any).allOf).toStrictEqual([
+    {
+      $ref: "../../common-types/resource-management/v3/types.json#/definitions/AzureEntityResource",
+    },
+  ]);
+});
+
+it("emits x-ms-external for resource with @armExternalType", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.armExternalType
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-external"]);
+});
+
+it("emits x-ms-azure-resource for resource with @customAzureResource and options", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource(#{isAzureResource: true})
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+it("omits path metadata for @customAzureResource with options.usePathNameParameter", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    model Widget is Azure.ResourceManager.Legacy.CustomAzureResource {
+       ...ResourceNameParameter<Widget>;
+       options: string;
+    }
+    
+    @@visibility(Widget.name, Lifecycle.Read);
+
+    interface Widgets {
+      get is ArmResourceRead<Widget>;
+      list is ArmResourceListByParent<Widget>;
+      put is ArmResourceCreateOrReplaceSync<Widget>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      update is ArmTagsPatchSync<Widget>;
+      delete is ArmResourceDeleteSync<Widget>;
+    }
+`,
+    { preset: "azure" },
+  );
+  const widgetPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}";
+  const opApi = openApi as any;
+  ok(opApi.definitions?.Widget["x-ms-azure-resource"]);
+  expect(opApi.definitions?.Widget.properties?.name).toBeUndefined();
+  expect(opApi.definitions?.Widget.properties?.widgetName).toBeUndefined();
+  expect(opApi.paths[widgetPath].put.responses["200"].schema).toStrictEqual({
+    $ref: "#/definitions/Widget",
+  });
+});
+it("does not emit x-ms-azure-resource for resource with @customAzureResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect(openApi.definitions?.Widget["x-ms-azure-resource"]).toBeUndefined();
 });
 
 it("excludes properties marked @invisible from the resource payload", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -347,9 +531,11 @@ it("excludes properties marked @invisible from the resource payload", async () =
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-  `);
+  `,
+    { preset: "azure" },
+  );
 
-  const Widget = openApi.definitions.Widget;
+  const Widget = openApi.definitions?.Widget;
 
   ok(Widget);
 
@@ -361,7 +547,7 @@ it("excludes properties marked @invisible from the resource payload", async () =
     },
   });
 
-  const WidgetProperties = openApi.definitions.WidgetProperties;
+  const WidgetProperties = openApi.definitions?.WidgetProperties;
 
   deepEqual(WidgetProperties, {
     type: "object",
@@ -374,4 +560,383 @@ it("excludes properties marked @invisible from the resource payload", async () =
     },
     required: ["size"],
   });
+});
+
+it("allows resources with multiple endpoints using LegacyOperations", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    using Azure.ResourceManager.Legacy;
+
+    /** A ContosoProviderHub resource */
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    /** Employee properties */
+    model EmployeeProperties {
+      /** Age of employee */
+      age?: int32;
+
+      /** City of employee */
+      city?: string;
+
+      /** Profile of employee */
+      @encode("base64url")
+      profile?: bytes;
+
+      /** The status of the last operation. */
+      @visibility(Lifecycle.Read)
+      provisioningState?: ProvisioningState;
+    }
+
+    /** The provisioning state of a resource. */
+    @lroStatus
+    union ProvisioningState {
+      string,
+
+      /** The resource create request has been accepted */
+      Accepted: "Accepted",
+
+      /** The resource is being provisioned */
+      Provisioning: "Provisioning",
+
+      /** The resource is updating */
+      Updating: "Updating",
+
+      /** Resource has been created. */
+      Succeeded: "Succeeded",
+
+      /** Resource creation failed. */
+      Failed: "Failed",
+
+      /** Resource creation was canceled. */
+      Canceled: "Canceled",
+
+      /** The resource is being deleted */
+      Deleting: "Deleting",
+    }
+
+    /** Employee move request */
+    model MoveRequest {
+      /** The moving from location */
+      from: string;
+
+      /** The moving to location */
+      to: string;
+    }
+
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: string;
+    }
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    /** A custom error type */
+    @error
+    model MyErrorType {
+      /** error code */
+      code: string;
+
+      /** error message */
+      message: string;
+    }
+
+    alias OtherOps
+      = Azure.ResourceManager.Legacy.LegacyOperations<
+          ParentParameters = ParentScope,
+          ResourceTypeParameter = InstanceScope,
+          ErrorType = MyErrorType
+        >;
+
+    alias BaseScope = {
+      ...ApiVersionParameter;
+      ...SubscriptionIdParameter;
+      ...Azure.ResourceManager.Legacy.Provider;
+      ...LocationParameter;
+    };
+
+    /** Experiments with scope */
+    alias InstanceScope = {
+      @doc("The employee name")
+      @path
+      @segment("employees")
+      employeeName: string;
+    };
+
+    /** The parent scope */
+    alias ParentScope = {
+      ...BaseScope;
+      ...ParentKeysOf<{
+        @doc("The employee name")
+        @path
+        @segment("employees")
+        @key
+        employeeName: string;
+      }>;
+    };
+
+    @armResourceOperations
+    interface Employees {
+      @Azure.ResourceManager.Legacy.renamePathParameter("location", "locationName")
+      get is OtherOps.Read<Employee>;
+      otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
+      update is OtherOps.CustomPatchAsync<Employee, Employee>;
+      delete is OtherOps.DeleteWithoutOkAsync<Employee, Parameters = {@doc("Permanently Delete") @query permanent?: boolean;}>;
+      list is OtherOps.List<Employee>;
+      listBySubscription is ArmListBySubscription<Employee>;
+
+      /** A sample resource action that move employee to different location */
+      move is OtherOps.ActionAsync<Employee, MoveRequest, MoveResponse>;
+
+      /** A sample HEAD operation to check resource existence */
+      checkExistence is ArmResourceCheckExistence<Employee>;
+    }
+      `,
+    { preset: "azure" },
+  );
+  ok(
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
+    ].get,
+  );
+
+  ok(
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees"
+    ].get,
+  );
+  const resourceGroupOperations =
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}"
+    ];
+  const locationPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
+  const renamedLocationPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{locationName}/employees/{employeeName}";
+
+  const locationOperations = openApi.paths[locationPath];
+  const renamedLocationOperations = openApi.paths[renamedLocationPath];
+  ok(resourceGroupOperations);
+  ok(locationOperations);
+  ok(renamedLocationOperations.get);
+  ok(locationOperations.put);
+  ok(locationOperations.patch);
+  ok(locationOperations.delete);
+  ok(openApi.paths[`${locationPath}/move`].post);
+  ok(resourceGroupOperations.put);
+  ok(resourceGroupOperations.head);
+});
+
+it("allows action requests with optional body parameters", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    /** A ContosoProviderHub resource */
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    /** Employee properties */
+    model EmployeeProperties {
+      /** Age of employee */
+      age?: int32;
+
+      /** City of employee */
+      city?: string;
+
+      /** Profile of employee */
+      @encode("base64url")
+      profile?: bytes;
+
+      /** The status of the last operation. */
+      @visibility(Lifecycle.Read)
+      provisioningState?: ProvisioningState;
+    }
+
+    /** The provisioning state of a resource. */
+    @lroStatus
+    union ProvisioningState {
+      string,
+
+      /** The resource create request has been accepted */
+      Accepted: "Accepted",
+
+      /** The resource is being provisioned */
+      Provisioning: "Provisioning",
+
+      /** The resource is updating */
+      Updating: "Updating",
+
+      /** Resource has been created. */
+      Succeeded: "Succeeded",
+
+      /** Resource creation failed. */
+      Failed: "Failed",
+
+      /** Resource creation was canceled. */
+      Canceled: "Canceled",
+
+      /** The resource is being deleted */
+      Deleting: "Deleting",
+    }
+
+    /** Employee move request */
+    model MoveRequest {
+      /** The moving from location */
+      from: string;
+
+      /** The moving to location */
+      to: string;
+    }
+
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: string;
+    }
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      update is ArmResourcePatchAsync<Employee, Employee>;
+      delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+      list is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscription<Employee>;
+
+      /** A sample resource action that move employee to different location */
+      move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, OptionalRequestBody = true>;
+
+    }
+      `,
+    { preset: "azure" },
+  );
+
+  const resourceGroupPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}";
+
+  const movePath = `${resourceGroupPath}/move`;
+  const moveOperation = openApi.paths[movePath].post;
+  ok(moveOperation);
+  ok(moveOperation.parameters[4]);
+  deepStrictEqual(moveOperation.parameters[4], {
+    name: "body",
+    in: "body",
+    description: "The content of the action request",
+    required: false,
+    schema: {
+      $ref: "#/definitions/MoveRequest",
+    },
+  });
+});
+
+it("allows sync and async provider actions with unknown body", async () => {
+  const openApi = await compileOpenAPI(
+    `@armProviderNamespace
+    namespace Microsoft.Contoso;
+    
+    @armResourceOperations
+    interface ProviderOperations {
+      calculateSync is ArmProviderActionSync<
+        Request = unknown,
+        Response = unknown,
+      >;
+      calculateAsync is ArmProviderActionAsync<
+        Request = unknown,
+        Response = unknown,
+      >;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  const syncOp = openApi.paths["/providers/Microsoft.Contoso/calculateSync"].post;
+  const asyncOp = openApi.paths["/providers/Microsoft.Contoso/calculateAsync"].post;
+
+  ok(syncOp);
+  ok(asyncOp);
+
+  deepStrictEqual(syncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+
+  deepStrictEqual(asyncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+});
+
+it("emits correct subscription-level list path for child resource using ArmListBySubscriptionScope", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    model Test is TrackedResource<{}> {
+      ...ResourceNameParameter<Test>;
+    }
+
+    @parentResource(Test)
+    model Employee is ProxyResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      age?: int32;
+      city?: string;
+    }
+
+    @armResourceOperations
+    interface Tests {
+      get is ArmResourceRead<Test>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+      delete is ArmResourceDeleteWithoutOkAsync<Test>;
+      listByResourceGroup is ArmResourceListByParent<Test>;
+    }
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+      delete is ArmResourceDeleteSync<Employee>;
+      listByParent is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscriptionScope<Employee>;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  // Verify the subscription-level list path is correct (no parent resource path segments)
+  const subscriptionListPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees";
+  ok(
+    openApi.paths[subscriptionListPath]?.get,
+    `Expected subscription-level list path ${subscriptionListPath} to exist`,
+  );
+
+  // Verify the parent-level list path also exists
+  const parentListPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/tests/{testName}/employees";
+  ok(
+    openApi.paths[parentListPath]?.get,
+    `Expected parent-level list path ${parentListPath} to exist`,
+  );
 });

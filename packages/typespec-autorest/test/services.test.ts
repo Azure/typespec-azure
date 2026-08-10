@@ -1,9 +1,10 @@
-import { deepStrictEqual } from "assert";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok } from "assert";
 import { it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { AzureTester, compileMultipleOpenAPI } from "./test-host.js";
 
 it("supports emitting multiple services", async () => {
-  const { Service, Client } = await openApiFor(
+  const { Service, Client } = await compileMultipleOpenAPI(
     `
       @service(#{ title: "My service" })
       namespace Service {
@@ -15,7 +16,7 @@ it("supports emitting multiple services", async () => {
         @route("other") op other(): string;
       }
       `,
-    ["Service", "Client"],
+    { Service: "Service/openapi.json", Client: "Client/openapi.json" },
   );
 
   deepStrictEqual(Service.paths, {
@@ -48,5 +49,44 @@ it("supports emitting multiple services", async () => {
         },
       },
     },
+  });
+});
+
+it("does not crash when no @service is defined and a model references a versioned namespace", async () => {
+  // Regression test for a null reference crash in the autorest emitter when
+  // there is no @service declared but the spec references a model from a
+  // versioned namespace (e.g. CommonTypes.AzureEntityResource).
+  const tester = await AzureTester.createInstance();
+  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
+    `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      /** Move response */
+      model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
+        /** Status */
+        movingStatus: string;
+      }
+      `,
+  );
+  expectDiagnosticEmpty(diagnostics);
+  const content = outputs["openapi.json"];
+  ok(content, "Expected to have found openapi output");
+  const openApi = JSON.parse(content);
+  deepStrictEqual(openApi.definitions?.MoveResponse, {
+    type: "object",
+    description: "Move response",
+    properties: {
+      movingStatus: {
+        type: "string",
+        description: "Status",
+      },
+    },
+    required: ["movingStatus"],
+    allOf: [
+      {
+        $ref: "../../common-types/resource-management/v3/types.json#/definitions/AzureEntityResource",
+      },
+    ],
   });
 });

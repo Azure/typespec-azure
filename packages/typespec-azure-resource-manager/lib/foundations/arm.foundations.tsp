@@ -1,4 +1,3 @@
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 
@@ -11,7 +10,6 @@ import "../private.decorators.tsp";
 import "../parameters.tsp";
 
 using Http;
-using OpenAPI;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
@@ -29,16 +27,16 @@ alias BaseParameters<Resource extends {}> = DefaultBaseParameters<Resource>;
  */
 @resourceBaseParametersOf(Resource)
 model DefaultBaseParameters<Resource extends {}> {
-  ...ApiVersionParameter;
+  ...CommonTypes.ApiVersionParameter;
 
   // unless tenant or extension
-  ...SubscriptionIdParameter;
+  ...CommonTypes.SubscriptionIdParameter;
 
   // deprecated, should not be used
-  ...LocationParameter;
+  ...CommonTypes.LocationParameter;
 
   // unless tenant, subscription, location, or extension
-  ...ResourceGroupParameter;
+  ...CommonTypes.ResourceGroupNameParameter;
 
   // unless tenant, subscription, location, or resourceGroup
   ...ResourceUriParameter;
@@ -59,14 +57,14 @@ model ArmTagsProperty {
  * The static parameters for a tenant-based resource
  */
 model TenantBaseParameters {
-  ...ApiVersionParameter;
+  ...CommonTypes.ApiVersionParameter;
 }
 
 /**
  * The static parameters for a subscription based resource
  */
 model SubscriptionBaseParameters is TenantBaseParameters {
-  ...SubscriptionIdParameter;
+  ...CommonTypes.SubscriptionIdParameter;
 }
 
 /**
@@ -80,7 +78,7 @@ model LocationBaseParameters is SubscriptionBaseParameters {
  * The static parameters for a resource-group based resource
  */
 model ResourceGroupBaseParameters is SubscriptionBaseParameters {
-  ...ResourceGroupParameter;
+  ...CommonTypes.ResourceGroupNameParameter;
 }
 
 /**
@@ -99,7 +97,7 @@ model ExtensionBaseParameters is TenantBaseParameters {
 @doc("The updatable properties of the {name}.", Resource)
 @friendlyName("{name}UpdateProperties", Resource)
 model ResourceUpdateModelProperties<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > is OptionalProperties<UpdateableProperties<Properties>>;
 
@@ -113,7 +111,7 @@ model ResourceUpdateModelProperties<
 @friendlyName("{name}Update", Resource)
 @omitIfEmpty("properties")
 model ResourceUpdateModel<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 >
   is OptionalProperties<UpdateableProperties<OmitProperties<
@@ -121,7 +119,6 @@ model ResourceUpdateModel<
     "Name" | "name" | "properties"
   >>> {
   /** The resource-specific properties for this resource. */
-  @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
@@ -131,47 +128,55 @@ model ResourceUpdateModel<
  */
 @doc("The type used for updating tags in {name} resources.", Resource)
 @friendlyName("{name}TagsUpdate", Resource)
-model TagsUpdateModel<Resource extends Foundations.Resource> {
+model TagsUpdateModel<Resource extends Foundations.SimpleResource> {
   ...ArmTagsProperty;
 }
 
 // Tenant resource operation definitions
 
-alias TenantParentScope<Resource extends Foundations.Resource> = TenantScope<Resource>;
+alias TenantParentScope<Resource extends Foundations.SimpleResource> = TenantScope<Resource>;
 
 /**
  * Parameter model for listing a resource at the tenant scope
  * @template Resource The type of the resource.
  */
-model TenantScope<Resource extends Foundations.Resource>
-  is ResourceParentParameters<Resource, TenantBaseParameters>;
+model TenantScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  TenantBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
  * @template Resource The type of the resource.
  */
-model SubscriptionScope<Resource extends Foundations.Resource>
-  is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
+model SubscriptionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  SubscriptionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the location scope
  * @template Resource The type of the resource.
  */
-model LocationScope<Resource extends Foundations.Resource>
-  is ResourceParentParameters<Resource, LocationBaseParameters>;
+model LocationScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  LocationBaseParameters
+>;
 
 /**
  * Parameter model for listing an extension resource
  * @template Resource The type of the resource.
  */
-model ExtensionScope<Resource extends Foundations.Resource>
-  is ResourceParentParameters<Resource, ExtensionBaseParameters>;
+model ExtensionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  ExtensionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
  * @template Resource The type of the resource.
  */
-model ResourceGroupScope<Resource extends Foundations.Resource>
+model ResourceGroupScope<Resource extends Foundations.SimpleResource>
   is ResourceParentParameters<Resource>;
 
 /**
@@ -182,11 +187,28 @@ model ResourceGroupScope<Resource extends Foundations.Resource>
 @doc("The type used for update operations of the {name}.", Resource)
 @friendlyName("{name}Update", Resource)
 model ProxyResourceUpdateModel<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > {
-  @conditionalClientFlatten
+  /** The resource-specific properties for this resource. */
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
+}
+
+/** A base definition of a resource using simple types.  This
+ * model should only be used as a constraint for other models.
+ */
+model SimpleResource {
+  /** The resource identifier */
+  id?: string;
+
+  /** The resource name */
+  name?: string;
+
+  /** The resource type */
+  type?: string;
+
+  /** readonly data about the resource */
+  systemData?: unknown;
 }
 
 alias DefaultProviderNamespace = {
@@ -217,7 +239,7 @@ op checkNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 >(
-  ...ApiVersionParameter,
+  ...CommonTypes.ApiVersionParameter,
   ...ScopeParameters,
   ...AdditionalParams,
 
@@ -227,39 +249,41 @@ op checkNameAvailability<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager GET and HEAD Operations.
- * @param Parameters The parameter object for the operation.
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * The base template for Azure Resource Manager GET and HEAD Operations.
+ * @template Parameters The parameter object for the operation.
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse extends {}>(
   ...Parameters,
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PUT Operations.
- * @param HttpParameters The parameter object for the operation.
- * @param BodyParameter The body parameter
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * The base template for Azure Resource Manager PUT Operations.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmCreateOperation<
   HttpParameters extends {},
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {}
->(
-  ...HttpParameters,
-  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
-): Response | ErrorResponse;
+>(...HttpParameters, @doc("Resource create parameters.") @bodyRoot resource: BodyParameter):
+  | Response
+  | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PATCH Operations.
- * @param HttpParameters The parameter object for the operation.
- * @param BodyParameter The body parameter
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * The base template for Azure Resource Manager PATCH Operations.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmUpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {},

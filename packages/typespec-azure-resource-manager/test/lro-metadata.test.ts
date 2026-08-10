@@ -1,59 +1,44 @@
-import { LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { Diagnostic, Model } from "@typespec/compiler";
-import { BasicTestRunner, expectDiagnosticEmpty } from "@typespec/compiler/testing";
-import { HttpOperation, getAllHttpServices } from "@typespec/http";
+import { type LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
+import type { Diagnostic, Model, Program } from "@typespec/compiler";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { type HttpOperation, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
-import { createAzureResourceManagerTestRunner } from "./test-host.js";
+import { Tester } from "./tester.js";
 
-async function getOperations(
-  code: string,
-): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
-  const runner = await createAzureResourceManagerTestRunner();
-  await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program);
-  return [services[0].operations, runner.program.diagnostics, runner];
+async function getOperations(code: string): Promise<[HttpOperation[], Program]> {
+  const { program } = await Tester.compile(code);
+  const [services] = getAllHttpServices(program);
+  return [services[0].operations, program];
 }
 
 async function getLroMetadataFor(
   code: string,
   operationName: string,
-): Promise<[LroMetadata | undefined, readonly Diagnostic[], BasicTestRunner]> {
-  const [operations, diagnostics, runner] = await getOperations(code);
+): Promise<LroMetadata | undefined> {
+  const [operations, program] = await getOperations(code);
   const filteredOperations = operations.filter((o) => o.operation.name === operationName);
   ok(filteredOperations?.length > 0);
   const outOperation = filteredOperations[0];
-  return [getLroMetadata(runner.program, outOperation.operation), diagnostics, runner];
+  return getLroMetadata(program, outOperation.operation);
 }
-describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
-  it("Returns correct metadata for Async CreateOrUpdate", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -63,6 +48,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -70,43 +56,32 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate with final location", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -124,6 +99,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
             string
           >
       >;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -131,43 +107,32 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async Update", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async Update", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -177,49 +142,39 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async Delete", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async Delete", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -229,61 +184,49 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "delete",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async action", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
+it("Returns correct metadata for Async action", async () => {
+  const metadata = await getLroMetadataFor(
+    `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -294,6 +237,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, ResultModel>;
@@ -301,54 +245,40 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
-  it("Returns correct metadata for Async action with void return type", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
+it("Returns correct metadata for Async action with void return type", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -359,6 +289,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, void, LroHeaders=ArmAsyncOperationHeader<FinalResult = void>>;
@@ -366,25 +297,21 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
        Succeeded: "Succeeded",
        Canceled: "Canceled",
@@ -392,18 +319,12 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
        string
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -413,6 +334,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -420,43 +342,32 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate with final location, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -474,6 +385,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
             string
           >
       >;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -481,43 +393,32 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final operation, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate with final operation, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -528,6 +429,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         get is ArmResourceRead<Widget>;
         @Azure.Core.finalOperation(Widgets.get)
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -535,43 +437,32 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async Update with final operation, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async Update with final operation, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -582,6 +473,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         @Azure.Core.finalOperation(Widgets.get)
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -589,43 +481,33 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "original-uri");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
+});
 
-  it("Returns correct metadata for Async Update with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async Update with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -635,49 +517,41 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        @Azure.Core.useFinalStateVia("original-uri")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
+});
 
-  it("Returns correct metadata for Async Delete with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async Delete with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -687,61 +561,48 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "delete",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async action with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async action with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
-        simpleArmId: ResourceIdentifier;
-
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -752,6 +613,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, ResultModel>;
@@ -759,26 +621,21 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location, with mixed union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+it("Returns correct metadata for Async CreateOrUpdate with final location, with mixed union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The state of the resource")
       union BaseState {
         Succeeded: "Succeeded",
       }
@@ -787,7 +644,6 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         Failed,
       }
 
-      @doc("The state of the resource")
       @Azure.Core.lroStatus
       union ResourceState {
         BaseState,
@@ -795,15 +651,11 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         Canceled: "Canceled",
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -823,13 +675,138 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
+
+describe("original-uri with no GET at same path", () => {
+  const providerActionSpec = `
+    @armProviderNamespace
+    namespace Microsoft.Test;
+
+    model RequestModel {
+      message: string;
+    }
+
+    {suppress}
+    @Azure.Core.useFinalStateVia("original-uri")
+    op doProviderAction is ArmProviderActionAsync<RequestModel, void, SubscriptionActionScope>;
+  `;
+
+  const widgetBase = `
+    @armProviderNamespace
+    namespace Microsoft.Test;
+
+    enum ResourceState {
+      Succeeded,
+      Canceled,
+      Failed
+    }
+
+    model WidgetProperties {
+      provisioningState: ResourceState;
+    }
+
+    model RequestModel {
+      message: string;
+    }
+
+    model Widget is TrackedResource<WidgetProperties> {
+      @key("widgetName")
+      @segment("widgets")
+      @path
+      name: string;
+    }
+  `;
+
+  const resourceActionSpec = `
+    ${widgetBase}
+
+    @armResourceOperations(Widget)
+    interface Widgets {
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      update is ArmResourcePatchSync<Widget, WidgetProperties>;
+      delete is ArmResourceDeleteSync<Widget>;
+      {suppress}
+      @Azure.Core.useFinalStateVia("original-uri")
+      doStuff is ActionAsync<Widget, RequestModel, void>;
+      listByResourceGroup is ArmResourceListByParent<Widget>;
+      listBySubscription is ArmListBySubscription<Widget>;
+    }
+  `;
+
+  function withSuppress(spec: string): string {
+    return spec.replace(
+      "{suppress}",
+      '#suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"',
     );
+  }
+
+  function withoutSuppress(spec: string): string {
+    return spec.replace("{suppress}", "");
+  }
+
+  /** Compile and call getLroMetadata, returning metadata and program diagnostics. */
+  async function getLroMetadataAndDiagnostics(
+    code: string,
+    operationName: string,
+  ): Promise<{ metadata: LroMetadata | undefined; diagnostics: readonly Diagnostic[] }> {
+    const [operations, program] = await getOperations(code);
+    const filteredOperations = operations.filter((o) => o.operation.name === operationName);
+    ok(filteredOperations?.length > 0);
+    const metadata = getLroMetadata(program, filteredOperations[0].operation);
+    return { metadata, diagnostics: program.diagnostics };
+  }
+
+  it("emits diagnostic for ArmProviderActionAsync with original-uri and no GET", async () => {
+    const { diagnostics } = await getLroMetadataAndDiagnostics(
+      withoutSuppress(providerActionSpec),
+      "doProviderAction",
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    });
+  });
+
+  it("returns void finalResult for ArmProviderActionAsync when diagnostic is suppressed", async () => {
+    const { metadata, diagnostics } = await getLroMetadataAndDiagnostics(
+      withSuppress(providerActionSpec),
+      "doProviderAction",
+    );
+    expectDiagnosticEmpty(diagnostics);
     ok(metadata);
-    expectDiagnosticEmpty(_diag);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
     deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+  });
+
+  it("emits diagnostic for ActionAsync with original-uri and no GET", async () => {
+    const { diagnostics } = await getLroMetadataAndDiagnostics(
+      withoutSuppress(resourceActionSpec),
+      "doStuff",
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    });
+  });
+
+  it("returns void finalResult for ActionAsync when diagnostic is suppressed", async () => {
+    const { metadata, diagnostics } = await getLroMetadataAndDiagnostics(
+      withSuppress(resourceActionSpec),
+      "doStuff",
+    );
+    expectDiagnosticEmpty(diagnostics);
+    ok(metadata);
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
   });
 });

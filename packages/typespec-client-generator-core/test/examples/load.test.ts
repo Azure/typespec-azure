@@ -1,94 +1,52 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-});
+import { it } from "vitest";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("example config", async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-
-  await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  await runner.compile(`
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op get(): string;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
-});
-
-it("example default config", async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-  });
-
-  await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  await runner.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples![0].filePath, "get.json");
 });
 
 it("no example folder found", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       op get(): string;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    "examples-dir": "./examples",
+  });
 
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-loading",
   });
 });
 
-it("load example without version", async () => {
-  await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  await runner.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
-});
-
 it("load example with version", async () => {
-  await runner.host.addRealTypeSpecFile("./examples/v3/get.json", `${__dirname}/load/get.json`);
-  await runner.compile(`
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/v3/get.json", `${__dirname}/load/get.json`);
+  const { program } = await instance.compile(`
     @service
     @versioned(Versions)
     namespace TestClient {
@@ -101,31 +59,32 @@ it("load example with version", async () => {
       v3,
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples![0].filePath, "v3/get.json");
 });
 
 it("load multiple example for one operation", async () => {
-  await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getAnother.json",
     `${__dirname}/load/getAnother.json`,
   );
-  await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 2);
   strictEqual(operation.examples![0].filePath, "get.json");
@@ -133,22 +92,17 @@ it("load multiple example for one operation", async () => {
 });
 
 it("load example with client customization", async () => {
-  await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  await runner.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-
-  await runner.compileWithCustomization(
-    `
+  const instance = await SimpleBaseTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace TestClient {
         op get(): string;
       }
     `,
-    `
+      `
       @client({
         name: "FooClient",
         service: TestClient
@@ -157,9 +111,11 @@ it("load example with client customization", async () => {
         op test is TestClient.get;
       }
     `,
+    ),
   );
+  const context = await createSdkContextForTester(program);
 
-  const client = runner.context.sdkPackage.clients[0];
+  const client = context.sdkPackage.clients[0];
   strictEqual(client.name, "FooClient");
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   ok(method);
@@ -170,15 +126,16 @@ it("load example with client customization", async () => {
 });
 
 it("load multiple example with @clientName", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/clientName.json",
     `${__dirname}/load/clientName.json`,
   );
-  await runner.host.addRealTypeSpecFile(
+  await instance.fs.addRealTypeSpecFile(
     "./examples/clientNameAnother.json",
     `${__dirname}/load/clientNameAnother.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @clientName("renamedNS")
@@ -196,8 +153,9 @@ it("load multiple example with @clientName", async () => {
       }
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const mainClient = runner.context.sdkPackage.clients[0];
+  const mainClient = context.sdkPackage.clients[0];
 
   const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
   ok(nsClient);
@@ -213,15 +171,16 @@ it("load multiple example with @clientName", async () => {
 });
 
 it("load multiple example of original operation id with @clientName", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/clientNameOriginal.json",
     `${__dirname}/load/clientNameOriginal.json`,
   );
-  await runner.host.addRealTypeSpecFile(
+  await instance.fs.addRealTypeSpecFile(
     "./examples/clientNameAnotherOriginal.json",
     `${__dirname}/load/clientNameAnotherOriginal.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @clientName("renamedNS")
@@ -239,8 +198,9 @@ it("load multiple example of original operation id with @clientName", async () =
       }
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const mainClient = runner.context.sdkPackage.clients[0];
+  const mainClient = context.sdkPackage.clients[0];
 
   const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
   ok(nsClient);
@@ -256,22 +216,305 @@ it("load multiple example of original operation id with @clientName", async () =
 });
 
 it("ensure ordering for multiple examples", async () => {
-  await runner.host.addRealTypeSpecFile("./examples/a_b_c.json", `${__dirname}/load/a_b_c.json`);
-  await runner.host.addRealTypeSpecFile("./examples/a_b.json", `${__dirname}/load/a_b.json`);
-  await runner.host.addRealTypeSpecFile("./examples/a.json", `${__dirname}/load/a.json`);
-  await runner.compile(`
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/a_b_c.json", `${__dirname}/load/a_b_c.json`);
+  await instance.fs.addRealTypeSpecFile("./examples/a_b.json", `${__dirname}/load/a_b.json`);
+  await instance.fs.addRealTypeSpecFile("./examples/a.json", `${__dirname}/load/a.json`);
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op get(): string;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 3);
   strictEqual(operation.examples![0].filePath, "a.json");
   strictEqual(operation.examples![1].filePath, "a_b.json");
   strictEqual(operation.examples![2].filePath, "a_b_c.json");
+});
+
+it("load example with @clientLocation existed interface", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface)
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const mainClient = context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "AnotherInterface");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @clientLocation new sub client", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationNewOperationGroup.json",
+    `${__dirname}/load/clientLocationNewOperationGroup.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation("NewOperationGroup")
+        op clientLocation(): string;
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const mainClient = context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "NewOperationGroup");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @clientLocation root client", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationRootClient.json",
+    `${__dirname}/load/clientLocationRootClient.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(TestClient)
+        op clientLocation(): string;
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const mainClient = context.sdkPackage.clients[0];
+  const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with per-language @clientLocation falls back to autorest scope", async () => {
+  // Example files come from autorest and have a single canonical operationId.
+  // Per-language @clientLocation overrides (e.g. moving an op to a different group
+  // only for one language) should not break example linkage for the other languages.
+  // Here the example file references the autorest-resolved id `AnotherInterface_clientLocation`,
+  // and the JS emitter has a conflicting per-language relocation to `JsGroup`.
+  // Example matching must still succeed using the autorest scope.
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface, "!javascript")
+        @clientLocation("JsGroup", "javascript")
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-ts",
+  });
+
+  // For the JS emitter, the operation is relocated to `JsGroup`, but the example file
+  // uses the autorest-resolved id `AnotherInterface_clientLocation`. The example should
+  // still be linked because example matching resolves under the autorest scope.
+  const mainClient = context.sdkPackage.clients[0];
+  const jsClient = mainClient.children?.find((c) => c.name === "JsGroup");
+  ok(jsClient);
+  const operation = (jsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("nested examples", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile("./examples/nested/get.json", `${__dirname}/load/get.json`);
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples![0].filePath, "nested/get.json");
+});
+
+it("teamplate case", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/template.json",
+    `${__dirname}/load/template.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface CommonOps<ReturnType extends TypeSpec.Reflection.Model> {
+        get(): ReturnType;
+      }
+      
+      model TestModel {
+        prop: string;
+      }
+
+      interface TestGroup extends CommonOps<TestModel> {}
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (
+    context.sdkPackage.clients[0].children?.[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples![0].filePath, "template.json");
+});
+
+it("multiple services without versioning", async () => {
+  const instance = await SimpleBaseTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./ServiceA/examples/AI_aTest.json",
+    `${__dirname}/multi-service/ServiceA_AI_aTest.json`,
+  );
+  await instance.fs.addRealTypeSpecFile(
+    "./ServiceB/examples/BI_bTest.json",
+    `${__dirname}/multi-service/ServiceB_BI_bTest.json`,
+  );
+
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace ServiceA {
+        interface AI {
+          @route("/aTest")
+          aTest(): string;
+        }
+      }
+      @service
+      namespace ServiceB {
+        interface BI {
+          @route("/bTest")
+          bTest(): string;
+        }
+      }
+    `,
+      `
+      @client({
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      })
+      namespace CombineClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.children?.length, 2);
+
+  // Check AI sub client examples
+  const aiClient = client.children?.find((c) => c.name === "AI");
+  ok(aiClient);
+  const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  ok(aiMethod.operation.examples);
+  strictEqual(aiMethod.operation.examples.length, 1);
+  strictEqual(aiMethod.operation.examples[0].filePath, "AI_aTest.json");
+  strictEqual(aiMethod.operation.examples[0].name, "Test operation from ServiceA");
+
+  // Check BI sub client examples
+  const biClient = client.children?.find((c) => c.name === "BI");
+  ok(biClient);
+  const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  ok(biMethod.operation.examples);
+  strictEqual(biMethod.operation.examples.length, 1);
+  strictEqual(biMethod.operation.examples[0].filePath, "BI_bTest.json");
+  strictEqual(biMethod.operation.examples[0].name, "Test operation from ServiceB");
+});
+
+it("multiple services without examples", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace ServiceA {
+        interface AI {
+          @route("/aTest")
+          aTest(): string;
+        }
+      }
+      @service
+      namespace ServiceB {
+        interface BI {
+          @route("/bTest")
+          bTest(): string;
+        }
+      }
+    `,
+      `
+      @client({
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      })
+      namespace CombineClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.children?.length, 2);
+
+  // Check AI sub client examples
+  const aiClient = client.children?.find((c) => c.name === "AI");
+  ok(aiClient);
+  const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(aiMethod.operation.examples, undefined);
+
+  // Check BI sub client examples
+  const biClient = client.children?.find((c) => c.name === "BI");
+  ok(biClient);
+  const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(biMethod.operation.examples, undefined);
 });

@@ -1,9 +1,8 @@
 import { ok, strictEqual } from "assert";
-import { SdkBodyModelPropertyType, SdkType } from "../../src/interfaces.js";
-import { SdkTestRunner } from "../test-host.js";
+import type { SdkContext, SdkModelPropertyType, SdkType } from "../../src/interfaces.js";
 
-export function getSdkBodyModelPropertyTypeHelper(runner: SdkTestRunner): SdkBodyModelPropertyType {
-  const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
+export function getSdkModelPropertyTypeHelper(context: SdkContext): SdkModelPropertyType {
+  const sdkModel = context.sdkPackage.models.find((x) => x.kind === "model");
   ok(sdkModel);
   strictEqual(sdkModel.kind, "model");
   const property = sdkModel.properties[0];
@@ -11,6 +10,6 @@ export function getSdkBodyModelPropertyTypeHelper(runner: SdkTestRunner): SdkBod
   return property;
 }
 
-export function getSdkTypeHelper(runner: SdkTestRunner): SdkType {
-  return getSdkBodyModelPropertyTypeHelper(runner).type;
+export function getSdkTypeHelper(context: SdkContext): SdkType {
+  return getSdkModelPropertyTypeHelper(context).type;
 }

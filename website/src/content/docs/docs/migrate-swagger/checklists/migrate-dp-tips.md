@@ -2,7 +2,7 @@
 title: Migrate data-plane specs
 ---
 
-The swagger converter will not be able to accurately represent every part of every API in TypeSpec. This document outlines some common changes you may need to make to a converted TypeSpec to make it conform to your existing service API and pass validation checks.
+The OpenAPI converter will not be able to accurately represent every part of every API in TypeSpec. This document outlines some common changes you may need to make to a converted TypeSpec to make it conform to your existing service API and pass validation checks.
 
 ## Initial pass through checklist
 
@@ -86,6 +86,8 @@ union WidgetColor {
 ❌ **DON'T** import or use templates from the `@azure-tools/typespec-azure-resource-manager` library in a data-plane specification
 
 ✅ **DO** make client customizations in a `client.tsp` file
+
+✅ **DO** reference `client.tsp` in `main.tsp` (add `import "./client.tsp";` so `main.tsp` is the single entrypoint)
 
 ❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in other files aside from client.tsp.
 

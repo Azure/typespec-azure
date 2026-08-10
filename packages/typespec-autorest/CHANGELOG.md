@@ -1,5 +1,334 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.70.1
+
+### Bug Fixes
+
+- [#4974](https://github.com/Azure/typespec-azure/pull/4974) Preserve non-TypeSpec `service.yaml` versions when updating an existing manifest. Versions the emitter no longer produces are now kept when they are not TypeSpec-generated (for example legacy swagger-only versions migrated from `readme.md`), while stale `source: typespec` versions the emitter no longer produces are still removed. This makes re-running the emitter idempotent for manifests that carry historical versions.
+
+
+## 0.70.0
+
+### Features
+
+- [#4846](https://github.com/Azure/typespec-azure/pull/4846) Add `service-yaml` emitter option to generate a `service.yaml` manifest at the project root declaring the service's API versions (derived from the `@versioned` enum). The option controls emission: `"auto"` (default) writes the file only when it already exists, `"always"` always writes it, and `"never"` disables it. When an existing `service.yaml` is present it is updated in place, preserving comments and unrelated keys.
+  
+  ```yaml
+  versions:
+    - version: 2023-11-01
+      source: typespec
+      swagger-files:
+        - resource-manager/Contoso/stable/2023-11-01/openapi.json
+  ```
+- [#4660](https://github.com/Azure/typespec-azure/pull/4660) Add `type-name-strategy` emitter option to control how OpenAPI names are derived from TypeSpec types. The new `"name-only"` strategy removes the namespace prefix from names (e.g. `Foo` instead of `LiftrBase.Foo`), matching the names used by client emitters. The default `"namespaced"` keeps the current behavior. When two types collapse to the same name, a `duplicate-type-name` error is reported.
+  
+  ```yaml
+  options:
+    "@azure-tools/typespec-autorest":
+      type-name-strategy: "name-only"
+  ```
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+
+## 0.69.1
+
+### Bug Fixes
+
+- Add support for the `@scope` TCGC decorator. Operations, model properties, and parameters that are scoped out of the autorest emitter are now omitted from the generated swagger output.
+
+
+## 0.69.0
+
+### Features
+
+- [#4190](https://github.com/Azure/typespec-azure/pull/4190) Added `skip-example-copying` emitter option. When enabled, example files are not copied to the output directory and `x-ms-examples` `$ref` values point directly to the source example files via relative paths.
+
+### Bug Fixes
+
+- [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there are no examples emitted for parameters
+
+
+## 0.68.0
+
+### Bug Fixes
+
+- [#4397](https://github.com/Azure/typespec-azure/pull/4397) Add an autorest emitter warning when multiple operations resolve to the same OpenAPI `operationId`, and report the warning on each conflicting operation.
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix crash in autorest emitter when no `@service` is declared but a spec references a model from a versioned namespace (e.g. `CommonTypes.AzureEntityResource`).
+- [#4393](https://github.com/Azure/typespec-azure/pull/4393) Emit intrinsic `@TypeSpec.example(...)` on model properties in the autorest OpenAPI2 emitter so property `example` values are preserved in generated definitions.
+
+
+## 0.67.0
+
+### Bug Fixes
+
+- [#4088](https://github.com/Azure/typespec-azure/pull/4088) Fix sorting of x-ms-paths entries that start with `?` (query-only paths). Previously these paths were not sorted alphabetically.
+
+
+## 0.66.2
+
+### Bug Fixes
+
+- [#4166](https://github.com/Azure/typespec-azure/pull/4166) Preserve casing in custom scalars used as lro final-result
+
+
+## 0.66.1
+
+### Bug Fixes
+
+- [#4101](https://github.com/Azure/typespec-azure/pull/4101) Fix `getLroMetadata` to correctly handle scalar types (e.g., `string`) as LRO final results. Previously, scalar result types in status monitor `@lroResult` properties were not recognized, causing incorrect metadata.
+
+
+## 0.66.0
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+
+## 0.65.0
+
+### Deprecations
+
+- [#3836](https://github.com/Azure/typespec-azure/pull/3836) Deprecate `azure-resource-provider-folder` option.
+  
+  ```diff lang=yaml
+  -azure-resource-provider-folder: "resource-manager"
+  -output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+  +output-file: "resource-manager/{service-name}/{version-status}/{version}/openapi.json"
+  ```
+
+
+## 0.64.1
+
+### Bug Fixes
+
+- [#3819](https://github.com/Azure/typespec-azure/pull/3819) Fix #3802 correct file references in feature files
+- [#3812](https://github.com/Azure/typespec-azure/pull/3812) Fix duplicate schema error caused when using union templates
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
+## 0.63.1
+
+### Features
+
+- [#3656](https://github.com/Azure/typespec-azure/pull/3656) Emit `x-ms-client-default` when using `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue`
+
+### Bug Fixes
+
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Allow explicit `ArrayEncoding.commaDelimited` on parameters
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Fix using `ArrayEncoding.pipeDelimited` or `ArrayEncoding.spaceDelimited` on parameter would transform the type to string incorrectly
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Don't include `items` when encoding change type to `string`
+- [#3644](https://github.com/Azure/typespec-azure/pull/3644) Ignore encoding resulting in format not explicitly supported by autorest
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove deprecated `arm-resource-flattening` option
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autorest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3613](https://github.com/Azure/typespec-azure/pull/3613) Deduplicate authentication schemes with same name
+- [#3558](https://github.com/Azure/typespec-azure/pull/3558) Respect `@externalDocs` on properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix constraints not applied on nullable properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix `x-ms-enum.name` not being set on nullable enum properties with default
+
+
+## 0.62.0
+
+### Deprecations
+
+- [#3465](https://github.com/Azure/typespec-azure/pull/3465) Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autoprest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3386](https://github.com/Azure/typespec-azure/pull/3386) Fix base64 encoding use correct `byte` format
+- [#3481](https://github.com/Azure/typespec-azure/pull/3481) Fix #3477 Allow uniqueItems for nullable array properties
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3452](https://github.com/Azure/typespec-azure/pull/3452) Fix #3416 Allow flattening for body parameters
+
+
+## 0.61.0
+
+### Features
+
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Support x-ms-secret in model types
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Allow x-ms-long-running-operation for resource get
+- [#3360](https://github.com/Azure/typespec-azure/pull/3360) Added an `xml-strategy` option to control whether the emitter outputs XML serialization metadata. The options are:
+  
+  - `xml-strategy: xml-service`: Emit XML serialization metadata for the whole service and all its schemas if the service uses the "application/xml" content-type.
+  - `xml-strategy: none`: Never emit XML serialization metadata.
+- [#3290](https://github.com/Azure/typespec-azure/pull/3290) Added support for emitting XML annotations.
+
+### Bug Fixes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3173](https://github.com/Azure/typespec-azure/pull/3173) Inline azureLocation
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-azure-resource extension for custom resources
+
+
+## 0.59.0
+
+### Features
+
+- [#3126](https://github.com/Azure/typespec-azure/pull/3126) Add multi-level discriminator support to typespec-autorest
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.1
+
+### Bug Fixes
+
+- [#3003](https://github.com/Azure/typespec-azure/pull/3003) Preserve explicit query parameters defined in the route by including them in `x-ms-paths`
+
+
+## 0.58.0
+
+### Breaking Changes
+
+- [#2927](https://github.com/Azure/typespec-azure/pull/2927) Change operation ID normalization logic to only capitalize the first letter.
+
+### Features
+
+- [#2968](https://github.com/Azure/typespec-azure/pull/2968) Support using enum member as type of parameter
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2970](https://github.com/Azure/typespec-azure/pull/2970) Fix the default pageable item name from `items` to `value` to align with the official AutoRest documentation.
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Add `@clientLocation` support to `resolveOperationId` function
+
+
+## 0.57.0
+
+### Bump dependencies
+
+- [#2667](https://github.com/Azure/typespec-azure/pull/2667) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2762](https://github.com/Azure/typespec-azure/pull/2762) Emits all path parameters as required even if optional in TypeSpec. Reports a new warning if an optional path parameter is found: `@azure-tools/typespec-autorest/unsupported-optional-path-param`.
+- [#2756](https://github.com/Azure/typespec-azure/pull/2756) Fix HttpPart<File> correctly render as `type:file`
+- [#2607](https://github.com/Azure/typespec-azure/pull/2607) Fix `x-ms-identifiers` being automatically populated, which caused default values to be overwritten unexpectedly. Now, it is only set when explicitly defined.
+- [#2775](https://github.com/Azure/typespec-azure/pull/2775) Models used to construct a multipart body will not be omitted from the definitions
+
+
+## 0.56.0
+
+### Breaking Changes
+
+- [#2576](https://github.com/Azure/typespec-azure/pull/2576) Modify how `x-nullable` is resolved when a `$ref` is present.
+  
+  Previously, the `$ref` was placed inside an `allOf`. With this change, the `$ref` is now moved directly next to `x-nullable`.
+  
+  ```diff lang=json
+  "Dog": {
+    "type": "object",
+    "properties": {
+    "type": {
+      - "type": "object",
+        "x-nullable": true,
+      + "$ref": "#/definitions/Pet"
+      - "allOf": [
+      -   {
+      -     "$ref": "#/definitions/Pet"
+      -   }
+      - ]
+      }
+    },
+    "required": [
+      "type"
+    ]
+  }
+  ```
+
+### Bug Fixes
+
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2606](https://github.com/Azure/typespec-azure/pull/2606) Fix unsupported param type diagnostic to target the model property with the issue
+
+
 ## 0.55.0
 
 No changes, version bump only.

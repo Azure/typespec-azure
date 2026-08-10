@@ -1,0 +1,5 @@
+emit:
+  - "@azure-tools/typespec-autorest"
+options:
+  "@azure-tools/typespec-autorest":
+    output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"

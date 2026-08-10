@@ -1,4 +1,5 @@
 import {
+  getClientLocation,
   getClientNameOverride,
   type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
@@ -9,14 +10,15 @@ import {
   isGlobalNamespace,
   isService,
   isTemplateInstance,
-  ModelProperty,
-  Operation,
-  Program,
-  Service,
-  Type,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Service,
+  type Type,
 } from "@typespec/compiler";
+import { capitalize } from "@typespec/compiler/casing";
 import { getOperationId } from "@typespec/openapi";
-import { pascalCase } from "change-case";
+import type { OpenApi2DocumentProxy } from "./types.js";
 
 export interface AutorestEmitterContext {
   readonly program: Program;
@@ -24,12 +26,15 @@ export interface AutorestEmitterContext {
   readonly outputFile: string;
   readonly tcgcSdkContext: TCGCContext;
   readonly version?: string;
+  readonly proxy?: OpenApi2DocumentProxy;
+  readonly multiService: boolean;
 }
 
 export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {
   const clientName = getClientNameOverride(context.tcgcSdkContext, type);
   return clientName ?? type.name;
 }
+
 /**
  * Determines whether a type will be inlined in OpenAPI rather than defined
  * as a schema and referenced.
@@ -47,11 +52,11 @@ export function shouldInline(program: Program, type: Type): boolean {
   }
   switch (type.kind) {
     case "Model":
+    case "Union":
       return !type.name || isTemplateInstance(type);
     case "Scalar":
       return program.checker.isStdType(type) || isTemplateInstance(type);
     case "Enum":
-    case "Union":
       return !type.name;
     default:
       return true;
@@ -61,6 +66,11 @@ export function shouldInline(program: Program, type: Type): boolean {
 /**
  * Resolve the OpenAPI operation ID for the given operation using the following logic:
  * - If @operationId was specified use that value
+ * - If @clientLocation was specified:
+ *   - If the target is a string, use the string value as the prefix of the operation ID
+ *   - If the target is an Interface, use the interface name as the prefix
+ *   - If the target is a Namespace and it's not the service namespace or global namespace, use the namespace name as the prefix
+ *   - If the target is the service namespace or global namespace, use the operation name as the operation ID
  * - If operation is defined at the root or under the service namespace return `<operation.name>`
  * - Otherwise(operation is under another namespace or interface) return `<namespace/interface.name>_<operation.name>`
  *
@@ -76,8 +86,28 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
   }
 
   const operationName = getClientName(context, operation);
+
+  // Check for `@clientLocation` decorator
+  const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
+  if (clientLocation) {
+    if (typeof clientLocation === "string") {
+      return standardizeOperationId(`${clientLocation}_${operationName}`);
+    }
+
+    if (clientLocation.kind === "Interface") {
+      return standardizeOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+    }
+
+    if (clientLocation.kind === "Namespace") {
+      if (isGlobalNamespace(program, clientLocation) || isService(program, clientLocation)) {
+        return standardizeOperationId(operationName);
+      }
+      return standardizeOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+    }
+  }
+
   if (operation.interface) {
-    return pascalCaseForOperationId(
+    return standardizeOperationId(
       `${getClientName(context, operation.interface)}_${operationName}`,
     );
   }
@@ -87,10 +117,10 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     isGlobalNamespace(program, namespace) ||
     isService(program, namespace)
   ) {
-    return pascalCase(operationName);
+    return standardizeOperationId(operationName);
   }
 
-  return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
+  return standardizeOperationId(`${getClientName(context, namespace)}_${operationName}`);
 }
 
 /**
@@ -113,9 +143,61 @@ export function isReadonlyProperty(program: Program, property: ModelProperty) {
   return visibility.size === 1 && visibility.has(read);
 }
 
-function pascalCaseForOperationId(name: string) {
+function standardizeOperationId(name: string) {
   return name
     .split("_")
-    .map((s) => pascalCase(s))
+    .map((s) => capitalize(s))
     .join("_");
+}
+
+const allowedAutorestFormats = new Set([
+  // number format
+  "int32",
+  "int64",
+  "float",
+  "double",
+  "unixtime",
+  "decimal",
+  // OAS-defined formats
+  "byte",
+  "binary",
+  "date",
+  "date-time",
+  "password",
+  // Additional formats recognized by autorest
+  "char",
+  "time",
+  "date-time-rfc1123",
+  "date-time-rfc7231", // Support for https://github.com/Azure/autorest/issues/4740
+  "duration",
+  "uuid",
+  "base64url",
+  "url",
+  "odata-query",
+  "certificate",
+
+  // ajv supported format
+  "uri",
+  "uri-reference",
+  "uri-template",
+  "email",
+  "hostname",
+  "ipv4",
+  "ipv6",
+  "regex",
+  "json-pointer",
+  "relative-json-pointer",
+  // for arm id purpose
+  "arm-id",
+
+  // Custom exclusions
+  "duration-constant",
+]);
+
+/**
+ * Check if the given format is supported by Autorest.
+ * Those formats are validated by https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/schema-format.ts#L17
+ */
+export function isSupportedAutorestFormat(formatStr: string): boolean {
+  return allowedAutorestFormats.has(formatStr.toLowerCase());
 }

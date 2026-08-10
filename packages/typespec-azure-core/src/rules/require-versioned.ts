@@ -1,16 +1,16 @@
 import {
-  CodeFix,
-  CodeFixContext,
+  type CodeFix,
+  createAddDecoratorCodeFix,
   createRule,
-  getSourceLocation,
+  fileRef,
   listServices,
-  Namespace,
+  type Namespace,
   paramMessage,
 } from "@typespec/compiler";
 import { getVersion } from "@typespec/versioning";
-import { findLineStartAndIndent } from "./utils.js";
 export const requireVersionedRule = createRule({
   name: "require-versioned",
+  docs: fileRef.fromPackageRoot("src/rules/require-versioned.md"),
   description: "Azure services should use the versioning library.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/require-versioned",
@@ -36,17 +36,7 @@ export const requireVersionedRule = createRule({
 });
 
 function createAddVersionedCodeFix(namespace: Namespace): CodeFix {
-  return {
-    id: "add-versioned",
-    label: "Add @versioned",
-    fix(context: CodeFixContext) {
-      const location = getSourceLocation(namespace);
-      const { lineStart, indent } = findLineStartAndIndent(location);
-      const updatedLocation = { ...location, pos: lineStart };
-      return context.prependText(
-        updatedLocation,
-        `${indent}@versioned(Versions /* create an enum called Versions with your service version */)\n`,
-      );
-    },
-  };
+  return createAddDecoratorCodeFix(namespace, "versioned", [
+    "Versions /* create an enum called Versions with your service version */",
+  ]);
 }

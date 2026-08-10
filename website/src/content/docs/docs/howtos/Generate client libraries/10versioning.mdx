@@ -1,0 +1,1238 @@
+---
+title: Versioning
+llmstxt: true
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for versioned specs
+
+## Single api Version
+
+If there is just one api version in the spec, we will generate the api surface area for that one version.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-01"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01")
+# python allows you to override the api version, even if only one version is defined in the spec
+```
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 1,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api_version will be "2023-11-01"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01);
+ServiceClient client = new ServiceClient(endpoint, options);
+//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01"
+```
+
+```typescript
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231101 = "2023-11-01",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // override the api version, even if only one version is defined in the spec
+    .serviceVersion(ServiceServiceVersion.V2023_11_01)
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-01
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+```
+
+```go
+type StableModel struct {
+	StableFeature *string
+}
+type ServiceClientStableFunctionalityOptions struct {}
+type ServiceClientStableFunctionalityResponse struct {}
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
+
+```
+
+</ClientTabs>
+
+## Multiple api versions
+
+The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate. For single-service packages, it accepts a string value. For multi-service packages, it can also be an object mapping each service namespace's full name to a version string (see [Per-service versioning](#per-service-versioning-multi-service-packages)).
+
+We will get the versioning information from the `Versions` enum that you pass to the `@versioned` decorator from the `@typespec/versioning` library.
+
+> NOTE: The ordering of the values in the `Versions` enum is very important. We use this information to determine the order of versions. Our default value will be the **last entry** in the `Versions` list
+
+### Default
+
+By default our emitters will only generate the surface used by the latest api version if there are multiple defined. This includes generating only the models used in the surface area of the latest api version.
+
+Documentation and enums showing the available api versions will still include all of the known api versions, meaning there will be documentation for both the preview and stable releases.
+
+For the below example, all languages will generate the api surface of default version `v2023_11_01`. There will be no generation of the operation `previewFunctionality`, and we will also not generate the `PreviewModel` because it's only used in `previewFunctionality`, and therefore is not used in the api surface of `v2023_11_01`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_02: "2023-11-02",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_02)
+@route("/preview")
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+@route("/stable")
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+client = MyServiceClient(endpoint=..., credential=...)
+# client's api_version will be "2023-11-02"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+client.stable_functionality(stable_model) # call goes through
+
+with pytest.expect(ImportError):
+  preview_model = models.PreviewModel(preview_functionality="not present")
+
+with pytest.expect(AttributeError):
+  client.preview_functionality({"previewFunctionality": "not present"})
+```
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1,
+    /// <summary> Service version "2023-11-02". </summary>
+    V2023_11_02 = 2,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+//client's api-version will be "2023-11-02"
+
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+
+//neither PreviewModel nor PreviewFunctionality will be generated
+```
+
+```typescript
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231102 = "2023-11-02",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-02");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-02
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+// neither PreviewModel nor previewFunctionality will be generated
+```
+
+```go
+type StableModel struct {
+	StableFeature *string
+}
+
+type ServiceClientStableFunctionalityOptions struct {}
+
+type ServiceClientStableFunctionalityResponse struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error)
+
+```
+
+</ClientTabs>
+
+### Override to a specific version
+
+You can override the signature to return the api surface area for a specific api version.
+
+In this example, you can see how this change is made in tspconfig.yaml, and we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
+
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
+
+```yaml title=tspconfig.yaml
+options:
+  "@azure-tools/typespec-python":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+    api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+    api-version: "2023-11-01-preview"
+```
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@added(Versions.v2023_11_01_preview)
+@removed(Versions.v2023_11_01)
+@route("/preview")
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+@route("/stable")
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</ClientTabItem>
+
+```python
+import pytest
+from my.service import MyServiceClient, models
+
+preview_client = MyServiceClient(endpoint=..., credential=...)
+
+# client's api_version will be "2023-11-01-preview"
+
+stable_model = models.StableModel(stable_feature="present")
+print(stable_model)
+preview_client.stable_functionality(stable_model) # call goes through
+
+preview_model = models.PreviewModel(preview_functionality="present")
+
+# the model is generated as part of the api surface
+
+preview_client.preview_functionality(preview_model) # call goes through
+
+```
+
+```csharp
+// ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01-preview". </summary>
+    V2023_11_01_Preview = 1
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+ServiceClient client = new ServiceClient(endpoint);
+// client's api-version will be "2023-11-01-preview"
+
+//call PreviewFunctionality
+PreviewModel previewModel = new PreviewModel("<betaFeature>");
+Response response = client.PreviewFunctionality(previewModel);
+
+//call StableFunctionality
+StableModel stableModel = new StableModel("<stableFeature>");
+Response response = client.StableFunctionality(stableModel);
+```
+
+```typescript
+export interface PreviewModel {
+  betaFeature: string;
+}
+
+export function previewModelSerializer(item: PreviewModel): any {
+  return { betaFeature: item["betaFeature"] };
+}
+
+/** model interface StableModel */
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231101Preview = "2023-11-01-preview",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function previewFunctionality(
+  context: Client,
+  previewModel: PreviewModel,
+  options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01_PREVIEW("2023-11-01-preview");
+
+    public static ServiceServiceVersion getLatest() {} // V2023_11_01_PREVIEW
+}
+
+// Client API
+ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's api-version will be 2023-11-01-preview
+
+StableModel stableModel = new StableModel("present");
+
+// call goes through
+serviceClientClient.stableFunctionality(stableModel);
+
+PreviewModel previewModel = new PreviewModel("present");
+// call goes through
+serviceClientClient.previewFunctionality(previewModel);
+```
+
+```go
+type PreviewModel struct {
+	BetaFeature *string
+}
+
+type StableModel struct {
+	StableFeature *string
+}
+
+type ClientPreviewFunctionalityResponse struct {}
+
+type ClientStableFunctionalityResponse struct {}
+
+type ClientPreviewFunctionalityOptions struct {}
+
+type ClientStableFunctionalityOptions struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error)
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error)
+
+```
+
+</ClientTabs>
+
+### Per-service versioning (multi-service packages)
+
+When your spec defines multiple services merged into a single client (using `@client({service: [ServiceA, ServiceB]})`), you can specify a different API version for each service by passing an object instead of a string. The keys are the full namespace names of each service, and the values are the desired version strings.
+
+Services not listed in the object default to their latest version.
+
+```yaml title=tspconfig.yaml
+options:
+  "@azure-tools/typespec-python":
+    api-version:
+      ServiceA: "2024-01-01"
+      ServiceB: "2024-05-01"
+```
+
+For example, given two versioned services:
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA {
+    v2024_01_01: "2024-01-01",
+    v2024_06_01: "2024-06-01",
+  }
+  @route("/aTest")
+  op aTest(@query("api-version") apiVersion: VersionsA): void;
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB {
+    v2024_05_01: "2024-05-01",
+    v2024_09_01: "2024-09-01",
+  }
+  @route("/bTest")
+  op bTest(@query("api-version") apiVersion: VersionsB): void;
+}
+```
+
+With `api-version: { ServiceA: "2024-01-01", ServiceB: "2024-05-01" }`, the generated client will use version `2024-01-01` for ServiceA operations and `2024-05-01` for ServiceB operations.
+
+With `api-version: { ServiceA: "2024-01-01" }` (ServiceB omitted), ServiceA will use `2024-01-01` while ServiceB will default to its latest version `2024-09-01`.
+
+> NOTE: The special value `"all"` is **not supported** for multi-service packages. If specified (either as a top-level string or as a per-service value), it is ignored and the service falls back to its latest version. The `"latest"` value works as expected and applies to all services.
+
+### New model/operation added in new api version
+
+You can use `@added` decorator to indicate when a specific Api feature was first introduced.
+When applied to models, operations, or parameters, `@added` marks the Api Version at which these elements became available. This prevents confusing error messages for customers using older version clients.
+
+#### New operation added in new api version
+
+In this example, `createUserProfile` is marked with `@added(Versions.v2024_02_01)`, meaning this operation only becomes available starting from the `2024-02-01` version. Elements without the `@added` decorator, like `getUserInfo`, are available across all defined versions.
+
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_02_01: "2024-02-01",
+}
+
+model UserInfo {
+  username: string;
+}
+
+model UserProfile {
+  profileName: string;
+}
+
+@route("/users/info")
+op getUserInfo(@body userInfo: UserInfo): void;
+
+@added(Versions.v2024_02_01)
+@route("/users/profile")
+op createUserProfile(@body userProfile: UserProfile): void;
+```
+
+</ClientTabItem>
+
+```python
+# change does not infect generated model
+class UserProfile(_Model):
+
+    profile_name: str = rest_field(name="profileName", visibility=["read", "create", "update", "delete", "query"])
+    profile_details: "_models.ProfileDetails" = rest_field(
+        name="profileDetails", visibility=["read", "create", "update", "delete", "query"]
+    )
+...
+
+# operation was first introduced from Api Version 2024-02-01, and is unreachable to client with Api Version 2024_01_01
+@distributed_trace
+@api_version_validation(
+    method_added_on="2024-02-01",
+    api_versions_list=["2024-02-01"],
+)
+def create_user_profile(
+    self, user_profile: Union[_models.UserProfile, JSON, IO[bytes]], **kwargs: Any
+) -> None:
+...
+```
+
+```csharp
+// The C# emitter generates both operations and a ServiceVersion enum, but does not
+// emit version guards on the newly added operation.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName);
+    public string ProfileName { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Task<Response> GetUserInfoAsync(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+    public virtual Task<Response> CreateUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+
+  public partial class ServiceClientOptions : ClientOptions
+  {
+    public ServiceClientOptions(ServiceVersion version = ServiceVersion.V2024_02_01);
+
+    public enum ServiceVersion
+    {
+      V2024_01_01 = 1,
+      V2024_02_01 = 2
+    }
+  }
+}
+```
+
+```typescript
+export interface UserInfo {
+  username: string;
+}
+
+export function userInfoSerializer(item: UserInfo): any {
+  return { username: item["username"] };
+}
+
+/** model interface UserProfile */
+export interface UserProfile {
+  profileName: string;
+}
+
+export function userProfileSerializer(item: UserProfile): any {
+  return { profileName: item["profileName"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2024-01-01 */
+  V20240101 = "2024-01-01",
+  /** 2024-02-01 */
+  V20240201 = "2024-02-01",
+}
+
+export async function createUserProfile(
+  context: Client,
+  userProfile: UserProfile,
+  options: CreateUserProfileOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function getUserInfo(
+  context: Client,
+  userInfo: UserInfo,
+  options: GetUserInfoOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion class
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_02_01("2024-02-01");
+
+    public String getVersion();
+}
+
+// Client class
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void getUserInfo(UserInfo userInfo);
+    public void createUserProfile(UserProfile userProfile);
+}
+```
+
+```go
+
+// UserInfo - User information model containing basic user details
+type UserInfo struct {
+// REQUIRED; The unique username for the user
+	Username *string
+}
+
+// UserProfile - User profile model containing profile-specific information
+type UserProfile struct {
+// REQUIRED; The display name for the user's profile
+	ProfileName *string
+}
+
+type ServiceUserOperationsClientCreateUserProfileOptions struct {
+}
+
+type ServiceUserOperationsClientGetUserInfoOptions struct {
+}
+
+type ServiceUserOperationsClientCreateUserProfileResponse struct {
+}
+
+type ServiceUserOperationsClientGetUserInfoResponse struct {
+}
+
+type ServiceUserOperationsClient struct {
+}
+
+func (client *ServiceUserOperationsClient) GetUserInfo(ctx context.Context, userInfo UserInfo, options *ServiceUserOperationsClientGetUserInfoOptions) (ServiceUserOperationsClientGetUserInfoResponse, error)
+
+func (client *ServiceUserOperationsClient) CreateUserProfile(ctx context.Context, userProfile UserProfile, options *ServiceUserOperationsClientCreateUserProfileOptions) (ServiceUserOperationsClientCreateUserProfileResponse, error)
+
+```
+
+</ClientTabs>
+
+#### New model property added in new api version
+
+In this example, the `ProfileDetails` model is marked with `@added(Versions.v2024_02_01)`, meaning this model as well as the property `profileDetails` of `UserProfile` only becomes available starting from the `2024-02-01` version, while other parameters of `UserProfile`, are available across all defined versions.
+
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_02_01: "2024-02-01",
+}
+
+model UserInfo {
+  username: string;
+}
+
+model UserProfile {
+  profileName: string;
+
+  @added(Versions.v2024_02_01)
+  profileDetails: ProfileDetails;
+}
+
+@added(Versions.v2024_02_01)
+model ProfileDetails {
+  detailDescription: string;
+}
+
+@route("/users/info")
+op getUserInfo(@body userInfo: UserInfo): void;
+
+@route("/users/profile")
+op createUserProfile(@body userProfile: UserProfile): void;
+```
+
+</ClientTabItem>
+
+```python
+# current python emitter only add validation for operation and parameters and don't handle versioning for models.
+class UserProfile(_Model):
+
+    profile_name: str = rest_field(name="profileName", visibility=["read", "create", "update", "delete", "query"])
+    profile_details: "_models.ProfileDetails" = rest_field(
+        name="profileDetails", visibility=["read", "create", "update", "delete", "query"]
+    )
+...
+
+@distributed_trace
+def create_user_profile(
+    self, user_profile: Union[_models.UserProfile, JSON, IO[bytes]], **kwargs: Any
+) -> None:
+...
+```
+
+```csharp
+// The C# emitter generates the new model and property as plain members; it does not
+// emit version guards or per-version conditional shapes.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName, ProfileDetails profileDetails);
+    public string ProfileName { get; }
+    public ProfileDetails ProfileDetails { get; }
+  }
+
+  public partial class ProfileDetails
+  {
+    public ProfileDetails(string detailDescription);
+    public string DetailDescription { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+}
+```
+
+```typescript
+export interface UserInfo {
+  username: string;
+}
+
+export function userInfoSerializer(item: UserInfo): any {
+  return { username: item["username"] };
+}
+
+/** model interface UserProfile */
+export interface UserProfile {
+  profileName: string;
+  profileDetails: ProfileDetails;
+}
+
+export function userProfileSerializer(item: UserProfile): any {
+  return {
+    profileName: item["profileName"],
+    profileDetails: profileDetailsSerializer(item["profileDetails"]),
+  };
+}
+
+/** model interface ProfileDetails */
+export interface ProfileDetails {
+  detailDescription: string;
+}
+
+export function profileDetailsSerializer(item: ProfileDetails): any {
+  return { detailDescription: item["detailDescription"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2024-01-01 */
+  V20240101 = "2024-01-01",
+  /** 2024-02-01 */
+  V20240201 = "2024-02-01",
+}
+
+export async function createUserProfile(
+  context: Client,
+  userProfile: UserProfile,
+  options: CreateUserProfileOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function getUserInfo(
+  context: Client,
+  userInfo: UserInfo,
+  options: GetUserInfoOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion class
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_02_01("2024-02-01");
+
+    public String getVersion();
+}
+
+// Client class
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void getUserInfo(UserInfo userInfo);
+    public void createUserProfile(UserProfile userProfile);
+}
+
+// Model class
+@Fluent
+public final class UserProfile implements JsonSerializable<UserProfile> {
+    public UserProfile(String profileName);
+    public UserProfile setProfileDetails(ProfileDetails profileDetails);
+    public String getProfileName();
+    public ProfileDetails getProfileDetails();
+}
+
+@Immutable
+public final class ProfileDetails implements JsonSerializable<ProfileDetails> {
+    public ProfileDetails(String detailDescription);
+    public String getDetailDescription();
+}
+```
+
+```go
+
+type ProfileDetails struct {
+// REQUIRED
+	DetailDescription *string
+}
+
+type UserInfo struct {
+// REQUIRED
+	Username *string
+}
+
+type UserProfile struct {
+// REQUIRED
+	ProfileDetails *ProfileDetails
+
+// REQUIRED
+	ProfileName *string
+}
+
+type ServiceClientCreateUserProfileResponse struct {
+}
+
+type ServiceClientGetUserInfoResponse struct {
+}
+
+type ServiceClientCreateUserProfileOptions struct {
+}
+
+type ServiceClientGetUserInfoOptions struct {
+}
+
+type ServiceClient struct {
+}
+
+func (client *ServiceClient) CreateUserProfile(ctx context.Context, userProfile UserProfile, options *ServiceClientCreateUserProfileOptions) (ServiceClientCreateUserProfileResponse, error)
+
+func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo, options *ServiceClientGetUserInfoOptions) (ServiceClientGetUserInfoResponse, error)
+
+```
+
+</ClientTabs>
+
+## Overriding the Client Api Version Parameter
+
+By default, we find api version parameters in specs based off of names. Name-based detection applies to HTTP metadata parameters (header, query, path, or cookie) and server URL template parameters (declared in `@server`). A parameter named `apiVersion` or `api-version` in these positions will automatically be treated as an API version parameter.
+
+There is special logic we do with api version parameters:
+
+1. These api version parameters get elevated up to the client level (if the service is versioned)
+2. We auto-add api version information to next links when paging
+3. We set the client default for these parameters to be the default api version for your service.
+
+There are cases where you have an api-versioning parameter without the explicit name `api-version`. In these cases, you can use the `@apiVersion` decorator to override and explicitly say whether that parameter is an api version param or not.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+using Versioning;
+using Http;
+using Azure.ClientGenerator.Core;
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+enum Versions {
+  v2023_11_01: "2023-11-01",
+  v2024_04_01: "2024-04-01",
+}
+op get(
+  @apiVersion
+  @header("x-ms-version")
+  version: string,
+): void;
+```
+
+```python
+from my.service import MyServiceClient
+
+client = MyServiceClient(endpoint=..., credential=...)
+print(client.version) # == "2024-04-01", since that is the default
+
+client_with_specified_api_version = MyServiceClient(endpoint=..., credential=..., version="2023-11-01")
+print(client.version) # == "2023-11-01", since we specified
+
+retval = client.get() # version is elevated onto the client
+```
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 1,
+    /// <summary> Service version "2024-04-01". </summary>
+    v2024_04_01 = 2,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+
+ServiceClient client = new ServiceClient(endpoint);
+//client's version will be "2024-04-01"
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01);
+ServiceClient clientWithSpecifiedApiVersion = new ServiceClient(endpoint, options);
+//client's version will be "2023-11-01"
+Response response = client.get(); // version parameter is elevated onto the client
+```
+
+```typescript
+export enum KnownVersions {
+  V20231101 = "2023-11-01",
+  V20240401 = "2024-04-01",
+}
+
+export async function get(
+  context: Client,
+  options: GetOptionalParams = { requestOptions: {} },
+): Promise<void>;
+```
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+    V2024_04_01("2024-04-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2024_04_01
+}
+
+// Client API
+ServiceClientClient client = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's version will be 2024-04-01
+
+ServiceClientClient clientWithSpecifiedApiVersion = new ServiceClientClientBuilder()
+    // other configurations
+    // override the api version, even if only one version is defined in the spec
+    .serviceVersion(ServiceServiceVersion.V2023_11_01)
+    .buildClient();
+// client's version will be 2023-11-01
+
+client.get(); // version parameter is elevated onto the client
+```
+
+```go
+type Versions string
+
+const (
+	v2023_11_01 Versions = "2023-11-01"
+	v2024_04_01 Versions = "2024-04-01"
+)
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error)
+
+```
+
+</ClientTabs>
+
+### Keeping an Api Version Parameter on the Operation with `@apiVersion(false)`
+
+In some cases, a service may have an `api-version` query parameter on an operation that should **not** be treated as the client-level API version parameter. For example, when the parameter controls a downstream service version or has a different semantic meaning for a specific operation. You can use `@apiVersion(false)` to explicitly opt a parameter out of API version treatment.
+
+When `@apiVersion(false)` is applied to a parameter:
+
+- That parameter will **not** be treated as an API version parameter
+- It stays as a method-level parameter and is **not** elevated to the client
+- Other operations in the same client can still have their API version parameters elevated to the client normally
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Versioning;
+using Http;
+using Azure.ClientGenerator.Core;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+  v2024_04_01: "2024-04-01",
+}
+
+// This operation has its api-version elevated to the client as normal
+@route("/resources")
+op listResources(@query("api-version") apiVersion: string): void;
+
+// This operation has an api-version query param that should NOT be treated
+// as the API version. It stays as a method parameter.
+@route("/snapshot")
+op getSnapshot(
+  @apiVersion(false)
+  @query("api-version")
+  apiVersion: string,
+): void;
+```
+
+```python
+class ServiceClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+    def list_resources(self, **kwargs: Any) -> None: ...
+
+    def get_snapshot(self, *, api_version: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+public partial class ServiceClient
+{
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+
+    public virtual Response GetResources(CancellationToken cancellationToken = default);
+    public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ServiceClient {
+  constructor(endpoint: string, options?: ServiceClientOptionalParams);
+
+  listResources(options?: ListResourcesOptionalParams): Promise<void>;
+  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
+}
+```
+
+```java
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void listResources();
+
+    public void getSnapshot(String apiVersion);
+}
+```
+
+```go
+func NewServiceClientWithNoCredential(endpoint string, options *ServiceClientOptions) (*ServiceClient, error)
+
+func (client *ServiceClient) ListResources(ctx context.Context, options *ServiceClientListResourcesOptions) (ServiceClientListResourcesResponse, error)
+
+func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *ServiceClientGetSnapshotOptions) (ServiceClientGetSnapshotResponse, error)
+```
+
+</ClientTabs>
+
+In the generated client, `listResources` will use the client-level API version parameter (defaulting to `"2024-04-01"`), while `getSnapshot` will require `apiVersion` to be passed explicitly as a method parameter.
+
+## Extending the Client API Version Enum (`@clientApiVersions`)
+
+When generating a client, you may want the API version enum to include versions beyond those defined by the service's `@versioned` decorator. This is useful when you want to generate a complete API version enum without requiring the entire specification to be annotated with versioning decorators.
+
+Use `@clientApiVersions` to specify the full set of API versions the client should support:
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(Versions)
+namespace Contoso;
+
+enum Versions {
+  v4,
+  v5,
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
+```
+
+```python
+# The generated client accepts api_version as a keyword argument.
+# The API version defaults to the latest version "v5".
+client = ContosoClient(endpoint="...", api_version="v1")
+```
+
+```csharp
+// The ServiceVersion enum includes all five versions.
+public enum ServiceVersion
+{
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+}
+```
+
+```typescript
+export enum KnownClientApiVersions {
+  V1 = "v1",
+  V2 = "v2",
+  V3 = "v3",
+  V4 = "v4",
+  V5 = "v5",
+}
+```
+
+```java
+// NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+In this example, the generated client will expose API versions `v1` through `v5`, even though the service spec only defines `v4` and `v5`. This is particularly useful for legacy services where adding `@added`/`@removed` annotations to every type and operation is not practical.

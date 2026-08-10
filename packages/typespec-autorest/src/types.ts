@@ -1,13 +1,30 @@
-import type { Service, SourceFile } from "@typespec/compiler";
-import type { OpenAPI2Document } from "./openapi2-document.js";
+import { getFeature } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  compilerAssert,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Service,
+  type SourceFile,
+  type Type,
+} from "@typespec/compiler";
+import { type HttpOperation, Visibility } from "@typespec/http";
+import type { AdditionalInfo } from "@typespec/openapi";
+import type { AutorestEmitterContext } from "./index.js";
+import type {
+  OpenAPI2Document,
+  OpenAPI2Operation,
+  OpenAPI2Parameter,
+  OpenAPI2Schema,
+  OpenAPI2SecurityScheme,
+} from "./openapi2-document.js";
 
 /**
  * A record containing the the OpenAPI 3 documents corresponding to
  * a particular service definition.
  */
 export type AutorestServiceRecord =
-  | AutorestUnversionedServiceRecord
-  | AutorestVersionedServiceRecord;
+  AutorestUnversionedServiceRecord | AutorestVersionedServiceRecord;
 
 export interface AutorestUnversionedServiceRecord extends AutorestEmitterResult {
   /** The service that generated this OpenAPI document */
@@ -44,6 +61,30 @@ export interface OperationExamples {
   readonly examples: LoadedExample[];
 }
 
+/**
+ * Machine-readable per-service manifest (`service.yaml`) that declares the ordered
+ * list of API versions for a service. See {@link ServiceYamlVersion}.
+ */
+export interface ServiceYaml {
+  /** The API versions of the service, ordered oldest to newest. */
+  readonly versions: ServiceYamlVersion[];
+}
+
+/** A single API version entry in a {@link ServiceYaml} manifest. */
+export interface ServiceYamlVersion {
+  /** The API version value (e.g. `2023-11-01`). */
+  readonly version: string;
+
+  /**
+   * Whether this version is generated from TypeSpec or is a legacy swagger version.
+   * The autorest emitter only ever produces `typespec` versions.
+   */
+  readonly source: "typespec" | "swagger";
+
+  /** Paths to the swagger/openapi file(s) for this version, relative to `service.yaml`. */
+  readonly "swagger-files": string[];
+}
+
 export interface AutorestEmitterResult {
   /** The OpenAPI document*/
   readonly document: OpenAPI2Document;
@@ -53,10 +94,223 @@ export interface AutorestEmitterResult {
 
   /** Output file used */
   readonly outputFile: string;
+
+  /** The feature associated with this file, if any */
+  readonly feature?: string;
+
+  /** The context associated with this emission */
+  readonly context: AutorestEmitterContext;
 }
 
 export interface LoadedExample {
   readonly relativePath: string;
   readonly file: SourceFile;
   readonly data: any;
+}
+
+/**
+ * Represents a node that will hold a JSON reference. The value is computed
+ * at the end so that we can defer decisions about the name that is
+ * referenced.
+ */
+export class LateBoundReference {
+  isLocal?: boolean;
+  file?: string;
+  value?: string;
+  useFeatures: boolean = false;
+  commonFile: string = "common";
+  getFileContext: () => string | undefined = () => undefined;
+  setLocalValue(program: Program, inValue: string, type?: Type): void {
+    if (type) {
+      switch (type.kind) {
+        case "Model":
+        case "ModelProperty":
+          if (this.useFeatures) {
+            const feature = getFeature(program, type);
+            let featureFile = feature.fileName;
+            if (feature.featureName.toLowerCase() === "common") {
+              featureFile = this.commonFile;
+            }
+            this.file = featureFile;
+          } else {
+            this.file = undefined;
+          }
+          break;
+        default:
+          this.file = this.useFeatures ? this.commonFile : undefined;
+      }
+    }
+    this.isLocal = true;
+    this.value = inValue;
+  }
+  setRemoteValue(inValue: string): void {
+    this.isLocal = false;
+    this.value = inValue;
+  }
+  toJSON() {
+    compilerAssert(this.value, "Reference value never set.");
+    const referencingFile = this.getFileContext();
+    if (!this.isLocal) return this.value;
+    if (referencingFile === undefined || this.file === undefined || referencingFile === this.file)
+      return `#/definitions/${this.value}`;
+    return `./${this.file}.json#/definitions/${this.value}`;
+  }
+}
+
+/**
+ * Represents a non-inlined schema that will be emitted as a definition.
+ * Computation of the OpenAPI schema object is deferred.
+ */
+export interface PendingSchema {
+  /** The TYPESPEC type for the schema */
+  type: Type;
+
+  /** The visibility to apply when computing the schema */
+  visibility: Visibility;
+
+  /**
+   * The JSON reference to use to point to this schema.
+   *
+   * Note that its value will not be computed until all schemas have been
+   * computed as we will add a suffix to the name if more than one schema
+   * must be emitted for the type for different visibilities.
+   */
+  ref: LateBoundReference;
+
+  /**
+   * Determines the schema name if an override has been set
+   * @param name The default name of the schema
+   * @param visibility The visibility in which the schema is used
+   * @returns The name of the given schema in the given visibility context
+   */
+  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
+}
+
+/**
+ * Represents a schema that is ready to emit as its OpenAPI representation
+ * has been produced.
+ */
+export interface ProcessedSchema extends PendingSchema {
+  schema: OpenAPI2Schema | undefined;
+}
+
+/** Abstracts away methods to create a OpenAPI 2.0 document ragardless of layout. */
+export interface OpenApi2DocumentProxy {
+  /**
+   * Add additionalInfo to the document header
+   * @param info The additional information to add
+   */
+  addAdditionalInfo(info?: AdditionalInfo): void;
+
+  /**
+   * Add security schemes to the document header
+   * @param schemes The security schemes to add
+   */
+  addSecuritySchemes(schemes: Record<string, OpenAPI2SecurityScheme>): void;
+
+  /**
+   * Add security requirements to the document header
+   * @param requirements The security requirements to add
+   */
+  addSecurityRequirements(requirements: Record<string, string[]>[]): void;
+
+  /**
+   * Add host information to the document header
+   * @param hostData The host information to add
+   */
+  addHostInfo(
+    hostData: Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes">,
+  ): void;
+
+  /** Set the global consumes MIME types
+   * @param mimeTypes The MIME types to set
+   */
+  setGlobalConsumes(mimeTypes: string[]): void;
+
+  /** Set the global produces MIME types
+   * @param mimeTypes The MIME types to set
+   */
+  setGlobalProduces(mimeTypes: string[]): void;
+
+  /**
+   * Get the resolved definitions in the document
+   */
+  getDefinitionMap(): Record<string, OpenAPI2Schema>;
+
+  /**
+   * Write a resolved definition to the document
+   * @param name The name of the definition
+   * @param processed The processed schema for this definition
+   * @param schema The OpenAPI schema to write
+   */
+  writeDefinition(name: string, processed: ProcessedSchema, schema: OpenAPI2Schema): void;
+
+  /**
+   * Get a map of resolved parameters
+   */
+  getParameterMap(): Record<string, OpenAPI2Parameter>;
+
+  /**
+   * Write a resolved parameter to the document
+   * @param key The key of the parameter
+   * @param property The model property associated with the parameter
+   * @param param The OpenAPI parameter to write
+   */
+  writeParameter(key: string, property: ModelProperty, param: OpenAPI2Parameter): void;
+
+  /**
+   * Resolve the logical OpenAPI document into a set of emitter results
+   */
+  resolveDocuments(context: AutorestEmitterContext): Promise<AutorestEmitterResult[]>;
+
+  /** Add a tag to an operation
+   * @param op The operation to add a tag to
+   * @param tag The tag to add
+   */
+  addTag(tag: string, op: Operation): void;
+
+  /**
+   * write resolved examples to the document
+   * @param op The operation to add examples to
+   * @param examples The examples to add
+   */
+  writeExamples(
+    examples: Map<string, Record<string, LoadedExample>>,
+    exampleIds: Set<string>,
+  ): void;
+
+  /**
+   * Get or add the path associated with the given operation
+   * @param op The operation to get or add the path for
+   */
+  createOrGetEndpoint(op: HttpOperation, context: AutorestEmitterContext): OpenAPI2Operation;
+
+  /**
+   * Create a late bound reference for a type in the processed program
+   * @param type The type to create the reference for
+   */
+  createLocalRef(type: Type): LateBoundReference;
+
+  /**
+   * Create a late bound reference for an external type
+   * @param absoluteRef The absolute value of the external reference
+   */
+  createExternalRef(absoluteRef: string): LateBoundReference;
+
+  /**
+   * Get the current feature being emitted
+   */
+  getCurrentFeature(): string | undefined;
+
+  /**
+   * Set the current feature being emitted
+   * @param feature The feature being emitted
+   */
+  setCurrentFeature(feature: string): void;
+
+  /**
+   * Get a parameter reference for the given key
+   * @param key The key to get the parameter reference for
+   */
+  getParameterRef(key: string): string;
 }

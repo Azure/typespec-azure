@@ -1,8 +1,8 @@
-import { getNamespaceFullName, Namespace } from "@typespec/compiler";
+import { getNamespaceFullName, type Namespace } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
 import { getExplicitClientApiVersions } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
-import { listAllNamespaces } from "../internal-utils.js";
+import type { TCGCContext } from "../interfaces.js";
+import { listAllUserDefinedNamespaces } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validatePackage(context: TCGCContext) {
@@ -10,14 +10,17 @@ export function validatePackage(context: TCGCContext) {
 }
 
 function validateNamespaces(context: TCGCContext) {
-  for (const namespace of listAllNamespaces(context, context.getMutatedGlobalNamespace())) {
+  for (const namespace of listAllUserDefinedNamespaces(context)) {
     validateDecoratorsAppliedToVersionedService(context, namespace);
     validateClientApiVersionsIncludesAllServiceVersions(context, namespace);
   }
 }
 function validateDecoratorsAppliedToVersionedService(context: TCGCContext, namespace: Namespace) {
   const versions = getVersions(context.program, namespace)[1];
-  if (versions === undefined && getExplicitClientApiVersions(context, namespace)) {
+  if (
+    (versions === undefined || versions.getVersions().length === 0) &&
+    getExplicitClientApiVersions(context, namespace)
+  ) {
     reportDiagnostic(context.program, {
       code: "require-versioned-service",
       format: {
@@ -34,7 +37,7 @@ function validateClientApiVersionsIncludesAllServiceVersions(
   namespace: Namespace,
 ) {
   const versions = getVersions(context.program, namespace)[1];
-  if (versions === undefined) {
+  if (versions === undefined || versions.getVersions().length === 0) {
     return;
   }
   const clientApiVersionsEnum = getExplicitClientApiVersions(context, namespace);

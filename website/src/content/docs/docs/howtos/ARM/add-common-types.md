@@ -22,12 +22,13 @@ Creating a new version of an existing common type mostly involves editing what i
 1. Make all the necessary versioning changes in the common-type file, mostly using `@added(Versions.vX)`, `@removed(Versions.vX)`, and `@typeChangedFrom(Versions.vX)` decorators.
 2. Update the common-type-ref file by adding the new version of the common type using the `@@armCommonDefinition` decorator .This needs to be done for all the definitions present in the new version, not only the newly added definitions.
    ```typespec
-   @@armCommonDefinition(ExtensionResource,
+   @@armCommonDefinition(
+     ExtensionResource,
      "ProxyResource",
      Azure.ResourceManager.CommonTypes.Versions.v6
    );
    ```
-3. If it is a completely new version, add the version to [versions.tsp](https://github.com/AlitzelMendez/typespec-azure/blob/main/packages/typespec-azure-resource-manager/lib/common-types/versions.tsp))
+3. If it is a completely new version, add the version to [versions.tsp](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-resource-manager/lib/common-types/versions.tsp)
 4. Generate the Swagger updates by running:
    ```bash
    cd typespec-azure\packages\samples\common-types
@@ -47,7 +48,6 @@ Creating a new version of an existing common type mostly involves editing what i
    - Use the `@added(Versions.vX)` decorator in all models to specify in which version the model is added.
 1. Create a new reference file in the [common-types folder](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-resource-manager/lib/common-types) with the common type name and the `-ref` suffix, e.g., `managed-identity-with-delegation-ref.tsp`
 1. Edit the `-ref` file:
-
    - Start by importing the common type TypeSpec file.
      ```typespec
      import "./managed-identity-with-delegation.tsp";
@@ -55,11 +55,13 @@ Creating a new version of an existing common type mostly involves editing what i
    - In the `-ref` file write the reference to all the definitions you just created using the `@@armCommonDefinition(` decorator. Expose every single version in which the definition is available.
 
      ```typespec
-     @@armCommonDefinition(ManagedServiceIdentityWithDelegation,
+     @@armCommonDefinition(
+       ManagedServiceIdentityWithDelegation,
        "ManagedServiceIdentityWithDelegation",
        Azure.ResourceManager.CommonTypes.Versions.v4
      );
-     @@armCommonDefinition(ManagedServiceIdentityWithDelegation,
+     @@armCommonDefinition(
+       ManagedServiceIdentityWithDelegation,
        "ManagedServiceIdentityWithDelegation",
        Azure.ResourceManager.CommonTypes.Versions.v5
      );

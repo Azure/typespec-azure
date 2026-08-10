@@ -27,12 +27,32 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "lro-status-monitor-invalid-result-property-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Property '${"propertyName"}' used as the final result of a long-running operation has an invalid type '${"typeName"}'. The property type must be a Model, Scalar, or 'unknown'.`,
+      },
+    },
+    "invalid-polling-operation-parameter": {
+      severity: "error",
+      messages: {
+        default: paramMessage`The @pollingOperationParameter '${"name"}' does not reference a valid parameter in the polling operation.`,
+      },
+    },
     "invalid-final-state": {
       severity: "warning",
       messages: {
         badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
-        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
+        notPut:
+          "The final state value 'original-uri' can only be used in http PUT, PATCH, or POST operations",
         noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
+      },
+    },
+    "no-operation-at-original-uri": {
+      severity: "warning",
+      messages: {
+        default:
+          "The 'original-uri' final state is specified, but there is no GET operation at the original URI. The final result will be treated as 'void'.",
       },
     },
     "bad-record-type": {
@@ -225,12 +245,34 @@ export const $lib = createTypeSpecLibrary({
         default: `Union is referencing itself and cannot be resolved as an enum.`,
       },
     },
+    "preview-version-invalid-enum-member": {
+      severity: "error",
+      messages: {
+        default: `@previewVersion can only be applied to members of a Version enum.`,
+      },
+    },
+    "preview-version-last-member": {
+      severity: "warning",
+      messages: {
+        default: `@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.`,
+      },
+    },
+    "unique-items-invalid-type": {
+      severity: "warning",
+      messages: {
+        default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
+      },
+    },
+    "experimental-feature": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`'${"feature"}' is an experimental feature and may be removed or changed at any time. Suppress this warning and proceed with caution if you are sure you want to use it.`,
+        dangerous: paramMessage`'${"feature"}' is a DANGEROUS experiemental feature that may be removed or changed at any time and may cause unexpected behavior. Suppress this warning and proceed with extreme caution if you are sure you want to use it.`,
+      },
+    },
   },
 
   state: {
-    fixed: { description: "Data for `@fixed` decorator" },
-    pagedResult: { description: "Data for `@pagedResult` decorator" },
-    items: { description: "Data for `@items` decorator" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },
@@ -256,8 +298,12 @@ export const $lib = createTypeSpecLibrary({
     trait: { description: "Data for `@trait` decorator" },
     traitContext: { description: "Data for `@traitContext` decorator" },
     traitLocation: { description: "Data for `@traitLocation` decorator" },
+    uniqueItems: { description: "Data for `@uniqueItems` decorator" },
     parameterizedNextLinkConfig: {
       description: "Data for `@parameterizedNextLinkConfig` decorator",
+    },
+    previewVersion: {
+      description: "Data for `@previewVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

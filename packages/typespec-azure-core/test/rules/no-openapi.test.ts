@@ -1,17 +1,12 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noOpenAPIRule } from "../../src/rules/no-openapi.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureCoreTestRunner();
+  const runner = await Tester.import("@typespec/openapi").createInstance();
   tester = createLinterRuleTester(runner, noOpenAPIRule, "@azure-tools/typespec-azure-core");
 });
 
@@ -32,7 +27,7 @@ describe("@operationId", () => {
 });
 
 describe("@extension", () => {
-  it("emit warning if @extension is used", async () => {
+  it("does not emit a warning if @extension is used", async () => {
     await tester
       .expect(
         `
@@ -40,14 +35,11 @@ describe("@extension", () => {
         op test(): string;
       `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/no-openapi",
-        message: `Azure specs should not be using decorator "$extension" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter.`,
-      });
+      .toBeValid();
   });
 
   // https://github.com/Azure/typespec-azure/issues/687
-  it("exclude x-ms-identifiers key", async () => {
+  it("does not emit a warning for the x-ms-identifiers key", async () => {
     await tester
       .expect(
         `model foo {

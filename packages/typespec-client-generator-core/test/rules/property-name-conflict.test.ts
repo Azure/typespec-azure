@@ -1,17 +1,17 @@
 import {
-  BasicTestRunner,
-  LinterRuleTester,
   createLinterRuleTester,
+  type LinterRuleTester,
+  type TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { propertyNameConflictRule } from "../../src/rules/property-name-conflict.rule.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { SimpleTester } from "../tester.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner();
+  runner = await SimpleTester.createInstance();
   tester = createLinterRuleTester(
     runner,
     propertyNameConflictRule,
@@ -140,25 +140,6 @@ it("is valid if inherited property name conflicts with model name", async () => 
 });
 
 it("emit warning if spread property name conflicts with model name", async () => {
-  await tester
-    .expect(
-      `
-      model Base {
-        foo: string
-      }
-
-      model Foo {
-        ...Base;
-      }
-      `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
-    });
-});
-
-it("don't emit ", async () => {
   await tester
     .expect(
       `

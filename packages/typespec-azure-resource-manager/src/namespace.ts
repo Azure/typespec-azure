@@ -1,13 +1,13 @@
 import {
-  DecoratorContext,
-  Enum,
-  EnumMember,
-  EnumValue,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
+  type DecoratorContext,
+  type Enum,
+  type EnumMember,
+  type EnumValue,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
   addService,
   getNamespaceFullName,
 } from "@typespec/compiler";
@@ -16,20 +16,16 @@ import * as http from "@typespec/http";
 import { getAuthentication, setAuthentication } from "@typespec/http";
 import { unsafe_setRouteOptionsForNamespace as setRouteOptionsForNamespace } from "@typespec/http/experimental";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
-import {
+import type {
   ArmLibraryNamespaceDecorator,
   ArmProviderNamespaceDecorator,
   UseLibraryNamespaceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import { $armCommonTypesVersion } from "./common-types.js";
-import { reportDiagnostic } from "./lib.js";
-import { getSingletonResourceKey } from "./resource.js";
+import { getArmVirtualResourceDetails, getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
-function getArmCommonTypesVersion(
-  context: DecoratorContext,
-  entity: Namespace | EnumMember,
-): EnumValue | undefined {
+function getArmCommonTypesVersion(entity: Namespace | EnumMember): EnumValue | undefined {
   return entity.decorators.find((x) => x.definition?.name === "@armCommonTypesVersion")?.args[0]
     .jsValue as EnumValue | undefined;
 }
@@ -146,15 +142,6 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
 
   const inRealm = unsafe_Realm.realmForType.has(entity);
   const override = isArmNamespaceOverride(program, entity);
-  const namespaceCount = program.stateMap(ArmStateKeys.armProviderNamespaces).size;
-  if (namespaceCount > 0 && !override && !inRealm) {
-    reportDiagnostic(program, {
-      code: "single-arm-provider",
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
   // armProviderNamespace will set the service namespace if it's not done already
   if (!override || inRealm) {
     addService(program, entity);
@@ -169,7 +156,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     }
   }
 
-  const armCommonTypesVersion = getArmCommonTypesVersion(context, entity);
+  const armCommonTypesVersion = getArmCommonTypesVersion(entity);
 
   // If it is versioned namespace, we will check each Version enum member. If no
   // @armCommonTypeVersion decorator, add the one
@@ -177,7 +164,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
   if (versioned) {
     const versionEnum = versioned.args[0].value as Enum;
     versionEnum.members.forEach((v) => {
-      if (!getArmCommonTypesVersion(context, v)) {
+      if (!getArmCommonTypesVersion(v)) {
         context.call($armCommonTypesVersion, v, armCommonTypesVersion ?? "v3");
       }
     });
@@ -221,7 +208,10 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
                     type: "implicit",
                     authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize",
                     scopes: [
-                      { value: "user_impersonation", description: "impersonate your user account" },
+                      {
+                        value: "https://management.azure.com/.default",
+                        description: "Default scope for management APIs",
+                      },
                     ],
                   },
                 ],
@@ -232,8 +222,12 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
       });
     }
 
-    // Set route options for the whole namespace
-    setRouteOptionsForNamespace(program, entity, {
+    // Set route options for the top level namespace
+    let topLevelNamespace = entity;
+    while (topLevelNamespace.namespace) {
+      topLevelNamespace = topLevelNamespace.namespace;
+    }
+    setRouteOptionsForNamespace(program, topLevelNamespace, {
       autoRouteOptions: {
         // Filter key parameters for singleton resource types to insert the
         // singleton key value
@@ -267,19 +261,48 @@ export function getArmProviderNamespace(
   program: Program,
   entity: Namespace | Model,
 ): string | undefined {
-  let currentNamespace: Namespace | undefined =
-    entity.kind === "Namespace" ? entity : entity.namespace;
+  if (entity.kind === "Model") {
+    const details = getArmVirtualResourceDetails(program, entity);
+    if (details?.provider !== undefined) {
+      return details.provider;
+    }
+  }
 
+  const currentNamespace: Namespace | undefined =
+    entity.kind === "Namespace" ? entity : entity.namespace;
+  return getArmProviderFromNamespace(program, currentNamespace);
+}
+
+function getArmProviderFromNamespace(
+  program: Program,
+  ns: Namespace | undefined,
+): string | undefined {
   let armProviderNamespace: string | undefined;
-  while (currentNamespace) {
-    armProviderNamespace = program
-      .stateMap(ArmStateKeys.armProviderNamespaces)
-      .get(currentNamespace);
+  while (ns) {
+    armProviderNamespace = program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns);
     if (armProviderNamespace) {
       return armProviderNamespace;
     }
 
-    currentNamespace = currentNamespace.namespace;
+    ns = ns.namespace;
+  }
+
+  return undefined;
+}
+
+export function resolveProviderNamespace(
+  program: Program,
+  ns?: Namespace | undefined,
+): Namespace | undefined {
+  ns = ns ?? program.getGlobalNamespaceType();
+  if (program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns)) {
+    return ns;
+  }
+  for (const child of ns.namespaces.values()) {
+    const providerNs = resolveProviderNamespace(program, child);
+    if (providerNs) {
+      return providerNs;
+    }
   }
 
   return undefined;

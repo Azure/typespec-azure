@@ -1,4 +1,11 @@
-import { ModelProperty, Scalar, createRule, getEncode, paramMessage } from "@typespec/compiler";
+import {
+  type ModelProperty,
+  type Scalar,
+  createRule,
+  fileRef,
+  getEncode,
+  paramMessage,
+} from "@typespec/compiler";
 
 const knownEncodings = new Set([
   // utcDateTime and offsetDateTime
@@ -14,8 +21,10 @@ const knownEncodings = new Set([
 ]);
 export const knownEncodingRule = createRule({
   name: "known-encoding",
+  docs: fileRef.fromPackageRoot("src/rules/known-encoding.md"),
   description: "Check for supported encodings.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/known-encoding",
   messages: {
     default: paramMessage`Encoding "${"encoding"}" is not supported for Azure Services. Known encodings are: ${"knownEncodings"}`,
   },

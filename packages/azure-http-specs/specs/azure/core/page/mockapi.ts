@@ -1,4 +1,4 @@
-import { dyn, dynItem, json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { dyn, dynItem, json, passOnSuccess, type ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 const validUser = { id: 1, name: "Madge", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" };
@@ -63,7 +63,7 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        value: [{ id: 1, name: "User1" }],
+        values: [{ id: 1, name: "User1" }],
         nextLink: dyn`${dynItem("baseUrl")}/azure/core/page/with-parameterized-next-link/second-page?select=name`,
       }),
     },
@@ -82,7 +82,38 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        value: [{ id: 2, name: "User2" }],
+        values: [{ id: 2, name: "User2" }],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_Core_Page_withRelativeNextLink = passOnSuccess([
+  {
+    // First page request
+    uri: "/azure/core/page/with-relative-next-link",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 1, name: "User1", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" }],
+        // Relative nextLink - client must resolve against endpoint
+        nextLink: dyn`/azure/core/page/with-relative-next-link/page/2`,
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // Second page request
+    uri: "/azure/core/page/with-relative-next-link/page/2",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 2, name: "User2", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" }],
       }),
     },
     kind: "MockApiDefinition",

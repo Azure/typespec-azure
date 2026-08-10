@@ -2,7 +2,7 @@
 title: How can I change the operation template of an operation in newer versions
 ---
 
-## Symtoms
+## Symptoms
 
 If you are switching to a different operation template in a new version, you may run into compilation errors if you only leverage `@added` and `@removed` versioning decorators.
 

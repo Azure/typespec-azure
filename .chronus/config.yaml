@@ -12,7 +12,7 @@ changeKinds:
     description: Fixes to existing features
 
   dependencies:
-    versionType: patch
+    versionType: none
     title: Bump dependencies
     description: Bumps dependencies
 
@@ -41,11 +41,16 @@ versionPolicies:
       - "@azure-tools/typespec-azure-portal-core"
       - "@azure-tools/typespec-azure-resource-manager"
       - "@azure-tools/typespec-client-generator-core"
+      - "@azure-tools/typespec-azure-rulesets"
+      - "@azure-tools/azure-http-specs"
 
 changelog: ["@chronus/github/changelog", { repo: "azure/typespec-azure" }]
 
 ignore:
   - "@typespec/*"
+  - "typespec-vscode"
+  - "tmlanguage-generator"
+  - "typespec-vs"
 
 changedFiles:
   - "!**/*.md"

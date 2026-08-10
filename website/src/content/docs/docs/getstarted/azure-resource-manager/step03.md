@@ -1,5 +1,7 @@
 ---
 title: 4. Defining Child Resource Types
+description: Defining ARM child resources
+llmstxt: true
 ---
 
 You can create parent/child relationships between resource types by using the `@parentResource` decorator when defining a resource type.
@@ -10,9 +12,7 @@ For example, here's how you could create a new `AddressResource` resource under 
 /** An address resource belonging to a user resource */
 @parentResource(User)
 model AddressResource is ProxyResource<AddressResourceProperties> {
-  @key("addressName")
-  @segment("addresses")
-  name: string;
+  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
 }
 
 /** The properties of AddressResource */

@@ -1,7 +1,8 @@
 import {
-  Operation,
-  Type,
+  type Operation,
+  type Type,
   createRule,
+  fileRef,
   ignoreDiagnostics,
   isErrorModel,
   paramMessage,
@@ -10,8 +11,10 @@ import { Visibility, createMetadataInfo, getHttpOperation } from "@typespec/http
 
 export const responseSchemaMultiStatusCodeRule = createRule({
   name: "response-schema-problem",
+  docs: fileRef.fromPackageRoot("src/rules/response-schema-problem.md"),
   description: "Warn about operations having multiple non-error response schemas.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/response-schema-problem",
   messages: {
     multipleSuccessSchemas: paramMessage`Operation '${"name"}' has multiple non-error response schemas. Did you forget to add '@error' to one of them?`,
   },
@@ -30,7 +33,7 @@ export const responseSchemaMultiStatusCodeRule = createRule({
           if (body === undefined) continue;
           const bodyType = body.type;
 
-          let currResponse: Type | undefined = undefined;
+          let currResponse: Type | undefined;
           switch (bodyType.kind) {
             case "Model":
               const effModel = metadataInfo.getEffectivePayloadType(bodyType, Visibility.Read);

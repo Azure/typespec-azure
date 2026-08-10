@@ -55,7 +55,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: "18.17.0"
+      versionSpec: "22.x"
   - script: npm install
   - script: npx tsp compile .
   - task: PublishPipelineArtifact@1

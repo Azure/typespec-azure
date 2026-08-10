@@ -57,6 +57,825 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getModel
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/model`
+
+Input: None
+Output: Feature object with geometry, properties, and optional id fields.
+Example response:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
+
+Input: None
+Output: ModelWithFeatureProperty object with feature and additionalProperty fields.
+Example response:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putModel
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/model`
+
+Input: Feature object in request body.
+Example input:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/property`
+
+Input: ModelWithFeatureProperty object in request body.
+Example input:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_ApiVersion_ClientApiVersions_sendApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/client-api-versions`
+
+Test that the client sends the api-version from @clientApiVersions decorator.
+The client api version enum is extended with an older version "2022-10-01" not present in the service versions.
+The client should be able to send "2022-10-01" as the api-version query parameter.
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
+
+Test case 4: `@clientDefaultValue` for header parameters.
+This scenario tests that client default values are correctly applied to header parameters.
+
+Expected header parameters:
+Accept: "application/json;odata.metadata=none" (default)
+x-custom-header: "default-value" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getOperationParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/operation-parameter`
+
+Test case 2: `@clientDefaultValue` for operation parameter.
+This scenario tests that client default values are correctly applied to operation parameters.
+
+Expected query parameter:
+name: "test"
+pageSize: 10 (default)
+format: "json" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/path-parameter/{segment1}/{segment2}`
+
+Test case 3: `@clientDefaultValue` for first path segment.
+This scenario has 2 path segments and tests client default value on the first segment.
+
+Expected path parameters:
+segment1: "default-segment1" (default)
+segment2: "segment2"
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_putModelProperty
+
+- Endpoint: `put /azure/client-generator-core/client-default-value/model-property`
+
+Test case 1: `@clientDefaultValue` for model property.
+This scenario tests that client default values are correctly applied to model properties.
+
+Expected input body:
+
+```json
+{
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
+}
+```
+
+### Azure_ClientGenerator_Core_ClientDoc_Documentation
+
+- Endpoint: `post /azure/client-generator-core/client-doc/harvest`
+
+This scenario tests the @clientDoc decorator which overrides documentation for types in client libraries.
+The 'Plant' model has a base doc from TypeSpec and additional client-specific documentation appended via @clientDoc in append mode.
+The 'harvest' operation has its documentation completely replaced by @clientDoc in replace mode.
+
+Expected request body:
+
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/header-param/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/header-param/with-body`
+
+Client for testing header parameter moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+const client = new HeaderParamClient({
+  name: "test-name-value"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name here
+client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MixedParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/mixed-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/mixed-params/with-body`
+
+Client for testing a mix of client-level and method-level parameters.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Parameters remaining at method level:
+
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MixedParamsClient({
+  name: "test-name-value"
+});
+
+client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+client.withBody(region: "us-west", body: { name: "test-name" });  // region stays as method param
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MultipleParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/multiple-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/multiple-params/with-body`
+
+Client for testing multiple parameters (header and query) moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MultipleParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_ParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/default/param-alias/{blobName}/with-original-name`
+
+Client for testing the @paramAlias decorator for renaming parameters in client code.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter with @paramAlias("blob"))
+
+Expected client usage:
+
+```ts
+const client = new ParamAliasClient({
+  blobName: "sample-blob",
+});
+
+// Operations don't need blob/blobName parameter
+client.withAliasedName();
+client.withOriginalName();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_PathParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new PathParamClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_QueryParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/query/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/default/query/delete-resource`
+
+Client for testing query parameter moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new QueryParamClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithHeader
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/delete-standalone`
+
+Client for testing default -> individually header parameter nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves header parameters to client level and uses individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// Operations don't need name header parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMixed
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/delete-standalone`
+
+Client for testing default -> individually mixed parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves some parameters to client level while keeping others at method level with individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Parameters remaining at method level:
+
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// Operations still need region parameter
+client.withQuery(region: "us-west", format: "text");
+client.getStandalone(region: "us-west");
+client.deleteStandalone(region: "us-west");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMultiple
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/delete-standalone`
+
+Client for testing default -> individually multiple parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves multiple parameters (header and query) to client level with individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// Operations don't need name or region parameters
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-param-alias/{blobName}/with-original-name`
+
+Client for testing default -> individually param alias nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization with param alias.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter with @paramAlias("blob"))
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithParamAliasClient({
+  blobName: "sample-blob",
+});
+
+// Operations don't need blob/blobName parameter
+client.withAliasedName();
+client.withOriginalName();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPath
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}`
+
+Client for testing default -> individually nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithQuery
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/delete-resource`
+
+Client for testing default -> individually nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithHeaderClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/delete-standalone`
+
+Client for testing default -> individually and parent header parameter nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves header parameters to client level and uses both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// Operations don't need name header parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMixedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/delete-standalone`
+
+Client for testing default -> individually and parent mixed parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves some parameters to client level while keeping others at method level with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Parameters remaining at method level:
+
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// Operations still need region parameter
+client.withQuery(region: "us-west", format: "text");
+client.getStandalone(region: "us-west");
+client.deleteStandalone(region: "us-west");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMultipleClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/delete-standalone`
+
+Client for testing default -> individually and parent multiple parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves multiple parameters (header and query) to client level with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// Operations don't need name or region parameters
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithParamAliasClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/{blobName}/with-original-name`
+
+Client for testing default -> individually and parent parameter alias nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client renames parameters at client level using @paramAlias with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" → renamed to "renamedBlobName" using @paramAlias (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithParamAliasClient({
+  renamedBlobName: "test-blob"  // Renamed from blobName
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithParamAliasClient({
+  renamedBlobName: "test-blob"  // Renamed from blobName
+});
+
+// Operations use blob or blobName at method level
+client.withAliasedName(blob: "test-blob-path");
+client.withOriginalName(blobName: "test-blob-path");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithPathClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}`
+
+Client for testing default -> individually and parent nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses both individually and parent initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithQueryClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/delete-resource`
+
+Client for testing default -> individually and parent nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses both individually and parent initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient_BlobOperations
+
+- Endpoint: `get /azure/client-generator-core/client-location/move-method-parameter-to-client/blob`
+
+Test moving a method parameter to client.
+
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
+
+Expected request:
+
+- GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
+
+Expected response:
+
+- Status: 200
+- Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient_UserOperations
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/move-to-existing-sub-client/user`
+  - `get /azure/client-generator-core/client-location/move-to-existing-sub-client/user`
+
+Test moving an operation from one sub client to another existing sub client.
+
+Operation `deleteUser` from interface `UserOperations` should be moved to interface `AdminOperations` using @clientLocation(AdminOperations).
+
+Expected client structure:
+
+- Interface UserOperations should contain only operation `getUser`
+- Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient_ProductOperations
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/move-to-new-sub-client/products`
+  - `get /azure/client-generator-core/client-location/move-to-new-sub-client/products/archive`
+
+Test moving an operation to a new sub client specified by string name.
+
+Operation `archiveProduct` from interface `ProductOperations` should be moved to a new sub client named "ArchiveOperations" using @clientLocation("ArchiveOperations").
+
+Expected client structure:
+
+- Interface ProductOperations should contain only operation `listProducts`
+- A new sub client "ArchiveOperations" should be created containing operation `archiveProduct`
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient_ResourceOperations
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/move-to-root-client/resource`
+  - `get /azure/client-generator-core/client-location/move-to-root-client/health`
+
+Test moving an operation to the root client.
+
+Operation `getHealthStatus` from interface `ResourceOperations` should be moved to the root client using @clientLocation(service namespace).
+
+Expected client structure:
+
+- Interface ResourceOperations should contain only operation `getResource`
+- Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -67,6 +886,116 @@ Expected response body:
 ```json
 {
   "serviceUrl": ""
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_EnumValue
+
+- Endpoint: `post /azure/client-generator-core/exact-name/enum-value`
+
+This scenario tests the exact() function applied to an enum value.
+The union AgentEndpointProtocol has a member 'a2a' which is renamed using exact("A2A")
+scoped per language. Emitters should preserve the exact enum value name 'A2A' without
+applying their usual casing conventions (e.g., Python should NOT convert to 'A_2_A',
+and C# should NOT convert to 'A2A' → 'A2a' or any other transformation).
+
+Expected request body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_Model
+
+- Endpoint: `post /azure/client-generator-core/exact-name/model`
+
+This scenario tests the exact() function which prevents language emitters from applying
+casing transformations to client names. The model 'ExactModel' is renamed to 'my_model'
+using exact(), meaning all languages should preserve the name 'my_model' without any
+casing conversion (e.g., Python should NOT convert to 'MyModel' class name,
+and C# should NOT convert to 'MyModel').
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_Operation
+
+- Endpoint: `get /azure/client-generator-core/exact-name/operation`
+
+This scenario tests the exact() function applied to an operation name.
+The operation 'myOp' is renamed using exact("myOp") scoped per language.
+Emitters should preserve the exact operation name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_op',
+and C# should NOT convert to 'MyOp').
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ExactName_Parameter
+
+- Endpoint: `get /azure/client-generator-core/exact-name/parameter`
+
+This scenario tests the exact() function applied to a parameter name.
+The query parameter 'myParam' is renamed using exact("myParam") scoped per language.
+Emitters should preserve the exact parameter name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_param',
+and C# should NOT convert to 'MyParam').
+
+Expected query parameter:
+myParam: hello
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ExactName_Property
+
+- Endpoint: `post /azure/client-generator-core/exact-name/property`
+
+This scenario tests the exact() function applied to a model property with language scoping.
+The property 'name' on ScopedModel is renamed using exact() scoped to each language,
+with names that include an underscore prefix to verify that language naming logic does not apply:
+
+- Python: '_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '_myName' (should not be converted to remove the underscore prefix)
+- C#: '_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '_myName' (should not be converted to remove the underscore prefix)
+- Go: '_MyName' (should not be converted to remove the underscore prefix)
+  Each language should preserve the specified exact name as-is without any further casing conversion.
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
 }
 ```
 
@@ -95,6 +1024,73 @@ Expected response body:
   "properties": {
     "description": "test",
     "age": 1
+  }
+}
+```
+
+### Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel
+
+- Endpoint: `put /azure/client-generator-core/flatten-property/flattenReadOnlyModel`
+
+Test model with flatten property containing all read-only properties.
+
+Expected behavior: When flattening a property that contains only read-only properties:
+
+- For input (write): Read-only properties should not appear in the input model, regardless of flattening
+
+The `properties` and `propertiesOptional` fields contain only read-only properties (`solutionId`,
+`title`, `content`). These should be flattened into the parent `Solution` model in the response.
+
+Expected input body:
+
+```json
+{
+  "name": "foo"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "foo",
+  "properties": {
+    "solutionId": "solution1",
+    "title": "Solution Title",
+    "content": "Solution Content"
+  }
+}
+```
+
+### Azure_ClientGenerator_Core_FlattenProperty_putFlattenUnknownModel
+
+- Endpoint: `put /azure/client-generator-core/flatten-property/flattenUnknownModel`
+
+Update and receive model with flatten property of unknown type.
+
+Note: `unknown` is a non-model type. The flatten decorator should be ignored for non-model types,
+so whether flattened or not, the behavior should be the same. This test verifies that SDKs correctly
+ignore flatten for non-model types.
+
+Expected behavior: The `properties` field should NOT be flattened and should remain as-is in the model,
+since flatten only applies to model types.
+
+Expected input body:
+
+```json
+{
+  "name": "foo"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test",
+  "properties": {
+    "key1": "value1",
+    "key2": "value2"
   }
 }
 ```
@@ -134,6 +1130,248 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Dog data and returns Dog data.
+Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Pet data and returns Pet data.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-dog`
+
+Test operation that accepts Dog input and returns Dog output.
+This operation validates Dog type directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+Service expects Dog data and returns Dog data.
+This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+This operation validates Pet type directly.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_NextLinkVerb_listItems
+
+- Endpoint: `post /azure/client-generator-core/next-link-verb/items`
+
+Test for @nextLinkVerb decorator with POST verb.
+This operation should use POST for both the initial request and the next link request.
+
+Expected initial request: POST /azure/client-generator-core/next-link-verb/items
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test1"
+    }
+  ],
+  "nextLink": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+}
+```
+
+Expected next link request: POST /azure/client-generator-core/next-link-verb/items/page/2
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test2"
+    }
+  ]
+}
+```
+
+### Azure_ClientGenerator_Core_Override_GroupParameters_group
+
+- Endpoint: `get /azure/client-generator-core/override/group`
+
+Verify that after `@override` the parameters are grouped correctly to `GroupParametersOptions` in the client method signature.
+
+Expected query parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
+
+- Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
+
+Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_exists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists`
+
+Test that a HEAD operation decorated with @responseAsBool returns true for a successful (2xx) response.
+
+Expected call:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_notExists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+
+Test that a HEAD operation decorated with @responseAsBool returns false for a 404 response.
+
+Expected call:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
+
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
 - Endpoints:
@@ -144,165 +1382,17 @@ Expected response body:
 
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-The other models are override to roundtrip, so they should be generated and exported as well.
+The other models' usage is additive to roundtrip, so they should be generated and exported as well.
 
-### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
+### Azure_ClientGenerator_Core_Usage_NamespaceUsage
 
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
-  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
+- Endpoint: `put /azure/client-generator-core/usage/namespaceModelSerializable`
 
-Client for testing header parameter moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-
-Expected client usage:
-
-```ts
-const client = new HeaderParamClient({
-  name: "test-name-value"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name here
-client.withBody({ name: "test-name" });  // No need to pass name here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
-
-- Endpoints:
-
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
-
-  Client for testing a mix of client-level and method-level parameters.
-
-  Parameters elevated to client level:
-
-  - name: "test-name-value" (header parameter)
-
-  Parameters remaining at method level:
-
-  - region: "us-west" (query parameter)
-
-  Expected client usage:
-
-  ```ts
-  const client = new MixedParamsClient({
-    name: "test-name-value"
-  });
-
-  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
-  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
-  ```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MultipleParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
-
-Client for testing multiple parameters (header and query) moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-- region: "us-west" (query parameter)
-
-Expected client usage:
-
-```ts
-const client = new MultipleParamsClient({
-  name: "test-name-value",
-  region: "us-west"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name or region here
-client.withBody({ name: "test-name" });  // No need to pass name or region here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParamAlias
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
-
-Client for testing the @paramAlias decorator for renaming parameters in client code.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// Elevated to client level via alias
-client.withAliasedName();
-
-// Elevated to client level via original name
-client.withOriginalName();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level, in child client.
-
-The child client can be initialized individually, or via its parent client.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentClient
-const client = new ParentClient.getChildClient({
-  blobName: "sample-blob"
-});
-
-// directly
-const client = new ChildClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_PathParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new PathParamClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
+This scenario tests @usage applied to a namespace.
+All models within the namespace (including nested sub-namespaces) inherit the usage.
+'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
+because their parent namespace has @usage(Usage.input | Usage.json) applied.
+The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -333,7 +1423,7 @@ Expected response body:
 
 ### Azure_Core_Basic_createOrUpdate
 
-- Endpoint: `get /azure/core/basic`
+- Endpoint: `patch /azure/core/basic`
 
 Should only generate models named User and UserOrder.
 
@@ -798,12 +1888,10 @@ This scenario is to test two operations with two different page item types.
   parameters are maintained in next link URLs.
 
   Expected query parameters on initial request:
-
   - includePending=true
   - select=name
 
   Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
-
   - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
   - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
 
@@ -825,6 +1913,50 @@ This scenario is to test two operations with two different page item types.
   ```
 
   Note that the nextLink preserves the original filter and select parameters.
+
+### Azure_Core_Page_withRelativeNextLink
+
+- Endpoint: `get /azure/core/page/with-relative-next-link`
+
+  This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+  When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+
+  Expected query parameter on initial request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (first page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ],
+    "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+  }
+  ```
+
+  Expected query parameter on next link request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (second page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 2,
+        "name": "User2",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ]
+  }
+  ```
+
+  Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 
@@ -1022,6 +2154,74 @@ maxpagesize=3
 }
 ```
 
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOrReplace
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
+  }
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
 
 - Endpoint: `put https://management.azure.com`
@@ -1191,6 +2391,838 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation with long LRO headers(> 6KB + 6KB = 12KB).
+To pass the test, client should accept both:
+
+1. Single header size that's more than 6KB. 7KB is sure to pass the test.
+2. Total headers size that's more than 12KB. 13KB is sure to pass the test.
+
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.LargeHeader/largeHeaders/header1/two6k
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post?userContext=<6KB-string>
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/operations/post?userContext=<6KB-string>
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "succeeded": true
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_listByManagementGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "subscriptionSetting": "test-sub-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_Operations
+
+- Endpoint: `get https://management.azure.com`
+
+Operations list GET operation for Azure.ResourceManager.MethodSubscriptionId.
+Expected path: /providers/Azure.ResourceManager.MethodSubscriptionId/operations
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "Azure.ResourceManager.MethodSubscriptionId/services/read",
+      "isDataAction": false,
+      "display": {
+        "provider": "Azure.ResourceManager.MethodSubscriptionId",
+        "resource": "services",
+        "operation": "Lists services",
+        "description": "Lists registered services"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "Valid subscription resource 1"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "configValue": "test-config"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiService_Compute_VirtualMachines_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services. This operaton should be called like this: `client.virtualMachines.createOrUpdate(...)`.
+
+PUT (create or update) a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+Expected query parameter: api-version=2025-04-01
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {}
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+  "name": "vm1",
+  "type": "Microsoft.Compute/virtualMachines",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiService_Compute_VirtualMachines_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services. This operaton should be called like this: `client.virtualMachines.get(...)`.
+
+GET a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+Expected query parameter: api-version=2025-04-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+  "name": "vm1",
+  "type": "Microsoft.Compute/virtualMachines",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiService_ComputeDisk_Disks_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services. This operaton should be called like this: `client.disks.createOrUpdate(...)`.
+
+PUT (create or update) a Disk resource.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1
+Expected query parameter: api-version=2025-01-02
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {}
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1",
+  "name": "disk1",
+  "type": "Microsoft.Compute/disks",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiService_ComputeDisk_Disks_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services. This operaton should be called like this: `client.disks.get(...)`.
+
+GET a Disk resource.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1
+Expected query parameter: api-version=2025-01-02
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1",
+  "name": "disk1",
+  "type": "Microsoft.Compute/disks",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.createOrUpdate(...)`.
+
+PUT (create or update) a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
+Expected query parameter: api-version=2025-05-01
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "metadata": {
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+  "name": "vm-shared1",
+  "type": "Microsoft.Compute/virtualMachinesShared",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-01T00:00:00Z",
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.get(...)`.
+
+GET a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
+Expected query parameter: api-version=2025-05-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+  "name": "vm-shared1",
+  "type": "Microsoft.Compute/virtualMachinesShared",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-01T00:00:00Z",
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.storageAccounts.createOrUpdate(...)`.
+
+PUT (create or update) a Storage Account.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1
+Expected query parameter: api-version=2025-02-01
+Expected request body:
+
+```json
+{
+  "location": "westus",
+  "properties": {
+    "metadata": {
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1",
+  "name": "account1",
+  "type": "Microsoft.Storage/storageAccounts",
+  "location": "westus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-02T00:00:00Z",
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.storageAccounts.get(...)`.
+
+GET a Storage Account.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1
+Expected query parameter: api-version=2025-02-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1",
+  "name": "account1",
+  "type": "Microsoft.Storage/storageAccounts",
+  "location": "westus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-02T00:00:00Z",
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
 - Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
@@ -1288,6 +3320,88 @@ Expected response body:
     "message": "Hostname 'checkName' already exists. Please select a different name."
   }
   ```
+
+### Azure_ResourceManager_OperationTemplates_Legacy_createOrReplaceOptionalBody
+
+- Endpoint: `put https://management.azure.com`
+
+PUT operation using Legacy.CreateOrReplaceSync with optional request body.
+Tests the pattern where a resource can be created or replaced with an optional body,
+as seen in marketplace Collections.
+
+This tests two sub-scenarios:
+
+1. With body: PUT with a resource body creates/updates the resource
+2. Without body: PUT without a body creates the resource with defaults
+
+Expected verb: PUT
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 (with body) - Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "configValue": "custom-value"
+  }
+}
+```
+
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default",
+  "name": "default",
+  "type": "Azure.ResourceManager.OperationTemplates/configurations",
+  "location": "eastus",
+  "properties": {
+    "configValue": "custom-value",
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+Scenario 2 (without body) - Expected request body: None (empty)
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default",
+  "name": "default",
+  "type": "Azure.ResourceManager.OperationTemplates/configurations",
+  "location": "eastus",
+  "properties": {
+    "configValue": "default-value",
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Legacy_routedGet
+
+- Endpoint: `get https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.OperationTemplates/configurations/{name}/diagnostics/{diagnosticName}`
+
+GET operation using RoutedOperations with a custom route path override.
+Tests the Legacy.RoutedOperations pattern where the resource path is overridden
+using ResourceRoute, and additional path parameters are added via @route.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default/diagnostics/memory
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "name": "memory",
+  "status": "healthy"
+}
+```
 
 ### Azure_ResourceManager_OperationTemplates_ListAvailableOperations
 
@@ -1526,6 +3640,541 @@ Expected response body:
 ```json
 {
   "content": "order1,product1,1"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Lro_exportArray
+
+- Endpoint: `post https://management.azure.com`
+
+Subscription-scoped POST operation returning an array.
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/exportArray
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "format": "csv"
+}
+```
+
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+  "name": "lro_exportarray_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+  "name": "lro_exportarray_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+Expected status code: 200
+Expected response body:
+
+```json
+[{ "content": "order1,product1,1" }, { "content": "order2,product2,2" }]
+```
+
+### Azure_ResourceManager_OperationTemplates_Lro_getLro
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation that returns a long-running operation.
+Uses Extension.Read with @markAsLro, which returns 200 or 202.
+The Location header points back to the same resource URL (matches real service behavior).
+
+Step 1: Initial GET Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+
+Step 2: Polling Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+
+Step 3: Final Polling Request (returns 200 OK with result)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1",
+  "name": "report1",
+  "type": "Azure.ResourceManager.OperationTemplates/costReports",
+  "properties": {
+    "downloadUrl": "https://storage.blob.core.windows.net/reports/report1.csv",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation that returns a LRO with paging.
+
+Step 1: Initial Request
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLro
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 2: Polling Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 3: Final Result Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+      "name": "product1",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product1"
+      }
+    }
+  ],
+  "nextLink": "..."
+}
+```
+
+Step 4: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with the second page of results.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+      "name": "product2",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product2"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLroWithBody
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation that returns a LRO with paging, using ArmResourceActionAsyncBase
+with a request body and a response that includes a body on both 200 and 202.
+Unlike postPagingLro which uses the convenience ArmResourceActionAsync with no body,
+this tests the lower-level ArmResourceActionAsyncBase pattern.
+
+Step 1: Initial Request
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLroWithBody
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "vnetId": "vnet1"
+}
+```
+
+Expected response: 202 Accepted with Location and Retry-After headers.
+Expected response body:
+
+```json
+{
+  "value": []
+}
+```
+
+Step 2: Polling Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 3: Final Result Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+      "name": "product1",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product1"
+      }
+    }
+  ],
+  "nextLink": "..."
+}
+```
+
+Step 4: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with the second page of results.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+      "name": "product2",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product2"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation to retrieve a widget.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_patch
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation using Legacy.CustomPatchSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains update data
+
+Expected verb: PATCH  
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"properties": {"name": "updated-widget", "description": "Updated description"}}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "updated-widget",
+    "description": "Updated description",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_post
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action operation using ArmResourceActionSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains action data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "result": "Action completed successfully"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "result": "Action completed successfully with parameters"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
+
+- Endpoint: `post https://management.azure.com`
+
+Provider POST action operation using ArmProviderActionSync with optional request body.
+This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+
+1. Empty body scenario: Request body is not sent (uses default allowance)
+2. With body scenario: Request body contains allowance change data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "totalAllowed": 50,
+  "status": "Changed to default allowance"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "totalAllowed": 100,
+  "status": "Changed to requested allowance"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_markAsPageable
+
+- Endpoint: `get https://management.azure.com`
+
+List operation using ArmListSinglePageByParent with @markAsPageable.
+The response uses a custom list model (CollectionsList) wrapping
+the resource array.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection1",
+      "name": "collection1",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Test Collection"
+      }
+    },
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection2",
+      "name": "collection2",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Another Collection"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_postActionPaging
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action returning pageable results.
+This tests a POST action with @list that returns pageable results (not an LRO).
+
+Step 1: Initial POST Request (returns first page)
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "filter": "status eq 'active'"
+}
+```
+
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+      "sendingMetrics": true
+    }
+  ],
+  "nextLink": "{endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage?api-version=2023-12-01-preview"
+}
+```
+
+Step 2: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm2",
+      "sendingMetrics": false
+    }
+  ]
 }
 ```
 
@@ -2725,6 +5374,189 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_listByServiceGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-match`
+
+Check when custom If-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-none-match`
+
+Check when custom If-None-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-none-match="invalid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-match`
+
+Check when only If-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-none-match`
+
+Check when only If-None-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-none-match="invalid"
+
 ### Azure_SpecialHeaders_XmsClientRequestId
 
 - Endpoint: `get /azure/special-headers/x-ms-client-request-id/`
@@ -2735,6 +5567,77 @@ Expected header parameters:
 - x-ms-client-request-id=<any uuid string>
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
+
+### Azure_Versioning_PreviewVersion_getWidget
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
+
+Test @previewVersion decorator with stable operations.
+Should send a preview api-version and response should contain color field.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "blue"
+}
+```
+
+### Azure_Versioning_PreviewVersion_listWidgets
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets`
+
+Test @previewVersion decorator with version-specific query parameters.
+Request should send stable api-version and response should not contain color field.
+
+Expected query parameter: api-version=2024-06-01
+Expected query parameter: name=test (color not available in stable version)
+
+Expected response body:
+
+```json
+{
+  "widgets": [
+    {
+      "id": "widget-1",
+      "name": "test"
+    }
+  ]
+}
+```
+
+### Azure_Versioning_PreviewVersion_updateWidgetColor
+
+- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
+
+Test @previewVersion decorator with preview-only operations.
+Only available in preview API versions.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected input body:
+
+```json
+{
+  "color": "red"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "red"
+}
+```
 
 ### Client_AlternateApiVersion_Service_Header_headerApiVersion
 
@@ -2770,6 +5673,28 @@ Expected client namespace for models:
 - FirstClientResult: Client.ClientNamespace.First
 - SecondClientResult: Client.ClientNamespace.Second
 - SecondClientEnumType: Client.ClientNamespace.Second.Sub
+
+### Client_Naming_EnumConflict_FirstOperations_first
+
+- Endpoint: `post /client/naming/enum-conflict/first`
+
+Test enum with same name in different namespace - first namespace.
+Expected request body:
+
+```json
+{ "status": "active", "name": "test" }
+```
+
+### Client_Naming_EnumConflict_SecondOperations_second
+
+- Endpoint: `post /client/naming/enum-conflict/second`
+
+Test enum with same name in different namespace - second namespace.
+Expected request body:
+
+```json
+{ "status": "running", "description": "test description" }
+```
 
 ### Client_Naming_Header_request
 
@@ -2899,6 +5824,35 @@ Expected request body:
   ```json
   "value1"
   ```
+
+### Client_Overload_list
+
+- Endpoint: `get /client/overload/resources`
+
+List all resources operation.
+
+Expected request: GET /client/overload/resources
+Expected response body:
+
+```json
+[
+  { "id": "1", "name": "foo", "scope": "car" },
+  { "id": "2", "name": "bar", "scope": "bike" }
+]
+```
+
+### Client_Overload_listByScope
+
+- Endpoint: `get /client/overload/resources/{scope}`
+
+List resources by scope operation. This operation uses `@clientName("list", "csharp")` to generate it as an overload method named "list" in C# client code, demonstrating method overloading capabilities.
+
+Expected request: GET /client/overload/resources/car
+Expected response body:
+
+```json
+[{ "id": "1", "name": "foo", "scope": "car" }]
+```
 
 ### Client_Structure_AnotherClientOperationGroup
 
@@ -3125,3 +6079,67 @@ With the above two calls, we test the following configurations from this service
 - A client generated from the second service spec can call the second deployment of a service with api version v2 with the updated changes
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
+
+### Service_MultipleServices_ServiceA_Operations_opA
+
+- Endpoint: `get /service/multiple-services/service-a/a-test`
+
+  Test that multiple services without explicit `@client` create separate root clients.
+  This operation should be accessible under `ServiceAClient` > `Operations`.
+
+  Expected path: /service/multiple-services/service-a/a-test
+  Expected query parameter: api-version=av2
+  Expected 204 response.
+
+### Service_MultipleServices_ServiceA_SubNamespace_subOpA
+
+- Endpoint: `get /service/multiple-services/service-a/a-sub-test`
+
+  Test that sub-namespaces are preserved per service when using multiple services.
+  This operation should be accessible under `ServiceAClient` > `SubNamespace`.
+
+  Expected path: /service/multiple-services/service-a/a-sub-test
+  Expected query parameter: api-version=av2
+  Expected 204 response.
+
+### Service_MultipleServices_ServiceB_Operations_opB
+
+- Endpoint: `get /service/multiple-services/service-b/b-test`
+
+  Test that multiple services without explicit `@client` create separate root clients.
+  This operation should be accessible under `ServiceBClient` > `Operations`.
+
+  Expected path: /service/multiple-services/service-b/b-test
+  Expected query parameter: api-version=bv2
+  Expected 204 response.
+
+### Service_MultipleServices_ServiceB_SubNamespace_subOpB
+
+- Endpoint: `get /service/multiple-services/service-b/b-sub-test`
+
+  Test that sub-namespaces are preserved per service when using multiple services.
+  This operation should be accessible under `ServiceBClient` > `SubNamespace`.
+
+  Expected path: /service/multiple-services/service-b/b-sub-test
+  Expected query parameter: api-version=bv2
+  Expected 204 response.
+
+### Service_MultiService_ServiceA_Foo_test
+
+- Endpoint: `get /service/multi-service/service-a/foo/test`
+
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.foo.test(...)`.
+
+  Expected path: /service/multi-service/service-a/foo/test
+  Expected query parameter: api-version=av2
+  Expected 204 response.
+
+### Service_MultiService_ServiceB_Bar_test
+
+- Endpoint: `get /service/multi-service/service-b/bar/test`
+
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bar.test(...)`.
+
+  Expected path: /service/multi-service/service-b/bar/test
+  Expected query parameter: api-version=bv2
+  Expected 204 response.

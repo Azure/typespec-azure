@@ -1,4 +1,9 @@
-import { json, MockApiDefinition, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  json,
+  type MockApiDefinition,
+  passOnSuccess,
+  type ScenarioMockApi,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 function createMockApiDefinitions(route: string, request: any, response: any): MockApiDefinition {
@@ -57,6 +62,39 @@ Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putNestedFlattenModel = pas
           description: "foo",
           age: 1,
         },
+      },
+    },
+  ),
+);
+
+Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenUnknownModel = passOnSuccess(
+  createMockApiDefinitions(
+    "flattenUnknownModel",
+    {
+      name: "foo",
+    },
+    {
+      name: "test",
+      properties: {
+        key1: "value1",
+        key2: "value2",
+      },
+    },
+  ),
+);
+
+Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel = passOnSuccess(
+  createMockApiDefinitions(
+    "flattenReadOnlyModel",
+    {
+      name: "foo",
+    },
+    {
+      name: "foo",
+      properties: {
+        solutionId: "solution1",
+        title: "Solution Title",
+        content: "Solution Content",
       },
     },
   ),

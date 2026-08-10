@@ -1,7 +1,7 @@
 // cspell:ignore bfff
 
-import { CommonLabels } from "../../core/eng/common/config/labels.js";
-import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.js";
+import { CommonLabels } from "../../core/eng/common/config/labels.ts";
+import { defineConfig, defineLabels } from "../../core/eng/common/scripts/labels/config.ts";
 
 /**
  * Labels that are used to categorize issue for which area they belong to.
@@ -27,6 +27,27 @@ export const AreaLabels = defineLabels({
     color: "957300",
     description: "Issues for @azure-tools/typespec-autorest emitter",
   },
+  "emitter:python": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-python emitter",
+  },
+  "emitter:go": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-go emitter",
+  },
+  "emitter:typescript": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-ts emitter",
+  },
+  "emitter:java": {
+    color: "0096c7",
+    description: "Issues for @azure-tools/typespec-java emitter",
+  },
+  "emitter:client:all": {
+    color: "957300",
+    description:
+      "General client emitter issues that do not involve TCGC or typespec-azure-http-specs",
+  },
   eng: {
     color: "65bfff",
     description: "",
@@ -39,6 +60,14 @@ export const AreaLabels = defineLabels({
     color: "9EB120",
     description: "Issues for Azure CLI/PSH features",
   },
+  "meta:website": {
+    color: "007dc8",
+    description: "TypeSpec.io updates",
+  },
+  linter: {
+    color: "65bfff",
+    description: "Issues related to linter rules",
+  },
 });
 
 /**
@@ -49,10 +78,21 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-core": ["packages/typespec-azure-core/"],
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
+  "emitter:python": ["packages/typespec-python/"],
+  "emitter:go": ["packages/typespec-go/"],
+  "emitter:typescript": ["packages/typespec-ts/"],
+  "emitter:java": ["packages/typespec-java/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
-  "lib:azure-http-specs": ["packages/typespec-azure-http-specs/"],
+  "lib:azure-http-specs": ["packages/azure-http-specs/"],
   ide: [],
   "cli/psh": [],
+  "emitter:client:all": [],
+  "meta:website": ["website/"],
+  linter: [
+    "packages/typespec-azure-core/src/rules/",
+    "packages/typespec-azure-resource-manager/src/rules/",
+    "packages/typespec-client-generator-core/src/rules/",
+  ],
 };
 
 export default defineConfig({
@@ -60,6 +100,7 @@ export default defineConfig({
     owner: "Azure",
     repo: "typespec-azure",
   },
+  externalOwners: {},
   areaPaths: AreaPaths,
   labels: {
     area: {
@@ -73,6 +114,14 @@ export default defineConfig({
         "good first issue": {
           color: "7057ff",
           description: "Good for newcomers",
+        },
+        "int:azure-specs": {
+          color: "0e8a16",
+          description: "Run integration tests against azure-rest-api-specs",
+        },
+        "agentic-workflows": {
+          color: "000000",
+          description: "Issues/PR created by github agentic workflows",
         },
       },
     },

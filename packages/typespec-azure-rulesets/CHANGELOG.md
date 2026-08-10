@@ -1,5 +1,181 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.70.0
+
+### Features
+
+- [#4842](https://github.com/Azure/typespec-azure/pull/4842) Add `no-reserved-resource-property` linter rule that flags reserved property names (matched case-insensitively, e.g. `billingData`) present in an ARM resource's property bag. The reserved-name list and diagnostic reason are extensible.
+- [#4541](https://github.com/Azure/typespec-azure/pull/4541) Add a new `client-sdk` ruleset and enable the `csharp-no-url-suffix` rule in it. The rule applies only to specs configured to emit a client SDK, i.e. those that extend `@azure-tools/typespec-azure-rulesets/client-sdk` in their `tspconfig.yaml`.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+
+## 0.69.2
+
+### Features
+
+- [111845d](https://github.com/Azure/typespec-azure/commit/111845d46f5cbd3c32b39f7fc89a05c2f6f7908c) Add a new `client-sdk` ruleset and enable the `csharp-no-url-suffix` rule in it. The rule applies only to specs configured to emit a client SDK, i.e. those that extend `@azure-tools/typespec-azure-rulesets/client-sdk` in their `tspconfig.yaml`.
+
+
+## 0.69.1
+
+### Bug Fixes
+
+- [#4621](https://github.com/Azure/typespec-azure/pull/4621) Adding Azure Resource Manager Base Types, including the Agent base type.
+  
+  Base types provide structured constraints for resources including required and optional
+  properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+  base type metadata to resource models for validation.
+  
+  Example of creating an Agent resource:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes;
+  using Azure.ResourceManager.BaseTypes.Agents;
+  
+  model MyDefinition is AgentDefinitionPlatform<true, true> {}
+  
+  model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyAgent is Agent<MyAgentProperties> {
+    ...ResourceNameParameter<MyAgent>;
+  }
+  
+  model MyConversationProperties is ConversationProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+    ...ResourceNameParameter<MyConversation>;
+  }
+  
+  model MyResponseProperties is ResponseProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+    ...ResourceNameParameter<MyResponse>;
+  }
+  ```
+
+
+## 0.69.0
+
+### Features
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+
+
+## 0.68.0
+
+### Features
+
+- [#4347](https://github.com/Azure/typespec-azure/pull/4347) Add new `version-progression` linter rule that validates ARM service versions all use unique dates and are declared in strictly increasing chronological order. Two api-versions sharing the same `YYYY-MM-DD` date (for example, `2026-04-28` and `2026-04-28-preview`) are not allowed.
+- [#4379](https://github.com/Azure/typespec-azure/pull/4379) Add new linter rule `arm-no-path-casing-conflicts` that flags ARM operation paths which differ only by character casing. The rule is enabled in the `@azure-tools/typespec-azure-rulesets` resource-manager ruleset.
+- [#4144](https://github.com/Azure/typespec-azure/pull/4144) Add `no-route-parameter-name-mismatch` linting rule that detects when two operation routes differ only by path parameter name.
+
+
+## 0.67.0
+
+No changes, version bump only.
+
+## 0.65.1
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+
+## 0.65.0
+
+No changes, version bump only.
+
+## 0.64.0
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
+## 0.63.0
+
+### Features
+
+- [#3475](https://github.com/Azure/typespec-azure/pull/3475) Add new `no-case-mismatch` rule checking for types with names only differing by case
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3483](https://github.com/Azure/typespec-azure/pull/3483) Add new `no-unnamed-union` rule to prevent usage of unnamed unions in Azure
+
+
+## 0.62.0
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add `@azure-tools/typespec-azure-resource-manager/secret-prop` rule to `resource-manager` ruleset
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Disable `retry-after` rule in arm ruleset which was a noop
+
+
+## 0.61.0
+
+No changes, version bump only.
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+
+## 0.59.0
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.0
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
+
+
+## 0.57.0
+
+No changes, version bump only.
+
+## 0.56.1
+
+### Bug Fixes
+
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Discourage use of legacy types outside brownfield conversions
+
+
+## 0.56.0
+
+No changes, version bump only.
+
 ## 0.55.0
 
 No changes, version bump only.

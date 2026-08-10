@@ -1,28 +1,12 @@
 ---
-title: 7. Defining child resources
+title: 7. Defining custom resource actions
+description: Defining custom resource actions
+llmstxt: true
 ---
 
-Sometimes your resource types will need to have child resources that relate to their parent types. You can identify that a resource type is the child of another resource by using the `@parentResource` decorator.
+Often your resource types will need additional operations that are not covered by the standard resource operation shapes. For this, there are a set of operation signatures for defining _resource actions_ at the instance and collection level.
 
-For example, here's how you could create a new `WidgetPart` resource under the `Widget` defined above:
-
-```typespec
-/** A WidgetPart resource belonging to a Widget resource. */
-@resource("parts")
-@parentResource(Widget)
-model WidgetPart {
-  @key("partName")
-  name: string;
-
-  /** The part number. */
-  number: string;
-
-  /** The part name. */
-  partName: string;
-}
-```
-
-When you use the standard resource operations with child resource types, their operation routes will include the route of the parent resource. For example, we might define the following operations for `WidgetPart`:
+To define a custom action you can use the `ResourceAction` and `ResourceCollectionAction` signatures from the `Azure.Core.ResourceOperations` interface. Let's define a couple of custom actions for the `Widget` and `WidgetPart` resources:
 
 ```typespec
 import "@azure-tools/typespec-azure-core";
@@ -36,15 +20,37 @@ alias ServiceTraits = SupportsRepeatableRequests &
 
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-/** Creates a WidgetPart */
-createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
+// In the Widgets interface...
+/** Schedule a widget for repairs. */
+op scheduleRepairs is Operations.ResourceAction<Widget, WidgetRepairRequest, WidgetRepairResponse>;
 
-/** Get a WidgetPart */
-getWidgetPart is Operations.ResourceRead<WidgetPart>;
+// In the WidgetParts interface...
+/** Reorder all parts for the widget. */
+op reorderParts is Operations.ResourceCollectionAction<
+  WidgetPart,
+  WidgetPartReorderRequest,
+  WidgetPartReorderResponse
+>;
 ```
 
-These operations will be defined under the route path:
+The `scheduleRepairs` operation defines a custom action for all instances of the `Widget` resource. **All collection action templates expect 3 parameters:** the resource type, the request action parameters, and the response type.
+
+> **NOTE:** The request parameters and response type **do not** have to be the same type!
+
+We also define an collection operation called `reorderParts`. Similarly to `scheduleRepairs`, it uses the `WidgetPartReorderRequest` as the request body and `WidgetPartReorderResponse` as the response body.
+
+Here are what the routes of these two operations will look like:
 
 ```
-/widgets/{widgetName}/parts/{partName}
+/widgets/{widgetName}:scheduleRepairs
+/widgets/{widgetName}/parts:reorderParts
 ```
+
+Notice that the operation name is used as the action name in the route!
+
+There are also long-running operation versions of these two operations:
+
+- `LongRunningResourceAction`
+- `LongRunningResourceCollectionAction`
+
+The same rules described in the [long-running operations](step05) section also apply to these long-running action signatures.

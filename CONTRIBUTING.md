@@ -6,6 +6,24 @@ https://github.com/microsoft/typespec/blob/main/CONTRIBUTING.md for most common
 day-to-day operations. The rest of this document only covers the things that
 are unique to this repo.
 
+# Prerequisites
+
+[mise](https://mise.jdx.dev/getting-started.html) is the recommended way to
+install the repository's development tools consistently across platforms.
+Install mise and [activate it for your shell](https://mise.jdx.dev/getting-started.html#activate-mise),
+then, after [cloning the repository recursively](#cloning-recursively), run:
+
+```bash
+mise install
+pnpm install
+```
+
+`mise install` installs the tool versions recorded in `mise.toml` and
+`mise.lock`, including Node.js, pnpm, Python, uv, Go, Java, and Maven. Using
+mise is recommended but not required; if you use another version manager,
+install the versions declared in `mise.toml` and the pnpm version declared by
+the `packageManager` field in `package.json`.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's
@@ -13,21 +31,19 @@ recommended to test a private of the change before merging.
 
 1. Create a fork of https://github.com/azure/azure-rest-api-specs
    (if you don't already have one)
-2. Create a branch from `main` you will use to create the test PR
-3. Find the URL of the private build of your test package(s)
-   1. Browse to your PR in repo `microsoft/typespec` or `azure/typespec-azure`
-   2. Select the "Checks" tab, the "Verify PR" pipeline, then click "View more
-      details on Azure Pipelines"
-   3. Click the link "# published" which shows the artifacts published by the
-      build
-   4. Expand "packages", find the package you need to test, click the three
-      vertical dots on the selected line, then "Copy download URL".
+2. Create a branch from `typespec-next`(Or `main` if that change is a hotfix) you will use to create the test PR
+3. A comment from the `pkg-pr-new` bot will include a URL to the preview build of each package. The URL follows this format:
+
+   ```http
+   https://pkg.pr.new/Azure/typespec-azure/<pkg-name>@<pr-number>
+   ```
+
 4. In your branch of `azure-rest-api-specs`, edit the root `package.json`, and
-   replace the version with the URL to your private build, for example:
+   replace the version with the URL to your private build(for both `dependencies` and `overrides`), for example:
 
    ```diff
-   - "@azure-tools/typespec-autorest": "0.36.0",
-   + "@azure-tools/typespec-autorest": "https://.../package.tgz"
+   - "@azure-tools/typespec-autorest": "next",
+   + "@azure-tools/typespec-autorest": "https://pkg.pr.new/Azure/typespec-azure/@azure-tools/typespec-azure-core@<pr-number>"
    ```
 
 5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
@@ -47,6 +63,10 @@ recommended to test a private of the change before merging.
      the course of action.
 
 Example: https://github.com/Azure/azure-rest-api-specs/pull/26684
+
+# Breaking changes
+
+See [docs/breaking-changes.md](docs/breaking-changes.md) for guidelines on rolling out breaking changes across TypeSpec, the spec repo, and SDK repos.
 
 # Working with the core submodule
 
@@ -179,6 +199,70 @@ Note that you only need to do all of the above when your changes span both
 repos. If you are only changing one repo or the other, then just work in
 each individual repo as you would any other.
 
+## Testing, formatting, and linting
+
+Testing, formatting, and linting run at the repo root via workspace-level tools (vitest, prettier, eslint). Packages that need additional tooling define `:extra` scripts run via turbo.
+
+### Package examples
+
+**Standard package** (vitest only — most packages):
+
+```json
+{
+  "scripts": {
+    "test": "vitest run"
+  }
+}
+```
+
+The package also needs a `vitest.config.ts` — the root vitest workspace config discovers it automatically.
+
+**Package with extra tests** (vitest + another runner):
+
+```json
+{
+  "scripts": {
+    "test": "pnpm test:vitest && pnpm test:extra",
+    "test:vitest": "vitest run",
+    "test:extra": "dotnet test"
+  }
+}
+```
+
+`test:extra` should only contain fast unit tests. Slow end-to-end tests should use `test:e2e` instead.
+
+**Package with custom formatting**:
+
+```json
+{
+  "scripts": {
+    "format:extra": "my-formatter --write .",
+    "format:extra:check": "my-formatter --check ."
+  }
+}
+```
+
+**Package with extra linting**:
+
+```json
+{
+  "scripts": {
+    "lint:extra": "my-linter ."
+  }
+}
+```
+
+### How the top-level commands work
+
+| Command             | What runs                                         |
+| ------------------- | ------------------------------------------------- |
+| `pnpm test`         | vitest (workspace) + `turbo run test:extra`       |
+| `pnpm format`       | prettier (whole repo) + `turbo run format:extra`  |
+| `pnpm format:check` | prettier (check) + `turbo run format:extra:check` |
+| `pnpm lint`         | eslint (whole repo) + `turbo run lint:extra`      |
+
+Vitest workspace mode runs all vitest-based packages in a single process with relative error paths. Turbo handles the `:extra` tasks in parallel for packages that define them — if no package defines them, the turbo step is a no-op.
+
 ## E2E tests
 
 ### Run tests same as the ci:
@@ -217,43 +301,32 @@ Do the following to publish a new release:
 
 2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
 
-3. Make sure your working copy is clean and you are up-to-date and on the
-   main branch (both typespec-azure and core should point to main).
+3. Make sure your working copy is clean and you are up-to-date and core submodules are both up to date with `upstream/main`.
+   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-
-   1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
+   1. In your fork of the core (typespec) repo, run `pnpm exec chronus ai-release-notes --policy typespec-stable --policy typespec-preview > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
 5. Generate release notes for TypeSpec Azure once the full list of changes are in.
-
-   1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
+   1. In your fork of the typespec-azure repo, run `pnpm exec chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
-6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
-
-   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
-
-7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
-
-8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
-
-9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
-
+6. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 
    - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
 
-10. Push and merge TypeSpec (core) PR.
+7. Push and merge TypeSpec (core) PR.
 
-11. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+8. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
-12. Make sure release pipeline completed and packages are on NPM.
-    - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
-    - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+9. Make sure release pipeline completed and packages are on NPM.
+   - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
+   - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
 ### Followups
 
@@ -314,6 +387,47 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 1. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
 1. Rebase merge the new backmerge PR into main.
 
+## Creating release notes
+
+Release notes are published at each release in `website/src/content/docs/docs/release-notes/`. They follow the pattern `release-YYYY-MM-DD.mdx`.
+
+Run the following command to generate the changelog:
+
+```bash
+pnpm chronus changelog --policy typespec-azure
+```
+
+Create a new file `website/src/content/docs/docs/release-notes/release-YYYY-MM-DD.mdx` with this frontmatter and paste the command output below it, removing the `Dependencies` category (dependency updates are not user-facing and should not appear in release notes):
+
+```markdown
+---
+title: "X.Y.0"
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core X.Y"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-YYYY-MM-DD"
+/>
+```
+
+See existing release notes for examples.
+
+## llms.txt
+
+The website build generates `llms.txt` and `llms-full.txt` files based on 2 factors:
+
+1. Presence of `llms.txt: true` frontmatter. See [example](website/src/content/docs/docs/getstarted/azure-core/step01.md) for an example of this in practice.
+1. The source document exists in a defined "topic". See [topic configuration](website/src/utils/llmstxt.ts) for where to define topics. Each topic appears as its own "section" in the root `llms.txt` file, and also generates its own `llms.txt` file at the specified `pathPrefix`.
+
+For libraries, update the `regen-docs` npm script to include the `--llmstxt` flag to opt into llms.txt generation. See [example](packages/typespec-azure-core/package.json) for an example:
+
+> "regen-docs": "tspd doc . --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
+
+For now the guidance is to prioritize including documentation for TypeSpec users as opposed to including documentation for emitter/library authors.
+
 ## Labels
 
 TypeSpec repo use labels to help categorize and manage issues and PRs. The following is a list of labels and their descriptions.
@@ -327,16 +441,23 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                                                  |
-| ---------------------------- | ------- | ---------------------------------------------------------------------------- |
-| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library               |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
-| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                            |
-| `eng`                        | #65bfff |                                                                              |
-| `ide`                        | #846da1 | Issues for Azure specific ide features                                       |
-| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                            |
+| Name                         | Color   | Description                                                                         |
+| ---------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library                      |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
+| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
+| `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
+| `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
+| `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
+| `emitter:java`               | #0096c7 | Issues for @azure-tools/typespec-java emitter                                       |
+| `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
+| `eng`                        | #65bfff |                                                                                     |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
+| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
+| `meta:website`               | #007dc8 | TypeSpec.io updates                                                                 |
+| `linter`                     | #65bfff | Issues related to linter rules                                                      |
 
 #### issue_kinds
 
@@ -383,9 +504,11 @@ Process labels
 
 Misc labels
 
-| Name               | Color   | Description        |
-| ------------------ | ------- | ------------------ |
-| `good first issue` | #7057ff | Good for newcomers |
+| Name                | Color   | Description                                        |
+| ------------------- | ------- | -------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                 |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
 
 #### external
 

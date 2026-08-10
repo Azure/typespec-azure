@@ -1,14 +1,16 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-client-generator-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.ClientGenerator.Core
 
 ### `@access` {#@Azure.ClientGenerator.Core.access}
 
-Override access for operations, models, enums and model property.
+Override access for operations, models, enums and model properties.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -18,9 +20,9 @@ Models/enums that are used in any operations with `@access(Access.public)` will 
 Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
 The access info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-The override access should not be narrow than the access calculated by operation,
+The override access should not be narrower than the access calculated by operation,
 and different override access should not conflict with each other,
-otherwise a warning will be added to diagnostics list.
+otherwise a warning will be added to the diagnostics list.
 Model property's access will default to public unless there is an override.
 
 ```typespec
@@ -29,14 +31,15 @@ Model property's access will default to public unless there is an override.
 
 #### Target
 
+The target type you want to override access info.
 `ModelProperty | Model | Operation | Enum | Union | Namespace`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `EnumMember`     | The access info you want to set for this model or operation.                                                                                                                                           |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember`     | The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -150,26 +153,30 @@ op func8(@body body: Test5): void;
 
 ### `@alternateType` {#@Azure.ClientGenerator.Core.alternateType}
 
-Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
 When the source type is `Scalar`, the alternate type must be `Scalar`.
+The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+**Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
 
 ```typespec
-@Azure.ClientGenerator.Core.alternateType(alternate: unknown, scope?: valueof string)
+@Azure.ClientGenerator.Core.alternateType(alternate: unknown | Azure.ClientGenerator.Core.ExternalType, scope?: valueof string)
 ```
 
 #### Target
 
 The source type to which the alternate type will be applied.
-`ModelProperty | Scalar`
+`ModelProperty | Scalar | Model | Enum | Union`
 
 #### Parameters
 
-| Name      | Type             | Description                                                                                                                                                                                            |
-| --------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                             |
-| scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name      | Type                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `unknown \| Azure.ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| scope     | `valueof string`                                     | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Change a model property to a different type
 
 ```typespec
 model Foo {
@@ -178,14 +185,20 @@ model Foo {
 @@alternateType(Foo.date, string);
 ```
 
+##### Change a Scalar type to a different type
+
 ```typespec
-scalar storageDateTime extends utcDataTime;
+scalar storageDateTime extends utcDateTime;
 @@alternateType(storageDateTime, string, "python");
 ```
+
+##### Change a function parameter to a different type
 
 ```typespec
 op test(@param @alternateType(string) date: utcDateTime): void;
 ```
+
+##### Change a model property to a different type with language specific alternate type
 
 ```typespec
 model Test {
@@ -197,11 +210,70 @@ model Test {
 }
 ```
 
+##### Use external type for DFE case
+
+```typespec
+@alternateType(
+  {
+    identity: "Azure.Core.Expressions.DataFactoryExpression",
+  },
+  "csharp"
+)
+union Dfe<T> {
+  T,
+  DfeExpression,
+}
+```
+
+##### Use external type with package information
+
+```typespec
+@alternateType(
+  {
+    identity: "pystac.Collection",
+    package: "pystac",
+    minVersion: "1.13.0",
+  },
+  "python"
+)
+model ItemCollection {
+  // ... properties
+}
+```
+
+##### Invalid: External type on model property (will emit a warning)
+
+```typespec
+model MyModel {
+  field: FieldType;
+}
+// This will emit a warning - external types cannot be applied to properties
+@@alternateType(
+  MyModel.field,
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+);
+
+// Correct: Apply external type to the type definition instead
+@alternateType(
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+)
+model FieldType {
+  // ... properties
+}
+```
+
 ### `@apiVersion` {#@Azure.ClientGenerator.Core.apiVersion}
 
-Use to override default assumptions on whether a parameter is an api-version parameter or not.
-By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
-a client parameter, we will also elevate this parameter up onto the client.
+Specify whether a parameter is an API version parameter or not.
+By default, we detect an API version parameter by matching the parameter name with `api-version` or `apiversion`, or if the type is referenced by the `@versioned` decorator.
+Since API versions are a client parameter, we will also elevate this parameter up onto the client.
+This decorator allows you to explicitly specify whether a parameter should be treated as an API version parameter or not.
 
 ```typespec
 @Azure.ClientGenerator.Core.apiVersion(value?: valueof boolean, scope?: valueof string)
@@ -209,16 +281,19 @@ a client parameter, we will also elevate this parameter up onto the client.
 
 #### Target
 
+The target parameter that you want to mark as an API version parameter.
 `ModelProperty`
 
 #### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                             |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Mark a parameter as an API version parameter
 
 ```typespec
 namespace Contoso;
@@ -230,37 +305,42 @@ op test(
 ): void;
 ```
 
-### `@client` {#@Azure.ClientGenerator.Core.client}
-
-Create a ClientGenerator.Core client out of a namespace or interface
+##### Mark a parameter as not presenting an API version parameter
 
 ```typespec
-@Azure.ClientGenerator.Core.client(value?: Model, scope?: valueof string)
+namespace Contoso;
+op test(
+  @apiVersion(false)
+  @query
+  api-version: string
+): void;
+```
+
+### `@client` {#@Azure.ClientGenerator.Core.client}
+
+Define the client generated in the client SDK.
+If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+
+```typespec
+@Azure.ClientGenerator.Core.client(options?: Azure.ClientGenerator.Core.ClientOptions, scope?: valueof string)
 ```
 
 #### Target
 
+The target namespace or interface that you want to define as a client.
 `Namespace | Interface`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `Model`          | Optional configuration for the service.                                                                                                                                                                |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name    | Type                                                                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | [`ClientOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientOptions) | Optional configuration for the service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| scope   | `valueof string`                                                            | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
-##### Basic client setting
-
-```typespec
-@client
-namespace MyService {
-
-}
-```
-
-##### Setting with other service
+##### Basic client definition
 
 ```typespec
 namespace MyService {
@@ -273,11 +353,16 @@ namespace MyService {
 interface MyInterface {}
 ```
 
-##### Changing client name if you don't want <Interface/Namespace>Client
+##### Changing client name
 
 ```typespec
+namespace MyService {
+
+}
+
 @client({
-  client: MySpecialClient,
+  service: MyService,
+  name: "MySpecialClient",
 })
 interface MyInterface {}
 ```
@@ -294,16 +379,19 @@ It is particularly beneficial when generating a complete API version enum withou
 
 #### Target
 
+The target client for which you want to define additional API versions.
 `Namespace`
 
 #### Parameters
 
-| Name  | Type             | Description |
-| ----- | ---------------- | ----------- |
-| value | `Enum`           |             |
-| scope | `valueof string` |             |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `Enum`           | An enum defining the complete set of API versions the client should support, including both service-defined and additional versions.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Add additional API versions to a client
 
 ```typespec
 // main.tsp
@@ -330,7 +418,7 @@ enum ClientApiVersions {
 ### `@clientDoc` {#@Azure.ClientGenerator.Core.clientDoc}
 
 Override documentation for a type in client libraries. This allows you to
-provide client-specific documentation that differs from the service-definition documentation.
+provide client-specific documentation that differs from the original documentation.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientDoc(documentation: valueof string, mode: EnumMember, scope?: valueof string)
@@ -338,15 +426,16 @@ provide client-specific documentation that differs from the service-definition d
 
 #### Target
 
+The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
 `unknown`
 
 #### Parameters
 
-| Name          | Type             | Description                                                                                                                                                                                            |
-| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                             |
-| mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                           |
-| scope         | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name          | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| scope         | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -379,7 +468,11 @@ op myOperation(): void;
 
 ### `@clientInitialization` {#@Azure.ClientGenerator.Core.clientInitialization}
 
-Customize the client initialization way.
+Allows customization of how clients are initialized in the generated SDK.
+By default, the root client is initialized independently, while sub clients are initialized through their parent client.
+Initialization parameters typically include endpoint, credential, and API version.
+With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
+This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientInitialization(options: Azure.ClientGenerator.Core.ClientInitializationOptions, scope?: valueof string)
@@ -387,16 +480,19 @@ Customize the client initialization way.
 
 #### Target
 
+The target client that you want to customize client initialization for.
 `Namespace | Interface`
 
 #### Parameters
 
-| Name    | Type                                                                                                    | Description                                                                                                                                                                                            |
-| ------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| options | [`ClientInitializationOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientInitializationOptions) |                                                                                                                                                                                                        |
-| scope   | `valueof string`                                                                                        | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name    | Type                                                                                                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | [`ClientInitializationOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientInitializationOptions) | The options for client initialization. You can use `ClientInitializationOptions` model to set the options.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| scope   | `valueof string`                                                                                        | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Add client initialization parameters
 
 ```typespec
 // main.tsp
@@ -412,13 +508,120 @@ model MyServiceClientOptions {
 }
 
 @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
-// The generated client will have `blobName` on its initialization method. We will also
+// The generated client will have `blobName` in its initialization method. We will also
 // elevate the existing `blobName` parameter from method level to client level.
+```
+
+### `@clientLocation` {#@Azure.ClientGenerator.Core.clientLocation}
+
+Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in `@clientInitialization` decorator.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | Operation | valueof string, scope?: valueof string)
+```
+
+#### Target
+
+The operation to change location for.
+`Operation | ModelProperty`
+
+#### Parameters
+
+| Name   | Type                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace \| Operation` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| scope  | `valueof string`                                          | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+
+#### Examples
+
+##### Move to existing sub client
+
+```typespec
+@service
+namespace MoveToExistingSubClient;
+
+interface UserOperations {
+  @route("/user")
+  @get
+  getUser(): void;
+
+  @route("/user")
+  @delete
+  @clientLocation(AdminOperations)
+  deleteUser(): void; // This operation will be moved to AdminOperations sub client.
+}
+
+interface AdminOperations {
+  @route("/admin")
+  @get
+  getAdminInfo(): void;
+}
+```
+
+##### Move to new sub client
+
+```typespec
+@service
+namespace MoveToNewSubClient;
+
+interface ProductOperations {
+  @route("/products")
+  @get
+  listProducts(): void;
+
+  @route("/products/archive")
+  @post
+  @clientLocation("ArchiveOperations")
+  archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
+}
+```
+
+##### Move operation to root client
+
+```typespec
+@service
+namespace MoveToRootClient;
+
+interface ResourceOperations {
+  @route("/resource")
+  @get
+  getResource(): void;
+
+  @route("/health")
+  @get
+  @clientLocation(MoveToRootClient)
+  getHealthStatus(): void; // This operation will be moved to the root client of MoveToRootClient namespace.
+}
+```
+
+##### Move parameter from operation to client
+
+```typespec
+@service
+namespace MyClient;
+
+getHealthStatus(
+  @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+  clientId: string
+): void;
+```
+
+##### Move parameter from client to operation
+
+```typespec
+// client.tsp
+
+@@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
 ```
 
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
-Changes the name of a method, parameter, property, or model generated in the client SDK
+Overrides the generated name for client SDK elements including clients, methods, parameters,
+unions, models, enums, and model properties.
+
+This decorator takes precedence over all other naming mechanisms, including the `name`
+property in `@client` decorator and default naming conventions.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientName(rename: valueof string, scope?: valueof string)
@@ -426,28 +629,57 @@ Changes the name of a method, parameter, property, or model generated in the cli
 
 #### Target
 
+The type you want to rename.
 `unknown`
 
 #### Parameters
 
-| Name   | Type             | Description                                                                                                                                                                                            |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                              |
-| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name   | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
+##### Rename a model
+
+```typespec
+@clientName("RenamedModel")
+model TestModel {
+  prop: string;
+}
+```
+
+##### Rename a model property
+
+```typespec
+model TestModel {
+  @clientName("renamedProp")
+  prop: string;
+}
+```
+
+##### Rename a parameter
+
+```typespec
+op example(@clientName("renamedParameter") parameter: string): void;
+```
+
+##### Rename an operation
+
 ```typespec
 @clientName("nameInClient")
-op nameInService: void;
+op example(): void;
 ```
+
+##### Rename an operation for different language emitters
 
 ```typespec
 @clientName("nameForJava", "java")
 @clientName("name_for_python", "python")
 @clientName("nameForCsharp", "csharp")
 @clientName("nameForJavascript", "javascript")
-op nameInService: void;
+op example(): void;
 ```
 
 ### `@clientNamespace` {#@Azure.ClientGenerator.Core.clientNamespace}
@@ -461,54 +693,122 @@ By default, the client namespace for them will follow the TypeSpec namespace.
 
 #### Target
 
+The type you want to change the namespace for.
 `Namespace | Interface | Model | Enum | Union`
 
 #### Parameters
 
-| Name   | Type             | Description                                                                                                                                                                                            |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                              |
-| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name   | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Change a namespace to a different name
 
 ```typespec
 @clientNamespace("ContosoClient")
 namespace Contoso;
 ```
 
+##### Move a model to a different namespace
+
 ```typespec
-@clientNamespace("ContosoJava", "java")
-@clientNamespace("ContosoPython", "python")
-@clientNamespace("ContosoCSharp", "csharp")
-@clientNamespace("ContosoJavascript", "javascript")
-namespace Contoso;
+@clientNamespace("ContosoClient.Models")
+model Test {
+  prop: string;
+}
 ```
 
-### `@convenientAPI` {#@Azure.ClientGenerator.Core.convenientAPI}
+### `@clientOption` {#@Azure.ClientGenerator.Core.clientOption}
 
-Whether you want to generate an operation as a convenient operation.
+Pass experimental flags or options to emitters without requiring TCGC reshipping.
+This decorator is intended for temporary workarounds or experimental features and requires
+suppression to acknowledge its experimental nature.
+
+See supported client options for each language emitter here https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/12clientOptions/
+
+**Warning**: This decorator always emits a warning that must be suppressed, and an additional
+warning if no scope is provided (since options are typically language-specific).
 
 ```typespec
-@Azure.ClientGenerator.Core.convenientAPI(value?: valueof boolean, scope?: valueof string)
+@Azure.ClientGenerator.Core.clientOption(name: valueof string, value: valueof unknown, scope?: valueof string)
 ```
 
 #### Target
 
-`Operation`
+The type you want to apply the option to.
+`unknown`
 
 #### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `valueof boolean` | Whether to generate the operation as convenience method or not.                                                                                                                                        |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name  | `valueof string`  | The name of the option (e.g., "enableFeatureFoo").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| value | `valueof unknown` | The value of the option. Can be any type; emitters will cast as needed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Apply an experimental option for Python
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
+@clientOption("enableFeatureFoo", true, "python")
+model MyModel {
+  prop: string;
+}
+```
+
+### `@convenientAPI` {#@Azure.ClientGenerator.Core.convenientAPI}
+
+Whether you want to generate an operation as a convenient method.
+When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+
+```typespec
+@Azure.ClientGenerator.Core.convenientAPI(flag?: valueof boolean, scope?: valueof string)
+```
+
+#### Target
+
+The target operation, namespace, or interface.
+`Operation | Namespace | Interface`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| flag  | `valueof boolean` | Whether to generate the operation as a convenience method or not.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+
+#### Examples
+
+##### Apply to a single operation
 
 ```typespec
 @convenientAPI(false)
 op test: void;
+```
+
+##### Apply to all operations in an interface
+
+```typespec
+@convenientAPI(false)
+interface MyOperations {
+  test1(): void;
+  test2(): void;
+}
+```
+
+##### Apply to all operations in a namespace
+
+```typespec
+@convenientAPI(false)
+namespace MyService {
+  op test1(): void;
+  op test2(): void;
+}
 ```
 
 ### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
@@ -521,13 +821,14 @@ Indicates that a model property of type `string` or a `Scalar` type derived from
 
 #### Target
 
+The target type that you want to apply this deserialization behavior to.
 `ModelProperty`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -544,41 +845,13 @@ model MyModel {
 }
 ```
 
-### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
-
-:::caution
-**Deprecated**: @flattenProperty decorator is not recommended to use.
-:::
-
-Set whether a model property should be flattened or not.
-
-```typespec
-@Azure.ClientGenerator.Core.flattenProperty(scope?: valueof string)
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
-
-#### Examples
-
-```typespec
-model Foo {
-  @flattenProperty
-  prop: Bar;
-}
-model Bar {}
-```
-
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
-Create a ClientGenerator.Core operation group out of a namespace or interface
+Define the sub client generated in the client SDK.
+If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+
+Deprecated: use `@client` instead. Sub clients should be represented using `@client`.
 
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
@@ -586,13 +859,14 @@ Create a ClientGenerator.Core operation group out of a namespace or interface
 
 #### Target
 
+The target namespace or interface that you want to define as a sub client.
 `Namespace | Interface`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -603,7 +877,9 @@ interface MyInterface {}
 
 ### `@override` {#@Azure.ClientGenerator.Core.override}
 
-Override the default client method generated by TCGC from your service definition
+Customize a method's signature in the generated client SDK.
+Currently, only parameter signature customization is supported.
+This decorator allows you to specify a different method signature for the client SDK than the original definition.
 
 ```typespec
 @Azure.ClientGenerator.Core.override(override: Operation, scope?: valueof string)
@@ -611,61 +887,62 @@ Override the default client method generated by TCGC from your service definitio
 
 #### Target
 
-: The original service definition
+: The target operation that you want to override.
 `Operation`
 
 #### Parameters
 
-| Name     | Type             | Description                                                                                                                                                                                            |
-| -------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                       |
-| scope    | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name     | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| scope    | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
+##### Customize parameters into an option bag
+
 ```typespec
 // main.tsp
+@service
 namespace MyService;
+
+op myOperation(foo: string, bar: string): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+
+// client.tsp
+namespace MyCustomizations;
 
 model Params {
  foo: string;
  bar: string;
 }
-op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
-
-// client.tsp
-namespace MyCustomizations;
 
 op myOperationCustomization(params: MyService.Params): void;
 
-@@override(MyService.myOperation, myOperationCustomization);
-
-// method signature is now `op myOperation(params: Params)`
+@@override(MyService.myOperation, myOperationCustomization); // method signature is now `op myOperation(params: Params)`
 ```
 
+##### Customize a parameter to be required
+
 ```typespec
 // main.tsp
+@service
 namespace MyService;
 
-model Params {
- foo: string;
- bar: string;
-}
-op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+op myOperation(foo: string, bar?: string): void; // by default, we generate the method signature as `op myOperation(foo: string, bar?: string)`;
 
 // client.tsp
 namespace MyCustomizations;
 
-op myOperationCustomization(params: MyService.Params): void;
+op myOperationCustomization(foo: string, bar: string): void;
 
-@@override(MyService.myOperation, myOperationCustomization, "csharp")
+@@override(MyService.myOperation, myOperationCustomization)
 
-// method signature is now `op myOperation(params: Params)` just for csharp
+// method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
 ```
 
 ### `@paramAlias` {#@Azure.ClientGenerator.Core.paramAlias}
 
-Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization and the original parameter in the operation.
 
 ```typespec
 @Azure.ClientGenerator.Core.paramAlias(paramAlias: valueof string, scope?: valueof string)
@@ -673,16 +950,19 @@ Alias the name of a client parameter to a different name. This permits you to ha
 
 #### Target
 
+The target model property that you want to alias.
 `ModelProperty`
 
 #### Parameters
 
-| Name       | Type             | Description                                                                                                                                                                                            |
-| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| paramAlias | `valueof string` |                                                                                                                                                                                                        |
-| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name       | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| paramAlias | `valueof string` | The alias name you want to apply to the target model property.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| scope      | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Elevate an operation parameter to client level and alias it to a different name
 
 ```typespec
 // main.tsp
@@ -699,39 +979,65 @@ model MyServiceClientOptions {
 @@clientInitialization(MyService, MyServiceClientOptions)
 @@paramAlias(MyServiceClientOptions.blob, "blobName")
 
-// The generated client will have `blobName` on it. We will also
-// elevate the existing `blob` parameter to the client level.
+// The `blob` property from MyServiceClientOptions will be elevated to the client level.
+// Because of @@paramAlias, it will be matched to the `blobName` operation parameter.
 ```
 
 ### `@protocolAPI` {#@Azure.ClientGenerator.Core.protocolAPI}
 
-Whether you want to generate an operation as a protocol operation.
+Whether you want to generate an operation as a protocol method.
+When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
 
 ```typespec
-@Azure.ClientGenerator.Core.protocolAPI(value?: valueof boolean, scope?: valueof string)
+@Azure.ClientGenerator.Core.protocolAPI(flag?: valueof boolean, scope?: valueof string)
 ```
 
 #### Target
 
-`Operation`
+The target operation, namespace, or interface.
+`Operation | Namespace | Interface`
 
 #### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `valueof boolean` | Whether to generate the operation as protocol or not.                                                                                                                                                  |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| flag  | `valueof boolean` | Whether to generate the operation as a protocol method or not.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Apply to a single operation
 
 ```typespec
 @protocolAPI(false)
 op test: void;
 ```
 
+##### Apply to all operations in an interface
+
+```typespec
+@protocolAPI(false)
+interface MyOperations {
+  test1(): void;
+  test2(): void;
+}
+```
+
+##### Apply to all operations in a namespace
+
+```typespec
+@protocolAPI(false)
+namespace MyService {
+  op test1(): void;
+  op test2(): void;
+}
+```
+
 ### `@responseAsBool` {#@Azure.ClientGenerator.Core.responseAsBool}
 
-Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+Indicates that a HEAD operation should be modeled as Response<bool>.
+404 will not raise an error, instead the service method will return `false`.
+2xx will return `true`. Everything else will still raise an error.
 
 ```typespec
 @Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
@@ -739,13 +1045,14 @@ Indicates that a HEAD operation should be modeled as Response<bool>. 404 will no
 
 #### Target
 
+The target operation that you want to apply this behavior to.
 `Operation`
 
 #### Parameters
 
-| Name  | Type             | Description |
-| ----- | ---------------- | ----------- |
-| scope | `valueof string` |             |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -757,7 +1064,12 @@ op headOperation(): void;
 
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}
 
-To define the client scope of an operation.
+Define the scope of an operation or model property.
+By default, the element will be applied to all language emitters.
+This decorator allows you to omit the element from certain languages or apply it to specific languages.
+When applied to an operation parameter (which is a `ModelProperty`), the parameter will be excluded
+from the generated method signature for the specified languages. A warning is emitted if a required
+parameter is scoped out.
 
 ```typespec
 @Azure.ClientGenerator.Core.scope(scope?: valueof string)
@@ -765,38 +1077,60 @@ To define the client scope of an operation.
 
 #### Target
 
-`Operation`
+The target operation or model property that you want to scope.
+`Operation | ModelProperty`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
+
+##### Omit an operation from a specific language
 
 ```typespec
 @scope("!csharp")
 op test: void;
 ```
 
+##### Apply an operation to specific languages
+
+```typespec
+@scope("go")
+op test: void;
+```
+
+##### Apply a model property to specific languages
+
+```typespec
+model TestModel {
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
+```
+
+##### Exclude an operation parameter from a specific language
+
+```typespec
+op test(name: string, @header("X-Custom-Header") @scope("!python") customHeader?: string): void;
+```
+
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
 
-Override usage for models/enums.
+Add usage for models/enums.
 A model/enum's default usage info is always calculated by the operations that use it.
-You could use this decorator to override the default usage info.
+You can use this decorator to add additional usage info.
 When setting usage for namespaces,
 the usage info will be propagated to the models defined in the namespace.
-If the model has an usage override, the model override takes precedence.
+If the model has a usage override, the model override takes precedence.
 For example, with operation definition `op test(): OutputModel`,
 the model `OutputModel` has default usage `Usage.output`.
-After adding decorator `@@usage(OutputModel, Usage.input | Usage.output)`,
-the final usage result for `OutputModel` is `Usage.input | Usage.output`.
+After adding decorator `@@usage(OutputModel, Usage.input | Usage.json)`,
+the final usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`.
 The usage info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-The override usage should not be narrow than the usage calculated by operation,
-and different override usage should not conflict with each other,
-otherwise a warning will be added to diagnostics list.
 
 ```typespec
 @Azure.ClientGenerator.Core.usage(value: EnumMember | Union, scope?: valueof string)
@@ -804,57 +1138,58 @@ otherwise a warning will be added to diagnostics list.
 
 #### Target
 
+The target type you want to extend usage.
 `Model | Enum | Union | Namespace`
 
 #### Parameters
 
-| Name  | Type                  | Description                                                                                                                                                                                            |
-| ----- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `EnumMember \| Union` | The usage info you want to set for this model.                                                                                                                                                         |
-| scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember \| Union` | The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.<br />For example, `Usage.input \| Usage.output \| Usage.json`.                                                                                                                                                                                                                                                                                                                                                                    |
+| scope | `valueof string`      | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
-##### Expand usage for model
+##### Add usage for model
 
 ```typespec
 op test(): OutputModel;
 
-// usage result for `OutputModel` is `Usage.input | Usage.output`
-@usage(Usage.input)
+// The resolved usage  for `OutputModel` is `Usage.input | Usage.output | Usage.json`
+@usage(Usage.input | Usage.json)
 model OutputModel {
   prop: string;
 }
 ```
 
-##### Propagation of usage
+##### Propagation of usage, all usage will be propagated to the parent model, discriminated sub models, and model properties.
 
 ```typespec
-// Usage.output
+// The resolved usage  for `Fish` is `Usage.input | Usage.output | Usage.json`
 @discriminator("kind")
 model Fish {
   age: int32;
 }
 
-// Usage.input | Usage.output
+// The resolved usage  for `Shark` is `Usage.input | Usage.output | Usage.json`
 @discriminator("sharktype")
-@usage(Usage.input)
+@usage(Usage.input | Usage.json)
 model Shark extends Fish {
   kind: "shark";
   origin: Origin;
 }
 
-// Usage.output
+// The resolved usage  for `Salmon` is `Usage.output | Usage.json`
 model Salmon extends Fish {
   kind: "salmon";
 }
 
-// Usage.output
+// The resolved usage  for `SawShark` is `Usage.input | Usage.output | Usage.json`
 model SawShark extends Shark {
   sharktype: "saw";
 }
 
-// Usage.output
+// The resolved usage  for `Origin` is `Usage.input | Usage.output | Usage.json`
 model Origin {
   country: string;
   city: string;
@@ -875,13 +1210,14 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 
 #### Target
 
+The target model that you want to set the custom JSON converter.
 `Model`
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -890,4 +1226,424 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 model MyModel {
   prop: string;
 }
+```
+
+## Azure.ClientGenerator.Core.Legacy
+
+### `@clientDefaultValue` {#@Azure.ClientGenerator.Core.Legacy.clientDefaultValue}
+
+Sets a client-level default value for a model property or operation parameter.
+
+This decorator allows brownfield services to specify default values that will be
+used by SDK generators, maintaining backward compatibility with existing SDK users
+who may rely on default values that were previously generated from Swagger definitions.
+
+This decorator is considered legacy functionality and should only be used for
+maintaining backward compatibility in existing services. New services should use
+standard TypeSpec patterns for default values.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.clientDefaultValue(value: valueof string | boolean | numeric, scope?: valueof string)
+```
+
+#### Target
+
+The model property or operation parameter that should have a client-level default value
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                   | Description                                                                                                                                                                                                                                                     |
+| ----- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof string \| boolean \| numeric` | The default value to be used by SDK generators (must be a string, number, or boolean literal)                                                                                                                                                                   |
+| scope | `valueof string`                       | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Set a default value for a model property
+
+```typespec
+model RequestOptions {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+  timeout?: int32;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+  tier?: string;
+}
+```
+
+##### Set a default value for an operation parameter
+
+```typespec
+op getItems(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+  @query
+  pageSize?: int32,
+): Item[];
+```
+
+##### Apply default value only for specific languages
+
+```typespec
+model Config {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+  enableCache?: boolean;
+}
+```
+
+### `@disablePageable` {#@Azure.ClientGenerator.Core.Legacy.disablePageable}
+
+Prevents an operation from being treated as a pageable operation by the SDK generators,
+even when the operation follows standard paging patterns (e.g., decorated with `@list`).
+
+When applied, the operation will be treated as a basic method:
+
+- The response will be the paged model itself (not the list of items)
+- The paged model will not be marked with paged result usage
+- No paging mechanisms (iterators/async iterators) will be generated
+
+This decorator is considered legacy functionality and should only be used when
+you need to override the default paging behavior for specific operations.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should NOT be treated as a pageable operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Prevent a paging operation from being treated as pageable
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+### `@flattenProperty` {#@Azure.ClientGenerator.Core.Legacy.flattenProperty}
+
+Set whether a model property should be flattened or not.
+This decorator is not recommended to use for green field services.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.flattenProperty(scope?: valueof string)
+```
+
+#### Target
+
+The target model property that you want to flatten.
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+```typespec
+model Foo {
+  @flattenProperty
+  prop: Bar;
+}
+model Bar {}
+```
+
+### `@hierarchyBuilding` {#@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding}
+
+Change the base type of a model in the client SDK.
+
+This decorator updates the model returned from TCGC so that, in the
+generated SDK, the target model inherits from a different base than the
+one declared in the spec. The TypeSpec service definition is not
+affected — only the SDK shape changes.
+
+Common real-world applications:
+
+- **Multi-level discriminated inheritance**: when discriminated subtypes
+  need to inherit from a sibling rather than the discriminator root
+  (e.g. `SportsCar` inheriting from `Car` instead of from `Vehicle`).
+- **Brownfield base-class alignment**: when a client SDK needs to keep
+  API compatibility with a previously-generated SDK that used a
+  different base — typically rebasing onto a richer Azure resource base
+  such as `TrackedResource` instead of plain `Resource`.
+
+After the rebase, properties supplied by the new base chain are
+inherited; same-named properties on the target (or on intermediate
+ancestors that the rebase walked past) are deduplicated when their
+types are compatible, and a `legacy-hierarchy-building-conflict`
+warning is emitted when the types are unrelated.
+
+This decorator is considered legacy functionality and may be deprecated in
+future releases.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(value: Model, scope?: valueof string)
+```
+
+#### Target
+
+The target model that will gain legacy inheritance behavior
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                           |
+| ----- | ---------------- | --------------------------------------------------------------------- |
+| value | `Model`          | The model whose properties should be inherited from                   |
+| scope | `valueof string` | Optional parameter to specify which language emitters this applies to |
+
+#### Examples
+
+##### Build multiple levels inheritance for discriminated models.
+
+```typespec
+@discriminator("type")
+model Vehicle {
+  type: string;
+}
+
+alias CarProperties = {
+ make: string;
+ model: string;
+ year: int32;
+}
+
+model Car extends Vehicle {
+  type: "car";
+  ...CarProperties;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Car)
+model SportsCar extends Vehicle {
+  type: "sports";
+  ...CarProperties;
+  topSpeed: int32;
+}
+
+```
+
+##### Replace the base class
+
+```typespec
+model C {
+  c?: string;
+}
+model B extends C {
+  b?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends B {
+  a?: string;
+}
+// After: A extends C. A's own properties are { a, b } (b is lifted from
+// the removed intermediate parent B). C still supplies c.
+```
+
+##### Deduplicate spread properties that overlap with the new base
+
+```typespec
+model B {
+  propB: string;
+}
+
+model A {
+  ...B;
+  propA: string;
+}
+
+@@Legacy.hierarchyBuilding(A, B);
+// After: A extends B. Overlapping same-typed properties are dropped
+// silently, so A's own property is just { propA }.
+```
+
+##### Brownfield ARM resource rebased onto TrackedResource
+
+```typespec
+model Resource {
+  id?: string;
+  name?: string;
+  type?: string;
+}
+
+model TrackedResource extends Resource {
+  location: string;
+  tags?: Record<string>;
+}
+
+model FooProperties {
+  provisioningState?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+model Foo extends Resource {
+  properties: FooProperties;
+  location?: string;
+  tags?: Record<string>;
+}
+// After: Foo extends TrackedResource. Foo's own properties are
+// { properties }; location and tags are inherited from TrackedResource.
+```
+
+##### Brownfield ARM envelope dropping an ArmTagsProperty spread
+
+```typespec
+model ArmTagsProperty {
+  tags?: Record<string>;
+}
+
+model TrackedResource {
+  id?: string;
+  name?: string;
+  tags?: Record<string>;
+  location?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+model FooResourceWithHierarchy {
+  id?: string;
+  name?: string;
+  ...ArmTagsProperty;
+  location?: string;
+}
+// After: FooResourceWithHierarchy extends TrackedResource with no own
+// properties — every field is supplied by the new base chain.
+```
+
+### `@markAsLro` {#@Azure.ClientGenerator.Core.Legacy.markAsLro}
+
+Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
+even when the operation is not long-running on the service side.
+
+NOTE: When used, you will need to verify the operatio and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be LRO will result in errors.
+
+When applied, TCGC will treat the operation as an LRO and SDK generators should:
+
+- Generate polling mechanisms (pollers)
+- Return appropriate LRO-specific return types
+- Handle the operation as an asynchronous long-running process
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec LRO patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a Long Running Operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as LRO for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+### `@markAsPageable` {#@Azure.ClientGenerator.Core.Legacy.markAsPageable}
+
+Forces an operation to be treated as a pageable operation by the SDK generators,
+even when the operation does not follow standard paging patterns on the service side.
+
+NOTE: When used, you will need to verify the operation and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be pageable will result in errors.
+
+When applied, TCGC will treat the operation as pageable and SDK generators should:
+
+- Generate paging mechanisms (iterators/async iterators)
+- Return appropriate pageable-specific return types
+- Handle the operation as a collection that may require multiple requests
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a pageable operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as pageable for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+### `@nextLinkVerb` {#@Azure.ClientGenerator.Core.Legacy.nextLinkVerb}
+
+Specifies the HTTP verb for the next link operation in a paging scenario.
+
+This decorator allows you to override the HTTP method used for fetching the next page
+when the default GET method is not appropriate. Only "POST" and "GET" are supported.
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not sufficient.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb(verb: "GET" | "POST", scope?: valueof string)
+```
+
+#### Target
+
+The paging operation to specify next link operation behavior for
+`Operation`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                                                                                     |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| verb  | `"GET" \| "POST"` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Specify POST for next link operations
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+@post
+op listItems(): PageResult;
 ```

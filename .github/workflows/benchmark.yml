@@ -1,0 +1,46 @@
+name: Benchmark
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      backfill_from:
+        description: "Backfill from: commit SHA or number of recent commits. Leave empty to run a normal benchmark."
+        required: false
+        type: string
+      branch:
+        description: "Data branch to store results (default: benchmark-data)"
+        required: false
+        type: string
+        default: "benchmark-data"
+      runner:
+        description: "Runner label (for stable runs prefer self-hosted or larger dedicated runner)"
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: benchmark-main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    uses: ./.github/workflows/benchmark-run.yml
+    with:
+      specs-dir: packages/benchmark/specs
+      results-dir: results
+      iterations: 25
+      warmup: 3
+      noise-cv: 0.08
+      rerun-iterations: 10
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
+      backfill_from: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from || '' }}
+      branch: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || 'benchmark-data' }}
+    permissions:
+      contents: write
+    secrets: inherit

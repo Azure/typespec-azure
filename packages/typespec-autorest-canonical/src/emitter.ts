@@ -1,24 +1,24 @@
 import {
-  AutorestDocumentEmitterOptions,
-  AutorestEmitterContext,
+  type AutorestDocumentEmitterOptions,
+  type AutorestEmitterContext,
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "@azure-tools/typespec-autorest";
 import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
 import { createTCGCContext, type TCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
-  EmitContext,
+  type EmitContext,
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
   interpolatePath,
   listServices,
-  Namespace,
+  type Namespace,
   navigateType,
-  Program,
+  type Program,
   resolvePath,
-  Service,
-  Type,
+  type Service,
+  type Type,
 } from "@typespec/compiler";
 import {
   getRenamedFrom,
@@ -26,12 +26,13 @@ import {
   getTypeChangedFrom,
   getVersion,
 } from "@typespec/versioning";
-import { AutorestCanonicalEmitterOptions, reportDiagnostic } from "./lib.js";
+import { type AutorestCanonicalEmitterOptions, reportDiagnostic } from "./lib.js";
 
 const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/canonical/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
+  "xml-strategy": "xml-service",
 } as const;
 
 export const canonicalVersion = "canonical";
@@ -64,12 +65,14 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
   const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
     useReadOnlyStatusSchema: true,
+    xmlStrategy: resolvedOptions["xml-strategy"],
   };
 
   await emitAllServices(context.program, tcgcSdkContext, options);
@@ -93,8 +96,10 @@ async function emitAllServices(
       service,
       version: canonicalVersion,
       tcgcSdkContext,
+      multiService: services.length > 1,
     };
-    const result = await getOpenAPIForService(context, options);
+    const results = await getOpenAPIForService(context, options);
+    const result = results[0];
     const includedVersions = getVersion(program, service.type)
       ?.getVersions()
       ?.map((item) => item.value ?? item.name);

@@ -1,4 +1,4 @@
-import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnSuccess, type ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -43,6 +43,22 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
       body: json({
         name: "name",
         desc: "desc",
+      }),
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ClientGenerator_Core_Usage_NamespaceUsage = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/usage/namespaceModelSerializable",
+    method: "put",
+    request: {
+      body: json({
+        name: "test",
       }),
     },
     response: {

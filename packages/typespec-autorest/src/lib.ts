@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, type JSONSchemaType, paramMessage } from "@typespec/compiler";
 
 export interface AutorestEmitterOptions {
   /**
@@ -11,10 +11,8 @@ export interface AutorestEmitterOptions {
    * Output file will interpolate the following values:
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
-   *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-   *  - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+   * @default `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -53,6 +51,7 @@ export interface AutorestEmitterOptions {
 
   version?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**
@@ -99,15 +98,62 @@ export interface AutorestEmitterOptions {
   "emit-lro-options"?: "none" | "final-state-only" | "all";
 
   /**
-   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
-   * ARM resource properties.
-   */
-  "arm-resource-flattening"?: boolean;
-  /**
    * Determines whether and how to emit schemas for common-types
    * @default "for-visibility-changes"
    */
   "emit-common-types-schema"?: "never" | "for-visibility-changes";
+
+  /**
+   * Strategy for applying XML serialization metadata to schemas.
+   *
+   * - "xml-service": Apply XML serialization metadata for any service that uses the `"application/xml"` content type.
+   * - "none": Do not apply any XML serialization metadata.
+   *
+   * @default "xml-service"
+   */
+  "xml-strategy"?: "xml-service" | "none";
+
+  /**
+   * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
+   * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
+   */
+  "output-splitting"?: "legacy-feature-files";
+
+  /**
+   * When enabled, the emitter will not copy example files to the output directory.
+   * Instead, it will reference the source example files using relative file paths.
+   * @default false
+   */
+  "skip-example-copying"?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix when a type lives outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). The service (and root `TypeSpec`) namespace is always stripped. This
+   *   is the current/default behavior.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). When two
+   *   types from different namespaces collapse to the same name, the conflict is reported as an
+   *   error (`@typespec/openapi/duplicate-type-name`).
+   *
+   * @default "namespaced"
+   */
+  "type-name-strategy"?: "namespaced" | "name-only";
+
+  /**
+   * Controls emission of a `service.yaml` manifest (declaring the service's API versions)
+   * at the project root, next to `tspconfig.yaml`.
+   *
+   * - `"auto"`: Emit/update `service.yaml` only if the file already exists. (default)
+   * - `"always"`: Always emit `service.yaml`.
+   * - `"never"`: Never emit `service.yaml`.
+   *
+   * When an existing file is present it is updated in place, preserving comments and unrelated keys.
+   *
+   * @default "auto"
+   */
+  "service-yaml"?: "auto" | "always" | "never";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -128,10 +174,9 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         "Output file will interpolate the following values:",
         " - service-name: Name of the service if multiple",
         " - version: Version of the service if multiple",
-        " - azure-resource-provider-folder: Value of the azure-resource-provider-folder option",
-        " - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.",
+        " - version-status: `preview` if version contains preview, stable otherwise.",
         "",
-        "Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`",
+        "Default: `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`",
         "",
         "",
         "Example: Single service no versioning",
@@ -151,8 +196,8 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - `openapi.Org1.Service2.v1.0.yaml`",
         " - `openapi.Org1.Service2.v1.1.yaml`",
         "",
-        "Example: azureResourceProviderFolder is provided",
-        " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
+        "Example: Versioning with version-status",
+        " - `arm-folder/AzureService/stable/2020-01-01.yaml`",
         " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
       ].join("\n"),
     },
@@ -169,7 +214,12 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description: "DEPRECATED. Use examples-dir instead",
     },
     version: { type: "string", nullable: true },
-    "azure-resource-provider-folder": { type: "string", nullable: true },
+    "azure-resource-provider-folder": {
+      type: "string",
+      nullable: true,
+      description:
+        "Deprecated. Do not use this option. Specify the path directly in emitter-output-dir.",
+    },
     "arm-types-dir": {
       type: "string",
       nullable: true,
@@ -218,13 +268,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
     },
-    "arm-resource-flattening": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
-    },
     "emit-common-types-schema": {
       type: "string",
       enum: ["never", "for-visibility-changes"],
@@ -232,6 +275,43 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "for-visibility-changes",
       description:
         "Determine whether and how to emit schemas for common-types rather than referencing them",
+    },
+    "xml-strategy": {
+      type: "string",
+      enum: ["xml-service", "none"],
+      nullable: true,
+      default: "xml-service",
+      description: "Strategy for applying XML serialization metadata to schemas.",
+    },
+    "output-splitting": {
+      type: "string",
+      enum: ["legacy-feature-files"],
+      nullable: true,
+      description:
+        'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
+    },
+    "skip-example-copying": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+    },
+    "type-name-strategy": {
+      type: "string",
+      enum: ["namespaced", "name-only"],
+      nullable: true,
+      default: "namespaced",
+      description:
+        'Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.',
+    },
+    "service-yaml": {
+      type: "string",
+      enum: ["auto", "always", "never"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
     },
   },
   required: [],
@@ -265,6 +345,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
+      },
+    },
+    "duplicate-operation-id": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operation ID '${"operationId"}' is duplicated across operations. OpenAPI requires operationId values to be globally unique.`,
       },
     },
     "invalid-schema": {
@@ -339,16 +425,23 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part '${"part"}'.`,
       },
     },
+    "unsupported-optional-path-param": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Path parameter '${"name"}' is optional, but swagger 2.0 does not support optional path parameters. It will be emitted as required.`,
+      },
+    },
     "cookies-unsupported": {
       severity: "warning",
       messages: {
         default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
       },
     },
-    "invalid-format": {
+    "unknown-format": {
       severity: "warning",
       messages: {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
+        encoding: paramMessage`'${"schema"}' encoding format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
     "unsupported-auth": {
@@ -362,6 +455,13 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "The emitter did not emit any files because the specified version option does not match any versions of the service.",
+      },
+    },
+    "service-yaml-multiple-services": {
+      severity: "warning",
+      messages: {
+        default:
+          "Cannot emit service.yaml because the project defines multiple services. Only the first service will be included.",
       },
     },
   },

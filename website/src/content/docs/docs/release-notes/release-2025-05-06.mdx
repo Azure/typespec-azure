@@ -1,0 +1,74 @@
+---
+title: 0.56.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+:::danger
+TypeSpec core contains Breaking Changes
+:::
+
+<LinkCard
+  title="TypeSpec Core 1.0"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-05-06"
+/>
+
+## Breaking Changes
+
+### @azure-tools/typespec-autorest
+
+- [#2576](https://github.com/Azure/typespec-azure/pull/2576) Modify how `x-nullable` is resolved when a `$ref` is present.
+
+  Previously, the `$ref` was placed inside an `allOf`. With this change, the `$ref` is now moved directly next to `x-nullable`.
+
+  ```diff lang=json
+  "Dog": {
+    "type": "object",
+    "properties": {
+    "type": {
+      - "type": "object",
+        "x-nullable": true,
+      + "$ref": "#/definitions/Pet"
+      - "allOf": [
+      -   {
+      -     "$ref": "#/definitions/Pet"
+      -   }
+      - ]
+      }
+    },
+    "required": [
+      "type"
+    ]
+  }
+  ```
+
+## Features
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Add `metadata` property to `SdkPackage` type to export package related info.
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2606](https://github.com/Azure/typespec-azure/pull/2606) Fix unsupported param type diagnostic to target the model property with the issue
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2250](https://github.com/Azure/typespec-azure/pull/2250) Addressing common type differences with common types in azure-rest-api-specs, such as ordering of elements, lower/upper case in definition names, typos, and incorrect format on the next link.
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2625](https://github.com/Azure/typespec-azure/pull/2625) Make Patch templates specify implicitOptionality
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Support `null` example value for `unknown` type.
+- [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node

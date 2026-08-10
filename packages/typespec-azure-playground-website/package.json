@@ -29,21 +29,22 @@
     }
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./dist-dev ./temp ./samples/dist",
-    "build-samples": "node ./samples/build.js",
-    "build": "npm run build-samples && tsc -p . && vite build 2>&1",
-    "start": "npm run -s watch",
+    "build-samples": "node ./samples/build.ts",
+    "build": "pnpm build-samples && tsc -p tsconfig.build.json && vite build 2>&1",
+    "preview": "pnpm build && vite preview",
+    "start": "pnpm -s watch",
     "test": "vitest run",
     "test:ci": "vitest run",
     "test:watch": "vitest -w",
     "watch": "vite --port 5174",
     "test:e2e": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e",
     "test:e2e:headed": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e --headed",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix "
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix"
   },
   "files": [
     "lib/*.tsp",
@@ -56,7 +57,9 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@emotion/react": "^11.14.0",
+    "@azure-tools/typespec-ts": "workspace:^",
+    "@fluentui/react-components": "catalog:",
+    "@fluentui/react-icons": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
@@ -69,23 +72,26 @@
     "@typespec/streams": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
-    "@vitejs/plugin-react": "~4.3.4",
-    "es-module-shims": "~2.0.10",
-    "react": "~18.3.1",
-    "react-dom": "~18.3.1",
-    "vite": "^6.2.4"
+    "@vitejs/plugin-react": "catalog:",
+    "es-module-shims": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vite": "catalog:",
+    "yaml": "catalog:"
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.1",
-    "@types/node": "~22.13.11",
-    "@types/react-dom": "~18.3.0",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@typespec/bundler": "workspace:^",
     "@typespec/playground": "workspace:^",
-    "@vitest/coverage-v8": "^3.0.9",
-    "@vitest/ui": "^3.0.9",
-    "cross-env": "~7.0.3",
-    "rimraf": "~6.0.1",
-    "typescript": "~5.8.2",
-    "vitest": "^3.0.9"
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "cross-env": "catalog:",
+    "pathe": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

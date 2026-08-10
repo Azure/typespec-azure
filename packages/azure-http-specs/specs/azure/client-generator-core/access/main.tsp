@@ -12,7 +12,6 @@ using Spector;
 namespace _Specs_.Azure.ClientGenerator.Core.Access;
 
 @route("/publicOperation")
-@global.Azure.ClientGenerator.Core.operationGroup
 @scenario
 @scenarioDoc("""
   This scenario contains public operations. It should be generated and exported.
@@ -48,7 +47,6 @@ namespace PublicOperation {
 }
 
 @route("/internalOperation")
-@global.Azure.ClientGenerator.Core.operationGroup
 @scenario
 @scenarioDoc("""
   This scenario contains internal operations. All should be generated but not exposed.
@@ -95,7 +93,6 @@ namespace InternalOperation {
 }
 
 @route("/sharedModelInOperation")
-@global.Azure.ClientGenerator.Core.operationGroup
 @scenario
 @scenarioDoc("""
   This scenario contains two operations, one public, another internal. The public one should be generated and exported while the internal one should be generated but not exposed.
@@ -125,7 +122,6 @@ namespace SharedModelInOperation {
 }
 
 @route("/relativeModelInOperation")
-@global.Azure.ClientGenerator.Core.operationGroup
 @scenario
 @scenarioDoc("""
   This scenario contains internal operations. All should be generated but not exposed.

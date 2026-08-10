@@ -1,14 +1,23 @@
-import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  type Enum,
+  type Model,
+  createRule,
+  fileRef,
+  getProperty,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
-import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResource } from "../resource.js";
+import { isReadonlyProperty } from "../utils.js";
 import { getSourceProperty } from "./utils.js";
 
 export const armResourceProvisioningStateRule = createRule({
   name: "arm-resource-provisioning-state",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-provisioning-state.md"),
   severity: "warning",
   description: "Check for properly configured provisioningState property.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-provisioning-state",
   messages: {
     default:
       "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",

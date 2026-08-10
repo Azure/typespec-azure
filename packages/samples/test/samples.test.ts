@@ -15,16 +15,6 @@ const pkgRoot = await findTestPackageRoot(import.meta.url);
 const rootOutputDir = resolvePath(pkgRoot, "test/output");
 
 const azureSamplesPath = resolvePath(pkgRoot, "specs");
-const coreSamplesPath = resolvePath(pkgRoot, "../../core/packages/samples/specs");
-
-describe("TypeSpec Samples (With autorest emitter)", () => {
-  defineSampleSnaphotTests({
-    sampleDir: coreSamplesPath,
-    outputDir: resolvePath(rootOutputDir, "core"),
-    exclude: [...excludedSamples, "authentication", "multipart", "todoApp"],
-    emit: [resolvePath(pkgRoot, "node_modules/@azure-tools/typespec-autorest").replace(/\\/g, "/")],
-  });
-});
 
 describe("TypeSpec Azure Samples", () => {
   describe("Data plane", () => {

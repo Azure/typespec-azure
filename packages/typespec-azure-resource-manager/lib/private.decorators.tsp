@@ -15,6 +15,11 @@ extern dec armUpdateProviderNamespace(target: Reflection.Operation);
 extern dec assignProviderNameValue(target: ModelProperty, resource: Model);
 
 /**
+ * @param resource Resource model
+ */
+extern dec assignUniqueProviderNameValue(target: ModelProperty, resource: Model);
+
+/**
  * This decorator is used to identify Azure Resource Manager resource types and extract their
  * metadata.  It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:
@@ -28,6 +33,21 @@ extern dec assignProviderNameValue(target: ModelProperty, resource: Model);
  * @param properties Azure Resource Manager resource properties
  */
 extern dec armResourceInternal(target: Model, properties: Model);
+
+/**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+extern dec armResourceWithParameter(
+  target: Model,
+  properties: Model,
+  type: valueof string,
+  nameParameter: valueof string
+);
 
 /**
  * Omit a property in the target model.
@@ -60,7 +80,7 @@ extern dec defaultResourceKeySegmentName(
  * Provides strict contraint type check.
  *
  * Due to TypeSpec language and all optional properties of `Foundations.Resource`,
- * the `Resource extends Foundations.Resource` on many of the standard ARM templates is
+ * the `Resource extends Foundations.SimpleResource` on many of the standard ARM templates is
  * essentially equal to `Resource extends {}` and does not enforce the containt.
  *
  * Note, this is intended for internal use only for now.
@@ -74,14 +94,6 @@ extern dec enforceConstraint(target: Operation | Model, sourceType: Model, const
  * It is *not* meant to be used directly by a spec author,
  */
 extern dec azureResourceBase(target: Model);
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-extern dec conditionalClientFlatten(target: ModelProperty);
 
 /**
  * Marks the operation as being a collection action
@@ -103,3 +115,145 @@ extern dec armRenameListByOperation(
  * This decorator is used to adjust optionality on ARM Resource's `properties` field for brownfield service conversion.
  */
 extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: valueof boolean);
+
+/** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
+extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
+
+/**
+ * Controls visibility of a base type property based on whether the property is present
+ * and whether the deployment model is Appliance or Platform.
+ *
+ * If `isPresent` is false, the property is made invisible (removed from all lifecycle visibility).
+ * If `isAppliance` is true, the property is made read-only.
+ *
+ * @param isPresent Whether this property is present in the current template instantiation.
+ * @param isAppliance Whether the current deployment model is Appliance (true) or Platform (false).
+ */
+extern dec baseTypeOptional(
+  target: ModelProperty,
+  isPresent: valueof boolean,
+  isAppliance: valueof boolean
+);
+
+/** designates a type as a legacy type and emits a warning diagnostic when used */
+extern dec legacyType(target: Model | Operation | Interface | Scalar);
+
+/** Determines the built-in parent of a base resource
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+extern dec resourceParentType(
+  target: Model,
+  parentType: valueof "Subscription" | "ResourceGroup" | "Tenant" | "Extension"
+);
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+extern dec legacyResourceOperation(
+  target: Operation,
+  resourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+extern dec extensionResourceOperation(
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+extern dec builtInResourceOperation(
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+extern dec legacyExtensionResourceOperation(
+  target: Operation,
+  resourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+extern dec validateCommonTypesVersionForResource(
+  target: Model,
+  version: valueof string,
+  resourceName: valueof string
+);
+
+/**
+ * This decorator is used to identify a generic Azure Resource Manager resource type
+ * that does not require name, key, or segment properties on the model itself.
+ * The resource type and path information comes from the operations (e.g. RoutedOperations).
+ *
+ * It is *not* meant to be used directly by a spec author, it instead
+ * gets implicitly applied when the spec author defines a model type in this form:
+ *
+ *   `model MyResource is GenericResource;`
+ */
+extern dec genericResourceInternal(target: Model);

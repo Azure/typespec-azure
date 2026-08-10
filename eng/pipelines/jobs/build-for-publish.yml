@@ -1,0 +1,93 @@
+jobs:
+  - job: build
+    displayName: Build Packages
+
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true # Disable docusaurus build
+
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - template: /eng/pipelines/templates/build.yml
+
+      - script: pnpm run test:ci
+        displayName: Test
+
+      - template: /eng/pipelines/templates/upload-coverage.yml
+
+      # The emitter e2e tests + spector coverage upload no longer run here so they
+      # don't gate npm publishing. They run in parallel in the `spector_coverage`
+      # stage, reusing the turbo build cache published below. See
+      # eng/pipelines/jobs/spector-coverage.yml.
+
+      - template: /eng/pipelines/templates/pack.yml
+        parameters:
+          artifactName: npm-packages-stable
+          name: npm_packages_stable
+
+      - task: AzureCLI@2
+        displayName: "Publish bundled packages to package storage"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptType: "bash"
+          scriptLocation: inlineScript
+          inlineScript: node ./eng/scripts/upload-bundler-packages.js
+
+      - task: AzureCLI@2
+        displayName: Upload scenario manifest
+        inputs:
+          workingDirectory: packages/azure-http-specs
+          azureSubscription: "TypeSpec Storage"
+          scriptType: "bash"
+          scriptLocation: "inlineScript"
+          inlineScript: "pnpm upload-manifest"
+
+      # Update version for next version publish
+      - script: pnpm change version --prerelease
+        displayName: Bump version to prerelease targets
+
+      - template: /eng/pipelines/templates/pack.yml
+        parameters:
+          artifactName: npm-packages-next
+          name: npm_packages_next
+
+      # Publish Next playground
+      - task: AzureCLI@2
+        displayName: "Publish Azure playground"
+        inputs:
+          azureSubscription: "Azure SDK Engineering System"
+          scriptType: "bash"
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch \
+              --auth-mode login \
+              --destination '$web' \
+              --account-name "cadlplayground" \
+              --destination-path cadl-azure/ \
+              --source "./packages/typespec-azure-playground-website/dist/" \
+              --overwrite
+
+    templateContext:
+      # Optimize so each output doesn't create its own scan
+      # https://eng.ms/docs/coreai/devdiv/one-engineering-system-1es/1es-docs/1es-pipeline-templates/features/outputs#multiple-outputs
+      outputParentDirectory: $(Build.ArtifactStagingDirectory)
+      outputs:
+        - output: pipelineArtifact
+          path: $(Build.ArtifactStagingDirectory)/npm-packages-stable
+          artifact: npm-packages-stable
+          displayName: Publish npm stable packages(.tgz) as pipeline artifacts
+
+        - output: pipelineArtifact
+          path: $(Build.ArtifactStagingDirectory)/npm-packages-next
+          artifact: npm-packages-next
+          displayName: Publish npm next packages(.tgz) as pipeline artifacts
+
+        # Turbo build cache, consumed by the spector_coverage stage so its jobs
+        # restore build outputs (dist/**) instead of recompiling the repo.
+        - output: pipelineArtifact
+          path: $(Build.SourcesDirectory)/.turbo/cache
+          artifact: turbo-cache
+          displayName: Publish turbo build cache for spector coverage jobs

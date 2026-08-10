@@ -1,4 +1,4 @@
-import { Model, createRule, getProperty } from "@typespec/compiler";
+import { type Model, createRule, fileRef, getProperty } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 import { getProperties } from "./utils.js";
@@ -8,8 +8,10 @@ import { getProperties } from "./utils.js";
  */
 export const envelopePropertiesRules = createRule({
   name: "empty-updateable-properties",
+  docs: fileRef.fromPackageRoot("src/rules/empty-updateable-properties.md"),
   severity: "warning",
   description: "Should have updateable properties.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/empty-updateable-properties",
   messages: {
     default: `The RP-specific properties of the Resource (as defined in the 'properties' property) should have at least one updateable property.  Properties are updateable if they do not have a '@visibility' decorator, or if they include 'update' in the '@visibility' decorator arguments.`,
   },

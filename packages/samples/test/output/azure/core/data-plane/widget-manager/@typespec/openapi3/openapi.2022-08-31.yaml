@@ -1271,7 +1271,9 @@ paths:
             schema:
               $ref: '#/components/schemas/WidgetRepairRequest'
 security:
-  - ApiKeyAuth: []
+  - WidgetManagerApiKeyAuth: []
+  - WidgetManagerOauth2Auth:
+      - https://widget.contoso.com/.default
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -1425,7 +1427,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
-      description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.
+      description: An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
     Azure.Core.Foundations.OperationState:
       anyOf:
         - type: string
@@ -1684,7 +1686,16 @@ components:
             - SentToManufacturer
       description: The repair state of a widget.
   securitySchemes:
-    ApiKeyAuth:
+    WidgetManagerApiKeyAuth:
       type: apiKey
       in: header
       name: X-Key
+      description: Authenticate requests with an API key in the X-Key header.
+    WidgetManagerOauth2Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.contoso.com/common/oauth2/v2.0/authorize
+          scopes:
+            https://widget.contoso.com/.default: ''
+      description: Authenticate requests with OAuth2 using the widget service scope.

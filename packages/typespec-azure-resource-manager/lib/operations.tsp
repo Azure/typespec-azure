@@ -1,6 +1,7 @@
 using Http;
 using Rest;
 using Azure.ResourceManager.Foundations;
+using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
@@ -8,79 +9,113 @@ namespace Azure.ResourceManager;
 
 /**
  * A resource list operation, at the subscription scope
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
 @doc("List {name} resources by subscription ID", Resource)
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @armResourceList(Resource)
 @get
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmListBySubscription<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
   Error extends {} = ErrorResponse
 > is ArmReadOperation<SubscriptionScope<Resource> & Parameters, Response, Error>;
 
 /**
+ * A resource list operation, at the subscription scope, for any resource.
+ * This template generates a standard resource list operation at the subscription level,
+ * @template Resource the resource being listed
+ * @template Parameters Optional. Additional query or header parameters
+ * @template Response Optional. The success response for the list operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("List {name} resources by subscription ID", Resource)
+@list
+@listsResource(Resource)
+@segmentOf(Resource)
+@armResourceList(Resource)
+@get
+@Private.enforceConstraint(Resource, Foundations.Resource)
+op ArmListBySubscriptionScope<
+  Resource extends Foundations.SimpleResource,
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<
+  SubscriptionBaseParameters & ProviderNamespace<Resource> & Parameters,
+  Response,
+  Error
+>;
+
+/**
  * A resource list operation, at the scope of the resource's parent
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListByParent<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = "",
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmReadOperation<
-  ResourceParentParameters<Resource, BaseParameters> & Parameters,
+  ResourceParentParameters<Resource, BaseParameters, Provider> & Parameters,
   Response,
   Error
 >;
 
 /**
  * A resource list operation, with scope determined by BaseParameters
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource) // This must come before @armResourceList!
 @armResourceList(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceListAtScope<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<Resource>>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmReadOperation<
-  ResourceParentParameters<Resource, BaseParameters> & Parameters,
+  ResourceParentParameters<Resource, BaseParameters, Provider> & Parameters,
   Response,
   Error
 >;
@@ -92,6 +127,7 @@ op ArmResourceListAtScope<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Get a {name}", Resource)
@@ -102,9 +138,10 @@ op ArmResourceRead<
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmReadOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   Response,
   Error
 >;
@@ -116,21 +153,60 @@ op ArmResourceRead<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Check for the existence of a {name}", Resource)
+@armResourceCheckExistence(Resource)
 @head
 op ArmResourceCheckExistence<
   Resource extends {},
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmReadOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   Response,
   Error
 >;
+
+/**
+ * A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
+ * The path is determined by the `Scope` parameter. Use one of the four standard scope models:
+ * - `TenantActionScope` (default): `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
+ * - `SubscriptionActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
+ * - `TenantLocationActionScope`: `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+ * - `SubscriptionLocationActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+ *
+ * @template Response The type of the response body. Defaults to ArmOperationStatus.
+ * @template Scope The scope of the operation. Defaults to TenantActionScope.
+ * @template Parameters Optional. Additional non-path parameters (e.g. query or header parameters).
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("Get the status of an async operation.")
+@get
+@armResourceCollectionAction
+@Private.armUpdateProviderNamespace
+op GetResourceOperationStatus<
+  Response extends {} = ArmOperationStatus,
+  Scope extends {} = TenantActionScope,
+  Parameters extends {} = {},
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...ProviderNamespace<Scope>,
+  ...Scope,
+
+  @path
+  @segment("operationStatuses")
+  @doc("The operation ID.")
+  operationId: string,
+
+  ...Parameters,
+): ArmResponse<Response> | Error;
 
 /**
  * A long-running resource CreateOrUpdate (PUT)
@@ -140,6 +216,7 @@ op ArmResourceCheckExistence<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Create a {name}", Resource)
@@ -148,18 +225,18 @@ op ArmResourceCheckExistence<
 @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
 @put
 op ArmResourceCreateOrUpdateAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
-  Error extends {} = ErrorResponse
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   Resource,
   Response,
   Error
@@ -172,6 +249,7 @@ op ArmResourceCreateOrUpdateAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 #deprecated "Please use ArmResourceCreateOrReplaceSync instead"
 @autoRoute
@@ -180,13 +258,14 @@ op ArmResourceCreateOrUpdateAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @put
 op ArmResourceCreateOrUpdateSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   Resource,
   Response,
   Error
@@ -197,8 +276,9 @@ op ArmResourceCreateOrUpdateSync<
  * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Create a {name}", Resource)
@@ -206,58 +286,69 @@ op ArmResourceCreateOrUpdateSync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @put
 op ArmResourceCreateOrReplaceSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
-  Error extends {} = ErrorResponse
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   Resource,
   Response,
   Error
 >;
 
 /**
- * @dev A long-running resource CreateOrUpdate (PUT)
+ * A long-running resource CreateOrUpdate (PUT)
  * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
+@doc("Create a {name}", Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceCreateOrReplaceAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
-  Error extends {} = ErrorResponse
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceCreateOrUpdateAsync<
   Resource,
   BaseParameters,
   LroHeaders,
   Parameters,
   Response,
-  Error
+  Error,
+  Provider
 >;
 
 /**
- * @dev A long-running resource update that only allows updating resource tags (the minimum)
+ * A long-running resource update that only allows updating resource tags (the minimum)
  * @template Resource the resource being patched
+ * @template Properties Optional. Exists for parallelism with ArmResourcePatch.
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Update a {name}", Resource)
 op ArmTagsPatchAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends {} = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -266,26 +357,34 @@ op ArmTagsPatchAsync<
     string
   > &
     Azure.Core.Foundations.RetryAfterHeader,
-  Parameters extends {} = {}
+  Parameters extends {} = {},
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmCustomPatchAsync<
   Resource,
   TagsUpdateModel<Resource>,
   BaseParameters,
   LroHeaders,
-  Parameters
+  Parameters,
+  ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  ErrorResponse,
+  Provider
 >;
 
 /**
- * @dev A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
+ * A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Update a {name}", Resource)
 op ArmResourcePatchAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -294,8 +393,18 @@ op ArmResourcePatchAsync<
     string
   > &
     Azure.Core.Foundations.RetryAfterHeader,
-  Parameters extends {} = {}
-> is ArmCustomPatchAsync<Resource, Resource, BaseParameters, LroHeaders, Parameters>;
+  Parameters extends {} = {},
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmCustomPatchAsync<
+  Resource,
+  Resource,
+  BaseParameters,
+  LroHeaders,
+  Parameters,
+  ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
@@ -306,14 +415,15 @@ op ArmResourcePatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch
 op ArmCustomPatchAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -323,45 +433,71 @@ op ArmCustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
-  Error extends {} = ErrorResponse
+  Response extends {} =
+    | ArmResponse<Resource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmUpdateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   PatchModel,
   Response,
   Error
 >;
 
 /**
- * @dev A resource update that only allows updating resource tags (the minimum)
+ * A resource update that only allows updating resource tags (the minimum)
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Update a {name}", Resource)
 op ArmTagsPatchSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  Parameters extends {} = {}
-> is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters>;
+  Parameters extends {} = {},
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmCustomPatchSync<
+  Resource,
+  TagsUpdateModel<Resource>,
+  BaseParameters,
+  Parameters,
+  ArmResponse<Resource>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
- * @dev A resource update using the items from the resource marked with Lifecycle.Update visibility
+ * A resource update using the items from the resource marked with Lifecycle.Update visibility
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Update a {name}", Resource)
 op ArmResourcePatchSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
   BaseParameters = DefaultBaseParameters<Resource>,
-  Parameters extends {} = {}
-> is ArmCustomPatchSync<Resource, Resource, BaseParameters, Parameters>;
+  Parameters extends {} = {},
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmCustomPatchSync<
+  Resource,
+  Resource,
+  BaseParameters,
+  Parameters,
+  ArmResponse<Resource>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
@@ -371,33 +507,36 @@ op ArmResourcePatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch
 op ArmCustomPatchSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmUpdateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  ResourceInstanceParameters<Resource, BaseParameters, Provider> & Parameters,
   PatchModel,
   Response,
   Error
 >;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template Resource The resource being deleted
  * @template Response The response type for the operation
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
@@ -405,53 +544,65 @@ op ArmCustomPatchSync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
 op ArmResourceDeleteAsyncBase<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
->(...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters): Response | Error;
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
- * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
+ * Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
  * @template Resource The resource being deleted
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 #deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Delete a {name}", Resource)
 op ArmResourceDeleteAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  Error extends {} = ErrorResponse
-> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error>;
+  Response extends {} =
+    | ArmDeletedResponse
+    | ArmDeleteAcceptedLroResponse<LroHeaders>
+    | ArmDeletedNoContentResponse,
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error, Provider>;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template Resource The resource being deleted
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("Delete a {name}", Resource)
 op ArmResourceDeleteWithoutOkAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<FinalResult = void> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  Error extends {} = ErrorResponse
-> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error>;
+  Error extends {} = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error, Provider>;
 
 /**
  * Delete a resource synchronously
@@ -460,6 +611,7 @@ op ArmResourceDeleteWithoutOkAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
@@ -467,12 +619,15 @@ op ArmResourceDeleteWithoutOkAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @delete
 op ArmResourceDeleteSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
-  Error = ErrorResponse
->(...ResourceInstanceParameters<Resource, BaseParameters>, ...Parameters): Response | Error;
+  Error = ErrorResponse,
+  Provider extends {} = ProviderNamespace<Resource>
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * A long-running resource action.
@@ -482,29 +637,33 @@ op ArmResourceDeleteSync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @post
 op ArmResourceActionAsyncBase<
-  Resource extends Foundations.Resource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Resource extends Foundations.SimpleResource,
+  Request,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): Response | Error;
 
 /**
- * @dev A long-running resource action.
+ * A long-running resource action.
  * @template Resource The resource being acted upon
  * @template Request The request model for the action
  * @template Response The response model for the action
@@ -512,13 +671,16 @@ op ArmResourceActionAsyncBase<
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("")
 op ArmResourceActionAsync<
-  Resource extends Foundations.Resource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Resource extends Foundations.SimpleResource,
+  Request,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -527,14 +689,59 @@ op ArmResourceActionAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody,
+  Provider
+>;
+
+/**
+ * The *standard*  long-running resource action.
+ * @template Resource The resource being acted upon
+ * @template Request The request model for the action
+ * @template Response The response model for the action, returned after polling the long-running operation
+ * @template BaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
+ */
+@returnsDoc("Azure operation completed successfully.")
+@Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("")
+op ActionAsync<
+  Resource extends Foundations.SimpleResource,
+  Request,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
+  BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Parameters extends {} = {},
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
+> is ArmResourceActionAsyncBase<
+  Resource,
+  Request,
+  ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
+  BaseParameters,
+  Parameters,
+  Error,
+  OptionalRequestBody,
+  Provider
 >;
 
 /**
@@ -545,6 +752,8 @@ op ArmResourceActionAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -552,64 +761,74 @@ op ArmResourceActionAsync<
 @post
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
-  Resource extends Foundations.Resource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Resource extends Foundations.SimpleResource,
+  Request,
+  Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): Response | Error;
 
 /**
- * @dev A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
+ * A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
  * @template Resource The resource being acted upon
  * @template Request The request model for the action
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("")
 op ArmResourceActionNoContentAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-  ArmAcceptedLroResponse<
-    "Resource operation accepted.",
-    LroHeaders
-  > | ArmNoContentResponse<"Action completed successfully.">,
+  | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
+  | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody,
+  Provider
 >;
 
 /**
- * @dev A long-running resource action that returns no content.
+ * A long-running resource action that returns no content.
  * @template Resource The resource being acted upon
  * @template Request The request model for the action
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
- * @template Headers Optional. Allows overriding the headers returned in the Accepted response
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
+@doc("")
 op ArmResourceActionNoResponseContentAsync<
-  Resource extends Foundations.Resource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Resource extends Foundations.SimpleResource,
+  Request,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -618,14 +837,18 @@ op ArmResourceActionNoResponseContentAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody,
+  Provider
 >;
 
 /**
@@ -635,30 +858,34 @@ op ArmResourceActionNoResponseContentAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @post
 op ArmResourceActionNoContentSync<
-  Resource extends Foundations.Resource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Resource extends Foundations.SimpleResource,
+  Request,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false,
+  Provider extends {} = ProviderNamespace<Resource>
 >(
-  ...ResourceInstanceParameters<Resource, BaseParameters>,
+  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): ArmNoContentResponse<"Action completed successfully."> | Error;
 
 /**
- * @dev Adds check global name availability operation, normally used if
+ * Adds check global name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
  * @template Response the availability response, default to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
@@ -669,16 +896,16 @@ op checkGlobalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace,
   Request,
   Response,
   AdditionalParams
 >;
 
 /**
- * @dev Adds check location-specific name availability operation, normally used if
+ * Adds check location-specific name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
  * @template Response the availability response, default to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
@@ -689,55 +916,61 @@ op checkLocalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
   Request,
   Response,
   AdditionalParams
 >;
 
 /**
- * @dev A provider action performed over a tenant
+ * A provider action performed over a tenant
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Scope The scope of the action (SubscriptionActionScope or TenantActionScope)
+ * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @post
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
+@doc("")
 op ArmProviderActionSync<
-  Request extends {} | void = void,
-  Response extends {} | void = void,
+  Request extends {} | unknown | void = void,
+  Response extends {} | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
   /** The request body */
-  @bodyRoot body: Request,
+  @armBodyRoot(OptionalRequestBody) body: Request,
 ): Response | Error;
 
 /**
- * @dev A long-running provider action.
+ * A long-running provider action.
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Scope The scope of the action (SubscriptionActionScope or TenantActionScope)
+ * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @post
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
+@doc("")
 op ArmProviderActionAsync<
-  Request extends {} | void = void,
-  Response extends {} | void = void,
+  Request extends {} | unknown | void = void,
+  Response extends TypeSpec.Reflection.Model | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -746,12 +979,14 @@ op ArmProviderActionAsync<
     string
   > &
     Azure.Core.Foundations.RetryAfterHeader,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
   /** The request body */
-  @bodyRoot body: Request,
+  @armBodyRoot(OptionalRequestBody) body: Request,
 ): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | Error;

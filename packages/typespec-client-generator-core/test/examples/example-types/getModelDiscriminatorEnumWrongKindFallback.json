@@ -1,0 +1,12 @@
+{
+  "operationId": "getModelDiscriminator",
+  "title": "getModelDiscriminator",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "kind": "goldfish"
+      }
+    }
+  }
+}

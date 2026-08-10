@@ -1,0 +1,10 @@
+{
+  "operationId": "getNumberStringConversion",
+  "title": "getNumberStringConversion",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "123"
+    }
+  }
+}

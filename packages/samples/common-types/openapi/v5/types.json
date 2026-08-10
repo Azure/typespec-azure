@@ -223,6 +223,7 @@
     },
     "KeyVaultProperties": {
       "type": "object",
+      "description": "Properties of a KeyVault",
       "properties": {
         "keyIdentifier": {
           "type": "string",
@@ -267,7 +268,7 @@
     },
     "OperationDisplay": {
       "type": "object",
-      "description": "Localized display information for and operation.",
+      "description": "Localized display information for an operation.",
       "properties": {
         "provider": {
           "type": "string",
@@ -504,13 +505,16 @@
           "readOnly": true
         },
         "identity": {
-          "$ref": "#/definitions/Identity"
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
         },
         "sku": {
-          "$ref": "#/definitions/Sku"
+          "$ref": "#/definitions/Sku",
+          "description": "The SKU of the resource."
         },
         "plan": {
-          "$ref": "#/definitions/Plan"
+          "$ref": "#/definitions/Plan",
+          "description": "The plan of the resource."
         }
       },
       "allOf": [

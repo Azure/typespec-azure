@@ -1,17 +1,17 @@
 import {
-  BasicTestRunner,
   createLinterRuleTester,
-  LinterRuleTester,
+  type LinterRuleTester,
+  type TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { SimpleTester } from "../tester.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner();
+  runner = await SimpleTester.createInstance();
   tester = createLinterRuleTester(
     runner,
     requireClientSuffixRule,
@@ -23,7 +23,7 @@ it("namespace doesn't end in client", async () => {
   await tester
     .expect(
       `
-      @client
+      @client({service: MyService})
       @service
       namespace MyService;
       `,
@@ -41,7 +41,7 @@ it("explicit client name doesn't ends with Client", async () => {
   await tester
     .expect(
       `
-      @client({name: "MySDK"})
+      @client({name: "MySDK", service: MyService})
       @service
       namespace MyService;
       `,
@@ -76,4 +76,25 @@ it("interface", async () => {
         message: `Client name "MyInterface" must end with Client. Use @client({name: "...Client"}`,
       },
     ]);
+});
+
+it("sub client", async () => {
+  await tester
+    .expect(
+      `
+      @service
+      namespace MyService;
+
+      namespace MyCustomizations {
+        @client({service: MyService})
+        namespace RootClient {
+
+          @client
+          interface NestedService {
+          }
+        };
+      }
+      `,
+    )
+    .toBeValid();
 });

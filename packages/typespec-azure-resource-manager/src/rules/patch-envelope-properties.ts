@@ -1,11 +1,20 @@
-import { Model, Type, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type Type,
+  createRule,
+  fileRef,
+  getProperty,
+  paramMessage,
+} from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 
 export const patchEnvelopePropertiesRules = createRule({
   name: "patch-envelope",
+  docs: fileRef.fromPackageRoot("src/rules/patch-envelope.md"),
   severity: "warning",
   description: "Patch envelope properties should match the resource properties.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-envelope",
   messages: {
     default: paramMessage`The Resource PATCH request for resource '${"resourceName"}' is missing envelope properties:  [${"propertyName"}]. Since these properties are supported in the resource, they must also be updatable via PATCH.`,
   },

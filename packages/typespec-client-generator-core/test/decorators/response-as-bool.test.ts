@@ -1,20 +1,16 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
 it("head operation marked as void", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @responseAsBool
     @head
     op headOperation(): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -22,15 +18,11 @@ it("head operation marked as void", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 
   strictEqual(operation.exceptions.length, 0);
 
@@ -38,7 +30,7 @@ it("head operation marked as void", async () => {
 });
 
 it("head operation marked as void with error model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model Error {
       code: int32;
@@ -49,7 +41,8 @@ it("head operation marked as void with error model", async () => {
     @head
     op headOperation(): void | Error;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -57,15 +50,11 @@ it("head operation marked as void with error model", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 
   strictEqual(operation.exceptions.length, 1);
 
@@ -73,30 +62,28 @@ it("head operation marked as void with error model", async () => {
 });
 
 it("head operation with explicitly marked valid response", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @responseAsBool
     @head
     op headOperation(): boolean;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
   strictEqual(operation.responses.length, 2);
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 200);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
   strictEqual(method.response.type?.kind, "boolean");
 });
+
 it("head operation with explicitly marked 404", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model Error {
       code: int32;
@@ -112,7 +99,8 @@ it("head operation with explicitly marked 404", async () => {
     @head
     op headOperation(): void | FourOFourError | Error;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -120,18 +108,15 @@ it("head operation with explicitly marked 404", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 });
+
 it("non-head operation", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @responseAsBool
     @get
     op getOperation(): boolean;

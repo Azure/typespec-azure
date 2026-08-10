@@ -16,14 +16,13 @@ namespace Microsoft.PrivateLinkTest;
 
 @doc("The PrivateLinkTest service versions.")
 enum Versions {
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-  @doc("The 2023-08-01-preview version.")
-  `2023-08-01-preview`,
+  @doc("The 2023-08-01 version.")
+  `2023-08-01`,
 
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @doc("The 2023-11-01-preview version.")
+  @Azure.Core.previewVersion
   `2023-11-01-preview`,
 }
 
@@ -58,35 +57,29 @@ model TestTrackedProperties {
   endpoints?: PrivateEndpoint[];
 }
 
-/** Holder for private endpoint connections */
-@parentResource(TestTrackedResource)
-model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
-  ...PrivateEndpointConnectionParameter;
-}
+model PrivateEndpoint is PrivateEndpointConnection;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpoint>;
 
 /** Private connection operations */
 @armResourceOperations(PrivateEndpointConnectionResource)
 interface PrivateEndpointConnections {
   /** List existing private connections */
-  listByTestTrackedResource is ArmResourceListByParent<PrivateEndpointConnectionResource>;
+  listByTestTrackedResource is PrivateEndpointOperations.ListByParent<TestTrackedResource>;
   /** Get a specific private connection */
-  get is ArmResourceRead<PrivateEndpointConnectionResource>;
+  get is PrivateEndpointOperations.Read<TestTrackedResource>;
   /** Create a Private endpoint connection */
-  create is ArmResourceCreateOrReplaceSync<PrivateEndpointConnectionResource>;
+  create is PrivateEndpointOperations.CreateOrReplaceSync<TestTrackedResource>;
   /** Delete the private endpoint connection */
-  delete is ArmResourceDeleteSync<PrivateEndpointConnectionResource>;
+  delete is PrivateEndpointOperations.DeleteAsync<TestTrackedResource>;
 }
 
 /** Private Links for TestRackedResource */
-#suppress "@azure-tools/typespec-providerhub-controller/no-resource-operations" "Expected for private links"
-@parentResource(TestTrackedResource)
-model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
-  ...PrivateLinkResourceParameter;
-}
+model PrivateLinkResource is PrivateLink;
+alias PrivateLinkOps = PrivateLinks<PrivateLinkResource>;
 
 /** Operations for private links on TestTrackedResource */
 @armResourceOperations(PrivateLinkResource)
-interface PrivateLinks {
+interface PrivateLinkOperations {
   /** list private links on the given resource */
-  listByTestTrackedResource is ArmResourceListByParent<PrivateLinkResource>;
+  listByTestTrackedResource is PrivateLinkOps.ListByParent<TestTrackedResource>;
 }

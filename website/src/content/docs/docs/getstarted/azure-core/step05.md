@@ -1,12 +1,12 @@
 ---
-title: 5. Defining standard resource operations
+title: 5. Defining long-running resource operations
+description: Defining long-running resource operations
+llmstxt: true
 ---
 
-The `Azure.Core` namespace provides a variety of [standard lifecycle operations](https://azure.github.io/typespec-azure/docs/libraries/azure-core/reference/interfaces#Azure.Core.ResourceOperations) for resource types. These operations adhere to the requirements of the [Azure REST API Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md).
+If your service uses any long-running operations (LROs; see [our guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#long-running-operations--jobs) for specifics), you will need to define a "status monitor" operation which can report the status of the operation.
 
-## Operation interface definition
-
-To define standard operations for a resource type, create an instance of the `ResourceOperations` interface that is tailored to your service. Here's an example:
+Let's say that we want to make our `createOrUpdateWidget` and `deleteWidget` operations long-running. Here's how we can update our `Widgets` interface to accomplish that:
 
 ```typespec
 import "@azure-tools/typespec-azure-core";
@@ -19,97 +19,31 @@ alias ServiceTraits = SupportsRepeatableRequests &
   SupportsClientRequestId;
 
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
-```
 
-In this example:
-
-1. `ServiceTraits` is defined as the intersection of three trait model types available in `Azure.Core`. Learn more about interface-level service traits [here](https://azure.github.io/typespec-azure/docs/libraries/azure-core/reference/data-types).
-2. `Operations` is defined as the instantiation of `Azure.Core.ResourceOperations` with the service trait types you defined.
-
-> **Note:** The name `Operations` is used for convenience, but you might define multiple aliases of `ResourceOperation` for a single service to apply different customizations for some operations. You might choose a more explicit name like `StandardOperations`.
-
-Next, we'll use this interface alias to define the standard resource operations we need.
-
-## Resource operations definition
-
-We'll define the standard set of CRUD (Create, Read, Update, Delete) operations typically needed for a resource type in an Azure service. We'll do this by defining an interface called `Widgets`:
-
-```typespec
 interface Widgets {
+  /** Get status of a Widget operation. This operation return status in status code. No response body is returned. */
+  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
+
   /** Fetch a Widget by name. */
   getWidget is Operations.ResourceRead<Widget>;
 
-  /** Creates or updates a Widget. */
-  createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
+  /** Create or replace a Widget asynchronously. */
+  @pollingOperation(Widgets.getWidgetOperationStatus)
+  createOrUpdateWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
-  /** Delete a Widget. */
-  deleteWidget is Operations.ResourceDelete<Widget>;
+  /** Delete a Widget asynchronously. */
+  @pollingOperation(Widgets.getWidgetOperationStatus)
+  deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
   /** List Widget resources. */
   listWidgets is Operations.ResourceList<Widget>;
 }
 ```
 
-> **Note:** It's not necessary to define your resource operations inside of an `interface`. You can also define them in a sub-namespace of your service or inside the top-level namespace of the service. However, it's a best practice in TypeSpec to use `interface` to encapsulate the operations of a particular resource type.
+1. We change `createOrUpdateWidget` to use `LongRunningResourceCreateOrReplace<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`.
+2. We define the `getWidgetOperationStatus` operation based on the `GetResourceOperationStatus` signature. This defines the operation status monitor as a child resource of the `Widget` type so that it shows up under that resource in the route hierarchy.
+3. We **must** add the `pollingOperation` decorator to both of the long-running operations and reference the `Widgets.getWidgetOperationStatus` operation. This connects the long-running operations to their associated status monitor operation to make it easier for service clients to be generated.
 
-The `Widget` interface defines the following standard lifecycle operations:
+> **NOTE:** The status monitor operation **must** be defined earlier in the interface than the long-running operations that reference it otherwise TypeSpec will not be able to resolve the reference!
 
-- `ResourceRead<TResource>`: Defines a "read" operation for a single resource instance.
-- `ResourceCreateOrUpdate<TResource>`: Defines an "upsert" operation which either creates or updates an instance of the resource type depending on whether it already exists.
-- `ResourceDelete<TResource>`: Defines a "delete" operation to delete a specific instance of the resource.
-- `ResourceList<TResource>`: Defines an operation that lists all instances of the resource type.
-
-> **Note:** There are both instantaneous and long-running versions of "create", "update", and "delete" operations for resource types depending on what you need for a particular resource!
-
-These operations will all exist under the route path `/widgets/{widgetName}`, with the list operation generating the path `/widgets`.
-
-## Error response customization
-
-If your service needs to use a custom error response type for all resource operations (which is uncommon), you may pass in a custom error response type to the `ResourceOperations` interface:
-
-```typespec
-import "@azure-tools/typespec-azure-core";
-
-using Azure.Core;
-using Azure.Core.Traits;
-
-alias ServiceTraits = SupportsRepeatableRequests &
-  SupportsConditionalRequests &
-  SupportsClientRequestId;
-
-/** A custom error response type. */
-@error
-model ErrorResponse {
-  /** The error code. */
-  code: string;
-
-  /** The error message. */
-  message: string;
-}
-
-alias Operations = Azure.Core.ResourceOperations<ServiceTraits, ErrorResponse>;
-```
-
-You can also reuse the standard Azure Core error types with minor customizations:
-
-```typespec
-import "@azure-tools/typespec-azure-core";
-
-using Azure.Core;
-using Azure.Core.Traits;
-
-alias ServiceTraits = SupportsRepeatableRequests &
-  SupportsConditionalRequests &
-  SupportsClientRequestId;
-
-/** A custom error type. */
-model Error is Azure.Core.Foundations.Error {
-  /** The environment where the error occurred. */
-  environment: string;
-}
-
-alias Operations = Azure.Core.ResourceOperations<
-  ServiceTraits,
-  Azure.Core.Foundations.ErrorResponseBase<Error>
->;
-```
+See [considerations for service design](https://github.com/microsoft/api-guidelines/blob/vNext/azure/ConsiderationsForServiceDesign.md#long-running-operations) for more information about LROs.

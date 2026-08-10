@@ -1,14 +1,7 @@
-// @ts-check
 import pc from "picocolors";
 import { parseArgs } from "util";
 import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
-import {
-  CommandFailedError,
-  checkForChangedFiles,
-  coreRepoRoot,
-  listPackages,
-  repoRoot,
-} from "./helpers.js";
+import { CommandFailedError, checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
 
 const columns = process.stdout.columns;
 function log(...args) {
@@ -33,6 +26,7 @@ const args = parseArgs({
   options: {
     noCommit: { type: "boolean" },
     onlyBumpVersions: { type: "boolean" }, // Only bump version, skip any extra steps like updating the docs and regenerating samples
+    skipUpToDateCheck: { type: "boolean" }, // Skip the pre-publish state check (clean repo, changelogs present)
   },
   args: process.argv.slice(2),
 });
@@ -58,7 +52,7 @@ if (production) {
 }
 
 // Check that we have a clean slate before starting
-if (production) {
+if (production && !args.values.skipUpToDateCheck) {
   await checkPrePublishState();
 }
 
@@ -89,8 +83,6 @@ if (production && (await checkForChangedFiles(repoRoot, undefined, { silent: tru
 }
 
 log("Bumping cross-submodule dependencies");
-// Determine project versions including any bumps from typespec publish above
-const versions = await getProjectVersions();
 
 // Stage typespec-azure publish
 await typespecAzureRun("pnpm", "change", "version");
@@ -190,18 +182,10 @@ async function typespecAzureRunWithRetries(tries, command, ...args) {
   }
 }
 
-async function getProjectVersions() {
-  const map = new Map();
-  for (const project of await listPackages()) {
-    map.set(project.manifest.name, project.manifest.version);
-  }
-  return map;
-}
-
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   await typespecAzureRunWithRetries(3, "pnpm", "install");
   await typespecAzureRunWithOptions(
-    { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
+    { env: { ...process.env, TYPESPEC_SKIP_WEBSITE_BUILD: true } },
     "pnpm",
     "build",
   );

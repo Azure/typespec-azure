@@ -1,0 +1,20 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import SampleContent from "@components/sample/sample-content.astro";
+import { type SampleConfig, getSampleStructure } from "src/utils/samples";
+
+interface Props {
+  sample: SampleConfig;
+}
+
+export async function getStaticPaths() {
+  const { samples } = await getSampleStructure();
+  return samples.map((x) => ({ params: { sample: x.id }, props: { sample: x } }));
+}
+
+const { sample } = Astro.props;
+---
+
+<StarlightPage frontmatter={{ title: sample.title }}>
+  <SampleContent sample={sample} />
+</StarlightPage>

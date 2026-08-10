@@ -3,7 +3,6 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
-using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Azure client request id header configurations.")
