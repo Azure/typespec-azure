@@ -12,12 +12,14 @@ import YAML from "yaml";
 import type { ProjectedEnumResult } from "./projected-enum-worker.js";
 
 const execFileAsync = promisify(execFile);
-const ANALYSIS_SCHEMA_VERSION = 5;
+const ANALYSIS_SCHEMA_VERSION = 6;
 const DATASET_SCHEMA_VERSION = 4;
 const LOCAL_RULESET = "tsp-lintdiff-local-linter/all";
 const LOCAL_RULE_PREFIX = "tsp-lintdiff-local-linter/";
 const ENUM_INSTEAD_OF_BOOLEAN_RULE =
   "tsp-lintdiff-local-linter/enum-instead-of-boolean";
+const VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE =
+  "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
 const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
 
@@ -583,6 +585,7 @@ export function filterProjectedEnumDiagnostics(
     if (diagnostic.rule !== ENUM_INSTEAD_OF_BOOLEAN_RULE) {
       return true;
     }
+
     const key = diagnosticLocationKey(diagnostic);
     if (key === undefined) {
       return false;
@@ -592,6 +595,22 @@ export function filterProjectedEnumDiagnostics(
       location !== undefined &&
       (emittedBooleanNames === undefined || emittedBooleanNames.has(location.emittedName))
     );
+  });
+}
+
+export function filterProjectedPointQueryDiagnostics(
+  diagnostics: TypeSpecDiagnostic[],
+  projected: ProjectedEnumResult,
+): TypeSpecDiagnostic[] {
+  const projectedLocations = new Set(
+    projected.queryParameterLocations.map((location) => diagnosticLocationKey(location)!),
+  );
+  return diagnostics.filter((diagnostic) => {
+    if (diagnostic.rule !== VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE) {
+      return true;
+    }
+    const key = diagnosticLocationKey(diagnostic);
+    return key !== undefined && projectedLocations.has(key);
   });
 }
 
@@ -1253,7 +1272,11 @@ async function compileProject(
   if (
     status === "success" &&
     project.apiVersion &&
-    diagnostics.some((diagnostic) => diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE)
+    diagnostics.some(
+      (diagnostic) =>
+        diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE ||
+        diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE,
+    )
   ) {
     const workerPath = path.join(import.meta.dirname, "projected-enum-worker.ts");
     const projected = await execFileAsync(
@@ -1281,6 +1304,7 @@ async function compileProject(
       projectedResult,
       loadEmittedBooleanNames(config.datasetDir, project),
     );
+    diagnostics = filterProjectedPointQueryDiagnostics(diagnostics, projectedResult);
   } else {
     fs.rmSync(projectedEnumPath, { force: true });
   }

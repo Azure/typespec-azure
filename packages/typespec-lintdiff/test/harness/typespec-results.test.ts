@@ -7,6 +7,7 @@ import {
   coverageBreakdownMarkdown,
   createCoverageBreakdown,
   filterProjectedEnumDiagnostics,
+  filterProjectedPointQueryDiagnostics,
   injectLocalRuleset,
   loadValidatorFixtureMetadata,
   loadValidatorMappings,
@@ -144,7 +145,45 @@ describe("TypeSpec result aggregation", () => {
             emittedName: "enabled",
           },
         ],
+        queryParameterLocations: [],
       }, new Set(["enabled"])),
+    ).toEqual([diagnostics[1], diagnostics[2]]);
+  });
+
+  it("filters point-query diagnostics outside the selected API version", () => {
+    const pointRule =
+      "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
+    const diagnostics: TypeSpecDiagnostic[] = [
+      {
+        ...diagnostic(pointRule, project),
+        sourceFile: "operations.tsp",
+        line: 10,
+        column: 3,
+      },
+      {
+        ...diagnostic(pointRule, project),
+        sourceFile: "operations.tsp",
+        line: 20,
+        column: 3,
+      },
+      diagnostic("tsp-lintdiff-local-linter/another-rule", project),
+    ];
+
+    expect(
+      filterProjectedPointQueryDiagnostics(diagnostics, {
+        apiVersion: "2026-01-01",
+        serviceCount: 1,
+        locations: [],
+        queryParameterLocations: [
+          {
+            sourceFile: "operations.tsp",
+            line: 20,
+            column: 3,
+            name: "mode",
+            verb: "delete",
+          },
+        ],
+      }),
     ).toEqual([diagnostics[1], diagnostics[2]]);
   });
 

@@ -16,6 +16,7 @@ import { getHttpService, type HttpOperation, type HttpPayloadBody } from "@types
 import { getVersioningMutators } from "@typespec/versioning";
 import * as path from "path";
 import { pathToFileURL } from "url";
+import { isPointOperationPath } from "../../src/rules/point-operation-path.js";
 
 export interface ProjectedEnumResult {
   apiVersion: string;
@@ -26,7 +27,16 @@ export interface ProjectedEnumResult {
     column: number;
     emittedName: string;
   }>;
+  queryParameterLocations: Array<{
+    sourceFile: string;
+    line: number;
+    column: number;
+    name: string;
+    verb: string;
+  }>;
 }
+
+const pointOperationVerbs = new Set(["get", "put", "patch", "delete"]);
 
 function isBooleanScalar(type: Type): boolean {
   return type.kind === "ModelProperty"
@@ -181,6 +191,7 @@ function visitHttpOperation(
   for (const property of operation.parameters.properties) {
     visitType(program, property.property, projectDir, locations, visited);
   }
+
   visitBody(
     program,
     operation.parameters.body,
@@ -206,6 +217,39 @@ function visitHttpOperation(
         locations,
         visited,
       );
+    }
+  }
+}
+
+function collectQueryParameterLocations(
+  program: Program,
+  operation: HttpOperation,
+  projectDir: string,
+  locations: Map<string, ProjectedEnumResult["queryParameterLocations"][number]>,
+): void {
+  if (
+    !pointOperationVerbs.has(operation.verb) ||
+    !isPointOperationPath(operation.path)
+  ) {
+    return;
+  }
+
+  for (const parameter of operation.parameters.parameters) {
+    if (
+      parameter.type !== "query" ||
+      parameter.name.toLowerCase() === "api-version"
+    ) {
+      continue;
+    }
+    const location = locationKey(program, parameter.param, projectDir);
+    if (location) {
+      locations.set(location.key, {
+        sourceFile: location.sourceFile,
+        line: location.line,
+        column: location.column,
+        name: parameter.name,
+        verb: operation.verb,
+      });
     }
   }
 }
@@ -249,6 +293,10 @@ export async function collectProjectedEnumLocations(
   }
 
   const locations = new Map<string, ProjectedEnumResult["locations"][number]>();
+  const queryParameterLocations = new Map<
+    string,
+    ProjectedEnumResult["queryParameterLocations"][number]
+  >();
   let serviceCount = 0;
   for (const service of listServices(program)) {
     const versioning = getVersioningMutators(program, service.type);
@@ -281,6 +329,12 @@ export async function collectProjectedEnumLocations(
       });
       for (const operation of httpService.operations) {
         visitHttpOperation(program, operation, projectDir, locations);
+        collectQueryParameterLocations(
+          program,
+          operation,
+          projectDir,
+          queryParameterLocations,
+        );
       }
       continue;
     }
@@ -306,6 +360,12 @@ export async function collectProjectedEnumLocations(
     });
     for (const operation of httpService.operations) {
       visitHttpOperation(program, operation, projectDir, locations);
+      collectQueryParameterLocations(
+        program,
+        operation,
+        projectDir,
+        queryParameterLocations,
+      );
     }
   }
 
@@ -317,6 +377,12 @@ export async function collectProjectedEnumLocations(
     apiVersion,
     serviceCount,
     locations: [...locations.values()].sort(
+      (left, right) =>
+        left.sourceFile.localeCompare(right.sourceFile) ||
+        left.line - right.line ||
+        left.column - right.column,
+    ),
+    queryParameterLocations: [...queryParameterLocations.values()].sort(
       (left, right) =>
         left.sourceFile.localeCompare(right.sourceFile) ||
         left.line - right.line ||
