@@ -27,6 +27,7 @@ import {
   PollingHelpers,
   SerializationHelpers,
   StorageCompatHelpers,
+  StreamingHelpers,
   UrlTemplateHelpers,
   XmlHelpers,
 } from "../../src/modular/static-helpers-metadata.js";
@@ -58,6 +59,9 @@ const sharedTester = createTester(resolvePath(__dirname, "..", ".."), {
     "@azure-tools/typespec-client-generator-core",
     "@azure-tools/typespec-azure-resource-manager",
     "@azure-tools/typespec-autorest",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
   ],
 });
 
@@ -102,6 +106,8 @@ const REST_USAGE =
 const VERSIONING_USAGE =
   /@(versioned|added|removedFrom|removed|renamedFrom|madeOptional|madeRequired|typeChangedFrom|returnTypeChangedFrom|useDependency)\b|\bVersions\b|\bVersioning\./;
 const XML_USAGE = /\bXml\b|@unwrapped\b|@attribute\b/;
+const STREAMS_USAGE = /\bJsonlStream\b|\bHttp\.Streams\b/;
+const SSE_USAGE = /\bSSEStream\b|@events\b|@terminalEvent\b|\bSSE\b|\bEvents\./;
 /**
  * Usage detectors for the heavy Azure libraries that dominate
  * `compileTypeSpecFor`'s prefix cost (azure-core + ARM + TCGC account for
@@ -208,6 +214,8 @@ export async function rlcEmitterFor(
   const needRest = needArmTemplate || REST_USAGE.test(code);
   const needVersioning = withVersionedApiVersion || VERSIONING_USAGE.test(code);
   const needXml = XML_USAGE.test(code);
+  const needStreams = STREAMS_USAGE.test(code);
+  const needSse = SSE_USAGE.test(code);
   const content = withRawContent
     ? code
     : `
@@ -215,6 +223,8 @@ import "@typespec/http";
 ${needRest ? 'import "@typespec/rest";' : ""}
 ${needVersioning ? 'import "@typespec/versioning";' : ""}
 ${needXml ? 'import "@typespec/xml";' : ""}
+${needStreams ? 'import "@typespec/http/streams";' : ""}
+${needSse ? 'import "@typespec/sse";\nimport "@typespec/events";' : ""}
 ${needTCGC ? 'import "@azure-tools/typespec-client-generator-core";' : ""} 
 ${needAzureCore ? 'import "@azure-tools/typespec-azure-core";' : ""} 
 ${needArmTemplate ? 'import "@azure-tools/typespec-azure-resource-manager";' : ""}
@@ -223,6 +233,8 @@ using Http;
 ${needRest ? "using Rest;" : ""}
 ${needVersioning ? "using Versioning;" : ""}
 ${needXml ? "using Xml;" : ""}
+${needStreams ? "using Http.Streams;" : ""}
+${needSse ? "using SSE;\nusing Events;" : ""}
 ${needTCGC ? "using Azure.ClientGenerator.Core;" : ""}
 ${needAzureCore ? "using Azure.Core;" : ""}
 ${needNamespaces ? namespace : ""}
@@ -449,6 +461,7 @@ export async function provideBinderWithAzureDependencies(project: Project) {
     ...PlatformTypeHelpers,
     ...CreateRecorderHelpers,
     ...StorageCompatHelpers,
+    ...StreamingHelpers,
   };
 
   const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {

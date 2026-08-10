@@ -28,7 +28,7 @@ import {
   TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useContext } from "../../context-manager.js";
-import { useSdkTypes } from "../../framework/hooks/sdk-types.js";
+import { getAllOperationsFromClient, useSdkTypes } from "../../framework/hooks/sdk-types.js";
 import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
@@ -73,6 +73,7 @@ import {
   PollingHelpers,
   SerializationHelpers,
   StorageCompatHelpers,
+  StreamingHelpers,
   UrlTemplateHelpers,
   XmlHelpers,
 } from "../static-helpers-metadata.js";
@@ -171,6 +172,11 @@ export function getDeserializePrivateFunction(
   const { name } = getOperationName(operation);
   const dependencies = useDependencies();
   const PathUncheckedResponseReference = resolveReference(dependencies.PathUncheckedResponse);
+
+  const structuredStreamInfo = getStructuredStreamInfo(context, operation);
+  if (structuredStreamInfo) {
+    return getStructuredStreamDeserializeFunction(context, operation, structuredStreamInfo);
+  }
 
   // Check if we need to wrap the non-model return type
   const { shouldWrap, isBinary } = checkWrapNonModelReturn(context, operation);
@@ -911,6 +917,16 @@ export function getOperationFunction(
     );
   }
 
+  const structuredStreamInfo = getStructuredStreamInfo(context, operation);
+  if (structuredStreamInfo) {
+    return getStructuredStreamOperationFunction(
+      context,
+      [method[0], operation],
+      clientType,
+      structuredStreamInfo,
+    );
+  }
+
   // TODO: Support operation overloads
   const response = operation.response;
   const responseHeaders = getResponseHeaders(operation.operation.responses);
@@ -1099,6 +1115,252 @@ export function getOperationFunction(
     ...functionStatement,
     statements,
   } as FunctionDeclarationStructure & { propertyName?: string };
+}
+
+/**
+ * Describes a single Server-Sent Event variant for the generated SSE deserializer.
+ */
+interface StructuredStreamEvent {
+  eventName?: string;
+  isTerminal: boolean;
+  terminalValue?: string;
+  deserializerName?: string;
+}
+
+/**
+ * Structured-streaming metadata resolved for an operation whose response is a JSONL or SSE stream.
+ */
+interface StructuredStreamInfo {
+  kind: "jsonl" | "sse";
+  itemType: string;
+  itemDeserializerName?: string;
+  events?: StructuredStreamEvent[];
+}
+
+/**
+ * Resolves structured JSONL/SSE streaming metadata for an operation, or `undefined` when the
+ * operation is not a structured stream.
+ *
+ * Triggers purely on the operation's TCGC stream metadata: an operation is treated as a
+ * structured stream when its response carries `streamMetadata` with a model/union `streamType`
+ * (JSONL) and/or `sseMetadata` (SSE). Structured streaming is the default behavior for this
+ * (always Azure-flavored) emitter, so no opt-in is required.
+ */
+export function getStructuredStreamInfo(
+  context: SdkContext,
+  operation: ServiceOperation,
+): StructuredStreamInfo | undefined {
+  if (
+    isPagingOnlyOperation(operation) ||
+    isLroOnlyOperation(operation) ||
+    isLroAndPagingOperation(operation)
+  ) {
+    return undefined;
+  }
+  const response = operation.response;
+  const streamMetadata = response.streamMetadata;
+  if (!streamMetadata) {
+    return undefined;
+  }
+
+  const sseMetadata = response.sseMetadata;
+  if (sseMetadata) {
+    const events: StructuredStreamEvent[] = [];
+    const payloadTypeExpressions: string[] = [];
+    for (const sseEvent of sseMetadata.events) {
+      const event: StructuredStreamEvent = {
+        eventName: sseEvent.eventType,
+        isTerminal: sseEvent.isTerminalEvent,
+      };
+      if (sseEvent.payloadType.kind === "constant") {
+        event.terminalValue = String(sseEvent.payloadType.value);
+      } else {
+        const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
+          nameOnly: true,
+          skipDiscriminatedUnionSuffix: false,
+        });
+        if (typeof deserializerName === "string") {
+          event.deserializerName = deserializerName;
+        }
+        if (!sseEvent.isTerminalEvent) {
+          payloadTypeExpressions.push(getTypeExpression(context, sseEvent.payloadType));
+        }
+      }
+      events.push(event);
+    }
+    const itemType =
+      payloadTypeExpressions.length > 0
+        ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
+        : getTypeExpression(context, streamMetadata.streamType);
+    return { kind: "sse", itemType, events };
+  }
+
+  const streamType = streamMetadata.streamType;
+  if (streamType.kind !== "model" && streamType.kind !== "union") {
+    return undefined;
+  }
+  const deserializerName = buildModelDeserializer(context, streamType, {
+    nameOnly: true,
+    skipDiscriminatedUnionSuffix: false,
+  });
+  return {
+    kind: "jsonl",
+    itemType: getTypeExpression(context, streamType),
+    itemDeserializerName: typeof deserializerName === "string" ? deserializerName : undefined,
+  };
+}
+
+/**
+ * Builds the public operation function for a structured JSONL/SSE streaming operation. It connects
+ * eagerly (so HTTP status/errors surface at call time) and returns a `Promise<AsyncIterable<T>>`
+ * whose body is decoded lazily by the paired deserializer.
+ */
+function getStructuredStreamOperationFunction(
+  context: SdkContext,
+  method: [string[], ServiceOperation],
+  clientType: string,
+  info: StructuredStreamInfo,
+): FunctionDeclarationStructure & { propertyName?: string } {
+  const operation = method[1];
+  const parameters: OptionalKind<ParameterDeclarationStructure>[] = getOperationSignatureParameters(
+    context,
+    method,
+    clientType,
+  );
+  const { name, fixme = [] } = getOperationName(operation, context);
+  const getStreamResponseRef = resolveReference(StreamingHelpers.getStreamResponse);
+
+  const paramNames = new Set(parameters.map((p) => p.name));
+  const resultVarName = generateLocallyUniqueName("result", paramNames);
+  const parameterList = parameters.map((p) => p.name).join(", ");
+
+  const statements: string[] = [
+    `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}));`,
+    `return _${name}Deserialize(${resultVarName});`,
+  ];
+
+  return {
+    kind: StructureKind.Function,
+    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    isAsync: true,
+    isExported: true,
+    name,
+    propertyName: normalizeName(operation.name, NameType.Property),
+    parameters,
+    returnType: `Promise<AsyncIterable<${info.itemType}>>`,
+    statements,
+  } as FunctionDeclarationStructure & { propertyName?: string };
+}
+
+/**
+ * Builds the private deserialize function for a structured JSONL/SSE streaming operation. It
+ * validates the response status (reusing the standard error handling) and returns an
+ * `AsyncIterable<T>` that lazily decodes the streamed body via the generated streaming helpers.
+ */
+function getStructuredStreamDeserializeFunction(
+  context: SdkContext,
+  operation: ServiceOperation,
+  info: StructuredStreamInfo,
+): OptionalKind<FunctionDeclarationStructure> {
+  const { name } = getOperationName(operation);
+  const streamResponseRef = resolveReference(StreamingHelpers.StreamResponse);
+
+  const statements: string[] = [];
+  statements.push(`const expectedStatuses = ${getExpectedStatuses(operation)};`);
+  statements.push(
+    `if(!expectedStatuses.includes(result.status)){`,
+    `${getExceptionThrowStatement(context, operation)}`,
+    "}",
+  );
+
+  if (info.kind === "jsonl") {
+    const readJsonlStreamRef = resolveReference(StreamingHelpers.readJsonlStream);
+    const deserializeCallback = info.itemDeserializerName
+      ? `(e) => ${info.itemDeserializerName}(e)`
+      : `(e) => e`;
+    statements.push(`return ${readJsonlStreamRef}(result.body, ${deserializeCallback});`);
+  } else {
+    const readSseStreamRef = resolveReference(StreamingHelpers.readSseStream);
+    const descriptors = (info.events ?? [])
+      .map((event) => {
+        const parts: string[] = [];
+        if (event.eventName !== undefined) {
+          parts.push(`eventName: ${JSON.stringify(event.eventName)}`);
+        }
+        parts.push(`isTerminal: ${event.isTerminal}`);
+        if (event.terminalValue !== undefined) {
+          parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
+        }
+        if (event.deserializerName) {
+          parts.push(`deserialize: (data) => ${event.deserializerName}(data)`);
+        }
+        return `{ ${parts.join(", ")} }`;
+      })
+      .join(", ");
+    statements.push(`return ${readSseStreamRef}(result.body, [${descriptors}]);`);
+  }
+
+  return {
+    isAsync: true,
+    isExported: true,
+    name: `_${name}Deserialize`,
+    parameters: [{ name: "result", type: streamResponseRef }],
+    returnType: `Promise<AsyncIterable<${info.itemType}>>`,
+    statements,
+  };
+}
+
+/**
+ * Returns true when the package contains at least one SSE (`text/event-stream`) streaming
+ * operation. Used to add the `@azure/core-sse` runtime dependency to the generated package
+ * only when it is actually needed.
+ */
+export function packageHasSseStreaming(context: SdkContext): boolean {
+  for (const client of context.sdkPackage.clients) {
+    for (const method of getAllOperationsFromClient(client)) {
+      if ((method as ServiceOperation).response?.sseMetadata) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns true when the package contains at least one structured streaming operation (JSONL or
+ * SSE), i.e. an operation whose response carries `streamMetadata` with a structured (model/union)
+ * `streamType` and/or `sseMetadata`. Used to load the streaming static helpers into the generated
+ * package only when they are actually needed.
+ *
+ * This is a side-effect-free metadata check (it does not build deserializers), so it is safe to
+ * call during helper loading, before the binder and serializers are wired up. It mirrors the
+ * gating conditions of {@link getStructuredStreamInfo}.
+ */
+export function packageHasStructuredStreaming(context: SdkContext): boolean {
+  for (const client of context.sdkPackage.clients) {
+    for (const rawMethod of getAllOperationsFromClient(client)) {
+      const method = rawMethod as ServiceOperation;
+      if (
+        isPagingOnlyOperation(method) ||
+        isLroOnlyOperation(method) ||
+        isLroAndPagingOperation(method)
+      ) {
+        continue;
+      }
+      const streamMetadata = method.response?.streamMetadata;
+      if (!streamMetadata) {
+        continue;
+      }
+      if (method.response?.sseMetadata) {
+        return true;
+      }
+      const streamType = streamMetadata.streamType;
+      if (streamType.kind === "model" || streamType.kind === "union") {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 function getLroOnlyOperationFunction(
